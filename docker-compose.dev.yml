@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      # Mount source code for live development changes
+      - ./app:/app/app
+      - ./components:/app/components
+      - ./lib:/app/lib
+      - ./actions:/app/actions
+      - ./store:/app/store
+      - ./types:/app/types
+      - ./utils:/app/utils
+      - ./public:/app/public
+      - ./prisma:/app/prisma
+      # Config files
+      - ./package.json:/app/package.json
+      - ./next.config.ts:/app/next.config.ts
+      - ./tailwind.config.ts:/app/tailwind.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./.env.local:/app/.env.local
+      # Preserve node_modules and .next for performance
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: adscod-dev-network

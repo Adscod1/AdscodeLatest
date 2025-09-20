@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: adscod:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      - ./prisma:/app/prisma
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development version with volume mounts for live code changes
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: adscod:latest
+    ports:
+      - "3001:3000"  # Use different port to avoid conflicts
+    volumes:
+      # Mount source code for live development
+      - ./app:/app/app
+      - ./components:/app/components
+      - ./lib:/app/lib
+      - ./actions:/app/actions
+      - ./store:/app/store
+      - ./types:/app/types
+      - ./utils:/app/utils
+      - ./public:/app/public
+      - ./prisma:/app/prisma
+      # Config files
+      - ./package.json:/app/package.json
+      - ./next.config.ts:/app/next.config.ts
+      - ./tailwind.config.ts:/app/tailwind.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./.env.local:/app/.env.local
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    # Override the default command to run in development mode
+    command: sh -c "npm install && npm run dev"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: adscod-network
