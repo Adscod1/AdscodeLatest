@@ -1,58 +1,128 @@
-version: '3.8'
+# Main Docker Compose file for Adscod application
+# Supports both development and production environments
+
+name: adscod-${ENVIRONMENT:-dev}
 
 services:
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-adscod}
+      POSTGRES_USER: ${POSTGRES_USER:-adscod_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-adscod_password}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./prisma/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - adscod-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-adscod_user} -d ${POSTGRES_DB:-adscod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Redis for caching and sessions (optional but recommended)
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - adscod-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Main Application Service
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: adscod:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
-    volumes:
-      - ./prisma:/app/prisma
+      target: ${BUILD_TARGET:-production}
+      args:
+        - NODE_ENV=${NODE_ENV:-production}
     restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      # App Environment
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_TELEMETRY_DISABLED=1
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      
+      # Database Configuration
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-adscod_user}:${POSTGRES_PASSWORD:-adscod_password}@postgres:5432/${POSTGRES_DB:-adscod}
+      - DIRECT_URL=postgresql://${POSTGRES_USER:-adscod_user}:${POSTGRES_PASSWORD:-adscod_password}@postgres:5432/${POSTGRES_DB:-adscod}
+      
+      # Redis Configuration (if used)
+      - REDIS_URL=redis://redis:6379
+      
+      # Auth Configuration
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-your-super-secret-key-change-in-production}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+      
+      # File Upload Configuration
+      - UPLOAD_MAX_SIZE=${UPLOAD_MAX_SIZE:-10485760}
+      - UPLOAD_ALLOWED_TYPES=${UPLOAD_ALLOWED_TYPES:-image/jpeg,image/png,image/webp,video/mp4}
+    volumes:
+      # Development volume mounts (only mounted in development)
+      - ${PWD}/app:/app/app:${VOLUME_MODE:-ro}
+      - ${PWD}/components:/app/components:${VOLUME_MODE:-ro}
+      - ${PWD}/lib:/app/lib:${VOLUME_MODE:-ro}
+      - ${PWD}/actions:/app/actions:${VOLUME_MODE:-ro}
+      - ${PWD}/store:/app/store:${VOLUME_MODE:-ro}
+      - ${PWD}/types:/app/types:${VOLUME_MODE:-ro}
+      - ${PWD}/utils:/app/utils:${VOLUME_MODE:-ro}
+      - ${PWD}/public:/app/public:${VOLUME_MODE:-ro}
+      - ${PWD}/prisma:/app/prisma:${VOLUME_MODE:-ro}
+      - ${PWD}/next.config.ts:/app/next.config.ts:${VOLUME_MODE:-ro}
+      # Temporarily commented out due to Docker mount issue
+      # - ${PWD}/tailwind.config.ts:/app/tailwind.config.ts:${VOLUME_MODE:-ro}
+      - ${PWD}/tsconfig.json:/app/tsconfig.json:${VOLUME_MODE:-ro}
+      
+      # Persistent uploads only - let .next stay in container to avoid permission issues  
+      - app_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - adscod-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-
-  # Development version with volume mounts for live code changes
-  app-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: adscod:latest
-    ports:
-      - "3001:3000"  # Use different port to avoid conflicts
-    volumes:
-      # Mount source code for live development
-      - ./app:/app/app
-      - ./components:/app/components
-      - ./lib:/app/lib
-      - ./actions:/app/actions
-      - ./store:/app/store
-      - ./types:/app/types
-      - ./utils:/app/utils
-      - ./public:/app/public
-      - ./prisma:/app/prisma
-      # Config files
-      - ./package.json:/app/package.json
-      - ./next.config.ts:/app/next.config.ts
-      - ./tailwind.config.ts:/app/tailwind.config.ts
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./.env.local:/app/.env.local
-    environment:
-      - NODE_ENV=development
-      - NEXT_TELEMETRY_DISABLED=1
-    # Override the default command to run in development mode
-    command: sh -c "npm install && npm run dev"
-    restart: unless-stopped
+      start_period: 60s
+    command: ${APP_COMMAND:-}
 
 networks:
-  default:
-    name: adscod-network
+  adscod-network:
+    driver: bridge
+    name: adscod-network-${ENVIRONMENT:-dev}
+
+volumes:
+  postgres_data:
+    driver: local
+    name: adscod-postgres-data-${ENVIRONMENT:-dev}
+  redis_data:
+    driver: local
+    name: adscod-redis-data-${ENVIRONMENT:-dev}
+  app_uploads:
+    driver: local
+    name: adscod-app-uploads-${ENVIRONMENT:-dev}
+  app_next:
+    driver: local
+    name: adscod-app-next-${ENVIRONMENT:-dev}
