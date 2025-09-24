@@ -1,19 +1,25 @@
-import { getAllUserStores } from "@/actions/store";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { LoadingState } from "@/app/components/skeletons/stores-skeleton-loader";
 import { ErrorState } from "@/app/components/errors/error-state";
+import { Store } from "@prisma/client";
 
 const AllStoresCards = () => {
   const {
     data: stores,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<Store[]>({
     queryKey: ["stores"],
-    queryFn: getAllUserStores,
+    queryFn: async () => {
+      const response = await fetch("/api/stores");
+      if (!response.ok) {
+        throw new Error("Failed to fetch stores");
+      }
+      return response.json();
+    },
   });
 
   if (isLoading) return <LoadingState />;
@@ -48,7 +54,7 @@ const AllStoresCards = () => {
         </Link>
       </div>
       <div className="space-y-4">
-        {stores.map((store) => (
+        {stores?.map((store) => (
           <Link
             href={`/${store.id}`}
             key={store.id}
