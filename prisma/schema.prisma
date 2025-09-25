@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -33,6 +32,8 @@ model Post {
   published Boolean @default(false)
   authorId  String
   author    User    @relation(fields: [authorId], references: [id])
+
+  @@index([authorId], map: "Post_authorId_fkey")
 }
 
 model Session {
@@ -46,6 +47,7 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "session_userId_fkey")
   @@map("session")
 }
 
@@ -65,6 +67,7 @@ model Account {
   updatedAt             DateTime
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "account_userId_fkey")
   @@map("account")
 }
 
@@ -99,7 +102,7 @@ model Store {
   id              String          @id @default(uuid())
   name            String
   tagline         String?
-  description     String?
+  description     String?         @db.Text
   category        String?
   regNumber       String?
   yearEstablished Int?
@@ -125,6 +128,7 @@ model Store {
   StoreSocial     StoreSocial[]
   StoreVideo      StoreVideo[]
 
+  @@index([userId], map: "store_userId_fkey")
   @@map("store")
 }
 
@@ -134,6 +138,7 @@ model StoreSocial {
   social  String
   store   Store  @relation(fields: [storeId], references: [id])
 
+  @@index([storeId], map: "store_social_storeId_fkey")
   @@map("store_social")
 }
 
@@ -145,6 +150,7 @@ model StoreHours {
   close   String
   store   Store  @relation(fields: [storeId], references: [id])
 
+  @@index([storeId], map: "store_hours_storeId_fkey")
   @@map("store_hours")
 }
 
@@ -154,6 +160,7 @@ model StoreImage {
   image   String
   store   Store  @relation(fields: [storeId], references: [id])
 
+  @@index([storeId], map: "store_image_storeId_fkey")
   @@map("store_image")
 }
 
@@ -163,6 +170,7 @@ model StoreVideo {
   video   String
   store   Store  @relation(fields: [storeId], references: [id])
 
+  @@index([storeId], map: "store_video_storeId_fkey")
   @@map("store_video")
 }
 
@@ -194,6 +202,7 @@ model Product {
   variations           ProductVariation[]
   videos               ProductVideo[]
 
+  @@index([storeId], map: "product_storeId_fkey")
   @@map("product")
 }
 
@@ -206,6 +215,7 @@ model ProductVariation {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId], map: "product_variation_productId_fkey")
   @@map("product_variation")
 }
 
@@ -215,6 +225,7 @@ model ProductImage {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId], map: "product_image_productId_fkey")
   @@map("product_image")
 }
 
@@ -224,6 +235,7 @@ model ProductVideo {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId], map: "product_video_productId_fkey")
   @@map("product_video")
 }
 
@@ -236,6 +248,7 @@ model StoreActivity {
   productId String?
   store     Store             @relation(fields: [storeId], references: [id])
 
+  @@index([storeId], map: "store_activity_storeId_fkey")
   @@map("store_activity")
 }
 
@@ -249,6 +262,9 @@ model StoreReview {
   updatedAt DateTime @updatedAt
   store     Store    @relation(fields: [storeId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([storeId], map: "StoreReview_storeId_fkey")
+  @@index([userId], map: "StoreReview_userId_fkey")
 }
 
 model Influencer {
@@ -287,6 +303,7 @@ model InfluencerSocial {
   updatedAt    DateTime       @updatedAt
   influencer   Influencer     @relation(fields: [influencerId], references: [id], onDelete: Cascade)
 
+  @@index([influencerId], map: "influencer_social_influencerId_fkey")
   @@map("influencer_social")
 }
 
