@@ -53,7 +53,7 @@ services:
         - NODE_ENV=${NODE_ENV:-production}
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-3000}:3000"
+      - "${APP_PORT:-3001}:3000"
     environment:
       # App Environment
       - NODE_ENV=${NODE_ENV:-production}
@@ -86,10 +86,9 @@ services:
       - ${PWD}/utils:/app/utils:${VOLUME_MODE:-ro}
       - ${PWD}/public:/app/public:${VOLUME_MODE:-ro}
       - ${PWD}/prisma:/app/prisma:${VOLUME_MODE:-ro}
-      - ${PWD}/next.config.ts:/app/next.config.ts:${VOLUME_MODE:-ro}
-      # Temporarily commented out due to Docker mount issue
-      # - ${PWD}/tailwind.config.ts:/app/tailwind.config.ts:${VOLUME_MODE:-ro}
-      - ${PWD}/tsconfig.json:/app/tsconfig.json:${VOLUME_MODE:-ro}
+      # Remove these problematic file mounts - they're already in the container
+      # - ${PWD}/next.config.ts:/app/next.config.ts:${VOLUME_MODE:-ro}
+      # - ${PWD}/tsconfig.json:/app/tsconfig.json:${VOLUME_MODE:-ro}
       
       # Persistent uploads only - let .next stay in container to avoid permission issues  
       - app_uploads:/app/uploads

@@ -71,7 +71,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
                 <Megaphone className="w-4 h-4 mr-3" />
                 Campaigns
               </Link>
-              <Link href="/creator-studio" className={getLinkClassName("/creator-studio")}>
+              <Link href={`/${storeId}/creator-studio`} className={getLinkClassName("/creator-studio")}>
                 <Settings className="w-4 h-4 mr-3" />
                 Creator Studio
               </Link>

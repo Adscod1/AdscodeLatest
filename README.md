@@ -118,5 +118,36 @@ If you encounter build issues:
 3. **Check Docker daemon:**
    ```bash
    docker system info
-   ```
+
+   
+   tom@tom:~/projects/adscod/AdscodeLatest$ sudo docker compose up -d --build
+[sudo] password for tom: 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "PWD" variable is not set. Defaulting to a blank string. 
+Compose now can delegate build to bake for better performances
+Just set COMPOSE_BAKE=true
+[+] Building 1158.9s (12/22)                                                                                                               docker:default
+ => [app internal] load build definition from Dockerfile                                                                                             1.0s
+ => => transferring dockerfile: 2.94kB                                                                                                               0.1s
+ => [app internal] load metadata for docker.io/library/node:20-alpine                                                                                4.0s
+ => [app internal] load .dockerignore                                                                                                                0.6s
+ => => transferring context: 34B                                                                                                                     0.1s
+ => [app base 1/4] FROM docker.io/library/node:20-alpine@sha256:eabac870db94f7342d6c33560d6613f188bbcf4bbe1f4eb47d5e2a08e1a37722                     0.0s
+ => [app internal] load build context                                                                                                              519.8s
+ => => transferring context: 927.41MB                                                                                                              517.4s
+ => CACHED [app base 2/4] RUN apk update && apk upgrade &&     apk add --no-cache     libc6-compat     curl     && rm -rf /var/cache/apk/*           0.0s
+ => CACHED [app base 3/4] WORKDIR /app                                                                                                               0.0s
+ => CACHED [app base 4/4] RUN addgroup --system --gid 1001 nodejs &&     adduser --system --uid 1001 nextjs                                          0.0s
+ => CACHED [app deps 1/2] COPY package.json package-lock.json* ./                                                                                    0.0s
+ => CACHED [app deps 2/2] RUN   if [ -f package-lock.json ]; then     npm ci --legacy-peer-deps &&     cp -R node_modules all_node_modules &&     n  0.0s
+ => CACHED [app production 1/8] COPY --from=deps /app/prod_node_modules ./node_modules                                                               0.0s
+ => CACHED [app builder 1/4] COPY --from=deps /app/node_modules ./node_modules                                                                       0.0s
+ => [app builder 2/4] COPY . .   
 
