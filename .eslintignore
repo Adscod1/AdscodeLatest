@@ -1,0 +1,9 @@
+node_modules
+.next
+lib/generated/**
+**/wasm.js
+**/runtime/**
+dist
+*.js
+**/*.js
+lib/**
