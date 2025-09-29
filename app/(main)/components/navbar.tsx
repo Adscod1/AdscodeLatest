@@ -169,7 +169,7 @@ export const FeedNavbar = () => {
   };
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-60 bg-white border-b border-gray-200">
+    <div className="sticky top-0 left-0 right-0 z-70 bg-white border-b border-gray-200">
       {/* Main Navigation Bar */}
       <nav className="container mx-auto ">
         <div className="flex items-center justify-between h-16">
@@ -185,7 +185,7 @@ export const FeedNavbar = () => {
             </button>
             
             {/* Center: Logo */}
-            <div className="flex-1 flex justify-center">
+            <div className="flex-1 flex justify-center ">
               <Logo />
             </div>
             
@@ -200,7 +200,7 @@ export const FeedNavbar = () => {
           </div>
 
           {/* Desktop Layout */}
-          <div className="hidden md:flex items-center justify-between w-full">
+          <div className="hidden z-70 md:flex items-center justify-between w-full">
             {/* Left Section */}
             <div className="flex items-center gap-6">
               {/* Logo */}
@@ -242,12 +242,7 @@ export const FeedNavbar = () => {
                 </button>
               </div>
 
-              {/* Create Store Button */}
-              <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
-                <PlusIcon />
-                Create store
-              </button>
-
+              
               {/* Notification Bell */}
               <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
                 <BellIcon />
