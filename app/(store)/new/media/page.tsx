@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Store } from "@prisma/client";
 import { Button } from "@/components/ui/button";
+import { FileUpload } from "@/components/ui/file-upload";
 
 const StoreMediaPage = () => {
   const router = useRouter();
@@ -30,6 +31,47 @@ const StoreMediaPage = () => {
     });
     return () => subscription.unsubscribe();
   }, [methods, setFormData]);
+
+  // Handle logo upload
+  const handleLogoUpload = (url: string) => {
+    setFormData({ ...formData, logo: url });
+    methods.setValue('logo', url);
+  };
+
+  // Handle banner upload
+  const handleBannerUpload = (url: string) => {
+    setFormData({ ...formData, banner: url });
+    methods.setValue('banner', url);
+  };
+
+  // Gallery state
+  const [galleryImages, setGalleryImages] = React.useState<string[]>([]);
+  const [galleryVideos, setGalleryVideos] = React.useState<string[]>([]);
+
+  // Handle gallery image upload
+  const handleGalleryImageUpload = (url: string) => {
+    const updatedImages = [...galleryImages, url];
+    setGalleryImages(updatedImages);
+    // Gallery images will be stored separately for now
+  };
+
+  // Handle gallery video upload
+  const handleGalleryVideoUpload = (url: string) => {
+    const updatedVideos = [...galleryVideos, url];
+    setGalleryVideos(updatedVideos);
+    // Gallery videos will be stored separately for now
+  };
+
+  // Remove gallery item
+  const removeGalleryImage = (index: number) => {
+    const updatedImages = galleryImages.filter((_, i) => i !== index);
+    setGalleryImages(updatedImages);
+  };
+
+  const removeGalleryVideo = (index: number) => {
+    const updatedVideos = galleryVideos.filter((_, i) => i !== index);
+    setGalleryVideos(updatedVideos);
+  };
 
   const storeMutation = useMutation({
     mutationFn: async (data: Partial<StoreFormData>) => {
@@ -126,18 +168,15 @@ const StoreMediaPage = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-4">
                     Business Logo
                   </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-12">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <ImageIcon className="w-8 h-8 text-gray-400" />
-                      </div>
-                      <Button variant="outline" size="sm" className="mb-3" disabled>
-                        Upload Logo
-                      </Button>
-                      <p className="text-xs text-gray-500">
-                        Recommended size: 512x512px (max 5MB)
-                      </p>
-                    </div>
+                  <div className="h-48">
+                    <FileUpload
+                      type="logo"
+                      onUpload={handleLogoUpload}
+                      currentUrl={formData.logo || undefined}
+                      accept="image/*"
+                      maxSize={5}
+                      className="h-full"
+                    />
                   </div>
                 </div>
 
@@ -146,18 +185,15 @@ const StoreMediaPage = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-4">
                     Banner Image
                   </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-12">
-                    <div className="text-center">
-                      <div className="w-20 h-12 bg-gray-100 rounded mx-auto mb-4 flex items-center justify-center">
-                        <ImageIcon className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <Button variant="outline" size="sm" className="mb-3" disabled>
-                        Upload Banner
-                      </Button>
-                      <p className="text-xs text-gray-500">
-                        Recommended size: 1920x1080px (max 5MB)
-                      </p>
-                    </div>
+                  <div className="h-64">
+                    <FileUpload
+                      type="banner"
+                      onUpload={handleBannerUpload}
+                      currentUrl={formData.banner || undefined}
+                      accept="image/*"
+                      maxSize={5}
+                      className="h-full"
+                    />
                   </div>
                 </div>
 
@@ -167,28 +203,49 @@ const StoreMediaPage = () => {
                     <label className="block text-sm font-medium text-gray-700">
                       Photo Gallery
                     </label>
-                    <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
-                      <Plus className="w-4 h-4 mr-1" />
-                      Add Image
-                    </Button>
+                    <span className="text-sm text-gray-500">
+                      {galleryImages.length}/10 images
+                    </span>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
-                    {[
-                      { title: "Product Display", subtitle: "Interior" },
-                      { title: "Customer Service", subtitle: "Team" },
-                      { title: "Product Display", subtitle: "Interior" }
-                    ].map((item, index) => (
-                      <div key={index} className="aspect-square bg-gray-100 rounded-lg flex flex-col items-center justify-center p-4">
-                        <ImageIcon className="w-12 h-12 text-gray-400 mb-3" />
-                        <p className="text-xs text-gray-700 font-medium text-center">
-                          {item.title}
-                        </p>
-                        <p className="text-xs text-gray-500 text-center">
-                          {item.subtitle}
-                        </p>
+                    {/* Existing gallery images */}
+                    {galleryImages.map((imageUrl, index) => (
+                      <div key={index} className="aspect-square relative group">
+                        <FileUpload
+                          type="gallery"
+                          onUpload={() => {}} // Already uploaded
+                          currentUrl={imageUrl}
+                          className="h-full"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeGalleryImage(index)}
+                        >
+                          ×
+                        </Button>
                       </div>
                     ))}
+                    
+                    {/* Add new image button */}
+                    {galleryImages.length < 10 && (
+                      <div className="aspect-square">
+                        <FileUpload
+                          type="gallery"
+                          onUpload={handleGalleryImageUpload}
+                          accept="image/*"
+                          maxSize={5}
+                          className="h-full"
+                        >
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <Plus className="w-8 h-8 text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500">Add Image</span>
+                          </div>
+                        </FileUpload>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -198,33 +255,50 @@ const StoreMediaPage = () => {
                     <label className="block text-sm font-medium text-gray-700">
                       Video Gallery
                     </label>
-                    <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
-                      <Plus className="w-4 h-4 mr-1" />
-                      Add Video
-                    </Button>
+                    <span className="text-sm text-gray-500">
+                      {galleryVideos.length}/5 videos
+                    </span>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
-                    {[1, 2, 3].map((item) => (
-                      <div key={item} className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center relative overflow-hidden">
-                        {/* Play button overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-sm">
-                            <Play className="w-5 h-5 text-gray-600 ml-0.5" fill="currentColor" />
-                          </div>
-                        </div>
-                        
-                        {/* Bottom text overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-                          <p className="text-xs text-white font-medium mb-1">
-                            Product Review
-                          </p>
-                          <p className="text-xs text-white/80 line-clamp-2">
-                            This product is very suitable for the children under the age of 5.
-                          </p>
-                        </div>
+                    {/* Existing gallery videos */}
+                    {galleryVideos.map((videoUrl, index) => (
+                      <div key={index} className="aspect-video relative group">
+                        <FileUpload
+                          type="video"
+                          onUpload={() => {}} // Already uploaded
+                          currentUrl={videoUrl}
+                          accept="video/*"
+                          className="h-full"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeGalleryVideo(index)}
+                        >
+                          ×
+                        </Button>
                       </div>
                     ))}
+                    
+                    {/* Add new video button */}
+                    {galleryVideos.length < 5 && (
+                      <div className="aspect-video">
+                        <FileUpload
+                          type="video"
+                          onUpload={handleGalleryVideoUpload}
+                          accept="video/*"
+                          maxSize={10}
+                          className="h-full"
+                        >
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <Play className="w-8 h-8 text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500">Add Video</span>
+                          </div>
+                        </FileUpload>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
