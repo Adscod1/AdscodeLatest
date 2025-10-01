@@ -19,6 +19,13 @@ import {
 const CreatorStudioDashboard = () => {
   const [activeTab, setActiveTab] = useState('Analytics');
   const [activeSection, setActiveSection] = useState('Dashboard');
+  
+  // Applications state
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [showInfluencerDetails, setShowInfluencerDetails] = useState(false);
+  const [showContractModal, setShowContractModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const menuItems = [
     { icon: BarChart3, label: 'Dashboard', path: 'Dashboard' },
@@ -32,7 +39,7 @@ const CreatorStudioDashboard = () => {
     { icon: Target, label: 'Coupons', path: 'Coupons' }
   ];
 
-  const tabs = ['Discovery', 'Campaigns', 'Content', 'Analytics'];
+  const tabs = ['Discovery', 'Campaigns', 'Applications', 'Content', 'Analytics'];
 
   const renderAnalytics = () => (
     <div className="space-y-8">
@@ -349,6 +356,360 @@ const CreatorStudioDashboard = () => {
     </div>
   );
 
+  const renderApplications = () => {
+    const applications = [
+      {
+        id: 1,
+        influencer: {
+          name: 'Alex Rivera',
+          username: '@alexrivera',
+          avatar: '🌸',
+          category: 'Lifestyle',
+          followers: '95K',
+          engagement: '4.5%',
+          rating: 4.8,
+          location: 'Los Angeles, CA',
+          joinedDate: 'March 2020',
+          bio: 'Fashion & lifestyle content creator passionate about sustainable fashion and authentic storytelling. Collaborating with brands that align with my values.',
+          platforms: {
+            instagram: '250K',
+            tiktok: '180K',
+            youtube: '95K'
+          },
+          demographics: {
+            '18-24': 35,
+            '25-34': 45,
+            '35-44': 15,
+            '45+': 5
+          },
+          audienceGender: { female: 78, male: 22 },
+          topLocations: [
+            { country: 'United States', rank: 1 },
+            { country: 'Canada', rank: 2 },
+            { country: 'United Kingdom', rank: 3 },
+            { country: 'Australia', rank: 4 }
+          ],
+          performance: {
+            totalCampaigns: 47,
+            avgEngagement: 4.2,
+            successRate: 94
+          },
+          avgLikes: '12.5K',
+          avgComments: 485,
+          avgReach: '180K'
+        },
+        campaign: 'Summer Collection Launch',
+        appliedDate: '15/01/2024',
+        proposedRate: '$400',
+        status: 'pending',
+        message: "I love your brand's aesthetic and would be thrilled to showcase your summer collection to my engaged audience of fashion enthusiasts.",
+        deliverables: {
+          instagramPosts: 2,
+          stories: 5,
+          reels: 1
+        }
+      },
+      {
+        id: 2,
+        influencer: {
+          name: 'Jordan Kim',
+          username: '@jordankimfit',
+          avatar: '🦊',
+          category: 'Fitness',
+          followers: '180K',
+          engagement: '3.9%',
+          rating: 4.6,
+          location: 'New York, NY',
+          joinedDate: 'January 2019',
+          bio: 'Certified personal trainer and nutrition coach. Helping people achieve their fitness goals through sustainable lifestyle changes.',
+          platforms: {
+            instagram: '180K',
+            tiktok: '220K',
+            youtube: '145K'
+          },
+          demographics: {
+            '18-24': 42,
+            '25-34': 38,
+            '35-44': 15,
+            '45+': 5
+          },
+          audienceGender: { female: 65, male: 35 },
+          topLocations: [
+            { country: 'United States', rank: 1 },
+            { country: 'United Kingdom', rank: 2 },
+            { country: 'Canada', rank: 3 },
+            { country: 'Germany', rank: 4 }
+          ],
+          performance: {
+            totalCampaigns: 52,
+            avgEngagement: 3.7,
+            successRate: 96
+          },
+          avgLikes: '15.2K',
+          avgComments: 620,
+          avgReach: '220K'
+        },
+        campaign: 'Holiday Promo Campaign',
+        appliedDate: '12/01/2024',
+        proposedRate: '$650',
+        status: 'approved',
+        message: "Your holiday campaign aligns perfectly with my content strategy. I can create authentic content that resonates with my fitness community.",
+        deliverables: {
+          instagramPosts: 3,
+          stories: 10,
+          reels: 2
+        }
+      },
+      {
+        id: 3,
+        influencer: {
+          name: 'Sophie Martinez',
+          username: '@sophiemartinez',
+          avatar: '🎨',
+          category: 'Beauty',
+          followers: '67K',
+          engagement: '5.2%',
+          rating: 4.5,
+          location: 'Miami, FL',
+          joinedDate: 'June 2020',
+          bio: 'Beauty enthusiast and makeup artist. Creating honest reviews and tutorials for products I truly believe in.',
+          platforms: {
+            instagram: '67K',
+            tiktok: '92K',
+            youtube: '45K'
+          },
+          demographics: {
+            '18-24': 48,
+            '25-34': 35,
+            '35-44': 12,
+            '45+': 5
+          },
+          audienceGender: { female: 85, male: 15 },
+          topLocations: [
+            { country: 'United States', rank: 1 },
+            { country: 'Mexico', rank: 2 },
+            { country: 'Spain', rank: 3 },
+            { country: 'Brazil', rank: 4 }
+          ],
+          performance: {
+            totalCampaigns: 34,
+            avgEngagement: 5.1,
+            successRate: 91
+          },
+          avgLikes: '8.3K',
+          avgComments: 380,
+          avgReach: '95K'
+        },
+        campaign: 'Summer Collection Launch',
+        appliedDate: '10/01/2024',
+        proposedRate: '$300',
+        status: 'rejected',
+        message: "I'm excited about the opportunity to collaborate and create beautiful content featuring your products.",
+        deliverables: {
+          instagramPosts: 1,
+          stories: 3,
+          reels: 0
+        }
+      }
+    ];
+
+    const recentCampaigns = [
+      { name: 'EcoFashion Co.', type: 'Product Launch', roi: '250%', badge: 'Excellent' },
+      { name: 'Sustainable Beauty', type: 'Brand Awareness', roi: '180%', badge: 'Good' },
+      { name: 'Green Living', type: 'Lifestyle Content', roi: '220%', badge: 'Excellent' }
+    ];
+
+    const quickMessages = [
+      "Thank you for your application! We're reviewing it and will get back to you soon.",
+      "Could you please provide more information about your content creation process?",
+      "We'd like to schedule a brief call to discuss this opportunity further.",
+      "Your application looks great! We have a few questions about the proposed timeline."
+    ];
+
+    const filteredApplications = applications.filter(app => 
+      filterStatus === 'all' || app.status === filterStatus
+    );
+
+    const getStatusBadge = (status) => {
+      const styles = {
+        pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        approved: 'bg-green-100 text-green-800 border-green-200',
+        rejected: 'bg-red-100 text-red-800 border-red-200'
+      };
+      const icons = {
+        pending: <span className="w-3 h-3 text-yellow-600">⏳</span>,
+        approved: <span className="w-3 h-3 text-green-600">✓</span>,
+        rejected: <span className="w-3 h-3 text-red-600">✗</span>
+      };
+      return (
+        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${styles[status]}`}>
+          {icons[status]}
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
+      );
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold">Influencer Applications</h3>
+            <p className="text-sm text-gray-600 mt-1">Review and manage influencer applications</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <select 
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Applications</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <div className="px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
+              <span className="text-sm font-medium text-blue-900">
+                {applications.filter(a => a.status === 'pending').length} pending reviews
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Applications List */}
+        <div className="space-y-4">
+          {filteredApplications.map((app) => (
+            <div key={app.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+              <div className={`h-1 ${app.status === 'approved' ? 'bg-green-500' : app.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+              
+              <div className="p-6">
+                <div className="flex items-start gap-4">
+                  {/* Avatar */}
+                  <div className="relative">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-2xl">
+                      {app.influencer.avatar}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-bold text-gray-900">{app.influencer.name}</h3>
+                          <span className="text-sm text-gray-500">{app.influencer.username}</span>
+                          {getStatusBadge(app.status)}
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{app.influencer.category}</span>
+                          <span>Applied on {app.appliedDate}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Campaign Info */}
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">CAMPAIGN</p>
+                        <p className="font-semibold text-gray-900">{app.campaign}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">FOLLOWERS</p>
+                        <p className="font-semibold text-gray-900">{app.influencer.followers}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">ENGAGEMENT</p>
+                        <p className="font-semibold text-gray-900">{app.influencer.engagement}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">PROPOSED RATE</p>
+                        <p className="font-semibold text-gray-900">{app.proposedRate}</p>
+                      </div>
+                    </div>
+
+                    {/* Application Message */}
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <p className="text-xs font-semibold text-gray-500 mb-2">APPLICATION MESSAGE</p>
+                      <p className="text-sm text-gray-700 italic">"{app.message}"</p>
+                    </div>
+
+                    {/* Deliverables */}
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-gray-500 mb-2">PROPOSED DELIVERABLES</p>
+                      <div className="flex gap-3">
+                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
+                          {app.deliverables.instagramPosts} Instagram Posts
+                        </span>
+                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
+                          {app.deliverables.stories} Stories
+                        </span>
+                        {app.deliverables.reels > 0 && (
+                          <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
+                            {app.deliverables.reels} Reels
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3">
+                      {app.status === 'pending' && (
+                        <>
+                          <button 
+                            onClick={() => {
+                              setSelectedApplication(app);
+                              setShowContractModal(true);
+                            }}
+                            className="flex-1 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                          >
+                            ✓ Approve Application
+                          </button>
+                          <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                            Decline
+                          </button>
+                        </>
+                      )}
+                      {app.status === 'approved' && (
+                        <button 
+                          onClick={() => {
+                            setSelectedApplication(app);
+                            setShowContractModal(true);
+                          }}
+                          className="px-6 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                        >
+                          📄 Send Contract
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => {
+                          setSelectedApplication(app);
+                          setShowMessageModal(true);
+                        }}
+                        className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      >
+                        💬 Message
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setSelectedApplication(app);
+                          setShowInfluencerDetails(true);
+                        }}
+                        className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      >
+                        👁️ View Details
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'Analytics':
@@ -357,6 +718,8 @@ const CreatorStudioDashboard = () => {
         return renderContent();
       case 'Campaigns':
         return renderCampaigns();
+      case 'Applications':
+        return renderApplications();
       case 'Discovery':
         return renderDiscovery();
       default:

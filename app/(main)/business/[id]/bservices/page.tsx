@@ -280,7 +280,7 @@ const BusinessPage = () => {
                   <MessageCircle className="w-6 h-6 mr-3" />
                   Listing main services
                 </h2>
-                <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
+                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
                   See all Services
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>

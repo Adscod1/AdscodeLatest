@@ -70,7 +70,7 @@ const ProfileContent = ({ user }: { user: Profile }) => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 px-10">
     
 
       <div className="flex">

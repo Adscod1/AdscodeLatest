@@ -3,7 +3,7 @@
 import { getProducts } from "@/actions/product";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { CTASection } from "./components/cta-section";
+
 import { MainProductCard } from "./components/main-product-card";
 
 
@@ -42,7 +42,7 @@ const FeedPage = () => {
         </div>
       )}
 
-      <CTASection />
+      
     </div>
   );
 };
