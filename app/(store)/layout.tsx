@@ -37,7 +37,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Search */}
-        <div className="px-6 py-4">
+        {/* <div className="px-6 py-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
@@ -46,7 +46,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
               className="w-full pl-9 pr-3 py-2 bg-gray-50 border-0 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Navigation */}
         <div className="flex-1 px-6 pb-6 overflow-y-auto">
@@ -54,11 +54,11 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">MENU</h2>
             <nav className="space-y-1">
               <Link
-                href={`/${storeId}`}
+                href={`/${storeId}`} 
                 className={getLinkClassName("/dashboard")}
               >
                 <LayoutDashboard className="w-4 h-4 mr-3" />
-                Dashboard
+                Overview
               </Link>
               <Link
                 href={`/${storeId}/listings`}

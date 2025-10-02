@@ -49,9 +49,7 @@ const AllStoresCards = () => {
     <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-medium">My Stores</h3>
-        <Link href="/new" className="text-blue-500 text-xs">
-          Create Store
-        </Link>
+        
       </div>
       <div className="space-y-4">
         {stores?.map((store) => (
@@ -60,14 +58,14 @@ const AllStoresCards = () => {
             key={store.id}
             className="flex items-center gap-3"
           >
-            <div className="w-8 h-8 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-gray-100 flex-shrink-0 flex items-center justify-center">
               {store.logo ? (
                 <Image
                   src={store.logo}
                   alt={store.name}
                   width={32}
                   height={32}
-                  className="w-full h-full rounded-full object-cover"
+                  className="w-full h-full rounded object-cover"
                 />
               ) : (
                 <span className="text-sm font-medium">

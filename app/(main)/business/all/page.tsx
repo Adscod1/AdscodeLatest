@@ -21,10 +21,26 @@ import Link from "next/link";
 import { useState } from "react";
 
 const StarRating = ({ rating }: { rating: number }) => {
+  const SoftStar = ({ filled }: { filled: boolean }) => (
+    <svg
+      className="w-4 h-4 text-6xl"
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path
+        d="M12 2.5c.3 0 .6.2.7.5l2.1 4.3 4.7.7c.3 0 .6.3.7.6.1.3 0 .6-.2.8l-3.4 3.3.8 4.7c.1.3 0 .6-.2.8-.2.2-.5.3-.8.1L12 15.4l-4.2 2.2c-.3.2-.6.1-.8-.1-.2-.2-.3-.5-.2-.8l.8-4.7L4.2 8.7c-.2-.2-.3-.5-.2-.8.1-.3.4-.6.7-.6l4.7-.7L11.3 3c.1-.3.4-.5.7-.5z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
   return (
-    <div className="flex items-center">
+    <div className="flex items-center space-x-0.5 ">
       {[...Array(5)].map((_, i) => (
-        <span
+        <div
           key={i}
           className={
             i < Math.floor(rating)
@@ -34,8 +50,8 @@ const StarRating = ({ rating }: { rating: number }) => {
               : "text-gray-300"
           }
         >
-          ★
-        </span>
+          <SoftStar filled={i < Math.floor(rating)} />
+        </div>
       ))}
     </div>
   );
@@ -55,7 +71,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
   return (
     <div className="flex h-[340px] bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow h-64">
       {/* Image Gallery */}
-      <div className="w-96 h-full relative flex-shrink-0">
+      <div className="w-[600px] h-full relative flex-shrink-0">
         <div className="flex h-full gap-1">
           {/* Main large image */}
           <div className="relative flex-1">
@@ -67,7 +83,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
             />
           </div>
           {/* 4 smaller images in a 2x2 grid */}
-          <div className="w-24 grid grid-cols-1 gap-1">
+          <div className="w-20 grid grid-cols-1 gap-1">
             <div className="relative h-full">
               <Image
                 src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?q=80&w=400"
@@ -118,8 +134,8 @@ const BusinessCard = ({ store }: { store: Store }) => {
                   {store.name}
                 </h3>
               </Link>
-              <div className="flex items-center gap-2 mt-2">
-                <StarRating rating={4} />
+              <div className="flex items-center gap-2 mt-2 font-6xl">
+                <StarRating rating={4}  />
                 <span className="text-base font-medium">4.0</span>
                 <span className="text-sm text-gray-500">(45 Reviews)</span>
               </div>
@@ -170,7 +186,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
 
         {/* Actions */}
         <div className="flex justify-between ">
-          <div className="flex gap-4 relative ml-[800px]  justify-end float-right">
+          <div className="flex gap-4 relative ml-[600px]  justify-end float-right">
             <Button variant="outline" size="default" className="px-6">
               Directions
             </Button>

@@ -203,7 +203,7 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
       `}>
         <div className="p-4">
           {/* Profile Section */}
-          <div className=" items-center space-x-3 mb-6">
+          <div className=" items-center space-x-3 mb-6 flex ">
             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
               <Image
                 src={avatarUrl}
@@ -231,10 +231,10 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       <p className="font-medium text-gray-900 truncate">{profile?.name || "Anonymous User"}</p>
                       <button
-                        className="text-blue-500 text-xs hover:text-blue-700"
+                        className="text-blue-500 text-xs hover:text-blue-700 ml-20"
                         onClick={() => setIsEditing(true)}
                       >
                         Edit
@@ -252,7 +252,7 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
                       <div className="flex items-center space-x-1 text-gray-600">
                         <User className="w-3 h-3" />
                         <span className="font-medium">128</span>
-                        <span className="text-gray-500">Following</span>
+                        <span className="text-gray-500">Rating</span>
                       </div>
                     </div>
                   </>
