@@ -17,27 +17,26 @@ export async function POST(request: NextRequest) {
 
     const data = await request.formData();
     const file: File | null = data.get('file') as unknown as File;
-    const type: string = data.get('type') as string || 'image'; // 'logo', 'banner', 'gallery', 'video'
+    const type: string = data.get('type') as string || 'product'; // 'product', 'variation'
 
     if (!file) {
       return NextResponse.json({ error: 'No file received' }, { status: 400 });
     }
 
     // Validate file type
-    if (type === 'video') {
-      if (!file.type.startsWith('video/')) {
-        return NextResponse.json({ error: 'Invalid video file type' }, { status: 400 });
-      }
-    } else {
-      if (!file.type.startsWith('image/')) {
-        return NextResponse.json({ error: 'Invalid image file type' }, { status: 400 });
-      }
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+
+    if (!isVideo && !isImage) {
+      return NextResponse.json({ error: 'Invalid file type. Only images and videos are allowed.' }, { status: 400 });
     }
 
-    // Validate file size (5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Validate file size (10MB for videos, 5MB for images)
+    const maxSize = isVideo ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      return NextResponse.json({ error: 'File size exceeds 5MB limit' }, { status: 400 });
+      return NextResponse.json({ 
+        error: `File size exceeds ${isVideo ? '10MB' : '5MB'} limit` 
+      }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
@@ -46,7 +45,8 @@ export async function POST(request: NextRequest) {
     // Create unique filename
     const timestamp = Date.now();
     const fileExtension = file.name.split('.').pop();
-    const filename = `${session.user.id}_${type}_${timestamp}.${fileExtension}`;
+    const mediaType = isVideo ? 'video' : 'image';
+    const filename = `${session.user.id}_product_${mediaType}_${timestamp}.${fileExtension}`;
 
     // Ensure uploads directory exists
     const uploadsDir = join(process.cwd(), 'public', 'uploads');
@@ -69,17 +69,18 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'File uploaded successfully',
+      message: 'Product media uploaded successfully',
       url: fileUrl,
       filename,
-      type,
-      size: file.size
+      type: file.type,
+      size: file.size,
+      mediaType
     });
 
   } catch (error) {
-    console.error('Media upload error:', error);
+    console.error('Product media upload error:', error);
     return NextResponse.json(
-      { error: 'Failed to upload media files' },
+      { error: 'Failed to upload product media' },
       { status: 500 }
     );
   }

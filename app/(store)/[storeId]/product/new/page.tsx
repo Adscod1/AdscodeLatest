@@ -20,6 +20,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useProductStore } from "@/store/use-product-store";
+import { FileUpload } from "@/components/ui/file-upload";
+import { X } from "lucide-react";
 
 const CreateNewProduct = () => {
   const { storeId } = useParams();
@@ -32,6 +34,50 @@ const CreateNewProduct = () => {
       storeId: storeId as string,
     },
   });
+
+  // State for product images and videos
+  const [productImages, setProductImages] = React.useState<string[]>(
+    product.images?.map(img => img.url) || []
+  );
+  const [productVideos, setProductVideos] = React.useState<string[]>(
+    product.videos?.map(vid => vid.url) || []
+  );
+
+  // Handle image upload
+  const handleImageUpload = (url: string) => {
+    const updatedImages = [...productImages, url];
+    setProductImages(updatedImages);
+    updateProduct({
+      images: updatedImages.map(url => ({ url }))
+    });
+  };
+
+  // Handle video upload
+  const handleVideoUpload = (url: string) => {
+    const updatedVideos = [...productVideos, url];
+    setProductVideos(updatedVideos);
+    updateProduct({
+      videos: updatedVideos.map(url => ({ url }))
+    });
+  };
+
+  // Remove image
+  const removeImage = (index: number) => {
+    const updatedImages = productImages.filter((_, i) => i !== index);
+    setProductImages(updatedImages);
+    updateProduct({
+      images: updatedImages.map(url => ({ url }))
+    });
+  };
+
+  // Remove video
+  const removeVideo = (index: number) => {
+    const updatedVideos = productVideos.filter((_, i) => i !== index);
+    setProductVideos(updatedVideos);
+    updateProduct({
+      videos: updatedVideos.map(url => ({ url }))
+    });
+  };
 
   const onSubmit = (data: CreateProductInput) => {
     updateProduct({
@@ -138,12 +184,93 @@ const CreateNewProduct = () => {
                   <div className="space-y-2">
                     <Label>Media (images, video or 3D models)</Label>
                     <div className="grid grid-cols-4 gap-4">
-                      <div className="border-2 border-dashed rounded-lg p-4 flex items-center justify-center">
-                        <Button variant="ghost" size="icon">
-                          +
-                        </Button>
-                      </div>
+                      {/* Display existing images */}
+                      {productImages.map((imageUrl, index) => (
+                        <div key={`image-${index}`} className="relative aspect-square group">
+                          <div className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-200">
+                            <img
+                              src={imageUrl}
+                              alt={`Product ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeImage(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+
+                      {/* Display existing videos */}
+                      {productVideos.map((videoUrl, index) => (
+                        <div key={`video-${index}`} className="relative aspect-square group">
+                          <div className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-200">
+                            <video
+                              src={videoUrl}
+                              className="w-full h-full object-cover"
+                              controls
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeVideo(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+
+                      {/* Add new image button */}
+                      {productImages.length + productVideos.length < 10 && (
+                        <div className="aspect-square">
+                          <FileUpload
+                            type="product"
+                            onUpload={handleImageUpload}
+                            accept="image/*"
+                            maxSize={5}
+                            endpoint="/api/product/media"
+                            className="h-full"
+                          >
+                            <div className="flex items-center justify-center h-full">
+                              <Button variant="ghost" size="icon" type="button">
+                                +
+                              </Button>
+                            </div>
+                          </FileUpload>
+                        </div>
+                      )}
+
+                      {/* Add new video button */}
+                      {productImages.length + productVideos.length < 10 && productVideos.length < 3 && (
+                        <div className="aspect-square">
+                          <FileUpload
+                            type="video"
+                            onUpload={handleVideoUpload}
+                            accept="video/*"
+                            maxSize={10}
+                            endpoint="/api/product/media"
+                            className="h-full"
+                          >
+                            <div className="flex flex-col items-center justify-center h-full">
+                              <Button variant="ghost" size="sm" type="button">
+                                + Video
+                              </Button>
+                            </div>
+                          </FileUpload>
+                        </div>
+                      )}
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Upload up to 10 images/videos. First image will be the main product image.
+                    </p>
                   </div>
                 </form>
               </CardContent>

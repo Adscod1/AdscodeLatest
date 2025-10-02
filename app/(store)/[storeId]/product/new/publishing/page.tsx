@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/table";
 import { useProductStore } from "@/store/use-product-store";
 import { useParams } from "next/navigation";
-import Image from "next/image";
 
 const NewProductPublishingPage = () => {
   const router = useRouter();
@@ -190,35 +189,25 @@ const NewProductPublishingPage = () => {
                       (images, video or 3D models)
                     </span>
                   </h3>
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-                      <Image
-                        src="/product-1.jpg"
-                        alt="Product preview"
-                        className="w-full h-full object-cover"
-                        width={100}
-                        height={100}
-                      />
+                  {product.images && product.images.length > 0 ? (
+                    <div className="grid grid-cols-4 gap-4">
+                      {product.images.slice(0, 4).map((image, index) => (
+                        <div key={index} className="aspect-square bg-muted rounded-lg overflow-hidden">
+                          <img
+                            src={image.url}
+                            alt={`Product ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
                     </div>
-                    <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-                      <Image
-                        src="/product-2.jpg"
-                        alt="Product preview"
-                        className="w-full h-full object-cover"
-                        width={100}
-                        height={100}
-                      />
+                  ) : (
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                        <p className="text-sm text-muted-foreground">No images</p>
+                      </div>
                     </div>
-                    <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-                      <Image
-                        src="/product-3.jpg"
-                        alt="Product preview"
-                        className="w-full h-full object-cover"
-                        width={100}
-                        height={100}
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Sale Information */}

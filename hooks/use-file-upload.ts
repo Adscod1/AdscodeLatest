@@ -13,26 +13,19 @@ interface UploadResult {
 export const useFileUpload = () => {
   const [uploading, setUploading] = useState(false);
 
-  const uploadFile = async (file: File, type: string = 'image'): Promise<UploadResult> => {
+  const uploadFile = async (
+    file: File, 
+    type: string = 'image',
+    endpoint: string = '/api/new/media'
+  ): Promise<UploadResult> => {
     setUploading(true);
     
     try {
-      // Validate file before upload
-      if (!file) {
-        throw new Error('No file selected');
-      }
-
-      // Check file size (5MB limit)
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        throw new Error('File size must be less than 5MB');
-      }
-
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', type);
 
-      const response = await fetch('/api/new/media', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });

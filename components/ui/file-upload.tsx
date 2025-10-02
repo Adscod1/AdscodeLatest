@@ -2,16 +2,16 @@ import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ImageIcon, Upload, X, Loader2 } from 'lucide-react';
 import { useFileUpload } from '@/hooks/use-file-upload';
-import Image from 'next/image';
 
 interface FileUploadProps {
-  type: 'logo' | 'banner' | 'gallery' | 'video';
+  type: 'logo' | 'banner' | 'gallery' | 'video' | 'product';
   onUpload: (url: string) => void;
   currentUrl?: string;
   accept?: string;
   maxSize?: number;
   className?: string;
   children?: React.ReactNode;
+  endpoint?: string; // Optional custom endpoint
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
@@ -21,7 +21,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   accept = "image/*",
   maxSize = 5,
   className = "",
-  children
+  children,
+  endpoint
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadFile, uploading } = useFileUpload();
@@ -41,7 +42,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       return;
     }
 
-    // Create preview
+    // Create local preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreview(e.target?.result as string);
@@ -49,10 +50,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     reader.readAsDataURL(file);
 
     // Upload file
-    const result = await uploadFile(file, type);
+    const result = await uploadFile(file, type, endpoint);
     if (result.success && result.url) {
+      // Update preview to the actual uploaded URL
+      setPreview(result.url);
       onUpload(result.url);
     } else {
+      // Revert to current URL or clear preview on error
       setPreview(currentUrl || null);
     }
   };
@@ -97,7 +101,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       />
       
       {preview ? (
-        <div className="relative group w-full h-full">
+        <div className="relative group">
           {type === 'video' ? (
             <video 
               src={preview} 
@@ -105,14 +109,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               controls
             />
           ) : (
-            <div className="relative w-full h-full">
-              <Image
-                src={preview}
-                alt="Preview"
-                fill
-                className="object-cover rounded-lg"
-              />
-            </div>
+            // Use regular img tag for both data URLs and regular URLs
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-full h-full object-cover rounded-lg"
+            />
           )}
           
           {/* Remove button */}
