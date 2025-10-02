@@ -3,6 +3,8 @@ import ProfileContent from "./profile-content";
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/actions/profile";
+import { prisma } from "@/lib/prisma";
+import { Role } from "@prisma/client";
 
 const ProfilePage = async () => {
   const session = await auth.api.getSession({
@@ -13,10 +15,24 @@ const ProfilePage = async () => {
     redirect("/auth/login");
   }
 
-  const profile = await getCurrentProfile();
+  let profile = await getCurrentProfile();
 
+  // If profile doesn't exist (e.g., OAuth user), create one automatically
   if (!profile) {
-    redirect("/auth/login");
+    try {
+      profile = await prisma.profile.create({
+        data: {
+          id: session.user.id,
+          userId: session.user.id,
+          name: session.user.name || "User",
+          image: session.user.image,
+          role: Role.USER,
+        },
+      });
+    } catch {
+      // Failed to create profile, redirect to login
+      redirect("/auth/login");
+    }
   }
 
   return <ProfileContent user={profile} />;
