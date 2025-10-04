@@ -55,6 +55,11 @@ const NewProductPublishingPage = () => {
   });
 
   const onSubmit = (data: CreateProductInput) => {
+    // Prevent double submission
+    if (createProductMutation.isPending) {
+      return;
+    }
+
     // Ensure all required fields are present and properly typed
     const finalData = {
       ...product,
@@ -118,7 +123,12 @@ const NewProductPublishingPage = () => {
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit(onSubmit)}>Publish</Button>
+          <Button 
+            onClick={handleSubmit(onSubmit)}
+            disabled={createProductMutation.isPending}
+          >
+            {createProductMutation.isPending ? "Publishing..." : "Publish"}
+          </Button>
         </div>
       </div>
 

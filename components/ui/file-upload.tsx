@@ -42,22 +42,38 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       return;
     }
 
-    // Create local preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreview(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
+    // Only show preview if no children (means it's a standalone upload component)
+    if (!children) {
+      // Create local preview temporarily
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
 
     // Upload file
     const result = await uploadFile(file, type, endpoint);
     if (result.success && result.url) {
-      // Update preview to the actual uploaded URL
-      setPreview(result.url);
+      // Call onUpload with the uploaded URL
       onUpload(result.url);
+      
+      // If using children (grid context), don't show preview in FileUpload
+      // The parent component will handle displaying the uploaded image
+      if (children) {
+        setPreview(null);
+      } else {
+        // Update preview for standalone usage
+        setPreview(result.url);
+      }
     } else {
       // Revert to current URL or clear preview on error
       setPreview(currentUrl || null);
+    }
+    
+    // Reset the input so the same file can be selected again if needed
+    if (event.target) {
+      event.target.value = '';
     }
   };
 
