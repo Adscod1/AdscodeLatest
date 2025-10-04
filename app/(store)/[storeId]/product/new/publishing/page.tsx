@@ -55,11 +55,6 @@ const NewProductPublishingPage = () => {
   });
 
   const onSubmit = (data: CreateProductInput) => {
-    // Prevent double submission
-    if (createProductMutation.isPending) {
-      return;
-    }
-
     // Ensure all required fields are present and properly typed
     const finalData = {
       ...product,
@@ -105,35 +100,31 @@ const NewProductPublishingPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-white border-b">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 bg-white border-b gap-4 sm:gap-0">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           <Button
             variant="ghost"
-            className="flex items-center text-gray-600 hover:text-gray-900"
+            className="flex items-center text-gray-600 hover:text-gray-900 text-sm sm:text-base"
             onClick={() => router.back()}
           >
-            <ChevronLeft className="w-5 h-5" />
-            <span>Back to product listing</span>
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Back to product listing</span>
+            <span className="sm:hidden">Back</span>
           </Button>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={() => router.back()}>
+        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => router.back()} className="flex-1 sm:flex-none text-sm">
             Back
           </Button>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} className="flex-1 sm:flex-none text-sm">
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit(onSubmit)}
-            disabled={createProductMutation.isPending}
-          >
-            {createProductMutation.isPending ? "Publishing..." : "Publish"}
-          </Button>
+          <Button onClick={handleSubmit(onSubmit)} className="flex-1 sm:flex-none text-sm">Publish</Button>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex gap-8">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Main Content */}
           <div className="flex-1">
             <ProductTabs activeTab="Publishing" />
@@ -148,12 +139,12 @@ const NewProductPublishingPage = () => {
                   Make sure all info is correct before selling your product
                 </p>
               </CardHeader>
-              <CardContent className="space-y-8">
+              <CardContent className="space-y-6 sm:space-y-8">
                 {/* Basic Information Section */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-medium">Basic information</h3>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <Label>Product title</Label>
                       <div className="px-3 py-2 bg-muted rounded-md">
@@ -168,7 +159,7 @@ const NewProductPublishingPage = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <Label>Vendor</Label>
                       <div className="px-3 py-2 bg-muted rounded-md">
@@ -200,7 +191,7 @@ const NewProductPublishingPage = () => {
                     </span>
                   </h3>
                   {product.images && product.images.length > 0 ? (
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                       {product.images.slice(0, 4).map((image, index) => (
                         <div key={index} className="aspect-square bg-muted rounded-lg overflow-hidden">
                           <img
@@ -212,7 +203,7 @@ const NewProductPublishingPage = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                       <div className="aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center">
                         <p className="text-sm text-muted-foreground">No images</p>
                       </div>
@@ -223,9 +214,9 @@ const NewProductPublishingPage = () => {
                 {/* Sale Information */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-medium">Sale information</h3>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div className="space-y-4">
-                      <div className="grid grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         <div>
                           <Label>Price</Label>
                           <div className="text-lg font-medium">
@@ -239,7 +230,7 @@ const NewProductPublishingPage = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                         <div>
                           <Label>Cost per item</Label>
                           <div className="text-lg font-medium">
@@ -299,7 +290,7 @@ const NewProductPublishingPage = () => {
                 {/* Shipping Section */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-medium">Shipping</h3>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <Label>Weight</Label>
                       <div className="text-lg font-medium">
@@ -332,7 +323,7 @@ const NewProductPublishingPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="w-80">
+          <div className="w-full lg:w-80 order-first lg:order-last">
             <Card>
               <CardHeader>
                 <CardTitle>Product Status</CardTitle>

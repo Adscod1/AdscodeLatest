@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ChevronLeft, Search } from "lucide-react";
+import { ChevronLeft, Search, Info } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -18,23 +19,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useProductStore } from "@/store/use-product-store";
+
+interface ExtendedDeliveryInput extends CreateProductInput {
+  requiresShipping?: boolean;
+  processingTime?: string;
+  shippingMethod?: string;
+  shippingCost?: number;
+  offerFreeShipping?: boolean;
+}
 
 const DeliveryPage = () => {
   const { storeId } = useParams();
   const router = useRouter();
   const { product, updateProduct, reset } = useProductStore();
 
-  const { register, handleSubmit } = useForm<CreateProductInput>({
+  const { register, handleSubmit, watch, setValue } = useForm<ExtendedDeliveryInput>({
     defaultValues: {
       ...product,
       storeId: storeId as string,
-      weightUnit: "lb",
-      sizeUnit: "inch",
+      weightUnit: "kg",
+      sizeUnit: "cm",
+      requiresShipping: true,
+      processingTime: "",
+      shippingMethod: "standard",
+      shippingCost: 0,
+      offerFreeShipping: false,
     },
   });
 
-  const onSubmit = (data: CreateProductInput) => {
+  const requiresShipping = watch("requiresShipping");
+  const shippingMethod = watch("shippingMethod");
+  const offerFreeShipping = watch("offerFreeShipping");
+
+  const onSubmit = (data: ExtendedDeliveryInput) => {
     updateProduct({
       ...data,
       storeId: storeId as string,
@@ -50,32 +74,33 @@ const DeliveryPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-white border-b">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 bg-white border-b gap-4 sm:gap-0">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           <Button
             variant="ghost"
-            className="flex items-center text-gray-600 hover:text-gray-900"
+            className="flex items-center text-gray-600 hover:text-gray-900 text-sm sm:text-base"
             asChild
           >
             <Link href={`/${storeId}/products`}>
-              <ChevronLeft className="w-5 h-5" />
-              <span>Back to product listing</span>
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Back to product listing</span>
+              <span className="sm:hidden">Back</span>
             </Link>
           </Button>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={() => router.back()}>
+        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => router.back()} className="flex-1 sm:flex-none text-sm">
             Back
           </Button>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} className="flex-1 sm:flex-none text-sm">
             Cancel
           </Button>
-          <Button onClick={handleSubmit(onSubmit)}>Next</Button>
+          <Button onClick={handleSubmit(onSubmit)} className="flex-1 sm:flex-none text-sm">Continue</Button>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex gap-8">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Main Content */}
           <div className="flex-1">
             <ProductTabs activeTab="Delivery" />
@@ -83,71 +108,158 @@ const DeliveryPage = () => {
             {/* Delivery Form */}
             <Card>
               <CardHeader>
-                <CardTitle>Delivery</CardTitle>
+                <CardTitle>Delivery Options</CardTitle>
+                <p className="text-sm text-gray-500">
+                  Configure shipping and delivery
+                </p>
               </CardHeader>
-              <CardContent className="space-y-8">
-                {/* Weight Section */}
-                <div className="space-y-2">
-                  <Label>Weight</Label>
-                  <div className="flex items-center space-x-2">
+              <CardContent className="space-y-6 sm:space-y-8">
+                {/* Requires Shipping Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="requires-shipping" 
+                    checked={requiresShipping}
+                    onCheckedChange={(checked) => setValue("requiresShipping", checked as boolean)}
+                  />
+                  <Label htmlFor="requires-shipping" className="text-sm font-medium">
+                    This product requires shipping
+                  </Label>
+                </div>
+
+                {/* Dimensions Section */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="weight">Weight (kg)</Label>
                     <Input
+                      id="weight"
                       {...register("weight", { valueAsNumber: true })}
                       type="number"
                       step="0.1"
                       placeholder="0.0"
-                      className="w-32"
                     />
-                    <Select {...register("weightUnit")} defaultValue="lb">
-                      <SelectTrigger className="w-24">
-                        <SelectValue placeholder="Unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="lb">lb</SelectItem>
-                        <SelectItem value="kg">kg</SelectItem>
-                        <SelectItem value="oz">oz</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
-                </div>
-
-                {/* Parcel Size Section */}
-                <div className="space-y-2">
-                  <Label>Parcel size</Label>
-                  <div className="flex items-center space-x-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="length">Length (cm)</Label>
                     <Input
+                      id="length"
                       {...register("length", { valueAsNumber: true })}
                       type="number"
                       step="0.1"
-                      placeholder="0.0"
-                      className="w-24"
+                      placeholder="0"
                     />
-                    <span className="text-muted-foreground">×</span>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="width">Width (cm)</Label>
                     <Input
+                      id="width"
                       {...register("width", { valueAsNumber: true })}
                       type="number"
                       step="0.1"
-                      placeholder="0.0"
-                      className="w-24"
+                      placeholder="0"
                     />
-                    <span className="text-muted-foreground">×</span>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="height">Height (cm)</Label>
                     <Input
+                      id="height"
                       {...register("height", { valueAsNumber: true })}
                       type="number"
                       step="0.1"
-                      placeholder="0.0"
-                      className="w-24"
+                      placeholder="0"
                     />
-                    <Select {...register("sizeUnit")} defaultValue="inch">
-                      <SelectTrigger className="w-24">
-                        <SelectValue placeholder="Unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="inch">inch</SelectItem>
-                        <SelectItem value="cm">cm</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
+
+                {/* Processing Time */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1">
+                    <Label htmlFor="processing-time">Processing Time</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-3.5 h-3.5 text-gray-400" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Time needed to prepare order for shipping</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <Select
+                    value={watch("processingTime")}
+                    onValueChange={(value) => setValue("processingTime", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select processing time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1-2">1-2 business days</SelectItem>
+                      <SelectItem value="3-5">3-5 business days</SelectItem>
+                      <SelectItem value="1-2-weeks">1-2 weeks</SelectItem>
+                      <SelectItem value="2-4-weeks">2-4 weeks</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Shipping Methods */}
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">Shipping Methods</Label>
+                  <RadioGroup
+                    value={shippingMethod}
+                    onValueChange={(value) => setValue("shippingMethod", value)}
+                  >
+                    <div className="flex items-center space-x-2 py-2 sm:py-3">
+                      <RadioGroupItem value="standard" id="standard" />
+                      <Label htmlFor="standard" className="font-normal cursor-pointer text-sm sm:text-base">
+                        Standard Shipping (5-7 days)
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 py-2 sm:py-3">
+                      <RadioGroupItem value="express" id="express" />
+                      <Label htmlFor="express" className="font-normal cursor-pointer text-sm sm:text-base">
+                        Express Shipping (2-3 days)
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 py-2 sm:py-3">
+                      <RadioGroupItem value="overnight" id="overnight" />
+                      <Label htmlFor="overnight" className="font-normal cursor-pointer text-sm sm:text-base">
+                        Overnight Shipping
+                      </Label>
+                    </div>
+                  </RadioGroup>
+
+                  {/* Offer Free Shipping */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-2">
+                    <Checkbox 
+                      id="free-shipping"
+                      checked={offerFreeShipping}
+                      onCheckedChange={(checked) => setValue("offerFreeShipping", checked as boolean)}
+                    />
+                    <Label htmlFor="free-shipping" className="font-normal cursor-pointer">
+                      Offer free shipping
+                    </Label>
+                  </div>
+                </div>
+
+                {/* Shipping Cost */}
+                {!offerFreeShipping && (
+                  <div className="space-y-2">
+                    <Label htmlFor="shipping-cost">Shipping Cost</Label>
+                    <div className="relative w-full sm:w-48">
+                      <span className="absolute left-3 top-2.5 text-sm text-gray-500">
+                        $
+                      </span>
+                      <Input
+                        id="shipping-cost"
+                        {...register("shippingCost", { valueAsNumber: true })}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="pl-7"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className="pt-4 border-t">
                   <div className="flex items-center space-x-2 mb-6">
@@ -169,7 +281,10 @@ const DeliveryPage = () => {
                     {/* Country/Region Selection */}
                     <div className="space-y-2">
                       <Label>Country/Region of origin</Label>
-                      <Select {...register("countryOfOrigin")}>
+                      <Select
+                        value={watch("countryOfOrigin")}
+                        onValueChange={(value) => setValue("countryOfOrigin", value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Enter region of origin" />
                         </SelectTrigger>
@@ -184,6 +299,9 @@ const DeliveryPage = () => {
                           <SelectItem value="European Union">
                             European Union
                           </SelectItem>
+                          <SelectItem value="Uganda">Uganda</SelectItem>
+                          <SelectItem value="Kenya">Kenya</SelectItem>
+                          <SelectItem value="Tanzania">Tanzania</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

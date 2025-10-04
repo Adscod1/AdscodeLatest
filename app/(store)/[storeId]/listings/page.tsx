@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Plus,
   Search,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import AddCatalogDialog from "@/components/AddCatalogDialog";
 import { deleteProduct, getProducts } from "@/actions/product";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
@@ -63,6 +64,7 @@ const StoreListings = () => {
   const pathname = usePathname();
   const storeId = pathname.split("/")[1];
   const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Fetch products
   const { data: products, isLoading } = useQuery({
@@ -112,11 +114,9 @@ const StoreListings = () => {
             Manage your product and service catalog
           </p>
         </div>
-        <Button asChild>
-          <Link href={`/${storeId}/product/new`}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </Link>
+        <Button onClick={() => setIsDialogOpen(true)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add Product
         </Button>
       </div>
 
@@ -288,6 +288,13 @@ const StoreListings = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Catalog Dialog */}
+      <AddCatalogDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        storeId={storeId}
+      />
     </div>
   );
 };
