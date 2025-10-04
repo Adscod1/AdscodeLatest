@@ -209,7 +209,7 @@ const InfluencerCampaignManager = () => {
   const renderBasicInfo = () => (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Informatio</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Information</h2>
         <p className="text-gray-600 mb-6">Set up the fundamental details of your campaign</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
