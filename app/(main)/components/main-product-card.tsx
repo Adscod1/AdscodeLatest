@@ -53,7 +53,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   };
 
   return (
-    <Card className="w-120 h-120 border rounded-2xl overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow duration-200">
+    <Card className="w-full border rounded-2xl overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow duration-200">
       {/* Header with user info and time */}
       <div className="flex items-center justify-between px-4 py-1">
         <div className="flex items-center gap-3">
@@ -91,13 +91,15 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
 
       {/* Product Image - Rectangle */}
       <div className="px-4">
-        <div className="relative h-62 w-full rounded-lg overflow-hidden bg-gray-100">
+        <div className="relative h-64 w-full rounded-lg overflow-hidden bg-gray-100">
           {product.images && product.images.length > 0 ? (
             <Image
               src={product.images[0].url}
               alt={product.title}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
+              priority={false}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

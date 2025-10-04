@@ -290,7 +290,7 @@ const CreatorNetworkForm: React.FC = () => {
         <div className="flex justify-between items-center p-6 border-b">
           <div>
             <h2 className="text-xl font-semibold text-blue-600">
-              Join Adscop's Creator Network
+              Join Adscod's Creator Network
             </h2>
             <p className="text-gray-600 text-sm mt-1">
               Connect with top brands and monetize your content like never before
