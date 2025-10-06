@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Check, Plus } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import React, { useState } from "react";
 
 const CreateNewCampaignPage = () => {
   const [activeStep] = useState(0);
   const [locationEnabled, setLocationEnabled] = useState(true);
+  const isMobile = useIsMobile();
 
   const steps = [
     "Basic details",
@@ -19,7 +21,7 @@ const CreateNewCampaignPage = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto my-8 bg-white rounded-xl shadow-sm p-8 mt-28">
+    <div className={`max-w-4xl mx-auto my-8 bg-white rounded-xl shadow-sm p-8 ${isMobile ? 'mt-4 ml-4 mr-4' : 'mt-28'}`}>
       <h1 className="text-2xl font-bold mb-8">Create new campaign</h1>
 
       {/* Progress Stepper */}

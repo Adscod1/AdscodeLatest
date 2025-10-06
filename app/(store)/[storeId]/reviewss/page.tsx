@@ -86,77 +86,79 @@ const ReviewsDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reviews Dashboard</h1>
-          <p className="text-gray-600 mt-1">Monitor and manage customer feedback</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Reviews Dashboard</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Monitor and manage customer feedback</p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <button className="flex items-center justify-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm w-full sm:w-auto">
             <AlertCircle className="w-4 h-4" />
-            View Alerts
+            <span className="hidden sm:inline">View Alerts</span>
+            <span className="sm:hidden">Alerts</span>
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 text-sm">
+          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 text-sm w-full sm:w-auto">
             <MessageSquare className="w-4 h-4" />
-            Respond to Reviews
+            <span className="hidden sm:inline">Respond to Reviews</span>
+            <span className="sm:hidden">Respond</span>
           </button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-blue-600" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-500">Total Reviews</span>
+            <span className="text-xs sm:text-sm text-gray-500">Total Reviews</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900 mb-2">2,847</div>
-          <div className="text-sm text-green-600">↗ +16.2% this month</div>
+          <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">2,847</div>
+          <div className="text-xs sm:text-sm text-green-600">↗ +16.2% this month</div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
-              <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
+              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 fill-yellow-500" />
             </div>
-            <span className="text-sm text-gray-500">Average Rating</span>
+            <span className="text-xs sm:text-sm text-gray-500">Average Rating</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900 mb-2">4.6</div>
-          <div className="text-sm text-green-600">↗ +0.3 vs last month</div>
+          <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">4.6</div>
+          <div className="text-xs sm:text-sm text-green-600">↗ +0.3 vs last month</div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-50 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
             </div>
-            <span className="text-sm text-gray-500">Response Rate</span>
+            <span className="text-xs sm:text-sm text-gray-500">Response Rate</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900 mb-2">94%</div>
-          <div className="text-sm text-green-600">↗ +5% this month</div>
+          <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">94%</div>
+          <div className="text-xs sm:text-sm text-green-600">↗ +5% this month</div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
-              <Clock className="w-5 h-5 text-orange-500" />
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-50 rounded-lg flex items-center justify-center">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
             </div>
-            <span className="text-sm text-gray-500">Pending Reviews</span>
+            <span className="text-xs sm:text-sm text-gray-500">Pending Reviews</span>
           </div>
-          <div className="text-3xl font-bold text-gray-900 mb-2">23</div>
-          <div className="text-sm text-red-600">↘ -12 to respond</div>
+          <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">23</div>
+          <div className="text-xs sm:text-sm text-red-600">↘ -12 to respond</div>
         </div>
       </div>
 
       {/* Top Row - Rating Breakdown and Sentiment Analysis */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {/* Rating Breakdown */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Rating Breakdown</h3>
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Rating Breakdown</h3>
           <div className="space-y-4">
             {[
               { stars: 5, count: 1620, percentage: 57, color: 'bg-black' },
@@ -188,8 +190,8 @@ const ReviewsDashboard: React.FC = () => {
         </div>
 
         {/* Sentiment Analysis */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Sentiment Analysis</h3>
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Sentiment Analysis</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -226,10 +228,10 @@ const ReviewsDashboard: React.FC = () => {
       </div>
 
       {/* Full Width Recent Reviews */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <div className="bg-white rounded-xl border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Reviews</h3>
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">Recent Reviews</h3>
           </div>
           <div className="divide-y divide-gray-100">
             {reviews.slice(0, 1).map((review) => (
@@ -317,11 +319,11 @@ const ReviewsDashboard: React.FC = () => {
       </div>
 
       {/* Bottom Section - Keywords & Analytics */}
-      <div className="grid grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
         {/* Frequently Mentioned Keywords */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Frequently Mentioned Keywords</h3>
-          <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Frequently Mentioned Keywords</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             {[
               { keyword: 'Quality', count: 456, icon: '👍' },
               { keyword: 'Comfortable', count: 398, icon: '😌' },
@@ -342,19 +344,19 @@ const ReviewsDashboard: React.FC = () => {
         </div>
 
         {/* Analytics */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Analytics</h3>
+        <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Analytics</h3>
               <p className="text-gray-500 text-sm">Track your store's performance and insights</p>
             </div>
-            <div className="flex items-center gap-3">
-              <select className="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <select className="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white w-full sm:w-auto">
                 <option>Last 30 days</option>
                 <option>Last 7 days</option>
                 <option>Last 90 days</option>
               </select>
-              <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-700 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+              <button className="flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-gray-700 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 w-full sm:w-auto">
                 <Download className="w-4 h-4" />
                 Export
               </button>

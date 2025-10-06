@@ -38,15 +38,15 @@ interface ProgressBarProps {
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ title, value, change, isPositive, icon }) => (
-  <div className="bg-white p-6 rounded-lg border border-gray-200">
+  <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
     <div className="flex items-center justify-between mb-2">
-      <span className="text-gray-600 text-sm font-medium">{title}</span>
+      <span className="text-gray-600 text-xs sm:text-sm font-medium">{title}</span>
       <div className="text-gray-400">{icon}</div>
     </div>
-    <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
-    <div className={`text-sm flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-      {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
-      {change}
+    <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{value}</div>
+    <div className={`text-xs sm:text-sm flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+      {isPositive ? <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> : <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />}
+      <span className="truncate">{change}</span>
     </div>
   </div>
 );
@@ -74,25 +74,25 @@ export default function AnalyticsDashboard() {
     <div className="flex min-h-screen bg-gray-50">
      
       
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-            <p className="text-gray-600 mt-1">Track your store's performance and insights</p>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Analytics</h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">Track your store's performance and insights</p>
           </div>
-          <div className="flex items-center space-x-4">
-            <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
+            <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-auto">
               <option>Last 30 days</option>
             </select>
-            <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium w-full sm:w-auto">
               Export
             </button>
           </div>
         </div>
 
         {/* Top Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <MetricCard
             title="Revenue"
             value="$45,231"
@@ -124,7 +124,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Secondary Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <MetricCard
             title="Page Views"
             value="18,420"
@@ -156,91 +156,91 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Engagement and Revenue Metrics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Engagement Metrics</h3>
-            <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Engagement Metrics</h3>
+            <div className="grid grid-cols-2 gap-3 sm:gap-6">
               <div>
-                <div className="text-2xl font-bold text-gray-900">8,420</div>
-                <div className="text-sm text-gray-600">Likes</div>
-                <div className="text-sm text-green-600 mt-1">+12.5%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">8,420</div>
+                <div className="text-xs sm:text-sm text-gray-600">Likes</div>
+                <div className="text-xs sm:text-sm text-green-600 mt-1">+12.5%</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">1,250</div>
-                <div className="text-sm text-gray-600">Shares</div>
-                <div className="text-sm text-green-600 mt-1">+8.3%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">1,250</div>
+                <div className="text-xs sm:text-sm text-gray-600">Shares</div>
+                <div className="text-xs sm:text-sm text-green-600 mt-1">+8.3%</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">432</div>
-                <div className="text-sm text-gray-600">Comments</div>
-                <div className="text-sm text-green-600 mt-1">+16.7%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">432</div>
+                <div className="text-xs sm:text-sm text-gray-600">Comments</div>
+                <div className="text-xs sm:text-sm text-green-600 mt-1">+16.7%</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">2.8%</div>
-                <div className="text-sm text-gray-600">Click-through Rate</div>
-                <div className="text-sm text-green-600 mt-1">+9.5%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">2.8%</div>
+                <div className="text-xs sm:text-sm text-gray-600">Click-through Rate</div>
+                <div className="text-xs sm:text-sm text-green-600 mt-1">+9.5%</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue Metrics</h3>
-            <div className="grid grid-cols-2 gap-6">
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Revenue Metrics</h3>
+            <div className="grid grid-cols-2 gap-3 sm:gap-6">
               <div>
-                <div className="text-2xl font-bold text-gray-900">$28,450</div>
-                <div className="text-sm text-gray-600">Monthly Recurring Revenue</div>
-                <div className="text-sm text-green-600 mt-1">+22.1%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">$28,450</div>
+                <div className="text-xs sm:text-sm text-gray-600">Monthly Recurring Revenue</div>
+                <div className="text-xs sm:text-sm text-green-600 mt-1">+22.1%</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">$341,400</div>
-                <div className="text-sm text-gray-600">Annual Recurring Revenue</div>
-                <div className="text-sm text-green-600 mt-1">+19.8%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">$341,400</div>
+                <div className="text-xs sm:text-sm text-gray-600">Annual Recurring Revenue</div>
+                <div className="text-xs sm:text-sm text-green-600 mt-1">+19.8%</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">$45</div>
-                <div className="text-sm text-gray-600">Customer Acquisition Cost</div>
-                <div className="text-sm text-green-600 mt-1">-8.3%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">$45</div>
+                <div className="text-xs sm:text-sm text-gray-600">Customer Acquisition Cost</div>
+                <div className="text-xs sm:text-sm text-green-600 mt-1">-8.3%</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">3.2%</div>
-                <div className="text-sm text-gray-600">Churn Rate</div>
-                <div className="text-sm text-red-600 mt-1">-1.1%</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900">3.2%</div>
+                <div className="text-xs sm:text-sm text-gray-600">Churn Rate</div>
+                <div className="text-xs sm:text-sm text-red-600 mt-1">-1.1%</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Performance Metrics */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Performance Metrics</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 mb-6 sm:mb-8">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Performance Metrics</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-1">2s</div>
-              <div className="text-sm text-gray-600">Load Time</div>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">2s</div>
+              <div className="text-xs sm:text-sm text-gray-600">Load Time</div>
               <div className="text-xs text-green-600 mt-1">-0.5s</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-1">99.98%</div>
-              <div className="text-sm text-gray-600">Uptime</div>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">99.98%</div>
+              <div className="text-xs sm:text-sm text-gray-600">Uptime</div>
               <div className="text-xs text-green-600 mt-1">+0.05%</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-1">0.02%</div>
-              <div className="text-sm text-gray-600">Error Rate</div>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">0.02%</div>
+              <div className="text-xs sm:text-sm text-gray-600">Error Rate</div>
               <div className="text-xs text-green-600 mt-1">-0.01%</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-1">245ms</div>
-              <div className="text-sm text-gray-600">API Response Time</div>
+              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">245ms</div>
+              <div className="text-xs sm:text-sm text-gray-600">API Response Time</div>
               <div className="text-xs text-green-600 mt-1">-5ms</div>
             </div>
           </div>
         </div>
 
         {/* Traffic Sources and Device Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Traffic Sources</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Traffic Sources</h3>
             <div className="space-y-4">
               <ProgressBar label="Organic Search" percentage={45} value="1,058 visitors" />
               <ProgressBar label="Direct" percentage={30} value="705 visitors" />
@@ -249,8 +249,8 @@ export default function AnalyticsDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Device Breakdown</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Device Breakdown</h3>
             <div className="space-y-4">
               <ProgressBar label="Desktop" percentage={65} value="" />
               <ProgressBar label="Mobile" percentage={30} value="" />
@@ -260,9 +260,9 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Customer Demographics */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Customer Type</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Customer Type</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700">New Customers</span>
@@ -290,8 +290,8 @@ export default function AnalyticsDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Geographic Distribution</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Geographic Distribution</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700">North America</span>
@@ -319,8 +319,8 @@ export default function AnalyticsDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Gender Demographics</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Gender Demographics</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700">Female</span>
@@ -342,8 +342,8 @@ export default function AnalyticsDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Account Quality</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Account Quality</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700">Verified Accounts</span>
@@ -373,8 +373,8 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Customer Journey Funnel */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Customer Journey Funnel</h3>
+        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 mb-6 sm:mb-8">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Customer Journey Funnel</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
@@ -439,9 +439,9 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Sales Performance and Key Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Sales Performance</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Sales Performance</h3>
             <div className="space-y-6">
               <div>
                 <div className="flex justify-between items-center mb-2">
@@ -476,8 +476,8 @@ export default function AnalyticsDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Key Insights</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Key Insights</h3>
             <div className="space-y-4">
               <div className="p-3 bg-green-50 rounded-lg">
                 <div className="text-sm font-medium text-green-900 mb-1">Revenue Growth</div>
@@ -508,9 +508,9 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Hourly Activity and Top Products */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Hourly Activity</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Hourly Activity</h3>
             <div className="space-y-3">
               {[
                 { time: '12:00 PM', visitors: '248 visitors', revenue: '$1,250' },
@@ -530,8 +530,8 @@ export default function AnalyticsDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Top Products</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Top Products</h3>
             <div className="space-y-4">
               {[
                 { name: 'Premium Plan', sales: '34 sales', revenue: '$14,500', change: '+12%' },
@@ -556,9 +556,9 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* User Behavior Analysis */}
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">User Behavior Analysis</h3>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">User Behavior Analysis</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-4">Page Engagement</h4>
               <div className="space-y-3">

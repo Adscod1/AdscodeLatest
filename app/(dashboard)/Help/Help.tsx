@@ -5,6 +5,7 @@ import CustomSidebar from '@/components/ui/custom-sidebar';
 import { getCurrentProfile } from '@/actions/profile';
 import { Profile } from '@prisma/client';
 import { auth } from '@/utils/auth';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { 
@@ -27,6 +28,7 @@ import {
 
 const HelpCenter = ({ user }: { user: Profile }) => {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   
 
   const { data: profile } = useQuery({
@@ -106,14 +108,16 @@ const HelpCenter = ({ user }: { user: Profile }) => {
         <CustomSidebar profile={profile} />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className={`flex-1 overflow-auto ${
+        isMobile ? 'pt-20' : ''
+      }`}>
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-8 py-6">
+        <div className={`bg-white border-b border-gray-200 ${isMobile ? 'px-4 py-4' : 'px-8 py-6'}`}>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Help Center</h1>
           <p className="text-gray-600">Find answers and get support for your influencer journey</p>
         </div>
 
-        <div className="p-8">
+        <div className={`${isMobile ? 'p-4' : 'p-8'}`}>
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 text-center">

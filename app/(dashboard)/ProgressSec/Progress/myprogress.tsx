@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/actions/profile";
 import { Button } from "@/components/ui/button";
 import CustomSidebar from "@/components/ui/custom-sidebar";
 import { Profile, Role } from "@prisma/client";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,6 +31,7 @@ import {
 
     const ProgressDashboard = ({ user }: { user: Profile }) => {
       const queryClient = useQueryClient();
+      const isMobile = useIsMobile();
       
     
       const { data: profile } = useQuery({
@@ -67,7 +69,9 @@ import {
       <CustomSidebar profile={profile} />
 
       {/* Main Content */}
-      <div className="flex-1 min-w-0 overflow-auto">
+      <div className={`flex-1 min-w-0 overflow-auto ${
+        isMobile ? 'pt-20' : ''
+      }`}>
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">

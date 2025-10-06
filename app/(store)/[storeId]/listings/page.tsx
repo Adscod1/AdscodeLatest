@@ -121,18 +121,18 @@ const StoreListings = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative flex-1 max-w-2xl">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+        <div className="relative flex-1 max-w-full lg:max-w-2xl">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <Input type="text" placeholder="Search products" className="pl-10" />
+          <Input type="text" placeholder="Search products" className="pl-10 w-full" />
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" size="sm">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
+          <Button variant="outline" size="sm" className="w-full sm:w-auto">
             <SlidersHorizontal className="w-4 h-4 mr-2" />
             Filter
           </Button>
           <Select defaultValue="newest">
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -147,17 +147,18 @@ const StoreListings = () => {
 
       {/* Products Table */}
       <div className="rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[70px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[200px]">Product</TableHead>
+                <TableHead className="hidden sm:table-cell">Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead className="hidden md:table-cell">Stock</TableHead>
+                <TableHead className="hidden lg:table-cell">Status</TableHead>
+                <TableHead className="w-[70px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
@@ -175,8 +176,8 @@ const StoreListings = () => {
               products?.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg mr-3 overflow-hidden">
+                    <div className="flex items-center min-w-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg mr-2 sm:mr-3 overflow-hidden flex-shrink-0">
                         {product.images && product.images[0] ? (
                           <Image
                             src={product.images[0].url}
@@ -191,19 +192,35 @@ const StoreListings = () => {
                           </div>
                         )}
                       </div>
-                      <span className="font-medium">{product.title}</span>
+                      <div className="min-w-0 flex-1">
+                        <span className="font-medium text-sm sm:text-base truncate block">{product.title}</span>
+                        <div className="sm:hidden text-xs text-gray-500 mt-1">
+                          {product.category || "Uncategorized"} • UGX {product.price.toLocaleString()}
+                        </div>
+                        <div className="md:hidden mt-1 flex gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            {getTotalStock(product.variations)}
+                          </Badge>
+                          <Badge
+                            variant="secondary"
+                            className={`text-xs ${getStatusColor(product.status)} lg:hidden`}
+                          >
+                            {product.status}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-gray-600">
+                  <TableCell className="text-gray-600 hidden sm:table-cell">
                     {product.category || "Uncategorized"}
                   </TableCell>
-                  <TableCell>UGX {product.price.toLocaleString()}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">UGX {product.price.toLocaleString()}</TableCell>
+                  <TableCell className="hidden md:table-cell">
                     <Badge variant="outline">
                       {getTotalStock(product.variations)} in stock
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden lg:table-cell">
                     <Badge
                       variant="secondary"
                       className={getStatusColor(product.status)}
@@ -272,13 +289,14 @@ const StoreListings = () => {
               ))
             )}
           </TableBody>
-        </Table>
-        <div className="px-6 py-4 border-t flex items-center justify-between text-sm text-gray-600">
+          </Table>
+        </div>
+        <div className="px-4 sm:px-6 py-4 border-t flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-600">
           <span>
             Showing {products?.length || 0} product
             {(products?.length || 0) !== 1 ? "s" : ""}
           </span>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-center sm:justify-end space-x-2">
             <Button variant="outline" size="sm" disabled>
               Previous
             </Button>

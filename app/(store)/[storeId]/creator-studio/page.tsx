@@ -16,16 +16,67 @@ import {
   Camera
 } from 'lucide-react';
 
+interface Influencer {
+  name: string;
+  username: string;
+  avatar: string;
+  category: string;
+  followers: string;
+  engagement: string;
+  rating: number;
+  location: string;
+  joinedDate: string;
+  bio: string;
+  platforms: {
+    instagram: string;
+    tiktok: string;
+    youtube: string;
+  };
+  demographics: {
+    '18-24': number;
+    '25-34': number;
+    '35-44': number;
+    '45+': number;
+  };
+  audienceGender: { female: number; male: number };
+  topLocations: Array<{ country: string; rank: number }>;
+  performance: {
+    totalCampaigns: number;
+    avgEngagement: number;
+    successRate: number;
+  };
+  avgLikes: string;
+  avgComments: number;
+  avgReach: string;
+}
+
+interface Application {
+  id: number;
+  influencer: Influencer;
+  campaign: string;
+  appliedDate: string;
+  proposedRate: string;
+  status: 'pending' | 'approved' | 'rejected';
+  message: string;
+  deliverables: {
+    instagramPosts: number;
+    stories: number;
+    reels: number;
+  };
+}
+
+type FilterStatus = 'all' | 'pending' | 'approved' | 'rejected';
+
 const CreatorStudioDashboard = () => {
   const [activeTab, setActiveTab] = useState('Analytics');
   const [activeSection, setActiveSection] = useState('Dashboard');
   
   // Applications state
-  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [showInfluencerDetails, setShowInfluencerDetails] = useState(false);
   const [showContractModal, setShowContractModal] = useState(false);
   const [showMessageModal, setShowMessageModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
 
   const menuItems = [
     { icon: BarChart3, label: 'Dashboard', path: 'Dashboard' },
@@ -42,54 +93,54 @@ const CreatorStudioDashboard = () => {
   const tabs = ['Discovery', 'Campaigns', 'Applications', 'Content', 'Analytics'];
 
   const renderAnalytics = () => (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <BarChart3 className="w-5 h-5" />
-            <h3 className="text-lg font-semibold">Campaign Performance</h3>
+    <div className="space-y-6 sm:space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
+            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+            <h3 className="text-base sm:text-lg font-semibold">Campaign Performance</h3>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Total Reach</span>
-              <span className="font-semibold">2.4M</span>
+              <span className="text-sm sm:text-base text-gray-600">Total Reach</span>
+              <span className="text-sm sm:text-base font-semibold">2.4M</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Engagement Rate</span>
-              <span className="font-semibold">4.2%</span>
+              <span className="text-sm sm:text-base text-gray-600">Engagement Rate</span>
+              <span className="text-sm sm:text-base font-semibold">4.2%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Click-through Rate</span>
-              <span className="font-semibold">2.8%</span>
+              <span className="text-sm sm:text-base text-gray-600">Click-through Rate</span>
+              <span className="text-sm sm:text-base font-semibold">2.8%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Conversion Rate</span>
-              <span className="font-semibold">1.3%</span>
+              <span className="text-sm sm:text-base text-gray-600">Conversion Rate</span>
+              <span className="text-sm sm:text-base font-semibold">1.3%</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-5 h-5 flex items-center justify-center">$</div>
-            <h3 className="text-lg font-semibold">ROI Metrics</h3>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
+            <div className="w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-sm sm:text-base">$</div>
+            <h3 className="text-base sm:text-lg font-semibold">ROI Metrics</h3>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Total Spent</span>
-              <span className="font-semibold">$15,750</span>
+              <span className="text-sm sm:text-base text-gray-600">Total Spent</span>
+              <span className="text-sm sm:text-base font-semibold">$15,750</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Revenue Generated</span>
-              <span className="font-semibold">$47,250</span>
+              <span className="text-sm sm:text-base text-gray-600">Revenue Generated</span>
+              <span className="text-sm sm:text-base font-semibold">$47,250</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">ROI</span>
-              <span className="font-semibold text-green-600">200%</span>
+              <span className="text-sm sm:text-base text-gray-600">ROI</span>
+              <span className="text-sm sm:text-base font-semibold text-green-600">200%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Cost per Acquisition</span>
-              <span className="font-semibold">$24.50</span>
+              <span className="text-sm sm:text-base text-gray-600">Cost per Acquisition</span>
+              <span className="text-sm sm:text-base font-semibold">$24.50</span>
             </div>
           </div>
         </div>
@@ -98,32 +149,32 @@ const CreatorStudioDashboard = () => {
   );
 
   const renderContent = () => (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Camera className="w-5 h-5" />
-        <h3 className="text-lg font-semibold">Content Library</h3>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
+        <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+        <h3 className="text-base sm:text-lg font-semibold">Content Library</h3>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {[1, 2, 3].map((item) => (
           <div key={item} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="aspect-square bg-gray-100 flex items-center justify-center">
-              <Camera className="w-12 h-12 text-gray-400" />
+              <Camera className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
             </div>
-            <div className="p-4">
-              <h4 className="font-semibold mb-2">Content #{item}</h4>
-              <p className="text-sm text-gray-600 mb-3">By @creator{item}</p>
-              <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="p-3 sm:p-4">
+              <h4 className="text-sm sm:text-base font-semibold mb-2">Content #{item}</h4>
+              <p className="text-xs sm:text-sm text-gray-600 mb-3">By @creator{item}</p>
+              <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500">
                 <div className="flex items-center gap-1">
-                  <Heart className="w-4 h-4" />
+                  <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>1.2K</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <MessageCircle className="w-4 h-4" />
+                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>89</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>5.4K</span>
                 </div>
               </div>
@@ -135,43 +186,43 @@ const CreatorStudioDashboard = () => {
   );
 
   const renderCampaigns = () => (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Target className="w-5 h-5" />
-        <h3 className="text-lg font-semibold">Active Campaigns</h3>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
+        <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+        <h3 className="text-base sm:text-lg font-semibold">Active Campaigns</h3>
       </div>
 
       <div className="space-y-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
             <div>
-              <h4 className="font-semibold text-lg">Summer Collection Launch</h4>
+              <h4 className="font-semibold text-base sm:text-lg">Summer Collection Launch</h4>
               <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mt-2">
                 Active
               </span>
             </div>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
+            <button className="self-start sm:self-auto px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
               <Eye className="w-4 h-4" />
               View
             </button>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
             <div>
-              <p className="text-gray-600 text-sm">Budget</p>
-              <p className="font-semibold">$5,000</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Budget</p>
+              <p className="font-semibold text-sm sm:text-base">$5,000</p>
             </div>
             <div>
-              <p className="text-gray-600 text-sm">Creators</p>
-              <p className="font-semibold">5</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Creators</p>
+              <p className="font-semibold text-sm sm:text-base">5</p>
             </div>
             <div>
-              <p className="text-gray-600 text-sm">Reach</p>
-              <p className="font-semibold">450K</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Reach</p>
+              <p className="font-semibold text-sm sm:text-base">450K</p>
             </div>
             <div>
-              <p className="text-gray-600 text-sm">Engagement</p>
-              <p className="font-semibold">3.2%</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
+              <p className="font-semibold text-sm sm:text-base">3.2%</p>
             </div>
           </div>
           
@@ -186,36 +237,36 @@ const CreatorStudioDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
             <div>
-              <h4 className="font-semibold text-lg">Holiday Promo Campaign</h4>
+              <h4 className="font-semibold text-base sm:text-lg">Holiday Promo Campaign</h4>
               <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mt-2">
                 Planning
               </span>
             </div>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
+            <button className="self-start sm:self-auto px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
               <Eye className="w-4 h-4" />
               View
             </button>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
             <div>
-              <p className="text-gray-600 text-sm">Budget</p>
-              <p className="font-semibold">$8,000</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Budget</p>
+              <p className="font-semibold text-sm sm:text-base">$8,000</p>
             </div>
             <div>
-              <p className="text-gray-600 text-sm">Creators</p>
-              <p className="font-semibold">3</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Creators</p>
+              <p className="font-semibold text-sm sm:text-base">3</p>
             </div>
             <div>
-              <p className="text-gray-600 text-sm">Reach</p>
-              <p className="font-semibold">320K</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Reach</p>
+              <p className="font-semibold text-sm sm:text-base">320K</p>
             </div>
             <div>
-              <p className="text-gray-600 text-sm">Engagement</p>
-              <p className="font-semibold">4.1%</p>
+              <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
+              <p className="font-semibold text-sm sm:text-base">4.1%</p>
             </div>
           </div>
           
@@ -234,41 +285,43 @@ const CreatorStudioDashboard = () => {
   );
 
   const renderDiscovery = () => (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Search className="w-5 h-5" />
-        <h3 className="text-lg font-semibold">Influencer Discovery</h3>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
+        <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+        <h3 className="text-base sm:text-lg font-semibold">Influencer Discovery</h3>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search creators..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
         </div>
-        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          <option>Category</option>
-          <option>Fashion</option>
-          <option>Tech</option>
-          <option>Fitness</option>
-        </select>
-        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          <option>Followers</option>
-          <option>10K-50K</option>
-          <option>50K-100K</option>
-          <option>100K+</option>
-        </select>
-        <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-          <div className="w-4 h-4"></div>
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <select className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base">
+            <option>Category</option>
+            <option>Fashion</option>
+            <option>Tech</option>
+            <option>Fitness</option>
+          </select>
+          <select className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base">
+            <option>Followers</option>
+            <option>10K-50K</option>
+            <option>50K-100K</option>
+            <option>100K+</option>
+          </select>
+          <button className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <div className="w-4 h-4"></div>
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {[
           {
             name: 'Sarah Johnson',
@@ -304,50 +357,51 @@ const CreatorStudioDashboard = () => {
             icon: '💪'
           }
         ].map((creator, index) => (
-          <div key={index} className="bg-white rounded-lg border border-gray-200 p-6">
+          <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center text-lg sm:text-xl shrink-0">
                 {creator.icon}
               </div>
-              <div>
-                <h4 className="font-semibold">{creator.name}</h4>
-                <p className="text-gray-600 text-sm">{creator.handle}</p>
+              <div className="min-w-0">
+                <h4 className="font-semibold text-sm sm:text-base truncate">{creator.name}</h4>
+                <p className="text-gray-600 text-xs sm:text-sm truncate">{creator.handle}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
               <div>
-                <p className="text-gray-600 text-sm">Followers</p>
-                <p className="font-semibold">{creator.followers}</p>
+                <p className="text-gray-600 text-xs sm:text-sm">Followers</p>
+                <p className="font-semibold text-sm sm:text-base">{creator.followers}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Engagement</p>
-                <p className="font-semibold">{creator.engagement}</p>
+                <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
+                <p className="font-semibold text-sm sm:text-base">{creator.engagement}</p>
               </div>
             </div>
 
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm bg-gray-100 px-2 py-1 rounded">{creator.category}</span>
+                <span className="text-xs sm:text-sm bg-gray-100 px-2 py-1 rounded">{creator.category}</span>
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                  <span className="text-sm font-medium">{creator.rating}</span>
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 fill-current" />
+                  <span className="text-xs sm:text-sm font-medium">{creator.rating}</span>
                 </div>
               </div>
-              <p className="text-sm text-gray-600">Rate: {creator.rate}</p>
-              <div className="flex items-center gap-1 text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">Rate: {creator.rate}</p>
+              <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
                 <MapPin className="w-3 h-3" />
-                {creator.location}
+                <span className="truncate">{creator.location}</span>
               </div>
             </div>
 
             <div className="flex gap-2">
-              <button className="flex-1 bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 flex items-center justify-center gap-2">
-                <Send className="w-4 h-4" />
-                Contact
+              <button className="flex-1 bg-black text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-gray-800 flex items-center justify-center gap-2">
+                <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Contact</span>
+                <span className="sm:hidden">Contact</span>
               </button>
               <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                <Eye className="w-4 h-4" />
+                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
@@ -357,7 +411,7 @@ const CreatorStudioDashboard = () => {
   );
 
   const renderApplications = () => {
-    const applications = [
+    const applications: Application[] = [
       {
         id: 1,
         influencer: {
@@ -401,7 +455,7 @@ const CreatorStudioDashboard = () => {
         campaign: 'Summer Collection Launch',
         appliedDate: '15/01/2024',
         proposedRate: '$400',
-        status: 'pending',
+        status: 'pending' as const,
         message: "I love your brand's aesthetic and would be thrilled to showcase your summer collection to my engaged audience of fashion enthusiasts.",
         deliverables: {
           instagramPosts: 2,
@@ -452,7 +506,7 @@ const CreatorStudioDashboard = () => {
         campaign: 'Holiday Promo Campaign',
         appliedDate: '12/01/2024',
         proposedRate: '$650',
-        status: 'approved',
+        status: 'approved' as const,
         message: "Your holiday campaign aligns perfectly with my content strategy. I can create authentic content that resonates with my fitness community.",
         deliverables: {
           instagramPosts: 3,
@@ -503,7 +557,7 @@ const CreatorStudioDashboard = () => {
         campaign: 'Summer Collection Launch',
         appliedDate: '10/01/2024',
         proposedRate: '$300',
-        status: 'rejected',
+        status: 'rejected' as const,
         message: "I'm excited about the opportunity to collaborate and create beautiful content featuring your products.",
         deliverables: {
           instagramPosts: 1,
@@ -530,13 +584,13 @@ const CreatorStudioDashboard = () => {
       filterStatus === 'all' || app.status === filterStatus
     );
 
-    const getStatusBadge = (status) => {
-      const styles = {
+    const getStatusBadge = (status: 'pending' | 'approved' | 'rejected') => {
+      const styles: Record<'pending' | 'approved' | 'rejected', string> = {
         pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
         approved: 'bg-green-100 text-green-800 border-green-200',
         rejected: 'bg-red-100 text-red-800 border-red-200'
       };
-      const icons = {
+      const icons: Record<'pending' | 'approved' | 'rejected', React.ReactElement> = {
         pending: <span className="w-3 h-3 text-yellow-600">⏳</span>,
         approved: <span className="w-3 h-3 text-green-600">✓</span>,
         rejected: <span className="w-3 h-3 text-red-600">✗</span>
@@ -552,24 +606,24 @@ const CreatorStudioDashboard = () => {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold">Influencer Applications</h3>
-            <p className="text-sm text-gray-600 mt-1">Review and manage influencer applications</p>
+            <h3 className="text-base sm:text-lg font-semibold">Influencer Applications</h3>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Review and manage influencer applications</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <select 
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Applications</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
             </select>
-            <div className="px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
-              <span className="text-sm font-medium text-blue-900">
+            <div className="px-3 sm:px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
+              <span className="text-xs sm:text-sm font-medium text-blue-900">
                 {applications.filter(a => a.status === 'pending').length} pending reviews
               </span>
             </div>
@@ -582,26 +636,26 @@ const CreatorStudioDashboard = () => {
             <div key={app.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
               <div className={`h-1 ${app.status === 'approved' ? 'bg-green-500' : app.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'}`} />
               
-              <div className="p-6">
-                <div className="flex items-start gap-4">
+              <div className="p-4 sm:p-6">
+                <div className="flex items-start gap-3 sm:gap-4">
                   {/* Avatar */}
-                  <div className="relative">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-2xl">
+                  <div className="relative shrink-0">
+                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-lg sm:text-2xl">
                       {app.influencer.avatar}
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white" />
                   </div>
 
                   {/* Main Content */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-bold text-gray-900">{app.influencer.name}</h3>
-                          <span className="text-sm text-gray-500">{app.influencer.username}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900">{app.influencer.name}</h3>
+                          <span className="text-xs sm:text-sm text-gray-500">{app.influencer.username}</span>
                           {getStatusBadge(app.status)}
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                           <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{app.influencer.category}</span>
                           <span>Applied on {app.appliedDate}</span>
                         </div>
@@ -609,43 +663,43 @@ const CreatorStudioDashboard = () => {
                     </div>
 
                     {/* Campaign Info */}
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
                       <div>
                         <p className="text-xs text-gray-500 mb-1">CAMPAIGN</p>
-                        <p className="font-semibold text-gray-900">{app.campaign}</p>
+                        <p className="font-semibold text-gray-900 text-xs sm:text-sm truncate">{app.campaign}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">FOLLOWERS</p>
-                        <p className="font-semibold text-gray-900">{app.influencer.followers}</p>
+                        <p className="font-semibold text-gray-900 text-xs sm:text-sm">{app.influencer.followers}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">ENGAGEMENT</p>
-                        <p className="font-semibold text-gray-900">{app.influencer.engagement}</p>
+                        <p className="font-semibold text-gray-900 text-xs sm:text-sm">{app.influencer.engagement}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500 mb-1">PROPOSED RATE</p>
-                        <p className="font-semibold text-gray-900">{app.proposedRate}</p>
+                        <p className="font-semibold text-gray-900 text-xs sm:text-sm">{app.proposedRate}</p>
                       </div>
                     </div>
 
                     {/* Application Message */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4">
                       <p className="text-xs font-semibold text-gray-500 mb-2">APPLICATION MESSAGE</p>
-                      <p className="text-sm text-gray-700 italic">"{app.message}"</p>
+                      <p className="text-xs sm:text-sm text-gray-700 italic">"{app.message}"</p>
                     </div>
 
                     {/* Deliverables */}
                     <div className="mb-4">
                       <p className="text-xs font-semibold text-gray-500 mb-2">PROPOSED DELIVERABLES</p>
-                      <div className="flex gap-3">
-                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
+                      <div className="flex flex-wrap gap-2 sm:gap-3">
+                        <span className="px-2 sm:px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
                           {app.deliverables.instagramPosts} Instagram Posts
                         </span>
-                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
+                        <span className="px-2 sm:px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
                           {app.deliverables.stories} Stories
                         </span>
                         {app.deliverables.reels > 0 && (
-                          <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
+                          <span className="px-2 sm:px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
                             {app.deliverables.reels} Reels
                           </span>
                         )}
@@ -653,7 +707,7 @@ const CreatorStudioDashboard = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                       {app.status === 'pending' && (
                         <>
                           <button 
@@ -661,11 +715,11 @@ const CreatorStudioDashboard = () => {
                               setSelectedApplication(app);
                               setShowContractModal(true);
                             }}
-                            className="flex-1 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                            className="w-full sm:flex-1 px-3 sm:px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 text-sm"
                           >
-                            ✓ Approve Application
+                            ✓ <span className="hidden sm:inline">Approve Application</span><span className="sm:hidden">Approve</span>
                           </button>
-                          <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                          <button className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm">
                             Decline
                           </button>
                         </>
@@ -676,29 +730,31 @@ const CreatorStudioDashboard = () => {
                             setSelectedApplication(app);
                             setShowContractModal(true);
                           }}
-                          className="px-6 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                          className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 text-sm"
                         >
-                          📄 Send Contract
+                          📄 <span className="hidden sm:inline">Send Contract</span><span className="sm:hidden">Contract</span>
                         </button>
                       )}
-                      <button 
-                        onClick={() => {
-                          setSelectedApplication(app);
-                          setShowMessageModal(true);
-                        }}
-                        className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                      >
-                        💬 Message
-                      </button>
-                      <button 
-                        onClick={() => {
-                          setSelectedApplication(app);
-                          setShowInfluencerDetails(true);
-                        }}
-                        className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                      >
-                        👁️ View Details
-                      </button>
+                      <div className="flex gap-2 sm:gap-3">
+                        <button 
+                          onClick={() => {
+                            setSelectedApplication(app);
+                            setShowMessageModal(true);
+                          }}
+                          className="flex-1 sm:flex-none px-3 sm:px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                        >
+                          💬 <span className="hidden sm:inline">Message</span><span className="sm:hidden">Message</span>
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setSelectedApplication(app);
+                            setShowInfluencerDetails(true);
+                          }}
+                          className="flex-1 sm:flex-none px-3 sm:px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                        >
+                          👁️ <span className="hidden sm:inline">View Details</span><span className="sm:hidden">View</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -728,63 +784,66 @@ const CreatorStudioDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50">
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-col">
         {/* Header */}
-        <div className="bg-white border-b border-gray-300 px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-white border-b border-gray-300 px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Creator Studio</h1>
-              <p className="text-gray-600">Manage influencer partnerships and content collaborations</p>
+              <h1 className="text-xl sm:text-2xl font-bold">Creator Studio</h1>
+              <p className="text-sm sm:text-base text-gray-600">Manage influencer partnerships and content collaborations</p>
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-4 gap-6 mt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                <Target className="w-5 h-5" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-4 sm:mt-6">
+            <div className="flex items-center gap-3 p-3 sm:p-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Active Campaigns</p>
-                <p className="text-2xl font-bold">12</p>
+                <p className="text-xs sm:text-sm text-gray-600">Active Campaigns</p>
+                <p className="text-xl sm:text-2xl font-bold">12</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 p-3 sm:p-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              </div>
               <div>
-                <p className="text-sm text-gray-600">Total Creators</p>
-                <p className="text-2xl font-bold">248</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total Creators</p>
+                <p className="text-xl sm:text-2xl font-bold">248</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Eye className="w-5 h-5 text-green-600" />
+            <div className="flex items-center gap-3 p-3 sm:p-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Reach</p>
-                <p className="text-2xl font-bold">2.4M</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total Reach</p>
+                <p className="text-xl sm:text-2xl font-bold">2.4M</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-yellow-600" />
+            <div className="flex items-center gap-3 p-3 sm:p-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 rounded-full flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Avg. Engagement</p>
-                <p className="text-2xl font-bold">4.2%</p>
+                <p className="text-xs sm:text-sm text-gray-600">Avg. Engagement</p>
+                <p className="text-xl sm:text-2xl font-bold">4.2%</p>
               </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex space-x-8 mt-6">
+          <div className="flex flex-wrap gap-2 sm:space-x-8 sm:gap-0 mt-4 sm:mt-6 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-1 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab
                     ? 'border-black text-black'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -797,7 +856,7 @@ const CreatorStudioDashboard = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 sm:p-6">
           {renderTabContent()}
         </div>
       </div>

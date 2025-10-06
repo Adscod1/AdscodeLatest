@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/actions/profile";
 import { Button } from "@/components/ui/button";
 import CustomSidebar from "@/components/ui/custom-sidebar";
 import { Profile, Role } from "@prisma/client";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -91,6 +92,7 @@ const SidebarItem: React.FC<{
 
 const Reviews = ({ user }: { user: Profile }) => {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   
 
   const { data: profile } = useQuery({
@@ -158,7 +160,9 @@ const Reviews = ({ user }: { user: Profile }) => {
         <CustomSidebar profile={profile} />
 
         {/* Main Content */}
-        <div className="flex-1 w-0 min-w-0">
+        <div className={`flex-1 w-0 min-w-0 ${
+          isMobile ? 'pt-20' : ''
+        }`}>
           <div className="p-4 sm:p-6 lg:p-8">
             <div className="w-full max-w-none">
               {/* Header */}

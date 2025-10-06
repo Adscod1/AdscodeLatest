@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import CustomSidebar from '@/components/ui/custom-sidebar';
 import { Profile } from '@prisma/client';
@@ -41,6 +41,18 @@ interface MenuItem {
 
 const NotificationsDashboard = ({ user }: { user: Profile }) => {
   const queryClient = useQueryClient();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user.id],
@@ -186,7 +198,7 @@ const NotificationsDashboard = ({ user }: { user: Profile }) => {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto">
-          <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+          <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8" style={{ paddingTop: isMobile ? '4rem' : '1.5rem' }}>
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 space-y-4 sm:space-y-0">
               <div>

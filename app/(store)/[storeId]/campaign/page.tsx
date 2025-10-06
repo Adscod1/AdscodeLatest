@@ -152,103 +152,103 @@ const MarketingCampaigns: React.FC = () => {
      
 
       {/* Main Content */}
-      <div className=" p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Marketing Campaigns</h1>
-            <p className="text-gray-600">Create and manage your marketing campaigns</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Marketing Campaigns</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Create and manage your marketing campaigns</p>
           </div>
-          <Link href={`/${storeId}/createCampaign`} className="bg-black text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-gray-800">
+          <Link href={`/${storeId}/createCampaign`} className="bg-black text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-800 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
-            <span>Create Campaign</span>
+            <span className="whitespace-nowrap">Create Campaign</span>
           </Link>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Total Budget</span>
-              <DollarSign className="w-5 h-5 text-blue-500" />
+              <span className="text-gray-600 text-xs sm:text-sm">Total Budget</span>
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalBudget)}</div>
-            <div className="text-sm text-gray-500">{formatCurrency(stats.budgetSpent)} spent (68%)</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(stats.totalBudget)}</div>
+            <div className="text-xs sm:text-sm text-gray-500">{formatCurrency(stats.budgetSpent)} spent (68%)</div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Active Campaigns</span>
-              <Target className="w-5 h-5 text-green-500" />
+              <span className="text-gray-600 text-xs sm:text-sm">Active Campaigns</span>
+              <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{stats.activeCampaigns}</div>
-            <div className="text-sm text-gray-500">2 running campaigns</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.activeCampaigns}</div>
+            <div className="text-xs sm:text-sm text-gray-500">2 running campaigns</div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Total Conversions</span>
-              <TrendingUp className="w-5 h-5 text-purple-500" />
+              <span className="text-gray-600 text-xs sm:text-sm">Total Conversions</span>
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.totalConversions)}</div>
-            <div className="text-sm text-green-600">+{stats.conversionIncrease}% from last month</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatNumber(stats.totalConversions)}</div>
+            <div className="text-xs sm:text-sm text-green-600">+{stats.conversionIncrease}% from last month</div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Avg. ROAS</span>
-              <DollarSign className="w-5 h-5 text-orange-500" />
+              <span className="text-gray-600 text-xs sm:text-sm">Avg. ROAS</span>
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{stats.avgRoas}x</div>
-            <div className="text-sm text-gray-500">Return on ad spend</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.avgRoas}x</div>
+            <div className="text-xs sm:text-sm text-gray-500">Return on ad spend</div>
           </div>
         </div>
 
         {/* Dashboard Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Campaign Performance */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <h3 className="text-lg font-semibold mb-4">Campaign Performance</h3>
-            <div className="space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Campaign Performance</h3>
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex justify-between">
-                <span className="text-gray-600">This Week</span>
-                <span className="font-semibold">72 conversions</span>
+                <span className="text-gray-600 text-sm sm:text-base">This Week</span>
+                <span className="font-semibold text-sm sm:text-base">72 conversions</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Revenue</span>
-                <span className="font-semibold">{formatCurrency(8640)}</span>
+                <span className="text-gray-600 text-sm sm:text-base">Revenue</span>
+                <span className="font-semibold text-sm sm:text-base">{formatCurrency(8640)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Spend</span>
-                <span className="font-semibold">{formatCurrency(2500)}</span>
+                <span className="text-gray-600 text-sm sm:text-base">Spend</span>
+                <span className="font-semibold text-sm sm:text-base">{formatCurrency(2500)}</span>
               </div>
             </div>
           </div>
 
           {/* Budget Allocation */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <h3 className="text-lg font-semibold mb-4">Budget Allocation</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Budget Allocation</h3>
             <div className="space-y-3">
               {budgetAllocation.map((item, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-                    <span className="text-gray-700">{item.type}</span>
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${item.color}`}></div>
+                    <span className="text-gray-700 text-sm sm:text-base truncate">{item.type}</span>
                   </div>
-                  <span className="font-semibold">{formatCurrency(item.amount)}</span>
+                  <span className="font-semibold text-sm sm:text-base flex-shrink-0 ml-2">{formatCurrency(item.amount)}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Top Performing */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <h3 className="text-lg font-semibold mb-4">Top Performing</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Top Performing</h3>
             <div className="space-y-3">
               {topPerforming.map((item, index) => (
                 <div key={index} className="border-b border-gray-100 pb-3 last:border-b-0">
-                  <div className="font-medium text-sm">{item.name}</div>
-                  <div className="text-xs text-gray-500">{item.conversions} conversions • {item.cr} CR</div>
+                  <div className="font-medium text-xs sm:text-sm truncate">{item.name}</div>
+                  <div className="text-xs text-gray-500 mt-1">{item.conversions} conversions • {item.cr} CR</div>
                 </div>
               ))}
             </div>
@@ -256,23 +256,23 @@ const MarketingCampaigns: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="relative">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+            <div className="relative w-full lg:w-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search campaigns..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full lg:w-64 text-sm sm:text-base"
               />
             </div>
-            <div className="flex space-x-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full lg:w-auto">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base w-full sm:w-auto"
               >
                 <option>All Status</option>
                 <option>Active</option>
@@ -282,7 +282,7 @@ const MarketingCampaigns: React.FC = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base w-full sm:w-auto"
               >
                 <option>All Types</option>
                 <option>Email</option>
@@ -293,8 +293,8 @@ const MarketingCampaigns: React.FC = () => {
             </div>
           </div>
 
-          {/* Campaigns Table */}
-          <div className="overflow-x-auto">
+          {/* Campaigns Table - Desktop */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full">
               <thead className="border-b border-gray-200">
                 <tr>
@@ -351,6 +351,60 @@ const MarketingCampaigns: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Campaigns Cards - Mobile */}
+          <div className="lg:hidden space-y-4">
+            {campaigns.map((campaign) => (
+              <div key={campaign.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-medium text-sm sm:text-base text-gray-900 truncate">{campaign.name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">{campaign.type} • {campaign.target}</p>
+                  </div>
+                  <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
+                      {campaign.status}
+                    </span>
+                    <button className="p-1 hover:bg-gray-100 rounded">
+                      <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Budget</p>
+                    <p className="font-semibold text-sm">{formatCurrency(campaign.budget)}</p>
+                    <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1">
+                      <div className="h-1.5 bg-blue-500 rounded-full" style={{ width: '75%' }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Conversions</p>
+                    <p className="font-semibold text-sm">{campaign.conversions}</p>
+                    <p className="text-xs text-gray-500">{campaign.cr} CR</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Impressions</p>
+                    <p className="font-semibold text-sm">{formatNumber(campaign.impressions)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Clicks</p>
+                    <p className="font-semibold text-sm">{formatNumber(campaign.clicks)}</p>
+                    <p className="text-xs text-gray-500">{campaign.ctr} CTR</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-xs text-gray-500">Duration</p>
+                  <p className="text-xs sm:text-sm text-gray-700">{campaign.duration}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CustomSidebar from "@/components/ui/custom-sidebar";
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 import React, { useState } from 'react';
 import { 
   User, 
@@ -33,6 +34,7 @@ interface ForumSection {
 
  const CommunityForums = ({ user }: { user: Profile }) => {
       const queryClient = useQueryClient();
+      const isMobile = useIsMobile();
       
     
       const { data: profile } = useQuery({
@@ -113,7 +115,9 @@ interface ForumSection {
       <CustomSidebar profile={profile} />
 
       {/* Main Content */}
-      <div className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
+      <div className={`flex-1 min-w-0 overflow-auto ${
+        isMobile ? 'pl-4 pr-4 pt-20 pb-4' : 'p-4 sm:p-6 lg:p-8'
+      }`}>
         <div className="w-full max-w-none">
           {/* Header */}
           <div className="mb-6 sm:mb-8">

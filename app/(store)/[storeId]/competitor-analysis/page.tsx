@@ -246,18 +246,18 @@ const CompetitorAnalysisDashboard = () => {
       
 
       {/* Main Content */}
-      <div className=" p-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Competitor Analysis</h1>
-            <p className="text-gray-600">Stay ahead with comprehensive market intelligence</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Competitor Analysis</h1>
+            <p className="text-sm sm:text-base text-gray-600">Stay ahead with comprehensive market intelligence</p>
           </div>
-          <div className="flex items-center space-x-4">
-            <select className="border border-gray-200 rounded-lg px-4 py-2 text-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <select className="w-full sm:w-auto border border-gray-200 rounded-lg px-3 sm:px-4 py-2 text-sm">
               <option>Last 30 days</option>
             </select>
-            <button className="flex items-center space-x-2 border border-gray-200 rounded-lg px-4 py-2 text-sm">
+            <button className="w-full sm:w-auto flex items-center justify-center sm:justify-start space-x-2 border border-gray-200 rounded-lg px-3 sm:px-4 py-2 text-sm">
               <AlertCircle className="w-4 h-4" />
               <span>Alerts</span>
             </button>
@@ -265,69 +265,69 @@ const CompetitorAnalysisDashboard = () => {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">Tracked Competitors</p>
-                <p className="text-2xl font-bold">12</p>
-                <p className="text-green-600 text-sm">+2 this month</p>
+                <p className="text-gray-600 text-xs sm:text-sm">Tracked Competitors</p>
+                <p className="text-xl sm:text-2xl font-bold">12</p>
+                <p className="text-green-600 text-xs sm:text-sm">+2 this month</p>
               </div>
-              <Users className="w-8 h-8 text-gray-400" />
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">Market Share</p>
-                <p className="text-2xl font-bold">23.4%</p>
-                <p className="text-green-600 text-sm">+1.8% vs competitors</p>
+                <p className="text-gray-600 text-xs sm:text-sm">Market Share</p>
+                <p className="text-xl sm:text-2xl font-bold">23.4%</p>
+                <p className="text-green-600 text-xs sm:text-sm">+1.8% vs competitors</p>
               </div>
-              <TrendingUp className="w-8 h-8 text-gray-400" />
+              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">Price Advantage</p>
-                <p className="text-2xl font-bold">8.2%</p>
-                <p className="text-red-600 text-sm">-2.1% lower avg</p>
+                <p className="text-gray-600 text-xs sm:text-sm">Price Advantage</p>
+                <p className="text-xl sm:text-2xl font-bold">8.2%</p>
+                <p className="text-red-600 text-xs sm:text-sm">-2.1% lower avg</p>
               </div>
-              <DollarSign className="w-8 h-8 text-gray-400" />
+              <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">Review Score Gap</p>
-                <p className="text-2xl font-bold">+0.3</p>
-                <p className="text-green-600 text-sm">+0.1 vs average</p>
+                <p className="text-gray-600 text-xs sm:text-sm">Review Score Gap</p>
+                <p className="text-xl sm:text-2xl font-bold">+0.3</p>
+                <p className="text-green-600 text-xs sm:text-sm">+0.1 vs average</p>
               </div>
-              <Star className="w-8 h-8 text-gray-400" />
+              <Star className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
             </div>
           </div>
         </div>
 
         {/* Competitor Overview - Full Width */}
-        <div className="bg-white rounded-lg shadow-sm border mb-8">
-          <div className="p-6 border-b">
-            <h2 className="text-lg font-semibold">Competitor Overview</h2>
+        <div className="bg-white rounded-lg shadow-sm border mb-6 sm:mb-8">
+          <div className="p-4 sm:p-6 border-b">
+            <h2 className="text-base sm:text-lg font-semibold">Competitor Overview</h2>
           </div>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="space-y-4">
               {competitors.map((competitor) => (
-                <div key={competitor.id} className="flex items-center justify-between py-3 border-b last:border-b-0">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-sm font-medium">
+                <div key={competitor.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b last:border-b-0 gap-3">
+                  <div className="flex items-start sm:items-center space-x-3">
+                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-sm font-medium shrink-0">
                       {competitor.code}
                     </div>
-                    <div>
-                      <p className="font-medium">{competitor.name}</p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <span>Market Share: {competitor.marketShare}%</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm sm:text-base">{competitor.name}</p>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mt-1">
+                        <span>Share: {competitor.marketShare}%</span>
                         <span>Traffic: {competitor.traffic}</span>
                         <div className="flex items-center space-x-1">
                           <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
@@ -336,17 +336,22 @@ const CompetitorAnalysisDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <p className="font-medium">{competitor.revenue}</p>
-                      <p className={`text-sm ${competitor.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ml-11 sm:ml-0">
+                    <div className="flex items-center justify-between sm:block sm:text-right">
+                      <span className="text-xs sm:hidden text-gray-500">Revenue:</span>
+                      <p className="font-medium text-sm sm:text-base">{competitor.revenue}</p>
+                      <p className={`text-xs sm:text-sm ${competitor.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
                         {competitor.growth}
                       </p>
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getThreatColor(competitor.threat)}`}>
-                      {competitor.threat} threat
-                    </span>
-                    <button className="text-blue-600 text-sm hover:underline">View Details</button>
+                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getThreatColor(competitor.threat)}`}>
+                        {competitor.threat} threat
+                      </span>
+                      <button className="text-blue-600 text-xs sm:text-sm hover:underline whitespace-nowrap">
+                        View Details
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -355,28 +360,28 @@ const CompetitorAnalysisDashboard = () => {
         </div>
 
         {/* Price Comparison and Market Trends - Side by Side */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Price Comparison */}
           <div className="bg-white rounded-lg shadow-sm border">
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Price Comparison</h2>
+            <div className="p-4 sm:p-6 border-b">
+              <h2 className="text-base sm:text-lg font-semibold">Price Comparison</h2>
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="space-y-4">
                 {priceComparisons.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between py-2">
-                    <div>
-                      <p className="font-medium">{item.category}</p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-2 gap-2">
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm sm:text-base">{item.category}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-xs sm:text-sm text-gray-600 gap-1 sm:gap-0">
                         <span>Your Price: {item.yourPrice}</span>
                         <span>Avg Competitor: {item.avgCompetitor}</span>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="flex items-center justify-between sm:flex-col sm:items-end sm:text-right gap-2">
                       <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${item.status === 'good' ? 'bg-green-100 text-green-800' : item.status === 'average' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
                         {item.status}
                       </span>
-                      <p className={`text-sm ${getStatusColor(item.status)}`}>
+                      <p className={`text-xs sm:text-sm ${getStatusColor(item.status)}`}>
                         {item.difference}
                       </p>
                     </div>
@@ -388,24 +393,26 @@ const CompetitorAnalysisDashboard = () => {
 
           {/* Market Trends */}
           <div className="bg-white rounded-lg shadow-sm border">
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Market Trends</h2>
+            <div className="p-4 sm:p-6 border-b">
+              <h2 className="text-base sm:text-lg font-semibold">Market Trends</h2>
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="space-y-4">
                 {marketTrends.map((trend, index) => (
-                  <div key={index} className="flex items-center justify-between py-2">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <p className="font-medium">{trend.category}</p>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${getOpportunityColor(trend.opportunity)}`}>
-                          {trend.opportunity} opportunity
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <span>Growth: </span>
-                        <span className="text-green-600 font-medium">{trend.growth}</span>
-                        <span className="ml-4">Market Adoption: {trend.adoption}</span>
+                  <div key={index} className="py-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                      <p className="font-medium text-sm sm:text-base">{trend.category}</p>
+                      <span className={`px-2 py-1 rounded text-xs font-medium self-start ${getOpportunityColor(trend.opportunity)}`}>
+                        {trend.opportunity} opportunity
+                      </span>
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-600">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                        <div>
+                          <span>Growth: </span>
+                          <span className="text-green-600 font-medium">{trend.growth}</span>
+                        </div>
+                        <span>Market Adoption: {trend.adoption}</span>
                       </div>
                     </div>
                   </div>
@@ -417,28 +424,28 @@ const CompetitorAnalysisDashboard = () => {
 
         {/* Latest Competitive Insights - Full Width */}
         <div className="bg-white rounded-lg shadow-sm border">
-          <div className="p-6 border-b">
-            <h2 className="text-lg font-semibold">Latest Competitive Insights</h2>
+          <div className="p-4 sm:p-6 border-b">
+            <h2 className="text-base sm:text-lg font-semibold">Latest Competitive Insights</h2>
           </div>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="space-y-4">
               {competitiveInsights.map((insight, index) => (
-                <div key={index} className={`border-l-4 p-4 rounded-r-lg ${getImpactColor(insight.impact)}`}>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <p className="font-medium">{insight.company}</p>
+                <div key={index} className={`border-l-4 p-3 sm:p-4 rounded-r-lg ${getImpactColor(insight.impact)}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <p className="font-medium text-sm sm:text-base">{insight.company}</p>
                         <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${insight.impact === 'high' ? 'bg-red-100 text-red-800' : insight.impact === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
                           {insight.impact} impact
                         </span>
                       </div>
-                      <p className="text-sm text-gray-700 mb-2">{insight.insight}</p>
-                      <div className="text-sm">
+                      <p className="text-xs sm:text-sm text-gray-700 mb-2">{insight.insight}</p>
+                      <div className="text-xs sm:text-sm">
                         <span className="font-medium text-blue-600">{insight.description}:</span>
-                        <p className="text-gray-600">{insight.action}</p>
+                        <p className="text-gray-600 mt-1">{insight.action}</p>
                       </div>
                     </div>
-                    <button className="ml-4 text-blue-600 text-sm hover:underline whitespace-nowrap">
+                    <button className="self-start sm:ml-4 text-blue-600 text-xs sm:text-sm hover:underline whitespace-nowrap">
                       Take Action
                     </button>
                   </div>

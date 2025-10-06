@@ -207,12 +207,12 @@ const InfluencerCampaignManager = () => {
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
   const renderBasicInfo = () => (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Information</h2>
-        <p className="text-gray-600 mb-6">Set up the fundamental details of your campaign</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Basic Information</h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Set up the fundamental details of your campaign</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Campaign Title <span className="text-red-500">*</span>
@@ -258,10 +258,10 @@ const InfluencerCampaignManager = () => {
       </div>
 
       <div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Budget & Timeline</h3>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Budget & Timeline</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="sm:col-span-2 lg:col-span-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Total Budget <span className="text-red-500">*</span>
             </label>
@@ -269,7 +269,7 @@ const InfluencerCampaignManager = () => {
               type="text"
               value={campaignData.budget}
               onChange={(e) => handleInputChange('budget', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               placeholder="e.g., 5000"
             />
           </div>
@@ -279,7 +279,7 @@ const InfluencerCampaignManager = () => {
             <select
               value={campaignData.currency}
               onChange={(e) => handleInputChange('currency', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             >
               <option>USD ($)</option>
               <option>EUR (€)</option>
@@ -288,7 +288,7 @@ const InfluencerCampaignManager = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Start Date <span className="text-red-500">*</span>
@@ -333,10 +333,10 @@ const InfluencerCampaignManager = () => {
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {/* App Installs */}
           <div 
-            className={`relative p-6 border-2 rounded-lg cursor-pointer transition-all ${
+            className={`relative p-4 sm:p-6 border-2 rounded-lg cursor-pointer transition-all ${
               campaignData.campaignObjective === 'app-installs' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
@@ -345,25 +345,25 @@ const InfluencerCampaignManager = () => {
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shrink-0">
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">App Installs</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">App Installs</h3>
               </div>
               {campaignData.campaignObjective === 'app-installs' && (
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-600">Drive mobile app downloads and installations</p>
+            <p className="text-xs sm:text-sm text-gray-600">Drive mobile app downloads and installations</p>
           </div>
 
           {/* Video Views */}
           <div 
-            className={`relative p-6 border-2 rounded-lg cursor-pointer transition-all ${
+            className={`relative p-4 sm:p-6 border-2 rounded-lg cursor-pointer transition-all ${
               campaignData.campaignObjective === 'video-views' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
@@ -372,20 +372,20 @@ const InfluencerCampaignManager = () => {
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shrink-0">
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Video Views</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Video Views</h3>
               </div>
               {campaignData.campaignObjective === 'video-views' && (
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-600">Increase video content engagement and reach</p>
+            <p className="text-xs sm:text-sm text-gray-600">Increase video content engagement and reach</p>
           </div>
 
           {/* Bookings */}
@@ -499,24 +499,24 @@ const InfluencerCampaignManager = () => {
       </div>
 
       {/* Call-to-Action Section */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center mb-6">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-            <Plus className="w-4 h-4 text-white" />
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="flex items-center mb-4 sm:mb-6">
+          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 shrink-0">
+            <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             Add Call-to-Action <span className="text-red-500">*</span>
           </h2>
         </div>
 
         {campaignData.callToActions.length === 0 && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   CTA Action <span className="text-red-500">*</span>
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base">
                   <option value="">Select Campaign Action</option>
                   <option value="app-download">App Download</option>
                   <option value="website-visit">Website Visit</option>
@@ -660,11 +660,11 @@ const InfluencerCampaignManager = () => {
   );
 
   const renderTargetsGoals = () => (
-    <div className="space-y-8">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
         <div className="flex items-center mb-4">
-          <Target className="w-5 h-5 text-blue-600 mr-2" />
-          <h2 className="text-xl font-semibold text-blue-900">Campaign Targets & Goals</h2>
+          <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2" />
+          <h2 className="text-lg sm:text-xl font-semibold text-blue-900">Campaign Targets & Goals</h2>
         </div>
         
         <div className="space-y-4">
@@ -730,22 +730,22 @@ const InfluencerCampaignManager = () => {
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Platforms <span className="text-red-500">*</span>
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
               {platforms.map(platform => (
-                <label key={platform} className="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <label key={platform} className="flex items-center space-x-2 p-2 sm:p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={campaignData.platforms.includes(platform)}
                     onChange={() => handlePlatformChange(platform)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0"
                   />
-                  <span className="text-sm text-gray-700">{platform}</span>
+                  <span className="text-xs sm:text-sm text-gray-700 truncate">{platform}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Followers</label>
               <input
@@ -753,7 +753,7 @@ const InfluencerCampaignManager = () => {
                 value={campaignData.minFollowers}
                 onChange={(e) => handleInputChange('minFollowers', e.target.value)}
                 placeholder="e.g., 10000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               />
             </div>
             <div>
@@ -763,12 +763,12 @@ const InfluencerCampaignManager = () => {
                 value={campaignData.maxFollowers}
                 onChange={(e) => handleInputChange('maxFollowers', e.target.value)}
                 placeholder="e.g., 100000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Target Age Range</label>
               <select
@@ -830,28 +830,28 @@ const InfluencerCampaignManager = () => {
   );
 
   const renderMilestones = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Campaign Milestones</h2>
-        <p className="text-gray-600 mb-6">Define key milestones and deadlines for your campaign</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Campaign Milestones</h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Define key milestones and deadlines for your campaign</p>
       </div>
 
       <div className="space-y-4">
         {campaignData.milestones.map((milestone, index) => (
-          <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+          <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Milestone {index + 1}</h3>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900">Milestone {index + 1}</h3>
               {index > 0 && (
                 <button 
                   onClick={() => removeMilestone(index)}
-                  className="p-1 text-red-500 hover:bg-red-50 rounded"
+                  className="p-1 text-red-500 hover:bg-red-50 rounded shrink-0 ml-2"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               )}
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                 <input
@@ -898,28 +898,28 @@ const InfluencerCampaignManager = () => {
   );
 
   const renderDeliverables = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Expected Deliverables</h2>
-        <p className="text-gray-600 mb-6">Specify what content you expect from influencers</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Expected Deliverables</h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Specify what content you expect from influencers</p>
       </div>
 
       <div className="space-y-4">
         {campaignData.deliverables.map((deliverable, index) => (
-          <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+          <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
             <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Deliverable {index + 1}</h3>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900">Deliverable {index + 1}</h3>
               {index > 0 && (
                 <button 
                   onClick={() => removeDeliverable(index)}
-                  className="p-1 text-red-500 hover:bg-red-50 rounded"
+                  className="p-1 text-red-500 hover:bg-red-50 rounded shrink-0 ml-2"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               )}
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
                 <select
@@ -932,14 +932,14 @@ const InfluencerCampaignManager = () => {
                   ))}
                 </select>
               </div>
-              <div>
+              <div className="sm:col-span-1 lg:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
                 <input
                   type="number"
                   min="1"
                   value={deliverable.quantity}
                   onChange={(e) => handleDeliverableChange(index, 'quantity', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
               </div>
             </div>
@@ -969,19 +969,19 @@ const InfluencerCampaignManager = () => {
   );
 
   const renderPreview = () => (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Campaign Preview</h2>
-        <p className="text-gray-600 mb-6">Review your campaign details before publishing</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Campaign Preview</h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Review your campaign details before publishing</p>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
         <div className="flex items-center mb-4">
-          <Target className="w-5 h-5 text-blue-600 mr-2" />
-          <h3 className="text-xl font-semibold text-blue-900">Campaign Targets</h3>
+          <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2" />
+          <h3 className="text-lg sm:text-xl font-semibold text-blue-900">Campaign Targets</h3>
         </div>
         
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {campaignData.targets.filter(t => t.metric && t.value).map((target, index) => (
             <div key={index} className="bg-white p-4 rounded-lg">
               <h4 className="font-medium text-gray-900">{target.metric}</h4>
@@ -1042,22 +1042,22 @@ const InfluencerCampaignManager = () => {
         </div>
       </div>
 
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6">
         <div className="flex items-center mb-4">
-          <Calendar className="w-5 h-5 text-green-600 mr-2" />
-          <h3 className="text-xl font-semibold text-green-900">Campaign Milestones</h3>
+          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mr-2" />
+          <h3 className="text-lg sm:text-xl font-semibold text-green-900">Campaign Milestones</h3>
         </div>
         
         <div className="space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-white rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-500" />
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">Campaign Kickoff</h4>
-              <p className="text-sm text-gray-600">Initial content planning and brand guidelines review</p>
+          <div className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-lg">
+            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <h4 className="font-medium text-gray-900 text-sm sm:text-base">Campaign Kickoff</h4>
+              <p className="text-xs sm:text-sm text-gray-600">Initial content planning and brand guidelines review</p>
             </div>
-            <div className="text-sm">
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">completed</span>
-              <div className="text-gray-500 mt-1">2024-06-01</div>
+            <div className="text-right shrink-0">
+              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">completed</span>
+              <div className="text-gray-500 mt-1 text-xs">2024-06-01</div>
             </div>
           </div>
           
@@ -1087,10 +1087,10 @@ const InfluencerCampaignManager = () => {
         </div>
       </div>
 
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 sm:p-6">
         <div className="flex items-center mb-4">
-          <Package className="w-5 h-5 text-purple-600 mr-2" />
-          <h3 className="text-xl font-semibold text-purple-900">Deliverables Tracker</h3>
+          <Package className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 mr-2" />
+          <h3 className="text-lg sm:text-xl font-semibold text-purple-900">Deliverables Tracker</h3>
         </div>
         
         <div className="space-y-4">
@@ -1129,10 +1129,10 @@ const InfluencerCampaignManager = () => {
         </div>
       </div>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Contract Templates</h3>
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Contract Templates</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="bg-white border-2 border-blue-500 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">Standard Influencer Agreement</h4>
             <p className="text-sm text-gray-600 mb-3">Basic agreement for Instagram collaborations</p>
@@ -1178,10 +1178,10 @@ const InfluencerCampaignManager = () => {
       </div>
 
       {/* Campaign Listings Preview */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">How Your Campaign Will Appear</h3>
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">How Your Campaign Will Appear</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <div className="h-32 bg-gradient-to-r from-orange-100 to-pink-100 relative">
               <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center">
@@ -1293,35 +1293,62 @@ const InfluencerCampaignManager = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className=" mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header */}
-        <div className="flex items-center mb-8">
+        <div className="flex items-center mb-6 sm:mb-8">
           <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-            <ChevronLeft className="w-5 h-5 mr-1" />
-            Back to Dashboard
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+            <span className="text-sm sm:text-base">Back to Dashboard</span>
           </button>
         </div>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Campaign</h1>
-          <p className="text-gray-600">Set up your comprehensive influencer marketing campaign</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Campaign</h1>
+          <p className="text-sm sm:text-base text-gray-600">Set up your comprehensive influencer marketing campaign</p>
         </div>
 
         {/* Step Navigation */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-          <div className="flex">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8">
+          {/* Mobile Step Navigation */}
+          <div className="block sm:hidden">
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-900">
+                  Step {currentStep + 1} of {steps.length}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
+                </span>
+              </div>
+              <div className="mt-2">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                    style={{width: `${((currentStep + 1) / steps.length) * 100}%`}}
+                  ></div>
+                </div>
+              </div>
+              <h2 className="mt-3 text-lg font-semibold text-gray-900">
+                {steps[currentStep].title}
+              </h2>
+            </div>
+          </div>
+          
+          {/* Desktop Step Navigation */}
+          <div className="hidden sm:flex">
             {steps.map((step, index) => (
               <button
                 key={step.id}
                 onClick={() => setCurrentStep(index)}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 border-b-2 transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-4 px-3 lg:px-6 border-b-2 transition-all ${
                   currentStep === index
                     ? 'border-blue-500 text-blue-600 bg-blue-50'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 {step.icon}
-                <span className="font-medium">{step.title}</span>
+                <span className="font-medium text-sm lg:text-base hidden md:inline">{step.title}</span>
+                <span className="font-medium text-sm md:hidden">{index + 1}</span>
                 {index < currentStep && <CheckCircle className="w-4 h-4 text-green-500" />}
               </button>
             ))}
@@ -1329,16 +1356,16 @@ const InfluencerCampaignManager = () => {
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8 p-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8 p-4 sm:p-6 lg:p-8">
           {renderStepContent()}
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between">
+        <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 sm:gap-0">
           <button
             onClick={prevStep}
             disabled={currentStep === 0}
-            className={`px-6 py-2 border border-gray-300 rounded-lg transition-colors ${
+            className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2 border border-gray-300 rounded-lg transition-colors text-sm sm:text-base ${
               currentStep === 0
                 ? 'text-gray-400 cursor-not-allowed'
                 : 'text-gray-700 hover:bg-gray-50'
@@ -1349,7 +1376,7 @@ const InfluencerCampaignManager = () => {
           
           <button
             onClick={currentStep === steps.length - 1 ? () => alert('Campaign Published!') : nextStep}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base font-medium"
           >
             {currentStep === steps.length - 1 ? 'Publish Campaign' : 'Next'}
           </button>

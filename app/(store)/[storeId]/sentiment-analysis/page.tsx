@@ -72,16 +72,16 @@ const SentimentDashboard = () => {
       
 
       {/* Main Content */}
-      <div className=" p-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Sentiment Analysis</h1>
-            <p className="text-gray-600">Monitor brand perception across all channels</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Sentiment Analysis</h1>
+            <p className="text-sm sm:text-base text-gray-600">Monitor brand perception across all channels</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
             <span className="text-sm text-gray-600">Last 7 days</span>
-            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
               <Filter className="w-4 h-4" />
               Filter
             </button>
@@ -89,58 +89,58 @@ const SentimentDashboard = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="relative mb-8">
+        <div className="relative mb-6 sm:mb-8">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
             placeholder="Search..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
           />
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Overall Sentiment</span>
+              <span className="text-gray-600 text-xs sm:text-sm">Overall Sentiment</span>
               <Heart className="w-4 h-4 text-gray-400" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">78%</div>
-            <div className="text-sm text-green-600">+5.2% positive</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">78%</div>
+            <div className="text-xs sm:text-sm text-green-600">+5.2% positive</div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Brand Mentions</span>
+              <span className="text-gray-600 text-xs sm:text-sm">Brand Mentions</span>
               <MessageSquare className="w-4 h-4 text-gray-400" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">1,247</div>
-            <div className="text-sm text-green-600">+231% this week</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">1,247</div>
+            <div className="text-xs sm:text-sm text-green-600">+231% this week</div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Engagement Rate</span>
+              <span className="text-gray-600 text-xs sm:text-sm">Engagement Rate</span>
               <TrendingUp className="w-4 h-4 text-gray-400" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">4.8%</div>
-            <div className="text-sm text-green-600">+1.2% vs last week</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">4.8%</div>
+            <div className="text-xs sm:text-sm text-green-600">+1.2% vs last week</div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-sm">Crisis Alerts</span>
+              <span className="text-gray-600 text-xs sm:text-sm">Crisis Alerts</span>
               <AlertTriangle className="w-4 h-4 text-gray-400" />
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">2</div>
-            <div className="text-sm text-red-600">-3 active</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">2</div>
+            <div className="text-xs sm:text-sm text-red-600">-3 active</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Sentiment Breakdown */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold mb-6">Sentiment Breakdown</h3>
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Sentiment Breakdown</h3>
             <div className="space-y-4">
               {sentimentData.map((item, index) => (
                 <div key={index} className="flex items-center gap-4">
@@ -162,21 +162,21 @@ const SentimentDashboard = () => {
           </div>
 
           {/* Platform Performance */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold mb-6">Platform Performance</h3>
-            <div className="space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Platform Performance</h3>
+            <div className="space-y-3 sm:space-y-4">
               {platformData.map((platform, index) => (
-                <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">{platform.icon}</span>
-                    <div>
-                      <div className="font-medium">{platform.platform}</div>
-                      <div className="text-sm text-gray-500">{platform.mentions}</div>
+                <div key={index} className="flex items-center justify-between p-2 sm:p-3 hover:bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <span className="text-base sm:text-lg shrink-0">{platform.icon}</span>
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm sm:text-base truncate">{platform.platform}</div>
+                      <div className="text-xs sm:text-sm text-gray-500">{platform.mentions}</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-bold text-lg">{platform.score}</div>
-                    <div className={`text-sm ${platform.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className="text-right shrink-0">
+                    <div className="font-bold text-base sm:text-lg">{platform.score}</div>
+                    <div className={`text-xs sm:text-sm ${platform.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
                       {platform.change}
                     </div>
                   </div>
@@ -187,18 +187,18 @@ const SentimentDashboard = () => {
         </div>
 
         {/* Trending Topics */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
-          <h3 className="text-lg font-semibold mb-6">Trending Topics</h3>
-          <div className="grid grid-cols-3 gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8">
+          <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Trending Topics</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {trendingTopics.map((topic, index) => (
-              <div key={index} className="p-4 border border-gray-200 rounded-lg">
+              <div key={index} className="p-3 sm:p-4 border border-gray-200 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium">{topic.topic}</h4>
-                  <TrendingUp className={`w-4 h-4 ${topic.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
+                  <h4 className="font-medium text-sm sm:text-base truncate pr-2">{topic.topic}</h4>
+                  <TrendingUp className={`w-4 h-4 shrink-0 ${topic.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
                 </div>
-                <div className="text-2xl font-bold mb-1">{topic.mentions}</div>
-                <div className="text-sm text-gray-600 mb-2">Mentions</div>
-                <div className={`text-sm font-medium ${topic.sentiment >= 70 ? 'text-green-600' : topic.sentiment >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+                <div className="text-xl sm:text-2xl font-bold mb-1">{topic.mentions}</div>
+                <div className="text-xs sm:text-sm text-gray-600 mb-2">Mentions</div>
+                <div className={`text-xs sm:text-sm font-medium ${topic.sentiment >= 70 ? 'text-green-600' : topic.sentiment >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
                   Sentiment: {topic.sentiment}%
                 </div>
               </div>
@@ -207,23 +207,23 @@ const SentimentDashboard = () => {
         </div>
 
         {/* Recent Mentions */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold mb-6">Recent Mentions</h3>
-          <div className="space-y-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Recent Mentions</h3>
+          <div className="space-y-4 sm:space-y-6">
             {recentMentions.map((mention, index) => (
-              <div key={index} className="flex gap-4 p-4 border border-gray-200 rounded-lg">
-                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium">{mention.user.charAt(1).toUpperCase()}</span>
+              <div key={index} className="flex gap-3 sm:gap-4 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
+                  <span className="text-xs sm:text-sm font-medium">{mention.user.charAt(1).toUpperCase()}</span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium">{mention.user}</span>
-                    <span className="text-sm text-gray-500">{mention.platform}</span>
-                    <span className="text-sm text-gray-500">{mention.time}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className="font-medium text-sm sm:text-base">{mention.user}</span>
+                    <span className="text-xs sm:text-sm text-gray-500">{mention.platform}</span>
+                    <span className="text-xs sm:text-sm text-gray-500">{mention.time}</span>
                   </div>
-                  <p className="text-gray-700 mb-3">{mention.content}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                  <p className="text-gray-700 mb-3 text-sm sm:text-base">{mention.content}</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-2 sm:gap-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         mention.sentiment === 'positive' 
                           ? 'bg-green-100 text-green-800' 
@@ -232,16 +232,17 @@ const SentimentDashboard = () => {
                         {mention.sentiment === 'positive' ? 'Positive' : 'Negative'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className={`text-sm font-medium ${
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                      <span className={`text-xs sm:text-sm font-medium ${
                         mention.sentiment === 'positive' ? 'text-green-600' : 'text-red-600'
                       }`}>
                         {mention.score}
                       </span>
-                      <span className="text-sm text-gray-500">{mention.engagements}</span>
-                      <button className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800">
-                        <Eye className="w-4 h-4" />
-                        View Details
+                      <span className="text-xs sm:text-sm text-gray-500">{mention.engagements}</span>
+                      <button className="flex items-center gap-1 text-xs sm:text-sm text-blue-600 hover:text-blue-800">
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">View Details</span>
+                        <span className="sm:hidden">View</span>
                       </button>
                     </div>
                   </div>

@@ -5,6 +5,7 @@ import CustomSidebar from '@/components/ui/custom-sidebar';
 import { Profile } from '@prisma/client';
 import { getCurrentProfile } from '@/actions/profile';
 import { auth } from '@/utils/auth';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import { 
   Settings, 
@@ -68,6 +69,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, isActive, onClic
 
 const SettingsPage = ({ user }: { user: Profile }) => {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   
 
   const { data: profile } = useQuery({
@@ -99,8 +101,10 @@ const SettingsPage = ({ user }: { user: Profile }) => {
          <CustomSidebar profile={profile} />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <div className="p-8 max-w-8xl">
+      <div className={`flex-1 overflow-auto ${
+        isMobile ? 'pt-20' : ''
+      }`}>
+        <div className={`${isMobile ? 'p-4' : 'p-8'} max-w-8xl`}>
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
             <p className="text-gray-600">Manage your account preferences and privacy settings</p>

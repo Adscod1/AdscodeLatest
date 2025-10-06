@@ -5,6 +5,7 @@ import { Profile } from "@prisma/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CustomSidebar from "@/components/ui/custom-sidebar";
 import { auth } from "@/utils/auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import Image from 'next/image';
 
 import { 
@@ -45,6 +46,7 @@ interface Achievement {
 
 const SocialProfile = ({ user }: { user: Profile }) => {
       const queryClient = useQueryClient();
+      const isMobile = useIsMobile();
       
     
       const { data: profile } = useQuery({
@@ -146,7 +148,9 @@ const SocialProfile = ({ user }: { user: Profile }) => {
         <CustomSidebar profile={profile} />
 
       {/* Main Content */}
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className={`flex-1 min-w-0 flex flex-col ${
+        isMobile ? 'pt-20' : ''
+      }`}>
         {/* Profile Header */}
         <div className="bg-white border-b border-gray-200 p-4 sm:p-6 lg:p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-0">

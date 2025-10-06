@@ -30,7 +30,7 @@ import Image from "next/image";
 import Link from "next/link";
 import UserEngagement from "./components/user-engagement";
 import UserLocation from "./components/user-location";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProfileEditForm } from "./components/profile-edit-form";
 import { getCurrentProfile } from "@/actions/profile";
 import AllStoresCards from "./components/all-stores-cards";
@@ -49,6 +49,19 @@ const fetchUserStats = async () => {
 
 const ProfileContent = ({ user }: { user: Profile }) => {
   const queryClient = useQueryClient();
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+  
   const { data: userStats } = useQuery({
     queryKey: ["userStats", user.id],
     queryFn: fetchUserStats,
@@ -70,14 +83,13 @@ const ProfileContent = ({ user }: { user: Profile }) => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-10">
-    
+    <div className="flex h-screen bg-gray-50">
+      <CustomSidebar profile={profile} />
 
-      <div className="flex">
-        <CustomSidebar profile={profile} />
-
-        {/* Main Content */}
-        <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          <main className="p-4 sm:p-6 lg:p-8 overflow-x-hidden" style={{ paddingTop: isMobile ? '4rem' : '1.5rem' }}>
           {/* Welcome Banner */}
           <div className="border border-2xl rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-black mb-6 sm:mb-8 relative overflow-hidden">
             <div className="relative z-10">
@@ -306,11 +318,9 @@ const ProfileContent = ({ user }: { user: Profile }) => {
               </div>
             </div>
           </div>
-        </main>
+          </main>
+        </div>
       </div>
-
-
-
     </div>
   );
 };

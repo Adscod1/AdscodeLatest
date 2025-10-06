@@ -27,105 +27,109 @@ const DashboardPage = () => {
   if (!store) return <ErrorState message="Store not found" />;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
       {/* Welcome Section */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Hello, {store.name.split(' ')[0] || 'Ignt'}!</h1>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 truncate">Hello, {store.name.split(' ')[0] || 'Ignt'}!</h1>
           <p className="text-gray-600 text-sm">
             {store.tagline || "Welcome back to your store overview"}
           </p>
         </div>
-        <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm w-full sm:w-auto justify-center sm:justify-start">
           <span className="text-sm text-gray-700">Today</span>
           <Calendar className="w-4 h-4 text-gray-500" />
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
         {/* Total Revenue */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-              <span className="text-blue-600 text-xl font-bold">$</span>
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div className="flex items-center mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+              <span className="text-blue-600 text-lg sm:text-xl font-bold">$</span>
             </div>
           </div>
-          <p className="text-gray-500 text-sm mb-2">Total Revenue</p>
+          <p className="text-gray-500 text-xs sm:text-sm mb-2">Total Revenue</p>
           <div className="flex items-end justify-between">
-            <h3 className="text-2xl font-bold text-gray-900">$ 29.2K</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">$ 29.2K</h3>
             <div className="flex items-center text-green-500 text-xs bg-green-50 px-2 py-1 rounded-full">
               <ArrowUpRight className="w-3 h-3 mr-1" />
-              <span>+12 This Month</span>
+              <span className="hidden sm:inline">+12 This Month</span>
+              <span className="sm:hidden">+12</span>
             </div>
           </div>
         </div>
 
         {/* Total Orders */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div className="flex items-center mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H19M17 17a2 2 0 11-4 0 2 2 0 014 0zM9 17a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
           </div>
-          <p className="text-gray-500 text-sm mb-2">Total Orders</p>
+          <p className="text-gray-500 text-xs sm:text-sm mb-2">Total Orders</p>
           <div className="flex items-end justify-between">
-            <h3 className="text-2xl font-bold text-gray-900">125</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">125</h3>
             <div className="flex items-center text-green-500 text-xs bg-green-50 px-2 py-1 rounded-full">
               <ArrowUpRight className="w-3 h-3 mr-1" />
-              <span>+12 This Month</span>
+              <span className="hidden sm:inline">+12 This Month</span>
+              <span className="sm:hidden">+12</span>
             </div>
           </div>
         </div>
 
         {/* Store Views */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div className="flex items-center mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
             </div>
           </div>
-          <p className="text-gray-500 text-sm mb-2">Store Views</p>
+          <p className="text-gray-500 text-xs sm:text-sm mb-2">Store Views</p>
           <div className="flex items-end justify-between">
-            <h3 className="text-2xl font-bold text-gray-900">102K</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">102K</h3>
             <div className="flex items-center text-green-500 text-xs bg-green-50 px-2 py-1 rounded-full">
               <ArrowUpRight className="w-3 h-3 mr-1" />
-              <span>+12 This Month</span>
+              <span className="hidden sm:inline">+12 This Month</span>
+              <span className="sm:hidden">+12</span>
             </div>
           </div>
         </div>
 
         {/* Total Impressions */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div className="flex items-center mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
           </div>
-          <p className="text-gray-500 text-sm mb-2">Total Impressions</p>
+          <p className="text-gray-500 text-xs sm:text-sm mb-2">Total Impressions</p>
           <div className="flex items-end justify-between">
-            <h3 className="text-2xl font-bold text-gray-900">646K</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">646K</h3>
             <div className="flex items-center text-green-500 text-xs bg-green-50 px-2 py-1 rounded-full">
               <ArrowUpRight className="w-3 h-3 mr-1" />
-              <span>+12 This Month</span>
+              <span className="hidden sm:inline">+12 This Month</span>
+              <span className="sm:hidden">+12</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Recent Activity and Store Traffic */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
         {/* Recent Activity */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Recent Activity</h2>
             <button className="text-blue-500 text-sm hover:underline font-medium">
               See all
             </button>
@@ -213,9 +217,9 @@ const DashboardPage = () => {
         </div>
 
         {/* Store Traffic */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Store Traffic</h2>
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Store Traffic</h2>
             <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-lg">
               <span className="text-sm text-gray-700">Week</span>
               <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -260,11 +264,11 @@ const DashboardPage = () => {
       </div>
 
       {/* Recent Orders and Popular Products */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Orders */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Recent Orders</h2>
             <button className="text-blue-500 text-sm hover:underline font-medium">
               See all
             </button>
@@ -327,9 +331,9 @@ const DashboardPage = () => {
         </div>
 
         {/* Popular Products */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Popular Products</h2>
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Popular Products</h2>
             <button className="text-blue-500 text-sm hover:underline font-medium">
               See all
             </button>
