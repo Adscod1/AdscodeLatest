@@ -225,13 +225,12 @@ export const FeedNavbar = () => {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    className={`text-sm font-medium transition-colors ${
                       isPathActive(item.href)
                         ? "text-blue-600"
                         : "text-gray-700 hover:text-gray-900"
                     }`}
                   >
-                    <item.icon />
                     {item.label}
                   </Link>
                 ))}
@@ -340,7 +339,6 @@ export const FeedNavbar = () => {
                       : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                 >
-                  <item.icon />
                   {item.label}
                 </Link>
               ))}
