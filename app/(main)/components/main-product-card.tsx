@@ -1,18 +1,18 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Heart,
-  UserCircle,
-  CheckCircle,
   MessageCircle,
   Share2,
   Bookmark,
   TrendingUp,
+  MoreVertical,
 } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@prisma/client";
 import { formatCurrency } from "@/lib/utils";
+import Link from "next/link";
 
 interface ExtendedProduct extends Product {
   store: {
@@ -36,139 +36,126 @@ interface ExtendedProduct extends Product {
 }
 
 export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
-  const discount = product.comparePrice
-    ? Math.round(
-        ((product.comparePrice - product.price) / product.comparePrice) * 100
-      )
-    : null;
-
-  const storeAvatar = product.store.avatarUrl;
-
-  // Mock engagement data - replace with real data
+  // Mock engagement data - replace with real data from your database
   const engagementData = {
-    likes: "5.4M",
-    comments: "5.4M", 
-    shares: "5.4M",
-    bookmarks: "5.4M"
+    likes: "8.2M",
+    comments: "3.1M",
+    views: "12.5M",
+    shares: "2.8M",
+    bookmarks: "6.7M",
   };
 
+  // Calculate review count (mock data - replace with actual reviews)
+  const reviewCount = 324;
+
   return (
-    <Card className="w-full border rounded-2xl overflow-hidden shadow-sm bg-white hover:shadow-md transition-shadow duration-200">
-      {/* Header with user info and time */}
-      <div className="flex items-center justify-between px-4 py-1">
+    <Card className="w-full max-w-md border border-gray-200 rounded-2xl overflow-hidden shadow-sm bg-white hover:shadow-lg transition-shadow duration-300">
+      {/* Header with store info */}
+      <div className="flex items-center justify-between p-4 pb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
-            {storeAvatar ? (
+          <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-purple-400 to-blue-500">
+            {product.store.avatarUrl ? (
               <Image
-                src={storeAvatar}
+                src={product.store.avatarUrl}
                 alt={product.store.name}
-                width={40}
-                height={40}
-                className="w-10 h-10 object-cover rounded-full"
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
               />
             ) : (
-              <UserCircle className="w-8 h-8 text-gray-400" />
+              <span className="text-white font-bold text-lg">
+                {product.store.name.charAt(0).toUpperCase()}
+              </span>
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-sm text-gray-900 truncate">
-                {product.store.name}
-              </span>
-              {product.store.verified && (
-                <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              )}
-            </div>
-            <div className="text-xs text-gray-500 truncate">
-              {product.store.category} • Just now
-            </div>
+          <div>
+            <h3 className="font-bold text-sm text-gray-900">
+              {product.store.name}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {product.store.category || "Electronics"} • Just now
+            </p>
           </div>
         </div>
-        <Badge className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-md">
-          5.8K ↗
-        </Badge>
+        <button className="text-gray-500 hover:text-gray-700">
+          <MoreVertical className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* Product Image - Rectangle */}
-      <div className="px-4">
-        <div className="relative h-64 w-full rounded-lg overflow-hidden bg-gray-100">
-          {product.images && product.images.length > 0 ? (
-            <Image
-              src={product.images[0].url}
-              alt={product.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
-              priority={false}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Heart className="h-8 w-8 text-gray-300" />
-            </div>
-          )}
-          
-          {/* Discount badge */}
-          {discount && discount > 0 && (
-            <Badge className="absolute top-2 right-2 bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold px-2 py-1 rounded-md">
-              {discount}% OFF
-            </Badge>
-          )}
-        </div>
+      {/* Product Image */}
+      <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-purple-600 via-purple-500 to-blue-500">
+        {product.images && product.images.length > 0 ? (
+          <Image
+            src={product.images[0].url}
+            alt={product.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover"
+            priority={false}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="text-white text-6xl opacity-50">📱</div>
+          </div>
+        )}
       </div>
 
-      {/* Product Info */}
-      <div className="px-4  flex-1 flex flex-col">
-          <h3 className="font-bold text-base text-gray-900 mb-1 truncate">
+      {/* Product Details */}
+      <div className="p-3 space-y-2">
+        {/* Title */}
+        <h2 className="font-bold text-lg text-gray-900 leading-tight line-clamp-1">
           {product.title}
-        </h3>
-        <div className="flex">
-      
-        
-        {/* Star rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex text-yellow-400">
-            {"★".repeat(5)}
+        </h2>
+
+        {/* Rating */}
+        <div className="flex items-center gap-2">
+          <div className="flex text-yellow-400 text-base">
+            {"★★★★"}
+            <span className="text-gray-300">★</span>
           </div>
-          <span className="text-xs text-gray-500">(190)</span>
+          <span className="text-xs text-gray-600">({reviewCount})</span>
         </div>
 
-        {/* Price */}
-        <div className="mb-2 ml-5">
-          <span className="text-sm font-medium text-gray-600">Price: </span>
-          <span className="text-base font-bold text-blue-600">
-            {formatCurrency(product.price)}
-          </span>
-        </div>
-        </div>
-
-        {/* Description - max 2 lines */}
-        {/* <p className="text-xs text-gray-500 line-clamp-2 mb-3 flex-1">
-          {product.description || "Promotion + marketing services are top notch if not the best in Kampala. Read more..."}
-        </p> */}
-
-        {/* Engagement Footer */}
-        <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
-              <Heart className="w-4 h-4" />
-              <span>{engagementData.likes}</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
-              <MessageCircle className="w-4 h-4" />
-              <span>{engagementData.comments}</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-green-500 transition-colors">
-              <TrendingUp className="w-4 h-4" />
-              <span>{engagementData.shares}</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
-              <Share2 className="w-4 h-4" />
-              <span>{engagementData.shares}</span>
-            </button>
+        {/* Price and Buy Button */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-2xl font-bold text-blue-600">
+              {formatCurrency(product.price)}
+            </p>
+            {product.comparePrice && product.comparePrice > product.price && (
+              <p className="text-xs text-gray-400 line-through">
+                {formatCurrency(product.comparePrice)}
+              </p>
+            )}
           </div>
+          <Link href={`/${product.store.id}/product/${product.id}`}>
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-1.5 rounded-full text-sm font-semibold shadow-md hover:shadow-lg transition-all">
+              Buy now
+            </Button>
+          </Link>
+        </div>
+
+        {/* Engagement Metrics */}
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-gray-600">
+          <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
+            <Heart className="w-4 h-4" />
+            <span className="text-xs font-medium">{engagementData.likes}</span>
+          </button>
+          <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-xs font-medium">{engagementData.comments}</span>
+          </button>
+          <button className="flex items-center gap-1 hover:text-green-500 transition-colors">
+            <TrendingUp className="w-4 h-4" />
+            <span className="text-xs font-medium">{engagementData.views}</span>
+          </button>
+          <button className="flex items-center gap-1 hover:text-purple-500 transition-colors">
+            <Share2 className="w-4 h-4" />
+            <span className="text-xs font-medium">{engagementData.shares}</span>
+          </button>
           <button className="flex items-center gap-1 hover:text-yellow-500 transition-colors">
             <Bookmark className="w-4 h-4" />
-            <span>{engagementData.bookmarks}</span>
+            <span className="text-xs font-medium">{engagementData.bookmarks}</span>
           </button>
         </div>
       </div>
