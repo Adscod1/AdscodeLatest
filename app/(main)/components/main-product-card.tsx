@@ -49,11 +49,11 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   const reviewCount = 324;
 
   return (
-    <Card className="w-full max-w-md border border-gray-200 rounded-2xl overflow-hidden shadow-sm bg-white hover:shadow-lg transition-shadow duration-300">
+    <Card className="w-full max-w-md border-[0.5px] border-gray-100 rounded-md overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
       {/* Header with store info */}
-      <div className="flex items-center justify-between p-4 pb-3">
+      <div className="flex items-center justify-between px-2 pt-2 pb-1">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-purple-400 to-blue-500">
+          <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-500">
             {product.store.avatarUrl ? (
               <Image
                 src={product.store.avatarUrl}
@@ -83,13 +83,13 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Image */}
-      <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-purple-600 via-purple-500 to-blue-500">
+      <div className="relative w-full aspect-square bg-gradient-to-br from-purple-600 via-purple-500 to-blue-500">
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images[0].url}
             alt={product.title}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 40vw, 33vw"
             className="object-cover"
             priority={false}
           />
@@ -98,12 +98,19 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
             <div className="text-white text-6xl opacity-50">📱</div>
           </div>
         )}
+        
+        {/* Discount Badge */}
+        {product.comparePrice && product.comparePrice > product.price && (
+          <div className="absolute top-3 right-3 bg-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+            {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
+          </div>
+        )}
       </div>
 
       {/* Product Details */}
-      <div className="p-3 space-y-2">
+      <div className="p-2 space-y-1.5">
         {/* Title */}
-        <h2 className="font-bold text-lg text-gray-900 leading-tight line-clamp-1">
+        <h2 className="font-bold text-base text-gray-900 leading-tight line-clamp-1">
           {product.title}
         </h2>
 
@@ -119,7 +126,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         {/* Price and Buy Button */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-xl font-bold text-blue-600">
               {formatCurrency(product.price)}
             </p>
             {product.comparePrice && product.comparePrice > product.price && (
@@ -129,14 +136,14 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
             )}
           </div>
           <Link href={`/${product.store.id}/product/${product.id}`}>
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-1.5 rounded-full text-sm font-semibold shadow-md hover:shadow-lg transition-all">
-              Buy now
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-1.5 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all">
+              See more
             </Button>
           </Link>
         </div>
 
         {/* Engagement Metrics */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-gray-600">
+        <div className="flex items-center justify-between pt-1 border-t border-gray-100 text-gray-600">
           <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
             <Heart className="w-4 h-4" />
             <span className="text-xs font-medium">{engagementData.likes}</span>
