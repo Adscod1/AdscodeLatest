@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { MainProductCard } from "./components/main-product-card";
+import { InfluencerMarketplace } from "./components/influencer-marketplace";
 
 
 const FeedPage = () => {
@@ -16,12 +17,13 @@ const FeedPage = () => {
   });
 
   return (
-    <div className="container mx-auto py-8  ">
-      {/* <SearchBar /> */}
+    <>    
+      <div className="container mx-auto py-8">
+        {/* <SearchBar /> */}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
-          {[...Array(8)].map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {[...Array(6)].map((_, i) => (
             <div
               key={i}
               className="border border-gray-200 rounded-xl overflow-hidden animate-pulse"
@@ -41,9 +43,10 @@ const FeedPage = () => {
           ))}
         </div>
       )}
+      </div>
 
-      
-    </div>
+      <InfluencerMarketplace />
+    </>
   );
 };
 
