@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import CustomSidebar from '@/components/ui/custom-sidebar';
+import { DashboardLayout } from '@/components/ui/dashboard-layout';
 import { Profile } from '@prisma/client';
 import { auth } from '@/utils/auth';
 import { getCurrentProfile } from '@/actions/profile';
@@ -191,14 +191,8 @@ const NotificationsDashboard = ({ user }: { user: Profile }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <CustomSidebar profile={profile} />
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8" style={{ paddingTop: isMobile ? '4rem' : '1.5rem' }}>
+    <DashboardLayout profile={profile}>
+          <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 space-y-4 sm:space-y-0">
               <div>
@@ -264,9 +258,7 @@ const NotificationsDashboard = ({ user }: { user: Profile }) => {
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

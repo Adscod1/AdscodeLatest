@@ -2,7 +2,7 @@
 import { getCurrentProfile } from "@/actions/profile";
 import { Profile } from "@prisma/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import CustomSidebar from "@/components/ui/custom-sidebar";
+import { DashboardLayout } from "@/components/ui/dashboard-layout";
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -110,14 +110,7 @@ interface ForumSection {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <CustomSidebar profile={profile} />
-
-      {/* Main Content */}
-      <div className={`flex-1 min-w-0 overflow-auto ${
-        isMobile ? 'pl-4 pr-4 pt-20 pb-4' : 'p-4 sm:p-6 lg:p-8'
-      }`}>
+    <DashboardLayout profile={profile}>
         <div className="w-full max-w-none">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
@@ -178,8 +171,7 @@ interface ForumSection {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

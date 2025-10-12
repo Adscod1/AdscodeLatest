@@ -15,192 +15,267 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
+import { useServiceStore } from "@/store/use-service-store";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface ServiceSaleInput {
-  pricingModel?: string;
-  price?: number;
-  compareAtPrice?: number;
-  currency?: string;
-  taxRate?: number;
-  allowQuoteRequests?: boolean;
-  storeId: string;
+interface ServicePricingInput {
+  price: number;
+  comparePrice?: number;
+  costPerService?: number;
+  status: string;
 }
 
-const ServiceSaleInfo = () => {
+const NewServiceSalePage = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const { service, updateService, reset } = useServiceStore();
 
-  const { register, handleSubmit, setValue, watch } = useForm<ServiceSaleInput>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ServicePricingInput>({
     defaultValues: {
-      storeId: storeId as string,
-      currency: "UGX",
-      taxRate: 0,
-      allowQuoteRequests: false,
+      price: service.price || 0,
+      comparePrice: service.comparePrice || 0,
+      costPerService: service.costPerService || 0,
+      status: service.status || "DRAFT",
     },
   });
 
-  const onSubmit = (data: ServiceSaleInput) => {
-    console.log("Service sale data:", data);
-    router.push(`/${storeId}/service/new/delivery?type=service`);
+  const price = watch("price");
+  const costPerService = watch("costPerService");
+  const profit = price && costPerService ? price - costPerService : 0;
+  const margin = price && costPerService ? ((price - costPerService) / price) * 100 : 0;
+
+  const onSubmit = (data: ServicePricingInput) => {
+    updateService({
+      price: Number(data.price),
+      comparePrice: data.comparePrice ? Number(data.comparePrice) : undefined,
+      costPerService: data.costPerService ? Number(data.costPerService) : undefined,
+      status: data.status,
+      storeId: storeId as string,
+    });
+    router.push(`/${storeId}/service/new/delivery`);
   };
 
-  const handleBack = () => {
-    router.push(`/${storeId}/service/new?type=service`);
+  const handleCancel = () => {
+    reset();
+    router.push(`/${storeId}/products`);
   };
+
+  if (!service.title) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">No service data found</h2>
+          <p className="text-gray-600 mb-4">Please start by creating the basic service information.</p>
+          <Button asChild>
+            <Link href={`/${storeId}/service/new`}>Start Creating Service</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 bg-white border-b">
-        <Button
-          variant="ghost"
-          className="flex items-center text-gray-600 hover:text-gray-900"
-          onClick={handleBack}
-        >
-          <ChevronLeft className="w-5 h-5 mr-1" />
-          Back
-        </Button>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={handleBack}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 bg-white border-b gap-4 sm:gap-0">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <Button
+            variant="ghost"
+            className="flex items-center text-gray-600 hover:text-gray-900 text-sm sm:text-base"
+            asChild
+          >
+            <Link href={`/${storeId}/products`}>
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Back to service listing</span>
+              <span className="sm:hidden">Back</span>
+            </Link>
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => router.back()} className="flex-1 sm:flex-none text-sm">
             Back
           </Button>
-          <Button onClick={handleSubmit(onSubmit)}>Continue</Button>
+          <Button variant="outline" onClick={handleCancel} className="flex-1 sm:flex-none text-sm">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit(onSubmit)} disabled={!watch('price')} className="flex-1 sm:flex-none text-sm">
+            Continue
+          </Button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <ProductTabs activeTab="Sale Information" type="service" />
-        
-        {/* Pricing & Sales Form */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
-            <h2 className="text-xl sm:text-2xl font-semibold">Pricing & Sales</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Set your pricing and manage rates
-            </p>
-          </div>
-          <div className="px-4 sm:px-6 lg:px-8 py-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-5xl">
-              {/* Pricing Model & Allow Quote Requests */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="pricingModel">
-                      Pricing Model <span className="text-red-500">*</span>
-                    </Label>
-                    <Info className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <Select
-                    value={watch("pricingModel")}
-                    onValueChange={(value) => setValue("pricingModel", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fixed">Fixed Price</SelectItem>
-                      <SelectItem value="hourly">Hourly Rate</SelectItem>
-                      <SelectItem value="package">Package</SelectItem>
-                      <SelectItem value="custom">Custom Quote</SelectItem>
-                    </SelectContent>
-                  </Select>
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+          {/* Main Content */}
+          <div className="flex-1">
+            <ProductTabs activeTab="Sale Information" type="service" />
+            
+            {/* Service Summary */}
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Info className="w-3 h-3 text-blue-600" />
                 </div>
-
-                <div className="flex items-end pb-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="allowQuoteRequests"
-                      checked={watch("allowQuoteRequests")}
-                      onCheckedChange={(checked) => setValue("allowQuoteRequests", checked as boolean)}
-                    />
-                    <Label htmlFor="allowQuoteRequests" className="text-sm font-normal">
-                      Allow quote requests
-                    </Label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Price & Compare at Price */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="price">
-                    Price <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      $
-                    </span>
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      {...register("price", { required: true })}
-                      placeholder="0.00"
-                      className="pl-8"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="compareAtPrice">Compare at Price</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      $
-                    </span>
-                    <Input
-                      id="compareAtPrice"
-                      type="number"
-                      step="0.01"
-                      {...register("compareAtPrice")}
-                      placeholder="0.00"
-                      className="pl-8"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Original price to show discount
+                <div>
+                  <h3 className="font-medium text-blue-900 mb-1">{service.title}</h3>
+                  <p className="text-sm text-blue-700">
+                    {service.description ? service.description.substring(0, 100) + '...' : 'No description provided'}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Category: {service.category || 'Uncategorized'}
                   </p>
                 </div>
               </div>
+            </div>
+            
+            {/* Pricing Form */}
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
+                <h2 className="text-xl sm:text-2xl font-semibold">Service Pricing & Sales</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Set your service pricing and manage publication
+                </p>
+              </div>
+              <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6 sm:space-y-8">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  
+                  {/* Pricing Section */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="price">
+                        Service Price <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2.5 text-sm text-gray-500">$</span>
+                        <Input
+                          id="price"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          {...register("price", { 
+                            required: "Service price is required",
+                            min: {
+                              value: 0.01,
+                              message: "Price must be greater than 0"
+                            }
+                          })}
+                          placeholder="0.00"
+                          className={`pl-7 ${errors.price ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {errors.price && (
+                        <p className="text-sm text-red-500">{errors.price.message}</p>
+                      )}
+                    </div>
 
-              {/* Currency & Tax Rate */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="currency">
-                    Currency <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    value={watch("currency")}
-                    onValueChange={(value) => setValue("currency", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="UGX">UGX - Ugandan Shilling</SelectItem>
-                      <SelectItem value="USD">USD - US Dollar</SelectItem>
-                      <SelectItem value="EUR">EUR - Euro</SelectItem>
-                      <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                      <SelectItem value="KES">KES - Kenyan Shilling</SelectItem>
-                      <SelectItem value="TZS">TZS - Tanzanian Shilling</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="comparePrice">Compare at Price</Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2.5 text-sm text-gray-500">$</span>
+                        <Input
+                          id="comparePrice"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          {...register("comparePrice")}
+                          placeholder="0.00"
+                          className="pl-7"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Original price to show discount
+                      </p>
+                    </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="taxRate">Tax Rate (%)</Label>
-                  <Input
-                    id="taxRate"
-                    type="number"
-                    step="0.01"
-                    {...register("taxRate")}
-                    placeholder="0"
-                    min="0"
-                    max="100"
-                  />
+                  {/* Cost and Profit Section */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="costPerService">Cost per Service</Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2.5 text-sm text-gray-500">$</span>
+                        <Input
+                          id="costPerService"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          {...register("costPerService")}
+                          placeholder="0.00"
+                          className="pl-7"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Your cost to provide this service
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Profit</Label>
+                      <div className="bg-muted px-3 py-2.5 rounded-md">
+                        <span className="text-sm text-muted-foreground">
+                          ${profit.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Margin</Label>
+                      <div className="bg-muted px-3 py-2.5 rounded-md">
+                        <span className="text-sm text-muted-foreground">
+                          {margin.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="w-full lg:w-80 order-first lg:order-last">
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
+                <h3 className="text-lg font-semibold">Service Status</h3>
+              </div>
+              <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="sidebar-status">Status</Label>
+                    <Select
+                      value={watch("status")}
+                      onValueChange={(value) => setValue("status", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DRAFT">Draft</SelectItem>
+                        <SelectItem value="PUBLISHED">Published</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      This service will be available to customers
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">
+                      Service channels
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="online-booking" defaultChecked />
+                        <Label htmlFor="online-booking" className="text-sm">Online Booking</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="in-person" defaultChecked />
+                        <Label htmlFor="in-person" className="text-sm">In-Person</Label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -208,4 +283,4 @@ const ServiceSaleInfo = () => {
   );
 };
 
-export default ServiceSaleInfo;
+export default NewServiceSalePage;

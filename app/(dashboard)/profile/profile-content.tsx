@@ -34,6 +34,7 @@ import { useState, useEffect } from "react";
 import { ProfileEditForm } from "./components/profile-edit-form";
 import { getCurrentProfile } from "@/actions/profile";
 import AllStoresCards from "./components/all-stores-cards";
+import { DashboardLayout } from "@/components/ui/dashboard-layout";
 
 const fetchUserStats = async () => {
   // This would be your API call to fetch user stats
@@ -83,13 +84,8 @@ const ProfileContent = ({ user }: { user: Profile }) => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <CustomSidebar profile={profile} />
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          <main className="p-4 sm:p-6 lg:p-8 overflow-x-hidden" style={{ paddingTop: isMobile ? '4rem' : '1.5rem' }}>
+    <DashboardLayout profile={profile}>
+          <div className="overflow-x-hidden">
           {/* Welcome Banner */}
           <div className="border border-2xl rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-black mb-6 sm:mb-8 relative overflow-hidden">
             <div className="relative z-10">
@@ -318,10 +314,8 @@ const ProfileContent = ({ user }: { user: Profile }) => {
               </div>
             </div>
           </div>
-          </main>
-        </div>
-      </div>
-    </div>
+          </div>
+    </DashboardLayout>
   );
 };
 

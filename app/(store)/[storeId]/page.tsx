@@ -7,8 +7,7 @@ import { getStoreById } from "@/actions/store";
 import { useParams } from "next/navigation";
 import { LoadingState } from "@/app/components/skeletons/stores-skeleton-loader";
 import { ErrorState } from "@/app/components/errors/error-state";
-import ActivityCard from "./components/activity-card";
-import PopularProducts from "./components/popular-products";
+
 
 const DashboardPage = () => {
   const { storeId } = useParams();

@@ -2,7 +2,7 @@
 import React from 'react';
 import { getCurrentProfile } from "@/actions/profile";
 import { Button } from "@/components/ui/button";
-import CustomSidebar from "@/components/ui/custom-sidebar";
+import { DashboardLayout } from "@/components/ui/dashboard-layout";
 import { Profile, Role } from "@prisma/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
@@ -65,15 +65,10 @@ import {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <CustomSidebar profile={profile} />
-
-      {/* Main Content */}
-      <div className={`flex-1 min-w-0 overflow-auto ${
-        isMobile ? 'pt-20' : ''
-      }`}>
+    <DashboardLayout profile={profile}>
+      <div>
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 -mx-4 sm:-mx-8 -mt-4 sm:-mt-8 mb-4 sm:mb-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Influencer Qualification</h1>
@@ -495,7 +490,7 @@ import {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

@@ -14,7 +14,10 @@ import {
   MessageSquare,
   Eye,
   MousePointer,
-  Calendar
+  Calendar,
+  Edit,
+  Pause,
+  PlayCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -39,6 +42,7 @@ const MarketingCampaigns: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [typeFilter, setTypeFilter] = useState('All Types');
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const campaigns: Campaign[] = [
     {
@@ -343,9 +347,57 @@ const MarketingCampaigns: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-4">
-                      <button className="p-1 hover:bg-gray-100 rounded">
-                        <MoreHorizontal className="w-4 h-4 text-gray-500" />
-                      </button>
+                      <div className="relative">
+                        <button 
+                          onClick={() => setOpenDropdown(openDropdown === campaign.id ? null : campaign.id)}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
+                          <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                        </button>
+                        
+                        {openDropdown === campaign.id && (
+                          <>
+                            <div 
+                              className="fixed inset-0 z-10" 
+                              onClick={() => setOpenDropdown(null)}
+                            />
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                              <Link
+                                href={`/${storeId}/campaign/${campaign.id}`}
+                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                onClick={() => setOpenDropdown(null)}
+                              >
+                                <Eye className="w-4 h-4 text-purple-500" />
+                                View Details
+                              </Link>
+                              <Link
+                                href={`/${storeId}/campaign/${campaign.id}/edit`}
+                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                onClick={() => setOpenDropdown(null)}
+                              >
+                                <Edit className="w-4 h-4 text-blue-500" />
+                                Edit
+                              </Link>
+                              <button
+                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                onClick={() => setOpenDropdown(null)}
+                              >
+                                {campaign.status === 'Active' ? (
+                                  <>
+                                    <Pause className="w-4 h-4 text-yellow-500" />
+                                    Pause
+                                  </>
+                                ) : (
+                                  <>
+                                    <PlayCircle className="w-4 h-4 text-green-500" />
+                                    Activate
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -366,9 +418,57 @@ const MarketingCampaigns: React.FC = () => {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
                       {campaign.status}
                     </span>
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      <MoreHorizontal className="w-4 h-4 text-gray-500" />
-                    </button>
+                    <div className="relative">
+                      <button 
+                        onClick={() => setOpenDropdown(openDropdown === `mobile-${campaign.id}` ? null : `mobile-${campaign.id}`)}
+                        className="p-1 hover:bg-gray-100 rounded"
+                      >
+                        <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                      </button>
+                      
+                      {openDropdown === `mobile-${campaign.id}` && (
+                        <>
+                          <div 
+                            className="fixed inset-0 z-10" 
+                            onClick={() => setOpenDropdown(null)}
+                          />
+                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                            <Link
+                              href={`/${storeId}/campaign/${campaign.id}`}
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              <Eye className="w-4 h-4 text-purple-500" />
+                              View Details
+                            </Link>
+                            <Link
+                              href={`/${storeId}/campaign/${campaign.id}/edit`}
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              <Edit className="w-4 h-4 text-blue-500" />
+                              Edit
+                            </Link>
+                            <button
+                              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              {campaign.status === 'Active' ? (
+                                <>
+                                  <Pause className="w-4 h-4 text-yellow-500" />
+                                  Pause
+                                </>
+                              ) : (
+                                <>
+                                  <PlayCircle className="w-4 h-4 text-green-500" />
+                                  Activate
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
                 

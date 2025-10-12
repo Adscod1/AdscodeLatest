@@ -35,7 +35,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
   }, [isMobileMenuOpen]);
 
   const isActive = (path: string) => {
-    if (path === "/dashboard" && pathname === "/") return true;
+    if (path === "/dashboard" && pathname === `/${storeId}`) return true;
     return pathname.includes(path);
   };
 
@@ -164,18 +164,18 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="space-y-1 mt-8">
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">PERSONAL</h2>
             <nav className="space-y-1">
-              <Link href="/messages" className={getLinkClassName("/messages")}>
+              <Link href={`/${storeId}/messages`} className={getLinkClassName("/messages")}>
                 <MessageSquare className="w-4 h-4 mr-3" />
                 Messages
                 <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
                   14+
                 </span>
               </Link>
-              <Link href="/notifications" className={getLinkClassName("/notifications")}>
+              <Link href={`/${storeId}/notifications`} className={getLinkClassName("/notifications")}>
                 <Bell className="w-4 h-4 mr-3" />
                 Notifications
               </Link>
-              <Link href="/settings" className={getLinkClassName("/settings")}>
+              <Link href={`/${storeId}/settings`} className={getLinkClassName("/settings")}>
                 <Settings className="w-4 h-4 mr-3" />
                 Settings
               </Link>

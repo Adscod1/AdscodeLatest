@@ -5,7 +5,6 @@ import { Profile } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import { 
   Bell,
   Settings,
@@ -23,20 +22,19 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { ProfileEditForm } from "@/app/(dashboard)/profile/components/profile-edit-form";
 import AllStoresCards from "@/app/(dashboard)/profile/components/all-stores-cards";
 
 interface CustomSidebarProps {
   profile: Profile | null;
   influencer?: any;
+  showMobileMenu?: boolean;
+  onMobileMenuClose?: () => void;
 }
 
-const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: propInfluencer }) => {
+const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: propInfluencer, showMobileMenu = true, onMobileMenuClose }) => {
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [hasInfluencerAccount, setHasInfluencerAccount] = useState<boolean | null>(null);
   
   // Check if the user has an influencer account
@@ -91,12 +89,6 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
     };
   }, [isMobileMenuOpen]);
 
-  const avatarUrl =
-    profile?.image ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      profile?.name || "User"
-    )}&background=000000&color=fff&size=150`;
-
   const isActive = (path: string) => {
     if (path === "/profile" && pathname === "/profile") return true;
     return pathname.includes(path);
@@ -112,7 +104,11 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
 
   const handleLinkClick = () => {
     if (isMobile) {
-      setIsMobileMenuOpen(false);
+      if (onMobileMenuClose) {
+        onMobileMenuClose();
+      } else {
+        setIsMobileMenuOpen(false);
+      }
     }
   };
 
@@ -122,27 +118,27 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
     return (
       <>
         {/* Mobile hamburger button */}
-        {isMobile && (
+        {showMobileMenu && isMobile && !isMobileMenuOpen && (
           <button 
             onClick={() => setIsMobileMenuOpen(true)}
-            className="fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-lg hover:bg-gray-100 md:hidden"
+            className="fixed top-4 left-4 z-[9999] p-2 bg-white border border-gray-200 rounded-lg shadow-lg hover:bg-gray-100 md:hidden"
           >
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
         )}
 
         {/* Mobile overlay */}
-        {isMobileMenuOpen && (
+        {showMobileMenu && isMobileMenuOpen && (
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            className="fixed inset-0 bg-black bg-opacity-30 z-[9996] md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
 
         {/* Sidebar Loading State */}
         <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out ${
-          isMobile 
-            ? `fixed inset-y-0 left-0 z-50 transform ${
+          showMobileMenu && isMobile 
+            ? `fixed inset-y-0 left-0 z-[9997] transform ${
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }` 
             : 'relative'
@@ -156,7 +152,13 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
               {/* Mobile close button */}
               {isMobile && (
                 <button 
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => {
+                    if (onMobileMenuClose) {
+                      onMobileMenuClose();
+                    } else {
+                      setIsMobileMenuOpen(false);
+                    }
+                  }}
                   className="p-1 rounded-lg hover:bg-gray-100 md:hidden"
                 >
                   <X className="w-5 h-5 text-gray-500" />
@@ -183,27 +185,27 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
   return (
     <>
       {/* Mobile hamburger button */}
-      {isMobile && (
+      {showMobileMenu && isMobile && !isMobileMenuOpen && (
         <button 
           onClick={() => setIsMobileMenuOpen(true)}
-          className="fixed top-4 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-lg hover:bg-gray-100 md:hidden"
+          className="fixed top-4 left-4 z-[9999] p-2 bg-white border border-gray-200 rounded-lg shadow-lg hover:bg-gray-100 md:hidden"
         >
           <Menu className="w-5 h-5 text-gray-600" />
         </button>
       )}
 
       {/* Mobile overlay */}
-      {isMobileMenuOpen && (
+      {showMobileMenu && isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-30 z-[9996] md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out ${
-        isMobile 
-          ? `fixed inset-y-0 left-0 z-50 transform ${
+        showMobileMenu && isMobile 
+          ? `fixed inset-y-0 left-0 z-[9997] transform ${
               isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
             }` 
           : 'relative'
@@ -226,7 +228,13 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
             {/* Mobile close button */}
             {isMobile && (
               <button 
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={() => {
+                  if (onMobileMenuClose) {
+                    onMobileMenuClose();
+                  } else {
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
                 className="p-1 rounded-lg hover:bg-gray-100 md:hidden"
               >
                 <X className="w-5 h-5 text-gray-500" />
@@ -235,81 +243,6 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
           </div>
         </div>
 
-        {/* Profile Section */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center">
-            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 mr-3">
-              <Image
-                src={avatarUrl}
-                alt={profile?.name || "Profile"}
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              {isEditing ? (
-                <div className="w-full">
-                  <ProfileEditForm
-                    profile={profile}
-                    onSuccess={() => {
-                      setIsEditing(false);
-                      queryClient.invalidateQueries({
-                        queryKey: ["profile", profile.id],
-                      });
-                    }}
-                    onCancel={() => setIsEditing(false)}
-                  />
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium text-gray-900 truncate">{profile?.name || "Anonymous User"}</p>
-                    <button
-                      className="text-blue-500 text-xs hover:text-blue-700"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      Edit
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-500 truncate">{profile?.role || "User"}</p>
-                  
-                  <div className="flex items-center justify-between mt-2 text-xs">
-                    <div className="flex items-center space-x-1 text-gray-600">
-                      <Users className="w-3 h-3" />
-                      <span className="font-medium">236</span>
-                      <span className="text-gray-500">Followers</span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-1 text-gray-600">
-                      <User className="w-3 h-3" />
-                      <span className="font-medium">128</span>
-                      <span className="text-gray-500">Rating</span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Bio Section */}
-        {!isEditing && (
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="font-medium text-sm text-gray-900">Bio</h2>
-              <button
-                className="text-blue-500 text-xs hover:text-blue-700"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit
-              </button>
-            </div>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              {profile?.bio || "No bio available. Click edit to add your bio."}
-            </p>
-          </div>
-        )}
         {/* Navigation */}
         <div className="flex-1 px-6 pb-6 overflow-y-auto">
           <div className="space-y-1">

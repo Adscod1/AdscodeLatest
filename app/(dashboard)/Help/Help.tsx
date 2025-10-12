@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import CustomSidebar from '@/components/ui/custom-sidebar';
+import { DashboardLayout } from '@/components/ui/dashboard-layout';
 import { getCurrentProfile } from '@/actions/profile';
 import { Profile } from '@prisma/client';
 import { auth } from '@/utils/auth';
@@ -103,22 +103,15 @@ const HelpCenter = ({ user }: { user: Profile }) => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-        <CustomSidebar profile={profile} />
-
-      {/* Main Content */}
-      <div className={`flex-1 overflow-auto ${
-        isMobile ? 'pt-20' : ''
-      }`}>
+    <DashboardLayout profile={profile}>
+      <div>
         {/* Header */}
-        <div className={`bg-white border-b border-gray-200 ${isMobile ? 'px-4 py-4' : 'px-8 py-6'}`}>
+        <div className={`bg-white border-b border-gray-200 ${isMobile ? 'px-4 py-4 -mx-4 sm:-mx-8 -mt-4 sm:-mt-8 mb-4' : 'px-8 py-6 -mx-8 -mt-8 mb-8'}`}>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Help Center</h1>
           <p className="text-gray-600">Find answers and get support for your influencer journey</p>
         </div>
 
-        <div className={`${isMobile ? 'p-4' : 'p-8'}`}>
-          {/* Quick Actions */}
+        {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -204,8 +197,7 @@ const HelpCenter = ({ user }: { user: Profile }) => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { ChevronLeft, Info } from "lucide-react";
+import React, { useState } from "react";
+import { ChevronLeft, Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../../product/components/product-tabs";
 import { useForm } from "react-hook-form";
@@ -16,91 +16,118 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import { toast } from "sonner";
 import { FileUpload } from "@/components/ui/file-upload";
 import { X } from "lucide-react";
+import { useServiceStore, CreateServiceInput } from "@/store/use-service-store";
 
-
-interface CreateServiceInput {
-  title: string;
-  category?: string;
-  tags?: string;
-  description?: string;
-  serviceProvider?: string;
-  location?: string;
-  duration?: string;
-  serviceType?: string;
-  experience?: number;
-  whatsIncluded?: string;
-  targetAudience?: string;
-  termsAndConditions?: string;
-  storeId: string;
+interface MediaFile {
+  url: string;
+  type: string;
+  filename: string;
+  size: number;
 }
 
 const CreateNewService = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const { service, updateService, reset } = useServiceStore();
 
-  const { register, handleSubmit, setValue, watch } = useForm<CreateServiceInput>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CreateServiceInput>({
     defaultValues: {
+      ...service,
       storeId: storeId as string,
-      experience: 0,
+      experience: service.experience || 0,
+      status: service.status || "DRAFT",
     },
   });
 
-  const [serviceMedia, setServiceMedia] = React.useState<string[]>([]);
+  // State for service media
+  const [serviceMedia, setServiceMedia] = useState<MediaFile[]>(
+    service.media || []
+  );
 
-  const handleMediaUpload = (url: string) => {
-    setServiceMedia(prev => [...prev, url]);
+  const handleMediaUpload = (response: any) => {
+    if (response.success) {
+      const mediaFile: MediaFile = {
+        url: response.url,
+        type: response.type,
+        filename: response.filename,
+        size: response.size
+      };
+      const updatedMedia = [...serviceMedia, mediaFile];
+      setServiceMedia(updatedMedia);
+      updateService({ media: updatedMedia });
+      toast.success('Media uploaded successfully');
+    } else {
+      toast.error('Failed to upload media');
+    }
   };
 
   const removeMedia = (index: number) => {
-    setServiceMedia(prev => prev.filter((_, i) => i !== index));
+    const updatedMedia = serviceMedia.filter((_, i) => i !== index);
+    setServiceMedia(updatedMedia);
+    updateService({ media: updatedMedia });
+    toast.success('Media removed');
   };
 
   const onSubmit = (data: CreateServiceInput) => {
-    console.log("Service data:", data);
-    router.push(`/${storeId}/service/new/sale?type=service`);
+    updateService({
+      ...data,
+      storeId: storeId as string,
+      media: serviceMedia,
+      experience: Number(data.experience) || 0,
+    });
+    router.push(`/${storeId}/service/new/sale`);
   };
 
   const handleCancel = () => {
+    reset();
     router.push(`/${storeId}/products`);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-white border-b">
-        <Button
-          variant="ghost"
-          className="flex items-center text-gray-600 hover:text-gray-900"
-          asChild
-        >
-          <Link href={`/${storeId}/products`}>
-            <ChevronLeft className="w-5 h-5 mr-1" />
-            Back
-          </Link>
-        </Button>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={handleCancel}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 bg-white border-b gap-4 sm:gap-0">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <Button
+            variant="ghost"
+            className="flex items-center text-gray-600 hover:text-gray-900 text-sm sm:text-base"
+            asChild
+          >
+            <Link href={`/${storeId}/products`}>
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Back to service listing</span>
+              <span className="sm:hidden">Back</span>
+            </Link>
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
+          <Button variant="outline" onClick={handleCancel} className="flex-1 sm:flex-none">
             Cancel
           </Button>
-          <Button onClick={handleSubmit(onSubmit)}>Continue</Button>
+          <Button onClick={handleSubmit(onSubmit)} className="flex-1 sm:flex-none">
+            Continue
+          </Button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <ProductTabs activeTab="Basic Information" type="service" />
-        
-        {/* Basic Information Form */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
-            <h2 className="text-xl sm:text-2xl font-semibold">Basic Information</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Provide essential details about your service
-            </p>
-          </div>
-          <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+          {/* Main Content */}
+          <div className="flex-1">
+            <ProductTabs activeTab="Basic Information" type="service" />
+
+            {/* Basic Information Form */}
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
+                <h2 className="text-xl sm:text-2xl font-semibold">Basic Information</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Provide essential details about your service
+                </p>
+              </div>
+              <div className="px-4 sm:px-6 lg:px-8 py-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-5xl">
               {/* Info Banner */}
               <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start gap-3">
@@ -121,10 +148,19 @@ const CreateNewService = () => {
                 </Label>
                 <Input
                   id="title"
-                  {...register("title", { required: true })}
+                  {...register("title", { 
+                    required: "Service title is required",
+                    minLength: {
+                      value: 3,
+                      message: "Service title must be at least 3 characters"
+                    }
+                  })}
                   placeholder="e.g., Professional Web Design"
-                  className="max-w-2xl"
+                  className={`max-w-2xl ${errors.title ? 'border-red-500' : ''}`}
                 />
+                {errors.title && (
+                  <p className="text-sm text-red-500">{errors.title.message}</p>
+                )}
               </div>
 
               {/* Service Category */}
@@ -173,10 +209,19 @@ const CreateNewService = () => {
                 </Label>
                 <Textarea
                   id="description"
-                  {...register("description")}
+                  {...register("description", {
+                    required: "Service description is required",
+                    minLength: {
+                      value: 20,
+                      message: "Description must be at least 20 characters"
+                    }
+                  })}
                   placeholder="Describe your service in detail. Include what you offer, your approach, and the results clients can expect."
-                  className="min-h-[120px]"
+                  className={`min-h-[120px] ${errors.description ? 'border-red-500' : ''}`}
                 />
+                {errors.description && (
+                  <p className="text-sm text-red-500">{errors.description.message}</p>
+                )}
                 <p className="text-xs text-gray-500">
                   A detailed description helps customers understand your offering better
                 </p>
@@ -349,18 +394,18 @@ const CreateNewService = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-                    {serviceMedia.map((mediaUrl, index) => (
+                    {serviceMedia.map((media, index) => (
                       <div key={`media-${index}`} className="relative aspect-square group">
                         <div className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-200">
-                          {mediaUrl.includes('video') ? (
+                          {media.type.startsWith('video/') ? (
                             <video
-                              src={mediaUrl}
+                              src={media.url}
                               className="w-full h-full object-cover"
                               controls
                             />
                           ) : (
                             <img
-                              src={mediaUrl}
+                              src={media.url}
                               alt={`Service ${index + 1}`}
                               className="w-full h-full object-cover"
                             />
@@ -397,11 +442,61 @@ const CreateNewService = () => {
                   </div>
                 )}
               </div>
-            </form>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="w-full lg:w-80 order-first lg:order-last">
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
+              <h3 className="text-lg font-semibold">Service Status</h3>
+            </div>
+            <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={watch("status") || "DRAFT"}
+                    onValueChange={(value) => setValue("status", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DRAFT">Draft</SelectItem>
+                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="ARCHIVED">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    This service will be available to customers
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium mb-2">
+                    Service channels
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="online-booking" defaultChecked className="rounded" />
+                      <Label htmlFor="online-booking" className="text-sm">Online Booking</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="in-person" defaultChecked className="rounded" />
+                      <Label htmlFor="in-person" className="text-sm">In-Person</Label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
   );
 };
 
