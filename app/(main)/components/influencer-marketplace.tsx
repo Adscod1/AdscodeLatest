@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Star, UserPlus, SlidersHorizontal, CheckCircle2, Eye, MessageCircle, Mail } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Influencer {
   id: string;
@@ -314,9 +315,11 @@ export const InfluencerMarketplace = () => {
                     <UserPlus className="w-4 h-4 mr-2" />
                     Follow
                   </Button>
-                  <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
-                    View Profile →
-                  </Button>
+                  <Link href={`/influencer/${influencer.id}`} className="flex-1">
+                    <Button className="w-full bg-blue-500 hover:bg-blue-600">
+                      View Profile →
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Card>
