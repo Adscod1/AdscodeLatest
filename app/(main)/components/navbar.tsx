@@ -251,7 +251,7 @@ export const FeedNavbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium px-3"
+                    className="flex items-center gap-2 ml-10 text-gray-700 hover:text-gray-900 font-medium px-3"
                   >
                     Explore
                     <ChevronDownIcon />
@@ -272,15 +272,11 @@ export const FeedNavbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Create Button */}
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-5 py-2 flex items-center gap-2">
-                <PlusIcon />
-                <span>Create</span>
-              </Button>
+              
             </div>
 
             {/* Center Section - Search Bar */}
-            <div className="flex-1 max-w-2xl mx-8">
+            <div className="flex-1 max-w-1xl mx-8 ">
               <div className="relative">
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <SearchIcon />
@@ -288,10 +284,16 @@ export const FeedNavbar = () => {
                 <Input
                   type="text"
                   placeholder="Search creators, products, or deals..."
-                  className="w-full px-4 py-2.5 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  className="w-full px-4 py-2.5 h-12 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 />
               </div>
+              
             </div>
+            {/* Create Button */}
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-full h-12 w-[10%] px-5 py-2 flex items-center gap-2 mr-[100px]">
+                <PlusIcon />
+                <span>Create Store</span>
+              </Button>
 
             {/* Right Section - Icons & Avatar */}
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -300,11 +302,7 @@ export const FeedNavbar = () => {
                 <BellIcon />
               </button>
 
-              {/* Messages */}
-              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
-                <MessageSquareIcon />
-              </button>
-
+             
               {/* Shopping Cart */}
               <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
                 <ShoppingCartIcon />

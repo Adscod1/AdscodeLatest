@@ -233,11 +233,17 @@ export default function InfluencerProfilePage() {
 
                   {/* Action Buttons */}
                   <div className="flex gap-3">
-                    <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
+                    <Button className="flex-1 w-10 bg-blue-500 hover:bg-blue-600">
                       Follow
                     </Button>
                     <Button variant="outline">
                       <Instagram className="w-4 h-4" />
+                    </Button>
+                    <Button variant="outline">
+                      <Twitter className="w-4 h-4" />
+                    </Button>
+                    <Button variant="outline">
+                      <Facebook className="w-4 h-4" />
                     </Button>
                     <Button variant="outline">
                       <Twitter className="w-4 h-4" />
@@ -258,7 +264,10 @@ export default function InfluencerProfilePage() {
 
             {/* Reviews Section */}
             <Card className="p-6">
-              <h2 className="text-xl font-bold mb-4">Reviews</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold mb-4">Reviews</h2>
+                <Button variant="link" className="float-right text-blue-500 cursor-pointer">See all</Button>
+              </div>
               <div className="space-y-4">
                 {influencer.reviews.map((review) => (
                   <div key={review.id} className="flex gap-4">
