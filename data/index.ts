@@ -620,6 +620,7 @@ export const reviewsList: Review[] = [
 
 // Influencers Page interfaces and data
 export interface Influencer {
+  id: string;
   name: string;
   image: string;
   description: string;
@@ -632,6 +633,7 @@ export interface Influencer {
 
 export const influencers: Influencer[] = [
   {
+    id: "1",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -643,6 +645,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "2",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -654,6 +657,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "3",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -665,6 +669,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "1",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -676,6 +681,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "2",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -687,6 +693,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "3",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -698,6 +705,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "1",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -709,6 +717,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "2",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
@@ -720,6 +729,7 @@ export const influencers: Influencer[] = [
     category: "Technology",
   },
   {
+    id: "3",
     name: "Elizabeth Lopez",
     image:
       "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",

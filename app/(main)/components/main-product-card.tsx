@@ -49,11 +49,11 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   const reviewCount = 324;
 
   return (
-    <Card className="w-full max-w-md border-[0.5px] border-gray-100 rounded-md overflow-hidden shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
+    <Card className="w-full border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 p-0">
       {/* Header with store info */}
-      <div className="flex items-center justify-between px-2 pt-2 pb-1">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-500">
+      <div className="flex items-center justify-between p-3 pb-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
             {product.store.avatarUrl ? (
               <Image
                 src={product.store.avatarUrl}
@@ -69,11 +69,11 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
             )}
           </div>
           <div>
-            <h3 className="font-bold text-sm text-gray-900">
+            <h3 className="font-semibold text-sm text-gray-900">
               {product.store.name}
             </h3>
             <p className="text-xs text-gray-500">
-              {product.store.category || "Electronics"} • Just now
+              {product.store.category || "Other"} • Just now
             </p>
           </div>
         </div>
@@ -83,7 +83,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Image */}
-      <div className="relative w-full aspect-square bg-gradient-to-br from-purple-600 via-purple-500 to-blue-500">
+      <div className="relative w-full aspect-[4/3] bg-gray-100">
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images[0].url}
@@ -108,61 +108,61 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Details */}
-      <div className="p-2 space-y-1.5">
+      <div className="p-3 pt-2 space-y-2">
         {/* Title */}
-        <h2 className="font-bold text-base text-gray-900 leading-tight line-clamp-1">
+        <h2 className="font-semibold text-base text-gray-900 leading-tight line-clamp-2">
           {product.title}
         </h2>
 
         {/* Rating */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <div className="flex text-yellow-400 text-base">
             {"★★★★"}
             <span className="text-gray-300">★</span>
           </div>
-          <span className="text-xs text-gray-600">({reviewCount})</span>
+          <span className="text-sm text-gray-600">({reviewCount})</span>
         </div>
 
         {/* Price and Buy Button */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-end justify-between">
           <div>
-            <p className="text-xl font-bold text-blue-600">
+            <p className="text-2xl font-bold text-blue-600">
               {formatCurrency(product.price)}
             </p>
             {product.comparePrice && product.comparePrice > product.price && (
-              <p className="text-xs text-gray-400 line-through">
+              <p className="text-sm text-gray-400 line-through">
                 {formatCurrency(product.comparePrice)}
               </p>
             )}
           </div>
           <Link href={`/${product.store.id}/product/${product.id}`}>
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-1.5 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium">
               See more
             </Button>
           </Link>
         </div>
 
         {/* Engagement Metrics */}
-        <div className="flex items-center justify-between pt-1 border-t border-gray-100 text-gray-600">
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100 text-gray-500">
           <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
             <Heart className="w-4 h-4" />
-            <span className="text-xs font-medium">{engagementData.likes}</span>
+            <span className="text-sm font-medium">{engagementData.likes}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
             <MessageCircle className="w-4 h-4" />
-            <span className="text-xs font-medium">{engagementData.comments}</span>
+            <span className="text-sm font-medium">{engagementData.comments}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-green-500 transition-colors">
             <TrendingUp className="w-4 h-4" />
-            <span className="text-xs font-medium">{engagementData.views}</span>
+            <span className="text-sm font-medium">{engagementData.views}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-purple-500 transition-colors">
             <Share2 className="w-4 h-4" />
-            <span className="text-xs font-medium">{engagementData.shares}</span>
+            <span className="text-sm font-medium">{engagementData.shares}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-yellow-500 transition-colors">
             <Bookmark className="w-4 h-4" />
-            <span className="text-xs font-medium">{engagementData.bookmarks}</span>
+            <span className="text-sm font-medium">{engagementData.bookmarks}</span>
           </button>
         </div>
       </div>

@@ -8,10 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   ChevronDown,
-  MessageCircle,
-  Share2,
   Heart,
-  BookmarkIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Influencer, influencers } from "@/data";
@@ -48,107 +45,93 @@ const CheckboxItem = ({ label, value }: { label: string; value?: string }) => {
 
 const InfluencerCard = ({ influencer }: { influencer: Influencer }) => {
   return (
-    <div className="border rounded-lg overflow-hidden relative bg-white">
-      <div className="absolute top-2 right-2 z-10">
-        <Checkbox className="h-4 w-4 rounded-sm bg-white" />
+    <div className="border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition-shadow p-0">
+      {/* Cover Image */}
+      <div className="relative h-32 bg-gradient-to-br from-gray-100 to-gray-200">
+        <Image
+          src={influencer.image}
+          alt={influencer.name}
+          fill
+          className="object-cover"
+        />
       </div>
 
-      <div className="p-4">
-        <div className="flex flex-col items-center">
-          <div className="relative w-24 h-24 rounded-full overflow-hidden mb-2">
-            <Image
-              src={influencer.image}
-              alt={influencer.name}
-              width={96}
-              height={96}
-              className="object-cover"
-            />
-          </div>
-
-          <Link href={`/influencer/martha`}>
-            <h3 className="font-semibold text-center">{influencer.name}</h3>
-          </Link>
-          <p className="text-xs text-gray-500 text-center">
-            {influencer.description}
-          </p>
-
-          <div className="grid grid-cols-3 w-full mt-4 gap-2 text-center">
-            <div className="flex flex-col items-center">
-              <div className="flex justify-center mb-1">
-                <BookmarkIcon className="h-3 w-3 mr-1" />
-                <span className="text-[10px]">Following</span>
-              </div>
-              <div className="flex justify-center">
-                <span className="mr-1">👍</span>
-                <span className="mr-1">👎</span>
-                <span>💬</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="flex justify-center mb-1">
-                <Heart className="h-3 w-3 mr-1" />
-                <span className="text-[10px]">Followers</span>
-              </div>
-              <div className="font-semibold text-sm">
-                {influencer.followers}
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="flex justify-center mb-1">
-                <Share2 className="h-3 w-3 mr-1" />
-                <span className="text-[10px]">Engagement</span>
-              </div>
-              <div className="font-semibold text-sm">
-                {influencer.engagement}
-              </div>
-            </div>
-          </div>
+      {/* Avatar */}
+      <div className="relative -mt-12 flex justify-center">
+        <div className="w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-white">
+          <Image
+            src={influencer.image}
+            alt={influencer.name}
+            width={80}
+            height={80}
+            className="object-cover w-full h-full"
+          />
         </div>
+      </div>
 
-        <div className="flex justify-between text-xs mt-4">
-          <div className="text-xs text-gray-500">Sponsored range</div>
-          <div className="text-xs text-gray-500">Platform type</div>
-        </div>
+      {/* Content */}
+      <div className="px-4 pb-4 pt-2 text-center">
+        {/* Name */}
+        <Link href={`/influencer/${influencer.id}`}>
+          <h3 className="font-bold text-base text-gray-900 flex items-center justify-center gap-1">
+            {influencer.name}
+            <span className="text-blue-500">✓</span>
+          </h3>
+        </Link>
 
-        <div className="flex justify-between text-xs">
-          <div className="font-medium">{influencer.price}</div>
-          <div className="font-medium">{influencer.contentType}</div>
-        </div>
+        {/* Username & Description */}
+        <p className="text-sm text-gray-500">@{influencer.name.toLowerCase().replace(' ', '')}</p>
+        <p className="text-sm text-gray-600 mb-3">{influencer.description}</p>
 
-        <div className="mt-2 mb-3">
-          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">
+        {/* Tags */}
+        <div className="flex gap-2 justify-center mb-3 flex-wrap">
+          <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
             {influencer.category}
+          </span>
+          <span className="px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
+            Top Influencer
+          </span>
+          <span className="px-3 py-1 bg-green-100 text-green-600 text-xs rounded-full">
+            Active
           </span>
         </div>
 
-        <div className="flex space-x-2 mt-3">
-          <Button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm h-8">
-            Add
+        {/* Rating */}
+        <div className="flex items-center justify-center gap-1 mb-4">
+          <span className="text-yellow-400 text-lg">★</span>
+          <span className="font-semibold text-gray-900">4.9</span>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-4 text-center border-t border-b border-gray-100 py-3">
+          <div>
+            <div className="text-gray-400 text-xs mb-1">👁️</div>
+            <div className="font-semibold text-gray-900">{influencer.followers}</div>
+          </div>
+          <div>
+            <div className="text-gray-400 text-xs mb-1">💬</div>
+            <div className="font-semibold text-gray-900">{influencer.engagement}</div>
+          </div>
+          <div>
+            <div className="text-gray-400 text-xs mb-1">✉️</div>
+            <div className="font-semibold text-gray-900">{influencer.engagement}</div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="flex-1 border-gray-300 hover:bg-gray-50"
+          >
+            <Heart className="w-4 h-4 mr-2" />
+            Follow
           </Button>
-          <Link href="/influencer/martha/message">
-            <Button variant="outline" className="flex-1 text-sm h-8">
-              <MessageCircle className="h-4 w-4 mr-1" />
-              Message
+          <Link href={`/influencer/${influencer.id}`} className="flex-1">
+            <Button className="w-full bg-blue-500 hover:bg-blue-600">
+              View Profile →
             </Button>
           </Link>
-          <div className="flex">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 border-r-0 rounded-r-none"
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 rounded-l-none"
-            >
-              <BookmarkIcon className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </div>
     </div>
@@ -159,18 +142,54 @@ const AllInfluencersPage = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([20, 200]);
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Find Influencers</h1>
-        <div className="flex items-center">
-          <span className="mr-2 text-sm">Sort by</span>
-          <select className="border rounded p-1 text-sm">
-            <option>Population</option>
-            <option>Rating</option>
-            <option>Price</option>
-          </select>
+    <div className="w-full bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Influencer Marketplace
+          </h1>
+          <p className="text-gray-600 text-base">
+            Connect with top influencers across various categories to amplify your brand&apos;s reach and engagement.
+          </p>
         </div>
-      </div>
+
+        {/* Search and Filters Bar */}
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            {/* Search Bar */}
+            <div className="relative flex-1 w-full">
+              <Input
+                placeholder="Search influencers..."
+                className="pl-4 pr-4 py-6 bg-white border-gray-200 rounded-lg w-full"
+              />
+            </div>
+
+            {/* Category Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
+              {["All", "Fashion", "Beauty", "Tech", "Fitness", "Travel", "Food", "Lifestyle"].map((category) => (
+                <Button
+                  key={category}
+                  variant={category === "All" ? "default" : "outline"}
+                  className={`whitespace-nowrap ${
+                    category === "All"
+                      ? "bg-blue-500 hover:bg-blue-600"
+                      : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  {category}
+                </Button>
+              ))}
+              <Button variant="outline" className="bg-white hover:bg-gray-50 whitespace-nowrap">
+                <ChevronDown className="w-4 h-4 mr-2" />
+                More Filters
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <p className="text-gray-600 mb-6">Showing {influencers.length} influencers</p>
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Filters Sidebar */}
@@ -339,6 +358,7 @@ const AllInfluencersPage = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

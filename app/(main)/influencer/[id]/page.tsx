@@ -151,7 +151,8 @@ const influencersData = {
 
 export default function InfluencerProfilePage() {
   const params = useParams();
-  const influencer = influencersData[params.id as keyof typeof influencersData];
+  const id = params?.id as string;
+  const influencer = id ? influencersData[id as keyof typeof influencersData] : null;
 
   if (!influencer) {
     return (

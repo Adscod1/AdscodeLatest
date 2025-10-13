@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { MainProductCard } from "./components/main-product-card";
-import { InfluencerMarketplace } from "./components/influencer-marketplace";
+
 
 
 const FeedPage = () => {
@@ -45,7 +45,7 @@ const FeedPage = () => {
       )}
       </div>
 
-      <InfluencerMarketplace />
+      
     </>
   );
 };

@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { UserAuthButton } from "./UserAuthButton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 // Icons
 const MenuIcon = () => (
@@ -83,6 +90,26 @@ const BellIcon = () => (
 const ChevronRightIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const ChevronDownIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const ShoppingCartIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="9" cy="21" r="1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="20" cy="21" r="1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const MessageSquareIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -182,7 +209,7 @@ export const FeedNavbar = () => {
   }, []);
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-70 bg-white border-b  border-gray-200">
+    <div className="sticky top-0 left-0 right-0 z-[9999] bg-white border-b border-gray-200">
       {/* Main Navigation Bar */}
       <nav className="container mx-auto ">
         <div className="flex items-center justify-between h-16">
@@ -213,58 +240,78 @@ export const FeedNavbar = () => {
           </div>
 
           {/* Desktop Layout */}
-          <div className="hidden z-70 md:flex items-center justify-between w-full">
-            {/* Left Section */}
-            <div className="flex items-center gap-6">
+          <div className="hidden z-70 md:flex items-center justify-between w-full gap-6">
+            {/* Left Section - Logo, Explore & Create */}
+            <div className="flex items-center gap-4 flex-shrink-0">
               {/* Logo */}
               <Logo />
               
-              {/* Main Navigation Links */}
-              <div className="flex items-center gap-8 mr-10">
-                {mainNavItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`text-sm font-medium transition-colors ${
-                      isPathActive(item.href)
-                        ? "text-blue-600"
-                        : "text-gray-700 hover:text-gray-900"
-                    }`}
+              {/* Explore Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium px-3"
                   >
-                    {item.label}
-                  </Link>
-                ))}
+                    Explore
+                    <ChevronDownIcon />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48 z-[10000]">
+                  {mainNavItems.map((item) => (
+                    <DropdownMenuItem key={item.href} asChild>
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-3 cursor-pointer"
+                      >
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Create Button */}
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-5 py-2 flex items-center gap-2">
+                <PlusIcon />
+                <span>Create</span>
+              </Button>
+            </div>
+
+            {/* Center Section - Search Bar */}
+            <div className="flex-1 max-w-2xl mx-8">
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <SearchIcon />
+                </div>
+                <Input
+                  type="text"
+                  placeholder="Search creators, products, or deals..."
+                  className="w-full px-4 py-2.5 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                />
               </div>
             </div>
 
-            {/* Right Section */}
-            <div className="flex items-center gap-4">
-              {/* Search Bar */}
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search"
-                  className="w-80 px-4 py-2 pl-4 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button 
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600" 
-                  onClick={() => router.push("/business/all")}
-                >
-                  <SearchIcon />
-                </button>
-              </div>
-
-              
+            {/* Right Section - Icons & Avatar */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               {/* Notification Bell */}
-              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
+              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
                 <BellIcon />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-                  9
-                </span>
+              </button>
+
+              {/* Messages */}
+              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
+                <MessageSquareIcon />
+              </button>
+
+              {/* Shopping Cart */}
+              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
+                <ShoppingCartIcon />
               </button>
 
               {/* User Avatar */}
-              <div className="flex items-center gap-4">
+              <div className="ml-2">
                 <UserAuthButton />
               </div>
             </div>
