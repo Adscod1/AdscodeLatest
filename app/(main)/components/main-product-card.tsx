@@ -89,7 +89,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
             alt={product.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 40vw, 33vw"
-            className="object-contain"
+            className="object-cover object-center"
             priority={false}
           />
         ) : (
