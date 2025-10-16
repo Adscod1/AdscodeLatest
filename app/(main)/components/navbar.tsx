@@ -163,7 +163,8 @@ export const FeedNavbar = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [showLeftScroll, setShowLeftScroll] = useState(false);
+  const [showRightScroll, setShowRightScroll] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
 
   const isPathActive = (linkPath: string) => {
@@ -185,27 +186,31 @@ export const FeedNavbar = () => {
     setIsSearchOpen(!isSearchOpen);
   };
 
-  const scrollCategories = () => {
-    if (categoriesRef.current) {
-      const scrollAmount = 200;
-      categoriesRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
-    }
+  const scrollCategories = (direction: 'left' | 'right') => {
+    const el = categoriesRef.current;
+    if (!el) return;
+    const scrollAmount = 280; // tune scroll distance
+    el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
   };
 
-  const checkScrollable = () => {
-    if (categoriesRef.current) {
-      const { scrollWidth, clientWidth } = categoriesRef.current;
-      setShowScrollButton(scrollWidth > clientWidth);
-    }
+  const updateScrollButtons = () => {
+    const el = categoriesRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setShowLeftScroll(scrollLeft > 8);
+    setShowRightScroll(scrollLeft + clientWidth < scrollWidth - 8);
   };
 
   useEffect(() => {
-    checkScrollable();
-    window.addEventListener('resize', checkScrollable);
-    return () => window.removeEventListener('resize', checkScrollable);
+    updateScrollButtons();
+    const onResize = () => updateScrollButtons();
+    window.addEventListener('resize', onResize);
+    const el = categoriesRef.current;
+    if (el) el.addEventListener('scroll', updateScrollButtons, { passive: true });
+    return () => {
+      window.removeEventListener('resize', onResize);
+      if (el) el.removeEventListener('scroll', updateScrollButtons);
+    };
   }, []);
 
   return (
@@ -421,31 +426,45 @@ export const FeedNavbar = () => {
       </>
 
       {/* Category Navigation */}
-      <div className="bg-gray w-full-50 mt-5 border-t border-gray-200">
+      <div className="bg-white w-full mt-4 border-t border-gray-100">
         <div className="container mx-auto relative">
+          {/* Left chevron */}
+          {showLeftScroll && (
+            <button
+              onClick={() => scrollCategories('left')}
+              className="absolute left-1 top-1/2 -translate-y-1/2 bg-white shadow-sm rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition-colors z-10 hidden sm:inline-flex"
+              aria-label="Scroll left"
+            >
+              {/* Reuse right icon rotated */}
+              <div className="-rotate-180"> <ChevronRightIcon /> </div>
+            </button>
+          )}
+
           <div 
             ref={categoriesRef}
-            className="flex items-center gap-2 py-3 overflow-x-auto scrollbar-hide"
+            className="flex items-center gap-3 py-3 overflow-x-auto scrollbar-hide px-8"
           >
             {categoryItems.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
+                className={`px-5 py-2 text-sm font-medium whitespace-nowrap rounded-full transition-colors border ${
                   activeCategory === category
-                    ? "bg-gray-700 text-white"
-                    : "text-gray-700 bg-gray-100 hover:bg-gray-500 hover:text-white"
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-gray-800 border-gray-200 hover:bg-gray-50"
                 }`}
               >
                 {category}
               </button>
             ))}
           </div>
-          {showScrollButton && (
+
+          {/* Right chevron */}
+          {showRightScroll && (
             <button
-              onClick={scrollCategories}
-              className="absolute right-1 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition-colors z-10"
-              aria-label="Show more categories"
+              onClick={() => scrollCategories('right')}
+              className="absolute right-1 top-1/2 -translate-y-1/2 bg-white shadow-sm rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition-colors z-10 hidden sm:inline-flex"
+              aria-label="Scroll right"
             >
               <ChevronRightIcon />
             </button>
