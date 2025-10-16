@@ -50,7 +50,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   return (
     <Card className="w-full border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 p-0">
       {/* Header with store info */}
-      <div className="flex items-center justify-between p-3 pb-2">
+  <div className="flex items-center justify-between p-3 pb-1.5">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
             {product.store.avatarUrl ? (
@@ -82,7 +82,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Image */}
-      <div className="relative w-full h-[220px] bg-gray-100">
+  <div className="relative w-full h-[260px] bg-gray-100">
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images[0].url}
@@ -107,7 +107,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Details */}
-      <div className="p-4 pt-3 space-y-3">
+  <div className="p-4 pt-2.5 space-y-2.5">
         {/* Title and Rating */}
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-semibold text-base text-gray-900 leading-tight line-clamp-1 flex-1">
@@ -122,16 +122,24 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
           </div>
         </div>
 
-        {/* Price - both on same line */}
-        <div className="flex items-center gap-2">
-          <p className="text-2xl font-bold text-blue-600">
-            {formatCurrency(product.price)}
-          </p>
-          {product.comparePrice && product.comparePrice > product.price && (
-            <p className="text-base text-gray-400 line-through">
-              {formatCurrency(product.comparePrice)}
+        {/* Price and CTA */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <p className="text-2xl font-bold text-blue-600">
+              {formatCurrency(product.price)}
             </p>
-          )}
+            {product.comparePrice && product.comparePrice > product.price && (
+              <p className="text-base text-gray-400 line-through">
+                {formatCurrency(product.comparePrice)}
+              </p>
+            )}
+          </div>
+          <Link
+            href={`/${product.store.id}/product/${product.id}`}
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm font-medium"
+          >
+            See more
+          </Link>
         </div>
 
         {/* Engagement Metrics */}
