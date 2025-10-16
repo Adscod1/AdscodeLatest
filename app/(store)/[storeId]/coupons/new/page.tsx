@@ -93,7 +93,7 @@ export default function CreateCouponModal() {
                   placeholder="e.g., Summer Sale 25% Off"
                   value={formData.couponTitle}
                   onChange={(e) => setFormData({ ...formData, couponTitle: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
 
@@ -107,7 +107,7 @@ export default function CreateCouponModal() {
                     placeholder="e.g., SUMMER25"
                     value={formData.couponCode}
                     onChange={(e) => setFormData({ ...formData, couponCode: e.target.value })}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                   <button
                     onClick={generateCode}
@@ -127,7 +127,7 @@ export default function CreateCouponModal() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent resize-none"
                 />
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function CreateCouponModal() {
                 <div className="relative">
                   <button
                     onClick={() => setShowDiscountDropdown(!showDiscountDropdown)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent flex items-center justify-between"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent flex items-center justify-between"
                   >
                     <span className="flex items-center gap-2">
                       <span>{discountTypes.find(d => d.label === discountType)?.icon}</span>
@@ -163,8 +163,8 @@ export default function CreateCouponModal() {
                             setDiscountType(type.label);
                             setShowDiscountDropdown(false);
                           }}
-                          className={`w-full px-3 py-2.5 text-sm text-left hover:bg-purple-50 flex items-center gap-2 transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                            discountType === type.label ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
+                          className={`w-full px-3 py-2.5 text-sm text-left hover:bg-gray-100 flex items-center gap-2 transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                            discountType === type.label ? 'bg-gray-100 text-black font-medium' : 'text-gray-700'
                           }`}
                         >
                           <span>{type.icon}</span>
@@ -184,7 +184,7 @@ export default function CreateCouponModal() {
                   type="number"
                   value={formData.discountPercentage}
                   onChange={(e) => setFormData({ ...formData, discountPercentage: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
 
@@ -196,7 +196,7 @@ export default function CreateCouponModal() {
                   type="number"
                   value={formData.minimumOrderAmount}
                   onChange={(e) => setFormData({ ...formData, minimumOrderAmount: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
 
@@ -209,7 +209,7 @@ export default function CreateCouponModal() {
                   placeholder="Leave empty for unlimited"
                   value={formData.usageLimit}
                   onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
             </div>
@@ -226,11 +226,58 @@ export default function CreateCouponModal() {
                 <div className="relative">
                   <button
                     onClick={() => setShowStartCalendar(!showStartCalendar)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent flex items-center gap-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent flex items-center gap-2"
                   >
                     <Calendar className="w-4 h-4 text-gray-400" />
                     {startDate}
                   </button>
+                  
+                  {showStartCalendar && (
+                    <div className="absolute z-20 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-4 w-80">
+                      <div className="flex items-center justify-between mb-4">
+                        <button className="p-1 hover:bg-gray-100 rounded">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <span className="font-semibold text-sm">October 2025</span>
+                        <button className="p-1 hover:bg-gray-100 rounded">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1 mb-2">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {[28, 29, 30].map((day) => (
+                          <button
+                            key={`prev-${day}`}
+                            className="p-2 text-sm text-gray-400 hover:bg-gray-100 rounded-lg"
+                          >
+                            {day}
+                          </button>
+                        ))}
+                        {getDaysInMonth().map((day) => (
+                          <button
+                            key={day}
+                            onClick={() => {
+                              setStartDate(`October ${day}th, 2025`);
+                              setShowStartCalendar(false);
+                            }}
+                            className="p-2 text-sm rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
+                          >
+                            {day}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div>
@@ -240,10 +287,10 @@ export default function CreateCouponModal() {
                 <div className="relative">
                   <button
                     onClick={() => setShowEndCalendar(!showEndCalendar)}
-                    className="w-full px-3 py-2 border border-purple-300 bg-purple-50 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent flex items-center gap-2"
+                    className="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-lg text-sm text-left focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent flex items-center gap-2"
                   >
-                    <Calendar className="w-4 h-4 text-purple-600" />
-                    <span className="text-purple-700">{endDate}</span>
+                    <Calendar className="w-4 h-4 text-gray-600" />
+                    <span className="text-gray-700">{endDate}</span>
                   </button>
                   
                   {showEndCalendar && (
@@ -283,7 +330,7 @@ export default function CreateCouponModal() {
                             onClick={() => handleDateSelect(day)}
                             className={`p-2 text-sm rounded-lg transition-colors ${
                               day === selectedEndDate
-                                ? 'bg-purple-600 text-white font-semibold'
+                                ? 'bg-black text-white font-semibold'
                                 : 'hover:bg-gray-100 text-gray-700'
                             }`}
                           >
@@ -308,7 +355,7 @@ export default function CreateCouponModal() {
                   <input
                     type="text"
                     placeholder="Add category"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                   <button className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                     <Plus className="w-4 h-4 text-gray-600" />
@@ -321,7 +368,7 @@ export default function CreateCouponModal() {
                   <input
                     type="text"
                     placeholder="Add product"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   />
                   <button className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                     <Plus className="w-4 h-4 text-gray-600" />
@@ -342,7 +389,7 @@ export default function CreateCouponModal() {
                   onChange={() => setActivateCoupon(!activateCoupon)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
               </label>
               <span className="text-sm font-medium text-gray-900">Activate coupon immediately</span>
             </div>
@@ -357,7 +404,7 @@ export default function CreateCouponModal() {
           >
             Cancel
           </button>
-          <button className="px-5 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+          <button className="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
             Create Coupon
           </button>
         </div>

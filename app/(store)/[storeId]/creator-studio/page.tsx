@@ -13,6 +13,7 @@ import {
   MapPin,
   Send,
   MoreHorizontal,
+  Calendar,
   Camera
 } from 'lucide-react';
 
@@ -94,96 +95,202 @@ const CreatorStudioDashboard = () => {
 
   const renderAnalytics = () => (
     <div className="space-y-6 sm:space-y-8">
+      {/* Header with Time Range Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Performance Analytics</h2>
+          <p className="text-sm text-gray-600 mt-1">Track ROI and campaign effectiveness</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option>Last 30 days</option>
+            <option>Last 7 days</option>
+            <option>Last 90 days</option>
+            <option>Last 12 months</option>
+          </select>
+          <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            Custom Range
+          </button>
+        </div>
+      </div>
+
+      {/* Main Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4 sm:mb-6">
-            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
-            <h3 className="text-base sm:text-lg font-semibold">Campaign Performance</h3>
+        {/* Campaign Performance Card */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-blue-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Campaign Performance</h3>
           </div>
-          <div className="space-y-3 sm:space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">Total Reach</span>
-              <span className="text-sm sm:text-base font-semibold">2.4M</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">Engagement Rate</span>
-              <span className="text-sm sm:text-base font-semibold">4.2%</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">Click-through Rate</span>
-              <span className="text-sm sm:text-base font-semibold">2.8%</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">Conversion Rate</span>
-              <span className="text-sm sm:text-base font-semibold">1.3%</span>
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4 sm:mb-6">
-            <div className="w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-sm sm:text-base">$</div>
-            <h3 className="text-base sm:text-lg font-semibold">ROI Metrics</h3>
-          </div>
-          <div className="space-y-3 sm:space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">Total Spent</span>
-              <span className="text-sm sm:text-base font-semibold">$15,750</span>
+          <div className="space-y-6">
+            {/* Total Reach */}
+            <div>
+              <div className="flex justify-between items-baseline mb-1">
+                <span className="text-sm text-gray-600 uppercase tracking-wide">TOTAL REACH</span>
+                <span className="text-xs text-green-600 font-medium">+12% vs last month</span>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">2.4M</p>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">Revenue Generated</span>
-              <span className="text-sm sm:text-base font-semibold">$47,250</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">ROI</span>
-              <span className="text-sm sm:text-base font-semibold text-green-600">200%</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm sm:text-base text-gray-600">Cost per Acquisition</span>
-              <span className="text-sm sm:text-base font-semibold">$24.50</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
-  const renderContent = () => (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-2 mb-4 sm:mb-6">
-        <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
-        <h3 className="text-base sm:text-lg font-semibold">Content Library</h3>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {[1, 2, 3].map((item) => (
-          <div key={item} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="aspect-square bg-gray-100 flex items-center justify-center">
-              <Camera className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
+            {/* Engagement Rate */}
+            <div>
+              <div className="flex justify-between items-baseline mb-1">
+                <span className="text-sm text-gray-600 uppercase tracking-wide">ENGAGEMENT RATE</span>
+                <span className="text-xs text-green-600 font-medium">+0.8% vs last month</span>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">4.2%</p>
             </div>
-            <div className="p-3 sm:p-4">
-              <h4 className="text-sm sm:text-base font-semibold mb-2">Content #{item}</h4>
-              <p className="text-xs sm:text-sm text-gray-600 mb-3">By @creator{item}</p>
-              <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>1.2K</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>89</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>5.4K</span>
-                </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200 my-4"></div>
+
+            {/* Additional Metrics */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Click-through Rate</span>
+                <span className="text-base font-semibold text-gray-900">2.8%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Conversion Rate</span>
+                <span className="text-base font-semibold text-gray-900">1.3%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Brand Mentions</span>
+                <span className="text-base font-semibold text-gray-900">1,847</span>
               </div>
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Financial Metrics Card */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="text-lg font-bold text-green-600">$</div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Financial Metrics</h3>
+          </div>
+
+          {/* ROI Highlight Box */}
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border border-green-200">
+            <p className="text-sm text-green-800 mb-2 uppercase tracking-wide">Return on Investment</p>
+            <p className="text-5xl font-bold text-green-600 mb-1">200%</p>
+            <p className="text-sm text-green-700">Excellent performance</p>
+          </div>
+
+          {/* Financial Details */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Total Investment</span>
+              <span className="text-base font-semibold text-gray-900">$15,750</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Revenue Generated</span>
+              <span className="text-base font-semibold text-green-600">$47,250</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Cost per Acquisition</span>
+              <span className="text-base font-semibold text-gray-900">$24.50</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Avg. Order Value</span>
+              <span className="text-base font-semibold text-gray-900">$89.30</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
+
+  const renderContent = () => {
+    const contentItems = [
+      {
+        id: 1,
+        title: 'Content #1',
+        creator: '@creator1',
+        type: 'video',
+        size: '4.2 GB',
+        likes: '1.2K',
+        comments: 89,
+        views: '5.4K'
+      },
+      {
+        id: 2,
+        title: 'Content #2',
+        creator: '@creator2',
+        type: 'image',
+        size: null,
+        likes: '1.2K',
+        comments: 89,
+        views: '5.4K'
+      },
+      {
+        id: 3,
+        title: 'Content #3',
+        creator: '@creator3',
+        type: null,
+        size: null,
+        likes: '1.2K',
+        comments: 89,
+        views: '5.4K'
+      }
+    ];
+
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex items-center gap-2 mb-4 sm:mb-6">
+          <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+          <h3 className="text-base sm:text-lg font-semibold">Content Library</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {contentItems.map((item) => (
+            <div key={item.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+              <div className="relative aspect-square bg-gray-100 flex items-center justify-center">
+                <Camera className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
+                {item.type && (
+                  <span className="absolute top-3 right-3 px-2 py-1 bg-gray-700 text-white text-xs rounded-full">
+                    {item.type}
+                  </span>
+                )}
+              </div>
+              <div className="p-3 sm:p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 className="text-sm sm:text-base font-semibold">{item.title}</h4>
+                    <p className="text-xs sm:text-sm text-gray-600">By {item.creator}</p>
+                  </div>
+                  {item.size && (
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded border border-gray-200">
+                      {item.size}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500 pt-2">
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>{item.likes}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>{item.comments}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>{item.views}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const renderCampaigns = () => (
     <div className="space-y-4 sm:space-y-6">
@@ -838,7 +945,7 @@ const CreatorStudioDashboard = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex flex-wrap gap-2 sm:space-x-8 sm:gap-0 mt-4 sm:mt-6 overflow-x-auto">
+          <div className="flex flex-wrap justify-center gap-2 sm:space-x-8 sm:gap-0 mt-4 sm:mt-6 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab}
