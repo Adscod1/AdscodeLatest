@@ -95,6 +95,30 @@ interface Product {
   dimensions?: string;
   supplier?: string;
   createdAt?: Date | string;
+  // Enriched properties
+  addedDate?: string;
+  totalSold?: number;
+  revenue?: number;
+  avgOrder?: number;
+  stockStatus?: {
+    label: string;
+    color: string;
+    bgColor: string;
+  };
+  totalStock?: number;
+  growth?: string;
+  pageViews?: number;
+  cartAdds?: number;
+  clicks?: number;
+  wishlistAdds?: number;
+  returns?: number;
+  conversionRate?: string;
+  monthlyGrowth?: string;
+  returnRate?: string;
+  costPrice?: number;
+  sellingPrice?: number;
+  competitorAvg?: number;
+  margin?: string;
 }
 
 const StoreListings = () => {
@@ -455,8 +479,8 @@ const StoreListings = () => {
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                          <span className="text-gray-600 hidden sm:inline">Added {selectedProduct.addedDate}</span>
-                          <span className="text-gray-600 sm:hidden">{selectedProduct.addedDate.split(' ').slice(0, 2).join(' ')}</span>
+                          <span className="text-gray-600 hidden sm:inline">Added {selectedProduct.addedDate || 'N/A'}</span>
+                          <span className="text-gray-600 sm:hidden">{selectedProduct.addedDate?.split(' ').slice(0, 2).join(' ') || 'N/A'}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400" />
@@ -481,7 +505,7 @@ const StoreListings = () => {
                     </div>
                     <div className="min-w-0">
                       <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Total Sold</div>
-                      <div className="text-base sm:text-xl font-bold truncate">{selectedProduct.totalSold}</div>
+                      <div className="text-base sm:text-xl font-bold truncate">{selectedProduct.totalSold || 0}</div>
                     </div>
                   </div>
                 </Card>
@@ -492,23 +516,23 @@ const StoreListings = () => {
                     </div>
                     <div className="min-w-0">
                       <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Revenue</div>
-                      <div className="text-base sm:text-xl font-bold truncate">UGX {(selectedProduct.revenue / 1000000).toFixed(1)}M</div>
+                      <div className="text-base sm:text-xl font-bold truncate">UGX {((selectedProduct.revenue || 0) / 1000000).toFixed(1)}M</div>
                     </div>
                   </div>
                 </Card>
                 <Card className="p-3 sm:p-4">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className={`p-1.5 sm:p-2 ${selectedProduct.stockStatus.bgColor} rounded-lg flex-shrink-0`}>
-                      {selectedProduct.totalStock > 0 ? (
-                        <CheckCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedProduct.stockStatus.color}`} />
+                    <div className={`p-1.5 sm:p-2 ${selectedProduct.stockStatus?.bgColor || 'bg-gray-100'} rounded-lg flex-shrink-0`}>
+                      {(selectedProduct.totalStock || 0) > 0 ? (
+                        <CheckCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedProduct.stockStatus?.color || 'text-gray-600'}`} />
                       ) : (
-                        <AlertCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedProduct.stockStatus.color}`} />
+                        <AlertCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${selectedProduct.stockStatus?.color || 'text-gray-600'}`} />
                       )}
                     </div>
                     <div className="min-w-0">
                       <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Stock Status</div>
-                      <div className={`text-sm sm:text-lg font-bold ${selectedProduct.stockStatus.color} truncate`}>
-                        {selectedProduct.stockStatus.label}
+                      <div className={`text-sm sm:text-lg font-bold ${selectedProduct.stockStatus?.color || 'text-gray-600'} truncate`}>
+                        {selectedProduct.stockStatus?.label || 'Unknown'}
                       </div>
                     </div>
                   </div>
@@ -520,7 +544,7 @@ const StoreListings = () => {
                     </div>
                     <div className="min-w-0">
                       <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Growth</div>
-                      <div className="text-base sm:text-xl font-bold text-green-600 truncate">{selectedProduct.growth}</div>
+                      <div className="text-base sm:text-xl font-bold text-green-600 truncate">{selectedProduct.growth || '0%'}</div>
                     </div>
                   </div>
                 </Card>
@@ -565,8 +589,8 @@ const StoreListings = () => {
                   <div className="space-y-2 sm:space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-xs sm:text-sm">Available</span>
-                      <span className={`font-medium text-xs sm:text-sm ${selectedProduct.totalStock >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {selectedProduct.totalStock >= 0 ? selectedProduct.totalStock : `-${Math.abs(selectedProduct.totalStock)}`}
+                      <span className={`font-medium text-xs sm:text-sm ${(selectedProduct.totalStock || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {(selectedProduct.totalStock || 0) >= 0 ? (selectedProduct.totalStock || 0) : `-${Math.abs(selectedProduct.totalStock || 0)}`}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -600,25 +624,25 @@ const StoreListings = () => {
                     <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div>
                         <div className="text-[10px] sm:text-sm text-gray-600 uppercase mb-1">Total Revenue</div>
-                        <div className="text-base sm:text-xl font-bold">UGX {(selectedProduct.revenue / 1000000).toFixed(1)}M</div>
+                        <div className="text-base sm:text-xl font-bold">UGX {((selectedProduct.revenue || 0) / 1000000).toFixed(1)}M</div>
                       </div>
                       <div>
                         <div className="text-[10px] sm:text-sm text-gray-600 uppercase mb-1">Avg. Order</div>
-                        <div className="text-base sm:text-xl font-bold">UGX {(selectedProduct.avgOrder / 1000).toFixed(0)}K</div>
+                        <div className="text-base sm:text-xl font-bold">UGX {((selectedProduct.avgOrder || 0) / 1000).toFixed(0)}K</div>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Conversion Rate</span>
-                        <span className="font-medium">{selectedProduct.conversionRate}</span>
+                        <span className="font-medium">{selectedProduct.conversionRate || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Monthly Growth</span>
-                        <span className="font-medium text-green-600">{selectedProduct.monthlyGrowth}</span>
+                        <span className="font-medium text-green-600">{selectedProduct.monthlyGrowth || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Return Rate</span>
-                        <span className="font-medium">{selectedProduct.returnRate}</span>
+                        <span className="font-medium">{selectedProduct.returnRate || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -633,25 +657,25 @@ const StoreListings = () => {
                     <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div>
                         <div className="text-[10px] sm:text-sm text-gray-600 uppercase mb-1">Page Views</div>
-                        <div className="text-base sm:text-xl font-bold">{selectedProduct.pageViews}</div>
+                        <div className="text-base sm:text-xl font-bold">{selectedProduct.pageViews || 0}</div>
                       </div>
                       <div>
                         <div className="text-[10px] sm:text-sm text-gray-600 uppercase mb-1">Cart Adds</div>
-                        <div className="text-base sm:text-xl font-bold">{selectedProduct.cartAdds}</div>
+                        <div className="text-base sm:text-xl font-bold">{selectedProduct.cartAdds || 0}</div>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Clicks</span>
-                        <span className="font-medium">{selectedProduct.clicks}</span>
+                        <span className="font-medium">{selectedProduct.clicks || 0}</span>
                       </div>
                       <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Wishlist Adds</span>
-                        <span className="font-medium">{selectedProduct.wishlistAdds}</span>
+                        <span className="font-medium">{selectedProduct.wishlistAdds || 0}</span>
                       </div>
                       <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Returns</span>
-                        <span className="font-medium text-red-600">{selectedProduct.returns}</span>
+                        <span className="font-medium text-red-600">{selectedProduct.returns || 0}</span>
                       </div>
                     </div>
                   </div>
@@ -667,17 +691,17 @@ const StoreListings = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                   <div>
                     <div className="text-xs sm:text-sm text-gray-600 mb-1">Cost Price</div>
-                    <div className="text-xl sm:text-2xl font-bold">UGX {selectedProduct.costPrice.toLocaleString()}</div>
+                    <div className="text-xl sm:text-2xl font-bold">UGX {((selectedProduct.costPrice ?? 0)).toLocaleString()}</div>
                     <div className="text-[10px] sm:text-xs text-gray-500 mt-1">Base cost from supplier</div>
                   </div>
                   <div>
                     <div className="text-xs sm:text-sm text-gray-600 mb-1">Selling Price</div>
-                    <div className="text-xl sm:text-2xl font-bold text-green-600">UGX {selectedProduct.sellingPrice.toLocaleString()}</div>
-                    <div className="text-[10px] sm:text-xs text-green-600 mt-1">Margin: {selectedProduct.margin}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-green-600">UGX {((selectedProduct.sellingPrice ?? 0)).toLocaleString()}</div>
+                    <div className="text-[10px] sm:text-xs text-green-600 mt-1">Margin: {selectedProduct.margin || 'N/A'}</div>
                   </div>
                   <div>
                     <div className="text-xs sm:text-sm text-gray-600 mb-1">Competitor Average</div>
-                    <div className="text-xl sm:text-2xl font-bold text-blue-600">UGX {selectedProduct.competitorAvg.toLocaleString()}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-blue-600">UGX {((selectedProduct.competitorAvg ?? 0)).toLocaleString()}</div>
                     <div className="text-[10px] sm:text-xs text-gray-500 mt-1">Market comparison</div>
                   </div>
                 </div>
