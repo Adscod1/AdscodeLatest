@@ -289,13 +289,13 @@ export const FeedNavbar = () => {
                 <Input
                   type="text"
                   placeholder="Search creators, products, or deals..."
-                  className="w-full px-4 py-2.5 h-12 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  className="w-full px-4 py-2.5 h-10 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 />
               </div>
               
             </div>
             {/* Create Button */}
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-full h-12 w-[10%] px-5 py-2 flex items-center gap-2 mr-[100px]">
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-full h-10 w-[11%] px-6 py-2 flex items-center gap-2 mr-[100px]">
                 <PlusIcon />
                 <span>Create Store</span>
               </Button>

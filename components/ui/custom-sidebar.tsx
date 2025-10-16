@@ -289,29 +289,6 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
                 Profile
               </Link>
               <Link
-                href={hasInfluencerAccount ? "/influencer/Dashboard" : "/influencer/register"}
-                onClick={handleLinkClick}
-                className={getLinkClassName(hasInfluencerAccount ? "/influencer/Dashboard" : "/influencer/register")}
-              >
-                <Box className="w-4 h-4 mr-3" />
-                {hasInfluencerAccount ? "Influencer Dashboard" : "Become an Influencer"}
-              </Link>
-              <Link
-                href="/new"
-                onClick={handleLinkClick}
-                className={getLinkClassName("/new")}
-              >
-                <Plus className="w-4 h-4 mr-3" />
-                Create Store
-              </Link>
-            </nav>
-          </div>
-
-          {/* Personal Section */}
-          <div className="space-y-1 mt-8">
-            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">PERSONAL</h2>
-            <nav className="space-y-1">
-              <Link
                 href="#"
                 onClick={handleLinkClick}
                 className={getLinkClassName("/messages")}
@@ -331,6 +308,32 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
                 Notifications
               </Link>
               <Link
+                href={hasInfluencerAccount ? "/influencer/Dashboard" : "/influencer/register"}
+                onClick={handleLinkClick}
+                className={getLinkClassName(hasInfluencerAccount ? "/influencer/Dashboard" : "/influencer/register")}
+              >
+                <Box className="w-4 h-4 mr-3 " />
+                {hasInfluencerAccount ? "Influencer Dashboard" : "Become an Influencer"}
+              </Link>
+              <Link
+                href="/new"
+                onClick={handleLinkClick}
+                className={getLinkClassName("/new")}
+              >
+                <Plus className="w-4 h-4 mr-3 " />
+                Create Store
+              </Link>
+
+              <AllStoresCards />
+            </nav>
+          </div>
+
+          {/* Personal Section */}
+          <div className="space-y-1 mt-8">
+            
+            <nav className="space-y-1">
+      
+              <Link
                 href="/Settingss"
                 onClick={handleLinkClick}
                 className={getLinkClassName("/Settingss")}
@@ -349,7 +352,7 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
             </nav>
           </div>
         </div>
-        <AllStoresCards />
+       
       </aside>
     </>
   );

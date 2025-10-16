@@ -47,8 +47,8 @@ const AllStoresCards = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-medium">My Stores</h3>
+      <div className="flex items-center justify-between mb-4 border-b">
+        <h3 className="font-medium text-xl">My Stores</h3>
         
       </div>
       <div className="space-y-4">
