@@ -98,8 +98,8 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
     const baseClasses =
       "flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium";
     return isActive(path)
-      ? `${baseClasses} text-white bg-black hover:bg-gray-800`
-      : `${baseClasses} text-gray-600 hover:text-gray-900 hover:bg-gray-50`;
+      ? `${baseClasses} text-blue-500  hover:bg-gray-50`
+      : `${baseClasses} text-gray-600 hover:text-blue-500 hover:bg-gray-50`;
   };
 
   const handleLinkClick = () => {
