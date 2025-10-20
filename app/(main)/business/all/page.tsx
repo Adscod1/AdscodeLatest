@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const SoftStar = ({ filled }: { filled: boolean }) => (
@@ -145,7 +146,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
           {/* Categories */}
           <div className="flex gap-2 mb-4">
             <span className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">
-              Seafood
+              {/* Seafood */}
             </span>
             <span className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">
               Wines Bars
@@ -234,10 +235,35 @@ const CategoryButton = ({ label, active = false }: { label: string; active?: boo
 );
 
 const BusinessesPage = () => {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
+  
   const { data: stores, isLoading } = useQuery({
     queryKey: ["stores"],
     queryFn: getStores,
   });
+
+  // Filter stores based on search query
+  const filteredStores = useMemo(() => {
+    if (!stores) return [];
+    
+    if (!searchQuery.trim()) {
+      return stores;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    
+    return stores.filter((store) => {
+      const matchesName = store.name.toLowerCase().includes(query);
+      const matchesDescription = store.description?.toLowerCase().includes(query);
+      const matchesTagline = store.tagline?.toLowerCase().includes(query);
+      const matchesCategory = store.category?.toLowerCase().includes(query);
+      
+      return matchesName || matchesDescription || matchesTagline || matchesCategory;
+    });
+  }, [stores, searchQuery]);
+
+  const resultCount = filteredStores.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -278,8 +304,12 @@ const BusinessesPage = () => {
           {/* Header */}
           <div className="mb-8">
             <p className="text-lg text-gray-600">
-              Found <span className="font-semibold">53 results</span> of{" "}
-              <span className="text-blue-600">"Top Restaurants"</span> in Kabalagala, UK Mall
+              Found <span className="font-semibold">{resultCount} result{resultCount !== 1 ? 's' : ''}</span>
+              {searchQuery && (
+                <>
+                  {' '}for <span className="text-blue-600">"{searchQuery}"</span>
+                </>
+              )}
             </p>
           </div>
 
@@ -303,10 +333,19 @@ const BusinessesPage = () => {
                   </div>
                 ))}
               </div>
-            ) : (
-              stores?.map((store) => (
+            ) : filteredStores.length > 0 ? (
+              filteredStores.map((store) => (
                 <BusinessCard key={store.id} store={store} />
               ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-xl text-gray-500 mb-2">No results found</p>
+                {searchQuery && (
+                  <p className="text-gray-400">
+                    Try adjusting your search or filters to find what you're looking for
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </div>
