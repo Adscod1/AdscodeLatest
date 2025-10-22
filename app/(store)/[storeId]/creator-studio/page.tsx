@@ -13,9 +13,15 @@ import {
   MapPin,
   Send,
   MoreHorizontal,
-  Calendar,
-  Camera
+  Calendar as CalendarIcon,
+  Camera,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Filter
 } from 'lucide-react';
+import { Calendar } from "@/components/ui/calendar";
 
 interface Influencer {
   name: string;
@@ -79,6 +85,18 @@ const CreatorStudioDashboard = () => {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
 
+  // Calendar/Campaigns state
+  const [currentMonth, setCurrentMonth] = useState('January 2024');
+  const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [eventTitle, setEventTitle] = useState('Campaign Launch: Summer Fashion');
+  const [eventSubtitle, setEventSubtitle] = useState('Summer Fashion Collection');
+  const [eventType, setEventType] = useState('Meeting');
+  const [selectedDate, setSelectedDate] = useState('October 19th, 2025');
+  const [selectedTime, setSelectedTime] = useState('--:--');
+  const [showEventTypeDropdown, setShowEventTypeDropdown] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
   const menuItems = [
     { icon: BarChart3, label: 'Dashboard', path: 'Dashboard' },
     { icon: Users, label: 'Listings', path: 'Listings' },
@@ -109,7 +127,7 @@ const CreatorStudioDashboard = () => {
             <option>Last 12 months</option>
           </select>
           <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
+            <CalendarIcon className="w-4 h-4" />
             Custom Range
           </button>
         </div>
@@ -292,104 +310,343 @@ const CreatorStudioDashboard = () => {
     );
   };
 
-  const renderCampaigns = () => (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-2 mb-4 sm:mb-6">
-        <Target className="w-4 h-4 sm:w-5 sm:h-5" />
-        <h3 className="text-base sm:text-lg font-semibold">Active Campaigns</h3>
-      </div>
+  const renderCampaigns = () => {
+    const upcomingEvents = [
+      {
+        title: 'Campaign Launch: Summer Fashion',
+        subtitle: 'Summer Fashion Collection',
+        time: 'Today, 10:00 AM',
+        type: 'Launch',
+        color: 'purple'
+      },
+      {
+        title: 'Content Review Deadline',
+        subtitle: 'Tech Product Launch',
+        time: 'Tomorrow, 3:00 PM',
+        type: 'Deadline',
+        color: 'gray'
+      },
+      {
+        title: 'Influencer Onboarding Call',
+        subtitle: 'Food Brand Awareness',
+        time: 'Jan 25, 3:00 PM',
+        type: 'Meeting',
+        color: 'gray'
+      },
+      {
+        title: 'Campaign Performance Review',
+        subtitle: 'Holiday Special',
+        time: 'Jan 26, 11:00 AM',
+        type: 'Review',
+        color: 'gray'
+      },
+      {
+        title: 'Strategy Meeting',
+        subtitle: 'Q1 Planning',
+        time: 'Jan 15, 9:00 AM',
+        type: 'Meeting',
+        color: 'gray'
+      }
+    ];
 
-      <div className="space-y-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-            <div>
-              <h4 className="font-semibold text-base sm:text-lg">Summer Collection Launch</h4>
-              <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mt-2">
-                Active
-              </span>
-            </div>
-            <button className="self-start sm:self-auto px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              View
+    const tasksDueSoon = [
+      {
+        title: 'Approve 5 pending content pieces',
+        time: 'Due in 2 hours',
+        priority: 'HIGH',
+        badge: 'bg-red-100 text-red-700'
+      },
+      {
+        title: 'Content Review Deadline',
+        subtitle: 'Tech Product Launch',
+        time: 'Tomorrow, 3:03 PM',
+        type: 'Deadline'
+      },
+      {
+        title: 'Influencer Onboarding Call',
+        subtitle: 'Food Brand Awareness',
+        time: 'Jan 25, 3:00 PM',
+        type: 'Meeting'
+      },
+      {
+        title: 'Campaign Performance Review',
+        subtitle: 'Holiday Special',
+        time: 'Jan 26, 11:00 AM',
+        type: 'Review'
+      },
+      {
+        title: 'Strategy Meeting',
+        subtitle: 'Q1 Planning',
+        time: 'Jan 15, 9:00 AM',
+        type: 'Meeting'
+      },
+      {
+        title: 'Send campaign brief to new influencers',
+        time: 'Due in 4 hours',
+        priority: 'Medium',
+        badge: 'bg-purple-100 text-purple-700'
+      },
+      {
+        title: 'Review analytics report',
+        time: 'Due tomorrow',
+        priority: 'Low',
+        badge: 'bg-gray-100 text-gray-700'
+      }
+    ];
+
+    const eventTypes = ['Launch', 'Deadline', 'Meeting', 'Review'];
+
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Campaign Calendar</h2>
+            <p className="text-sm text-gray-500">Manage your campaign schedule and deadlines</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <Filter size={16} />
+              Filter
+            </button>
+            <button
+              onClick={() => setShowAddEventModal(true)}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700"
+            >
+              <span className="text-lg">+</span>
+              Add Event
             </button>
           </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Budget</p>
-              <p className="font-semibold text-sm sm:text-base">$5,000</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Creators</p>
-              <p className="font-semibold text-sm sm:text-base">5</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Reach</p>
-              <p className="font-semibold text-sm sm:text-base">450K</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
-              <p className="font-semibold text-sm sm:text-base">3.2%</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Calendar Section */}
+          <div className="lg:col-span-2 bg-white rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-center">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border shadow-sm"
+                classNames={{
+                  months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                  month: "space-y-4",
+                  caption: "flex justify-center pt-1 relative items-center",
+                  caption_label: "text-lg font-semibold",
+                  nav: "space-x-1 flex items-center",
+                  nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                  nav_button_previous: "absolute left-1",
+                  nav_button_next: "absolute right-1",
+                  table: "w-full border-collapse space-y-1",
+                  head_row: "flex",
+                  head_cell: "text-muted-foreground rounded-md w-16 font-normal text-[0.8rem]",
+                  row: "flex w-full mt-2",
+                  cell: "h-16 w-16 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                  day: "h-16 w-16 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
+                  day_range_end: "day-range-end",
+                  day_selected: "bg-purple-600 text-white hover:bg-purple-600 hover:text-white focus:bg-purple-600 focus:text-white",
+                  day_today: "bg-accent text-accent-foreground",
+                  day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
+                  day_disabled: "text-muted-foreground opacity-50",
+                  day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                  day_hidden: "invisible",
+                }}
+              />
             </div>
           </div>
-          
-          <div className="mb-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress</span>
-              <span>75%</span>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Upcoming Events */}
+            <div className="bg-white rounded-lg p-5 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h3>
+              <div className="space-y-3">
+                {upcomingEvents.map((event, idx) => (
+                  <div key={idx} className="flex items-start justify-between pb-3 border-b border-gray-100 last:border-0">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-1.5 h-1.5 bg-purple-600 rounded-full"></div>
+                        <h4 className="text-sm font-semibold text-gray-900">{event.title}</h4>
+                      </div>
+                      <p className="text-xs text-gray-600 ml-3.5 mb-1">{event.subtitle}</p>
+                      <div className="flex items-center gap-1 ml-3.5 text-xs text-gray-500">
+                        <Clock size={12} />
+                        <span>{event.time}</span>
+                      </div>
+                    </div>
+                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                      {event.type}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-              <div className="bg-black h-2 rounded-full" style={{ width: '75%' }}></div>
+
+            {/* Tasks Due Soon */}
+            <div className="bg-white rounded-lg p-5 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tasks Due Soon</h3>
+              <div className="space-y-3">
+                {tasksDueSoon.map((task, idx) => (
+                  <div key={idx} className="pb-3 border-b border-gray-100 last:border-0">
+                    <div className="flex items-start justify-between mb-1">
+                      <div className="flex items-center gap-2 flex-1">
+                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-1.5"></div>
+                        <h4 className="text-sm font-semibold text-gray-900">{task.title}</h4>
+                      </div>
+                      {task.priority && (
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${task.badge}`}>
+                          {task.priority}
+                        </span>
+                      )}
+                      {task.type && (
+                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                          {task.type}
+                        </span>
+                      )}
+                    </div>
+                    {task.subtitle && (
+                      <p className="text-xs text-gray-600 ml-3.5 mb-1">{task.subtitle}</p>
+                    )}
+                    <div className="flex items-center gap-1 ml-3.5 text-xs text-gray-500">
+                      <Clock size={12} />
+                      <span>{task.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-            <div>
-              <h4 className="font-semibold text-base sm:text-lg">Holiday Promo Campaign</h4>
-              <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mt-2">
-                Planning
-              </span>
+        {/* Add Event Modal */}
+        {showAddEventModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Add New Event</h3>
+                  <p className="text-sm text-gray-500">Create a new campaign event or deadline</p>
+                </div>
+                <button
+                  onClick={() => setShowAddEventModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={eventTitle}
+                    onChange={(e) => setEventTitle(e.target.value)}
+                    className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Campaign Launch: Summer Fashion"
+                  />
+                </div>
+
+                {/* Subtitle */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                  <input
+                    type="text"
+                    value={eventSubtitle}
+                    onChange={(e) => setEventSubtitle(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Summer Fashion Collection"
+                  />
+                </div>
+
+                {/* Event Type */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Event Type <span className="text-red-500">*</span>
+                  </label>
+                  <button
+                    onClick={() => setShowEventTypeDropdown(!showEventTypeDropdown)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-left flex items-center justify-between"
+                  >
+                    <span className="text-gray-700">{eventType}</span>
+                    <ChevronRight size={16} className={`text-gray-400 transform transition-transform ${showEventTypeDropdown ? 'rotate-90' : ''}`} />
+                  </button>
+                  {showEventTypeDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
+                      {eventTypes.map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => {
+                            setEventType(type);
+                            setShowEventTypeDropdown(false);
+                          }}
+                          className={`w-full px-3 py-2 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                            type === eventType ? 'bg-purple-600 text-white' : 'text-gray-700'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Date - Using shadcn calendar */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Date <span className="text-red-500">*</span>
+                  </label>
+                  <div className="border border-gray-300 rounded-lg p-2">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      className="rounded-md"
+                    />
+                  </div>
+                </div>
+
+                {/* Time */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Time <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="--:--"
+                    />
+                    <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                      <Clock size={16} className="text-gray-600" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setShowAddEventModal(false)}
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button className="px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+                  Add Event
+                </button>
+              </div>
             </div>
-            <button className="self-start sm:self-auto px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              View
-            </button>
           </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Budget</p>
-              <p className="font-semibold text-sm sm:text-base">$8,000</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Creators</p>
-              <p className="font-semibold text-sm sm:text-base">3</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Reach</p>
-              <p className="font-semibold text-sm sm:text-base">320K</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
-              <p className="font-semibold text-sm sm:text-base">4.1%</p>
-            </div>
-          </div>
-          
-          <div className="mb-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress</span>
-              <span>25%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-              <div className="bg-black h-2 rounded-full" style={{ width: '25%' }}></div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderDiscovery = () => (
     <div className="space-y-4 sm:space-y-6">

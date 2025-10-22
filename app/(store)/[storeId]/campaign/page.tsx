@@ -17,7 +17,8 @@ import {
   Calendar,
   Edit,
   Pause,
-  PlayCircle
+  PlayCircle,
+  UserCheck
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -371,6 +372,14 @@ const MarketingCampaigns: React.FC = () => {
                                 View Details
                               </Link>
                               <Link
+                                href={`/${storeId}/campaign/${campaign.id}/influencers/performance`}
+                                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                onClick={() => setOpenDropdown(null)}
+                              >
+                                <UserCheck className="w-4 h-4 text-indigo-500" />
+                                Influencer Performance
+                              </Link>
+                              <Link
                                 href={`/${storeId}/campaign/${campaign.id}/edit`}
                                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                 onClick={() => setOpenDropdown(null)}
@@ -440,6 +449,14 @@ const MarketingCampaigns: React.FC = () => {
                             >
                               <Eye className="w-4 h-4 text-purple-500" />
                               View Details
+                            </Link>
+                            <Link
+                              href={`/${storeId}/campaign/${campaign.id}/influencers/performance`}
+                              className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              <UserCheck className="w-4 h-4 text-indigo-500" />
+                              Influencer Performance
                             </Link>
                             <Link
                               href={`/${storeId}/campaign/${campaign.id}/edit`}
