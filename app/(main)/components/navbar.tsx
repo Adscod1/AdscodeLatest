@@ -302,10 +302,8 @@ export const FeedNavbar = () => {
                 </div>
                 <Input
                   type="text"
-                  value={searchQuery}
-                  onChange={handleSearchInputChange}
-                  placeholder="Search businesses, services, or products..."
-                  className="w-full px-4 py-2.5 h-10 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  placeholder="Search creators, products, or deals..."
+                  className="w-full px-4 py-2.5 h-12 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 />
               </form>
               
