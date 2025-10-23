@@ -105,9 +105,9 @@ const Dashboard = ({ influencer, profile }: DashboardProps) => {
   ];
 
   const journeySteps = [
-    { title: 'New User', description: 'Complete profile setup', status: 'completed', icon: CheckCircle2 },
-    { title: 'Aspiring Influencer', description: '10+ reviews, 100+ followers', status: 'completed', icon: CheckCircle2 },
-    { title: 'Verified Influencer', description: '50+ reviews, 500+ followers', status: 'locked', icon: Lock },
+    { title: 'Rising Creator', description: 'Complete profile setup', status: 'completed', icon: CheckCircle2 },
+    { title: 'Pro Creator', description: '10+ reviews, 100+ followers', status: 'completed', icon: CheckCircle2 },
+    { title: 'Elite Partner', description: '50+ reviews, 500+ followers', status: 'locked', icon: Lock },
   ];
 
   const benefits = [
@@ -281,7 +281,7 @@ const Dashboard = ({ influencer, profile }: DashboardProps) => {
                 
                 <div className="mt-6 pt-4 border-t border-gray-200">
                   <div className="text-xs text-gray-500 mb-2">For testing purposes only:</div>
-                  <ResetButton />
+                  
                 </div>
               </div>
 

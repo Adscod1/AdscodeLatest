@@ -1,5 +1,7 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useParams } from 'next/navigation';
+import Link from 'next/link';
 import { 
   BarChart3, 
   Users, 
@@ -75,7 +77,12 @@ interface Application {
 type FilterStatus = 'all' | 'pending' | 'approved' | 'rejected';
 
 const CreatorStudioDashboard = () => {
-  const [activeTab, setActiveTab] = useState('Analytics');
+  const searchParams = useSearchParams();
+  const params = useParams();
+  const storeId = params.storeId as string;
+  const initialTab = searchParams.get('tab') || 'Analytics';
+  
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [activeSection, setActiveSection] = useState('Dashboard');
   
   // Applications state
@@ -110,6 +117,13 @@ const CreatorStudioDashboard = () => {
   ];
 
   const tabs = ['Discovery', 'Campaigns', 'Applications', 'Content', 'Analytics'];
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tabs.includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   const renderAnalytics = () => (
     <div className="space-y-6 sm:space-y-8">
@@ -764,9 +778,12 @@ const CreatorStudioDashboard = () => {
                 <span className="hidden sm:inline">Contact</span>
                 <span className="sm:hidden">Contact</span>
               </button>
-              <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <Link
+                href={`/${storeId}/campaign/1/influencers/profile`}
+                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center"
+              >
                 <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
+              </Link>
             </div>
           </div>
         ))}

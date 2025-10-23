@@ -144,9 +144,6 @@ const AllInfluencersPage = () => {
   return (
     <div className="w-full bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        
-
-        {/* Results Count */}
         <p className="text-gray-600 mb-6">Showing {influencers.length} influencers</p>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -216,6 +213,14 @@ const AllInfluencersPage = () => {
             <Filter title="Gender">
               <CheckboxItem label="Male" />
               <CheckboxItem label="Female" />
+            </Filter>
+
+            <Filter title="Preferred Content Style">
+              <CheckboxItem label="Casual & Authentic" />
+              <CheckboxItem label="Professional & Polished" />
+              <CheckboxItem label="Fun & Energetic" />
+              <CheckboxItem label="Educational" />
+              <CheckboxItem label="Minimalist" />
             </Filter>
 
             <Filter title="Engagement Rate">

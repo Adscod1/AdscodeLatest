@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 // Define types for the campaign data
 interface Target {
@@ -51,6 +53,9 @@ interface CampaignData {
 }
 
 const InfluencerCampaignManager = () => {
+  const params = useParams();
+  const storeId = params.storeId as string;
+
   const [currentStep, setCurrentStep] = useState(0);
   const [campaignData, setCampaignData] = useState<CampaignData>({
     title: '',
@@ -720,111 +725,17 @@ const InfluencerCampaignManager = () => {
       </div>
 
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center mb-4">
-          <Users className="w-5 h-5 text-gray-600 mr-2" />
+        <Link 
+          href={`/${storeId}/creator-studio?tab=Discovery`}
+          className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-blue-300 text-blue-600 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer"
+        >
+          <Users className="w-5 h-5" />
           <h3 className="text-xl font-semibold text-gray-900">Target Influencers</h3>
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Platforms <span className="text-red-500">*</span>
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-              {platforms.map(platform => (
-                <label key={platform} className="flex items-center space-x-2 p-2 sm:p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={campaignData.platforms.includes(platform)}
-                    onChange={() => handlePlatformChange(platform)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0"
-                  />
-                  <span className="text-xs sm:text-sm text-gray-700 truncate">{platform}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Followers</label>
-              <input
-                type="text"
-                value={campaignData.minFollowers}
-                onChange={(e) => handleInputChange('minFollowers', e.target.value)}
-                placeholder="e.g., 10000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Maximum Followers</label>
-              <input
-                type="text"
-                value={campaignData.maxFollowers}
-                onChange={(e) => handleInputChange('maxFollowers', e.target.value)}
-                placeholder="e.g., 100000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Target Age Range</label>
-              <select
-                value={campaignData.ageRange}
-                onChange={(e) => handleInputChange('ageRange', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select age range</option>
-                <option>18-24</option>
-                <option>25-34</option>
-                <option>35-44</option>
-                <option>45-54</option>
-                <option>55+</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Target Gender</label>
-              <select
-                value={campaignData.gender}
-                onChange={(e) => handleInputChange('gender', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select gender</option>
-                <option>Female</option>
-                <option>Male</option>
-                <option>Any</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-              <input
-                type="text"
-                value={campaignData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="e.g., US, UK, Global"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Content Style</label>
-            <select
-              value={campaignData.contentStyle}
-              onChange={(e) => handleInputChange('contentStyle', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select content style</option>
-              <option>Casual & Authentic</option>
-              <option>Professional & Polished</option>
-              <option>Fun & Energetic</option>
-              <option>Educational</option>
-              <option>Minimalist</option>
-            </select>
-          </div>
-        </div>
+          <span className="ml-2 text-sm text-gray-600">→</span>
+        </Link>
+        <p className="text-sm text-gray-600 text-center mt-3">
+          Click to discover and select influencers for your campaign
+        </p>
       </div>
     </div>
   );
