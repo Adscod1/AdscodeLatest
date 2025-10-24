@@ -622,123 +622,40 @@ export const reviewsList: Review[] = [
 export interface Influencer {
   id: string;
   name: string;
-  image: string;
   description: string;
+  category: string;
   followers: string;
   engagement: string;
-  price: string;
-  contentType: string;
-  category: string;
+  image: string;
 }
 
 export const influencers: Influencer[] = [
   {
     id: "1",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "40K",
-    engagement: "86%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
+    name: "Sophia Chen",
+    description: "Fashion Stylist",
+    category: "Fashion",
+    followers: "1.3M",
+    engagement: "4.2%",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop",
   },
   {
     id: "2",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "700",
-    engagement: "62%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
+    name: "Marcus Williams",
+    description: "Tech Reviewer",
+    category: "Tech",
+    followers: "890K",
+    engagement: "3.8%",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
   },
   {
     id: "3",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "40K",
-    engagement: "86%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
-  },
-  {
-    id: "1",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "700",
-    engagement: "62%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
-  },
-  {
-    id: "2",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "40K",
-    engagement: "86%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
-  },
-  {
-    id: "3",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "700",
-    engagement: "62%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
-  },
-  {
-    id: "1",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "40K",
-    engagement: "86%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
-  },
-  {
-    id: "2",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "700",
-    engagement: "62%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
-  },
-  {
-    id: "3",
-    name: "Elizabeth Lopez",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200",
-    description: "Nulla dolor culpa aliqua consectetur idlorem",
-    followers: "40K",
-    engagement: "86%",
-    price: "$30/Post + story",
-    contentType: "How-to-do Guides",
-    category: "Technology",
+    name: "Aria Johnson",
+    description: "Beauty Expert",
+    category: "Beauty",
+    followers: "2.1M",
+    engagement: "5.1%",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop",
   },
 ];
 

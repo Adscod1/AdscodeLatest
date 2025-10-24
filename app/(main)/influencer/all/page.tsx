@@ -11,7 +11,46 @@ import {
   Heart,
 } from "lucide-react";
 import Link from "next/link";
-import { Influencer, influencers } from "@/data";
+
+export interface Influencer {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  followers: string;
+  engagement: string;
+  image: string;
+}
+
+export const influencers: Influencer[] = [
+  {
+    id: "1",
+    name: "Sophia Chen",
+    description: "Fashion Stylist",
+    category: "Fashion",
+    followers: "1.3M",
+    engagement: "4.2%",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
+  },
+  {
+    id: "2", 
+    name: "Marcus Williams",
+    description: "Tech Reviewer",
+    category: "Tech",
+    followers: "890K",
+    engagement: "3.8%",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
+  },
+  {
+    id: "3",
+    name: "Aria Johnson", 
+    description: "Beauty Expert",
+    category: "Beauty",
+    followers: "2.1M",
+    engagement: "5.1%",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop"
+  }
+];
 
 const Filter = ({
   title,

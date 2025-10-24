@@ -229,7 +229,7 @@ const StoreListings = () => {
         </div>
         <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
-          Add Product
+          Add Listing
         </Button>
       </div>
 

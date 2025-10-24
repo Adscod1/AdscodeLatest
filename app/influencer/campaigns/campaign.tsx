@@ -177,7 +177,7 @@ const CampaignsPage = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  <span>{campaign.deliverables} deliverables</span>
+                  <span>{campaign.deliverables} Applicants</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />

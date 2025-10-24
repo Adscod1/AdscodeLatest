@@ -90,7 +90,7 @@ const ProfileContent = ({ user }: { user: Profile }) => {
           <div className="border border-2xl rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-black mb-6 sm:mb-8 relative overflow-hidden">
             <div className="relative z-10">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
-                Welcome to Adscod, {profile?.name || "Anonymous User"}
+                Welcome {profile?.name || "Anonymous User"}
               </h1>
               <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
                 Complete your first tasks to become an Aspiring Influencer

@@ -105,7 +105,7 @@ import {
           {/* Requirements Summary */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Influencer Requirements Summary</h2>
-            <p className="text-blue-800 mb-4 text-sm sm:text-base">To become a verified influencer on Adsook, you must meet these minimum requirements:</p>
+            <p className="text-blue-800 mb-4 text-sm sm:text-base">To become a verified influencer on Adscod, you must meet these minimum requirements:</p>
             
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <div className="text-center">

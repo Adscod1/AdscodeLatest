@@ -736,6 +736,28 @@ const InfluencerCampaignManager = () => {
         <p className="text-sm text-gray-600 text-center mt-3">
           Click to discover and select influencers for your campaign
         </p>
+
+        {/* Preferred Content Style Section */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">Preferred Content Style</h4>
+          <div className="space-y-2">
+            {['Casual & Authentic', 'Professional & Polished', 'Fun & Energetic', 'Educational', 'Minimalist'].map((style) => (
+              <div key={style} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id={style.toLowerCase().replace(/\s+/g, '-')}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label 
+                  htmlFor={style.toLowerCase().replace(/\s+/g, '-')} 
+                  className="text-sm text-gray-700"
+                >
+                  {style}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
