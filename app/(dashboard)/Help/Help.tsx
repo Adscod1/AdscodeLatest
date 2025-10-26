@@ -61,7 +61,7 @@ const HelpCenter = ({ user }: { user: Profile }) => {
       icon: BookOpen,
       title: 'Getting Started',
       articles: '12 articles',
-      description: 'Learn the basics of becoming an Influencer on Adzcord'
+      description: 'Learn the basics of becoming an Influencer on Adscord'
     },
     {
       icon: Edit3,

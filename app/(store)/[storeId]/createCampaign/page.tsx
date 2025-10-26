@@ -98,6 +98,7 @@ const InfluencerCampaignManager = () => {
   const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Snapchat', 'Twitch', 'Pinterest', 'Facebook'];
   const deliverableTypes = ['Instagram Post', 'Instagram Story', 'Instagram Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
+  const cattype = ['Product campaign', 'Coupon Campaign', 'Video Campaign'];
 
   const handleInputChange = (field: keyof CampaignData, value: string | number) => {
     setCampaignData(prev => ({ ...prev, [field]: value }));
@@ -241,6 +242,43 @@ const InfluencerCampaignManager = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select a category</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Campaign Type <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={campaignData.category}
+              onChange={(e) => handleInputChange('category', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select campaign type</option>
+              {cattype.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select content
+               Type <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={campaignData.category}
+              onChange={(e) => handleInputChange('category', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select a content type</option>
               {categories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
