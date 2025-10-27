@@ -19,9 +19,9 @@
 - `app/api/campaigns/[id]/applicants/[influencerId]/select/route.ts` - POST (select influencer)
 
 ### API Routes (Influencer)
-- `app/api/campaigns/available/route.ts` - GET (list published campaigns for influencers)
-- `app/api/campaigns/[id]/apply/route.ts` - POST (apply to campaign)
-- `app/api/campaigns/my-applications/route.ts` - GET (list influencer's applications)
+- `app/api/campaigns/available/route.ts` - ✓ Created - GET (list published campaigns excluding already applied)
+- `app/api/campaigns/[id]/apply/route.ts` - ✓ Created - POST (apply to campaign with validation for approved influencer status and duplicate check)
+- `app/api/campaigns/my-applications/route.ts` - ✓ Created - GET (list influencer's applications with campaign details)
 
 ### API Routes (Notifications)
 - `app/api/notifications/route.ts` - GET (list user notifications), POST (mark all as read)
@@ -91,23 +91,23 @@
   - [✓] 2.16 Create `actions/campaign.ts` with server actions: `createCampaign`, `updateCampaign`, `publishCampaign`, `getCampaigns` (optional alternative to API routes - SKIPPED: Using API routes directly)
 
 - [ ] 3.0 Campaign Discovery & Application (Influencer Side)
-  - [ ] 3.1 Create `app/api/campaigns/available/route.ts` with GET handler to list published campaigns (status=PUBLISHED, exclude campaigns influencer already applied to)
-  - [ ] 3.2 Update `app/influencer/campaigns/campaign.tsx` to replace mock data with API call to fetch real campaigns
-  - [ ] 3.3 Add useEffect hook to fetch campaigns on component mount and when tab changes
-  - [ ] 3.4 Implement tab filtering logic: "available" shows unapplied campaigns, "applied" shows campaigns with influencer's applications
-  - [ ] 3.5 Create `app/api/campaigns/my-applications/route.ts` with GET handler to fetch influencer's applications (join Campaign and CampaignInfluencer tables)
-  - [ ] 3.6 Update campaign card rendering to display real data: title, brand name (from Store relation), budget with currency, location, platforms, targets
-  - [ ] 3.7 Calculate and display applicant count by counting CampaignInfluencer records per campaign
-  - [ ] 3.8 Format requirements summary from targets and platforms JSON data
-  - [ ] 3.9 Add loading states (skeleton loaders) while fetching campaign data
-  - [ ] 3.10 Add empty state message when no campaigns available ("No campaigns match your criteria")
-  - [ ] 3.11 Create `app/api/campaigns/[id]/apply/route.ts` with POST handler to create CampaignInfluencer record
-  - [ ] 3.12 Add validation in apply endpoint: check influencer status is APPROVED, check for duplicate applications (unique constraint)
-  - [ ] 3.13 Wire up "Apply Now" button to call POST /api/campaigns/[id]/apply
-  - [ ] 3.14 Show success toast notification after successful application
-  - [ ] 3.15 Update button to "Applied" (disabled) state after application
+  - [✓] 3.1 Create `app/api/campaigns/available/route.ts` with GET handler to list published campaigns (status=PUBLISHED, exclude campaigns influencer already applied to)
+  - [✓] 3.2 Update `app/influencer/campaigns/campaign.tsx` to replace mock data with API call to fetch real campaigns
+  - [✓] 3.3 Add useEffect hook to fetch campaigns on component mount and when tab changes
+  - [✓] 3.4 Implement tab filtering logic: "available" shows unapplied campaigns, "applied" shows campaigns with influencer's applications
+  - [✓] 3.5 Create `app/api/campaigns/my-applications/route.ts` with GET handler to fetch influencer's applications (join Campaign and CampaignInfluencer tables)
+  - [✓] 3.6 Update campaign card rendering to display real data: title, brand name (from Store relation), budget with currency, location, platforms, targets
+  - [✓] 3.7 Calculate and display applicant count by counting CampaignInfluencer records per campaign
+  - [✓] 3.8 Format requirements summary from targets and platforms JSON data
+  - [✓] 3.9 Add loading states (skeleton loaders) while fetching campaign data
+  - [✓] 3.10 Add empty state message when no campaigns available ("No campaigns match your criteria")
+  - [✓] 3.11 Create `app/api/campaigns/[id]/apply/route.ts` with POST handler to create CampaignInfluencer record
+  - [✓] 3.12 Add validation in apply endpoint: check influencer status is APPROVED, check for duplicate applications (unique constraint)
+  - [✓] 3.13 Wire up "Apply Now" button to call POST /api/campaigns/[id]/apply
+  - [✓] 3.14 Show success toast notification after successful application
+  - [✓] 3.15 Update button to "Applied" (disabled) state after application
   - [ ] 3.16 Optimistically update UI to move campaign from "available" to "applied" tab without page refresh
-  - [ ] 3.17 Add application status badges on "applied" tab: "Application Pending" (yellow), "Selected" (green), "Not Selected" (gray)
+  - [✓] 3.17 Add application status badges on "applied" tab: "Application Pending" (yellow), "Selected" (green), "Not Selected" (gray)
 
 - [ ] 4.0 Applicant Review & Selection (Brand Side)
   - [ ] 4.1 Create `app/(dashboard)/campaign/[id]/applicants/page.tsx` for viewing campaign applicants
