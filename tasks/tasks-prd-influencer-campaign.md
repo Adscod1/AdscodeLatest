@@ -9,12 +9,12 @@
 - `prisma/migrations/` - Auto-generated migration files after running `npx prisma migrate dev`
 
 ### Validation Schemas
-- `lib/validations/campaign.ts` - Zod validation schemas for campaign creation, update, and application requests
+- `lib/validations/campaign.ts` - ✓ Created - Zod validation schemas for campaign creation, update, publish, and application requests
 
 ### API Routes (Brand)
-- `app/api/campaigns/route.ts` - POST (create campaign), GET (list brand's campaigns)
-- `app/api/campaigns/[id]/route.ts` - GET (campaign details), PATCH (update campaign)
-- `app/api/campaigns/[id]/publish/route.ts` - POST (publish campaign)
+- `app/api/campaigns/route.ts` - ✓ Created - POST (create draft campaign), GET (list brand's campaigns with filters)
+- `app/api/campaigns/[id]/route.ts` - ✓ Created - GET (campaign details), PATCH (update draft campaign)
+- `app/api/campaigns/[id]/publish/route.ts` - ✓ Created - POST (publish campaign with validation)
 - `app/api/campaigns/[id]/applicants/route.ts` - GET (list applicants for campaign)
 - `app/api/campaigns/[id]/applicants/[influencerId]/select/route.ts` - POST (select influencer)
 
@@ -44,7 +44,7 @@
 - `store/use-campaign-store.ts` - Zustand store for campaign form state (optional for MVP)
 
 ### Types
-- `types/campaign.ts` - TypeScript types for Campaign, CampaignInfluencer, and related data structures
+- `types/campaign.ts` - ✓ Created - TypeScript interfaces for Campaign, CampaignInfluencer, form data, API responses, and type guards
 
 ### Utility Functions
 - `lib/utils/campaign-helpers.ts` - Helper functions for campaign data formatting and calculations
@@ -73,19 +73,19 @@
   - [✓] 1.12 Verify migration success by checking database tables in MySQL
 
 - [ ] 2.0 Campaign Creation & Management (Brand Side)
-  - [ ] 2.1 Create `lib/validations/campaign.ts` with Zod schemas: `createCampaignSchema`, `updateCampaignSchema`, `publishCampaignSchema`
-  - [ ] 2.2 Create `types/campaign.ts` with TypeScript interfaces for Campaign, CampaignInfluencer, and form data types
+  - [✓] 2.1 Create `lib/validations/campaign.ts` with Zod schemas: `createCampaignSchema`, `updateCampaignSchema`, `publishCampaignSchema`
+  - [✓] 2.2 Create `types/campaign.ts` with TypeScript interfaces for Campaign, CampaignInfluencer, and form data types
   - [ ] 2.3 Update `app/(dashboard)/campaign/new/page.tsx` to add missing form fields (title, description, budget, currency, duration) above or below existing fields
   - [ ] 2.4 Add form state management in campaign creation page using React useState or react-hook-form
-  - [ ] 2.5 Create `app/api/campaigns/route.ts` with POST handler to create draft campaign (validate with Zod, check user has Store, save to DB)
-  - [ ] 2.6 Create `app/api/campaigns/route.ts` with GET handler to list campaigns for authenticated brand (filter by brandId from session)
+  - [✓] 2.5 Create `app/api/campaigns/route.ts` with POST handler to create draft campaign (validate with Zod, check user has Store, save to DB)
+  - [✓] 2.6 Create `app/api/campaigns/route.ts` with GET handler to list campaigns for authenticated brand (filter by brandId from session)
   - [ ] 2.7 Wire up "Continue" button in campaign form to call POST /api/campaigns and show success/error feedback
   - [ ] 2.8 Add client-side validation before form submission (required fields, at least one platform/target selected)
   - [ ] 2.9 Create `app/(dashboard)/campaign/page.tsx` as campaign dashboard listing all brand's campaigns in a table/grid
   - [ ] 2.10 Display campaign cards/rows with title, status badge, budget, applicant count, created date, and action buttons
-  - [ ] 2.11 Create `app/api/campaigns/[id]/route.ts` with GET handler for campaign details
-  - [ ] 2.12 Create `app/api/campaigns/[id]/route.ts` with PATCH handler to update draft campaigns
-  - [ ] 2.13 Create `app/api/campaigns/[id]/publish/route.ts` with POST handler to validate and change status to PUBLISHED
+  - [✓] 2.11 Create `app/api/campaigns/[id]/route.ts` with GET handler for campaign details
+  - [✓] 2.12 Create `app/api/campaigns/[id]/route.ts` with PATCH handler to update draft campaigns
+  - [✓] 2.13 Create `app/api/campaigns/[id]/publish/route.ts` with POST handler to validate and change status to PUBLISHED
   - [ ] 2.14 Add "Publish" button to campaign dashboard with confirmation dialog before publishing
   - [ ] 2.15 Add "Edit" button for draft campaigns that redirects to campaign creation form with pre-filled data
   - [ ] 2.16 Create `actions/campaign.ts` with server actions: `createCampaign`, `updateCampaign`, `publishCampaign`, `getCampaigns` (optional alternative to API routes)
