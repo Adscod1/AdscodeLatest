@@ -20,6 +20,7 @@ model User {
   Influencer    Influencer?
   sessions      Session[]
   Store         Store[]
+  notifications Notification[]
 
   @@map("user")
 }
@@ -126,6 +127,7 @@ model Store {
   StoreImage      StoreImage[]
   StoreSocial     StoreSocial[]
   StoreVideo      StoreVideo[]
+  campaigns       Campaign[]
 
   @@index([userId], map: "store_userId_fkey")
   @@map("store")
@@ -287,6 +289,7 @@ model Influencer {
   updatedAt           DateTime           @updatedAt
   user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   socialAccounts      InfluencerSocial[]
+  campaignApplications CampaignInfluencer[]
 
   @@map("influencer")
 }
@@ -304,6 +307,65 @@ model InfluencerSocial {
 
   @@index([influencerId], map: "influencer_social_influencerId_fkey")
   @@map("influencer_social")
+}
+
+model Campaign {
+  id                  String              @id @default(uuid())
+  brandId             String
+  title               String
+  description         String?             @db.Text
+  budget              Float
+  currency            String              @default("UGX")
+  duration            Int?
+  influencerLocation  Json?
+  platforms           Json?
+  targets             Json?
+  status              CampaignStatus      @default(DRAFT)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  
+  brand               Store               @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  applicants          CampaignInfluencer[]
+  
+  @@index([brandId])
+  @@index([status])
+  @@map("campaign")
+}
+
+model CampaignInfluencer {
+  id                  String                      @id @default(uuid())
+  campaignId          String
+  influencerId        String
+  applicationStatus   CampaignApplicationStatus   @default(APPLIED)
+  appliedAt           DateTime                    @default(now())
+  selectedAt          DateTime?
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+  
+  campaign            Campaign                    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  influencer          Influencer                  @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  
+  @@unique([campaignId, influencerId])
+  @@index([campaignId])
+  @@index([influencerId])
+  @@index([applicationStatus])
+  @@map("campaign_influencer")
+}
+
+model Notification {
+  id        String              @id @default(uuid())
+  userId    String
+  type      NotificationType
+  message   String              @db.Text
+  link      String?
+  read      Boolean             @default(false)
+  createdAt DateTime            @default(now())
+  
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([read])
+  @@map("notification")
 }
 
 enum Role {
@@ -338,4 +400,26 @@ enum InfluencerStatus {
   APPROVED
   REJECTED
   SUSPENDED
+}
+
+enum CampaignStatus {
+  DRAFT
+  PUBLISHED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum CampaignApplicationStatus {
+  APPLIED
+  SELECTED
+  NOT_SELECTED
+  WITHDRAWN
+}
+
+enum NotificationType {
+  CAMPAIGN_SELECTION
+  APPLICATION_UPDATE
+  SYSTEM
 }
