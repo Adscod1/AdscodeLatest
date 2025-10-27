@@ -33,7 +33,7 @@
 
 ### UI Components (Brand)
 - `app/(dashboard)/campaign/new/page.tsx` - ✓ Updated - Campaign creation form with title, description, budget, currency, duration, location, platforms, and targets
-- `app/(dashboard)/campaign/page.tsx` - Campaign list dashboard (new page)
+- `app/(dashboard)/campaign/page.tsx` - ✓ Created - Campaign list dashboard with stats, filters, and campaign cards
 - `app/(dashboard)/campaign/[id]/applicants/page.tsx` - Applicant list view (new page)
 
 ### UI Components (Influencer)
@@ -81,8 +81,8 @@
   - [✓] 2.6 Create `app/api/campaigns/route.ts` with GET handler to list campaigns for authenticated brand (filter by brandId from session)
   - [✓] 2.7 Wire up "Continue" button in campaign form to call POST /api/campaigns and show success/error feedback
   - [✓] 2.8 Add client-side validation before form submission (required fields, at least one platform/target selected)
-  - [ ] 2.9 Create `app/(dashboard)/campaign/page.tsx` as campaign dashboard listing all brand's campaigns in a table/grid
-  - [ ] 2.10 Display campaign cards/rows with title, status badge, budget, applicant count, created date, and action buttons
+  - [✓] 2.9 Create `app/(dashboard)/campaign/page.tsx` as campaign dashboard listing all brand's campaigns in a table/grid
+  - [✓] 2.10 Display campaign cards/rows with title, status badge, budget, applicant count, created date, and action buttons
   - [✓] 2.11 Create `app/api/campaigns/[id]/route.ts` with GET handler for campaign details
   - [✓] 2.12 Create `app/api/campaigns/[id]/route.ts` with PATCH handler to update draft campaigns
   - [✓] 2.13 Create `app/api/campaigns/[id]/publish/route.ts` with POST handler to validate and change status to PUBLISHED
