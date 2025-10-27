@@ -38,7 +38,7 @@
 
 ### UI Components (Influencer)
 - `app/influencer/campaigns/page.tsx` - Server component wrapper (existing, no changes)
-- `app/influencer/campaigns/campaign.tsx` - Campaign list client component (update existing)
+- `app/influencer/campaigns/campaign.tsx` - ✓ Updated - Campaign discovery and application interface with real data fetching, tab filtering, apply functionality, optimistic UI updates
 
 ### State Management
 - `store/use-campaign-store.ts` - Zustand store for campaign form state (optional for MVP)
@@ -106,8 +106,10 @@
   - [✓] 3.13 Wire up "Apply Now" button to call POST /api/campaigns/[id]/apply
   - [✓] 3.14 Show success toast notification after successful application
   - [✓] 3.15 Update button to "Applied" (disabled) state after application
-  - [ ] 3.16 Optimistically update UI to move campaign from "available" to "applied" tab without page refresh
+  - [✓] 3.16 Optimistically update UI to move campaign from "available" to "applied" tab without page refresh
   - [✓] 3.17 Add application status badges on "applied" tab: "Application Pending" (yellow), "Selected" (green), "Not Selected" (gray)
+
+- [✓] 3.0 Campaign Discovery & Application (Influencer Side)
 
 - [ ] 4.0 Applicant Review & Selection (Brand Side)
   - [ ] 4.1 Create `app/(dashboard)/campaign/[id]/applicants/page.tsx` for viewing campaign applicants

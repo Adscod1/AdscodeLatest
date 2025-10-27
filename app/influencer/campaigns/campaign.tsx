@@ -186,6 +186,14 @@ const CampaignsPage = () => {
   };
 
   const handleApplyToCampaign = async (campaignId: string) => {
+    // Find the campaign being applied to
+    const campaignToApply = campaigns.find(c => c.id === campaignId);
+    
+    if (!campaignToApply) return;
+
+    // Optimistically remove from available campaigns
+    setCampaigns(prev => prev.filter(c => c.id !== campaignId));
+
     try {
       const response = await fetch(`/api/campaigns/${campaignId}/apply`, {
         method: 'POST',
@@ -201,13 +209,16 @@ const CampaignsPage = () => {
         description: 'Your application has been sent to the brand.',
       });
 
-      // Refresh campaigns to update the UI
-      fetchCampaigns();
+      // If user switches to "applied" tab, they'll see the new application
+      // No need to refresh since we optimistically updated the UI
     } catch (error) {
       console.error('Error applying to campaign:', error);
       toast.error('Failed to apply', {
         description: error instanceof Error ? error.message : 'Please try again later',
       });
+      
+      // Rollback: add the campaign back to the list on error
+      setCampaigns(prev => [...prev, campaignToApply]);
     }
   };
 
