@@ -129,12 +129,12 @@
 - [✓] 4.0 Applicant Review & Selection (Brand Side)
 
 - [ ] 5.0 Notification System Implementation
-  - [ ] 5.1 Create `lib/utils/notification-helpers.ts` with helper function `createNotification(userId, type, message, link)`
-  - [ ] 5.2 In the select influencer endpoint (`/api/campaigns/[id]/applicants/[influencerId]/select`), after updating applicationStatus, create a notification record
-  - [ ] 5.3 Set notification fields: userId (influencer's userId), type=CAMPAIGN_SELECTION, message="You've been selected for [Campaign Title]!", link="/influencer/campaigns"
-  - [ ] 5.4 Create `app/api/notifications/route.ts` with GET handler to fetch user's notifications (filter by userId, order by createdAt desc)
-  - [ ] 5.5 Create `app/api/notifications/[id]/read/route.ts` with PATCH handler to mark notification as read (update read=true)
-  - [ ] 5.6 Create `app/api/notifications/route.ts` with POST handler for mark-all-read functionality
+  - [✓] 5.1 Create `lib/utils/notification-helpers.ts` with helper function `createNotification(userId, type, message, link)`
+  - [✓] 5.2 In the select influencer endpoint (`/api/campaigns/[id]/applicants/[influencerId]/select`), after updating applicationStatus, create a notification record
+  - [✓] 5.3 Set notification fields: userId (influencer's userId), type=CAMPAIGN_SELECTION, message="You've been selected for [Campaign Title]!", link="/influencer/campaigns"
+  - [✓] 5.4 Create `app/api/notifications/route.ts` with GET handler to fetch user's notifications (filter by userId, order by createdAt desc)
+  - [✓] 5.5 Create `app/api/notifications/[id]/read/route.ts` with PATCH handler to mark notification as read (update read=true)
+  - [✓] 5.6 Create `app/api/notifications/route.ts` with POST handler for mark-all-read functionality
   - [ ] 5.7 Add notification badge/icon to influencer navigation/header (check existing layout for notification area)
   - [ ] 5.8 Display unread notification count as a badge number (query count where read=false)
   - [ ] 5.9 Create notification dropdown/panel to display recent notifications with message, timestamp, and link
