@@ -44,7 +44,7 @@
 
 ### UI Components (Store)
 - `app/(store)/[storeId]/campaign/page.tsx` - ✓ Updated - Store campaigns page; fixed "Create Campaign" button to route to `/${storeId}/createCampaign`
-- `app/(store)/[storeId]/createCampaign/page.tsx` - ✓ Updated - Draft persistence via localStorage (per-store key), legacy key migration, and clear draft safety
+- `app/(store)/[storeId]/createCampaign/page.tsx` - ✓ Updated - Draft persistence via localStorage (per-store key), legacy key migration, clear draft safety, and persisted "Preferred Content Style" selections across steps
 
 ### State Management
 - `store/use-campaign-store.ts` - Zustand store for campaign form state (optional for MVP)
@@ -156,6 +156,11 @@
   - [✓] 7.1 Ensure "Create Campaign" links navigate to `/${storeId}/createCampaign` (updated store campaigns page)
   - [✓] 7.2 Update dashboard Edit navigation to store route `/${storeId}/campaign/${campaignId}/edit`
   - [✓] 7.3 Ensure draft persistence works on `/${storeId}/createCampaign` (guard on storeId, migrate legacy keys)
+
+- [ ] 8.0 Draft Persistence & UX Fixes (Store Create Campaign)
+  - [✓] 8.1 Persist "Preferred Content Style" checkbox selections across steps and reloads
+  - [ ] 8.2 Replace any remaining `/campaign/new` references (e.g., profile test page) with store-scoped navigation logic
+  - [✓] 8.3 Store campaigns list: remove dummy data and display real campaigns from API in `app/(store)/[storeId]/campaign/page.tsx`
 
 - [ ] 6.0 Integration, Testing & Polish
   - [ ] 6.1 Test complete flow as Brand: Create campaign → Save as draft → Publish campaign → View on campaign dashboard

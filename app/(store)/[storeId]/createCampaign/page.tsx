@@ -48,7 +48,7 @@ interface CampaignData {
   ageRange: string;
   gender: string;
   location: string;
-  contentStyle: string;
+  contentStyles: string[];
   campaignObjective: string;
   callToActions: CallToAction[];
   milestones: Milestone[];
@@ -80,7 +80,7 @@ const InfluencerCampaignManager = () => {
     ageRange: '',
     gender: '',
     location: '',
-    contentStyle: '',
+    contentStyles: [],
     campaignObjective: '',
     callToActions: [],
     milestones: [
@@ -102,7 +102,23 @@ const InfluencerCampaignManager = () => {
       if (savedData) {
         const parsed = JSON.parse(savedData);
         // Merge onto defaults so newly added fields retain defaults
-        setCampaignData(prev => ({ ...prev, ...(parsed.campaignData ?? parsed) }));
+        const merged = (prevData: CampaignData) => {
+          const base = { ...prevData, ...(parsed.campaignData ?? parsed) } as any;
+          // Backward compatibility: map single contentStyle to array
+          if (!Array.isArray(base.contentStyles)) {
+            if (typeof base.contentStyle === 'string' && base.contentStyle) {
+              base.contentStyles = [base.contentStyle];
+            } else {
+              base.contentStyles = [];
+            }
+          }
+          // Clean up legacy key
+          if (base.contentStyle !== undefined) {
+            delete base.contentStyle;
+          }
+          return base as CampaignData;
+        };
+        setCampaignData(prev => merged(prev));
         setCurrentStep(parsed.currentStep || 0);
         // Migrate legacy key to scoped key
         if (!localStorage.getItem(key)) {
@@ -263,6 +279,16 @@ const InfluencerCampaignManager = () => {
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
+  // Preferred Content Style toggle handler
+  const handleContentStyleToggle = (style: string) => {
+    setCampaignData(prev => ({
+      ...prev,
+      contentStyles: prev.contentStyles.includes(style)
+        ? prev.contentStyles.filter(s => s !== style)
+        : [...prev.contentStyles, style],
+    }));
+  };
+
   // Clear draft function
   const handleClearDraft = () => {
     if (confirm("Are you sure you want to clear your draft? This action cannot be undone.")) {
@@ -293,7 +319,7 @@ const InfluencerCampaignManager = () => {
         ageRange: '',
         gender: '',
         location: '',
-        contentStyle: '',
+        contentStyles: [],
         campaignObjective: '',
         callToActions: [],
         milestones: [
@@ -882,6 +908,8 @@ const InfluencerCampaignManager = () => {
                 <input
                   type="checkbox"
                   id={style.toLowerCase().replace(/\s+/g, '-')}
+                  checked={campaignData.contentStyles.includes(style)}
+                  onChange={() => handleContentStyleToggle(style)}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <label 
