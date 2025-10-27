@@ -24,12 +24,12 @@
 - `app/api/campaigns/my-applications/route.ts` - ✓ Created - GET (list influencer's applications with campaign details)
 
 ### API Routes (Notifications)
-- `app/api/notifications/route.ts` - GET (list user notifications), POST (mark all as read)
-- `app/api/notifications/[id]/read/route.ts` - PATCH (mark notification as read)
+- `app/api/notifications/route.ts` - ✓ Created - GET (list user notifications with limit and filters), POST (mark all as read)
+- `app/api/notifications/[id]/read/route.ts` - ✓ Created - PATCH (mark single notification as read with authorization)
 
 ### Server Actions
 - `actions/campaign.ts` - Server actions for campaign CRUD operations
-- `actions/notification.ts` - Server actions for notification operations
+- `actions/notification.ts` - Server actions for notification operations (OPTIONAL - using API routes instead)
 
 ### UI Components (Brand)
 - `app/(dashboard)/campaign/new/page.tsx` - ✓ Updated - Campaign creation form with title, description, budget, currency, duration, location, platforms, and targets
@@ -39,6 +39,12 @@
 ### UI Components (Influencer)
 - `app/influencer/campaigns/page.tsx` - Server component wrapper (existing, no changes)
 - `app/influencer/campaigns/campaign.tsx` - ✓ Updated - Campaign discovery and application interface with real data fetching, tab filtering, apply functionality, optimistic UI updates
+- `components/ui/notification-bell.tsx` - ✓ Created - Notification bell with dropdown, unread count badge, mark as read, real-time polling
+- `components/ui/influencersidebar.tsx` - ✓ Updated - Integrated notification bell in header
+
+### UI Components (Store)
+- `app/(store)/[storeId]/campaign/page.tsx` - ✓ Updated - Store campaigns page; fixed "Create Campaign" button to route to `/${storeId}/createCampaign`
+- `app/(store)/[storeId]/createCampaign/page.tsx` - ✓ Updated - Draft persistence via localStorage (per-store key), legacy key migration, and clear draft safety
 
 ### State Management
 - `store/use-campaign-store.ts` - Zustand store for campaign form state (optional for MVP)
@@ -48,6 +54,7 @@
 
 ### Utility Functions
 - `lib/utils/campaign-helpers.ts` - Helper functions for campaign data formatting and calculations
+- `lib/utils/notification-helpers.ts` - ✓ Created - Helper functions for notification CRUD operations (createNotification, markAsRead, getUserNotifications, etc.)
 
 ### Notes
 
@@ -135,13 +142,20 @@
   - [✓] 5.4 Create `app/api/notifications/route.ts` with GET handler to fetch user's notifications (filter by userId, order by createdAt desc)
   - [✓] 5.5 Create `app/api/notifications/[id]/read/route.ts` with PATCH handler to mark notification as read (update read=true)
   - [✓] 5.6 Create `app/api/notifications/route.ts` with POST handler for mark-all-read functionality
-  - [ ] 5.7 Add notification badge/icon to influencer navigation/header (check existing layout for notification area)
-  - [ ] 5.8 Display unread notification count as a badge number (query count where read=false)
-  - [ ] 5.9 Create notification dropdown/panel to display recent notifications with message, timestamp, and link
-  - [ ] 5.10 Add click handler to mark notification as read when clicked
-  - [ ] 5.11 Make notification message clickable to navigate to the linked page
-  - [ ] 5.12 Add real-time notification updates using polling (fetch notifications every 30-60 seconds) or WebSocket (future enhancement)
-  - [ ] 5.13 Create `actions/notification.ts` with server action `createNotification` for creating notifications (alternative to direct DB calls)
+  - [✓] 5.7 Add notification badge/icon to influencer navigation/header (check existing layout for notification area)
+  - [✓] 5.8 Display unread notification count as a badge number (query count where read=false)
+  - [✓] 5.9 Create notification dropdown/panel to display recent notifications with message, timestamp, and link
+  - [✓] 5.10 Add click handler to mark notification as read when clicked
+  - [✓] 5.11 Make notification message clickable to navigate to the linked page
+  - [✓] 5.12 Add real-time notification updates using polling (fetch notifications every 30-60 seconds) or WebSocket (future enhancement)
+  - [ ] 5.13 Create `actions/notification.ts` with server action `createNotification` for creating notifications (alternative to direct DB calls - OPTIONAL)
+
+- [✓] 5.0 Notification System Implementation
+
+- [✓] 7.0 Route Alignment & Cleanup
+  - [✓] 7.1 Ensure "Create Campaign" links navigate to `/${storeId}/createCampaign` (updated store campaigns page)
+  - [✓] 7.2 Update dashboard Edit navigation to store route `/${storeId}/campaign/${campaignId}/edit`
+  - [✓] 7.3 Ensure draft persistence works on `/${storeId}/createCampaign` (guard on storeId, migrate legacy keys)
 
 - [ ] 6.0 Integration, Testing & Polish
   - [ ] 6.1 Test complete flow as Brand: Create campaign → Save as draft → Publish campaign → View on campaign dashboard

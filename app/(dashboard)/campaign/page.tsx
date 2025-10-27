@@ -80,8 +80,24 @@ const CampaignDashboard = () => {
     }
   };
 
-  const handleCreateCampaign = () => {
-    router.push("/campaign/new");
+  const handleCreateCampaign = async () => {
+    try {
+      // Fetch user's store
+      const response = await fetch('/api/stores');
+      const result = await response.json();
+      
+      if (result.stores && result.stores.length > 0) {
+        const storeId = result.stores[0].id;
+        router.push(`/${storeId}/createCampaign`);
+      } else {
+        toast.error("No store found", {
+          description: "Please create a store first to create campaigns.",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching store:", error);
+      toast.error("Failed to load store information");
+    }
   };
 
   const handleViewApplicants = (campaignId: string) => {
@@ -89,7 +105,25 @@ const CampaignDashboard = () => {
   };
 
   const handleEditCampaign = (campaignId: string) => {
-    router.push(`/campaign/new?id=${campaignId}`);
+    // Route to store-scoped edit page; derive storeId like in handleCreateCampaign
+    (async () => {
+      try {
+        const response = await fetch('/api/stores');
+        const result = await response.json();
+
+        if (result.stores && result.stores.length > 0) {
+          const storeId = result.stores[0].id;
+          router.push(`/${storeId}/campaign/${campaignId}/edit`);
+        } else {
+          toast.error("No store found", {
+            description: "Please create a store first to edit campaigns.",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching store:", error);
+        toast.error("Failed to load store information");
+      }
+    })();
   };
 
   const handlePublishClick = (campaign: Campaign) => {

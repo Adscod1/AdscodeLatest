@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { toast } from 'sonner';
 
 // Define types for the campaign data
 interface Target {
@@ -54,7 +55,7 @@ interface CampaignData {
 
 const InfluencerCampaignManager = () => {
   const params = useParams();
-  const storeId = params.storeId as string;
+  const storeId = params.storeId as string | undefined;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [campaignData, setCampaignData] = useState<CampaignData>({
@@ -85,6 +86,50 @@ const InfluencerCampaignManager = () => {
       { type: 'Instagram Post', quantity: 1, description: '' }
     ]
   });
+
+  // Load from localStorage when storeId is available
+  useEffect(() => {
+    if (!storeId) return; // Wait for dynamic route param
+    const key = `campaign_draft_${storeId}`;
+    try {
+      // Support legacy key migration if it exists
+      const legacyKey = 'campaign_draft';
+      const savedData = localStorage.getItem(key) || localStorage.getItem(legacyKey);
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        setCampaignData(parsed.campaignData ?? parsed);
+        setCurrentStep(parsed.currentStep || 0);
+        // Migrate legacy key to scoped key
+        if (!localStorage.getItem(key)) {
+          localStorage.setItem(key, savedData);
+          localStorage.removeItem(legacyKey);
+        }
+        toast.info("Draft restored", {
+          description: "Your previous campaign draft has been restored.",
+        });
+      }
+    } catch (error) {
+      console.error("Error parsing saved campaign data:", error);
+      try {
+        localStorage.removeItem(`campaign_draft_${storeId}`);
+      } catch {}
+    }
+  }, [storeId]);
+
+  // Save to localStorage whenever campaignData or currentStep changes (once storeId is ready)
+  useEffect(() => {
+    if (!storeId) return;
+    const dataToSave = {
+      campaignData,
+      currentStep,
+      timestamp: new Date().toISOString(),
+    };
+    try {
+      localStorage.setItem(`campaign_draft_${storeId}`, JSON.stringify(dataToSave));
+    } catch (e) {
+      console.error('Failed to save draft to localStorage:', e);
+    }
+  }, [campaignData, currentStep, storeId]);
 
   const steps = [
     { id: 'basic-info', title: 'Basic Info', icon: <Users className="w-4 h-4" /> },
@@ -211,6 +256,51 @@ const InfluencerCampaignManager = () => {
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
+
+  // Clear draft function
+  const handleClearDraft = () => {
+    if (confirm("Are you sure you want to clear your draft? This action cannot be undone.")) {
+      try {
+        if (storeId) localStorage.removeItem(`campaign_draft_${storeId}`);
+        // Clean up potential legacy keys
+        localStorage.removeItem('campaign_draft');
+        localStorage.removeItem('campaign_draft_undefined');
+      } catch {}
+      // Reset to initial state
+      setCampaignData({
+        title: '',
+        category: '',
+        description: '',
+        budget: '',
+        currency: 'USD ($)',
+        startDate: '',
+        endDate: '',
+        targets: [
+          { metric: 'Reach', value: '', unit: 'Users' },
+          { metric: 'Engagement Rate', value: '', unit: 'Percentage' }
+        ],
+        platforms: [],
+        minFollowers: '',
+        maxFollowers: '',
+        ageRange: '',
+        gender: '',
+        location: '',
+        contentStyle: '',
+        campaignObjective: '',
+        callToActions: [],
+        milestones: [
+          { title: 'Campaign Kickoff', description: '', dueDate: '' }
+        ],
+        deliverables: [
+          { type: 'Instagram Post', quantity: 1, description: '' }
+        ]
+      });
+      setCurrentStep(0);
+      toast.success("Draft cleared", {
+        description: "Your campaign draft has been cleared.",
+      });
+    }
+  };
 
   const renderBasicInfo = () => (
     <div className="space-y-6 sm:space-y-8">
@@ -1274,8 +1364,18 @@ const InfluencerCampaignManager = () => {
         </div>
 
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Campaign</h1>
-          <p className="text-sm sm:text-base text-gray-600">Set up your comprehensive influencer marketing campaign</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Campaign</h1>
+              <p className="text-sm sm:text-base text-gray-600">Set up your comprehensive influencer marketing campaign</p>
+            </div>
+            <button
+              onClick={handleClearDraft}
+              className="px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-red-200"
+            >
+              Clear Draft
+            </button>
+          </div>
         </div>
 
         {/* Step Navigation */}
