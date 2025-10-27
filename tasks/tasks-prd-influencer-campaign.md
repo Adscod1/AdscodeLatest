@@ -72,7 +72,7 @@
   - [✓] 1.11 Run `npx prisma generate` to update Prisma client types
   - [✓] 1.12 Verify migration success by checking database tables in MySQL
 
-- [ ] 2.0 Campaign Creation & Management (Brand Side)
+- [✓] 2.0 Campaign Creation & Management (Brand Side)
   - [✓] 2.1 Create `lib/validations/campaign.ts` with Zod schemas: `createCampaignSchema`, `updateCampaignSchema`, `publishCampaignSchema`
   - [✓] 2.2 Create `types/campaign.ts` with TypeScript interfaces for Campaign, CampaignInfluencer, and form data types
   - [✓] 2.3 Update `app/(dashboard)/campaign/new/page.tsx` to add missing form fields (title, description, budget, currency, duration) above or below existing fields
@@ -87,8 +87,8 @@
   - [✓] 2.12 Create `app/api/campaigns/[id]/route.ts` with PATCH handler to update draft campaigns
   - [✓] 2.13 Create `app/api/campaigns/[id]/publish/route.ts` with POST handler to validate and change status to PUBLISHED
   - [✓] 2.14 Add "Publish" button to campaign dashboard with confirmation dialog before publishing
-  - [ ] 2.15 Add "Edit" button for draft campaigns that redirects to campaign creation form with pre-filled data
-  - [ ] 2.16 Create `actions/campaign.ts` with server actions: `createCampaign`, `updateCampaign`, `publishCampaign`, `getCampaigns` (optional alternative to API routes)
+  - [✓] 2.15 Add "Edit" button for draft campaigns that redirects to campaign creation form with pre-filled data
+  - [✓] 2.16 Create `actions/campaign.ts` with server actions: `createCampaign`, `updateCampaign`, `publishCampaign`, `getCampaigns` (optional alternative to API routes - SKIPPED: Using API routes directly)
 
 - [ ] 3.0 Campaign Discovery & Application (Influencer Side)
   - [ ] 3.1 Create `app/api/campaigns/available/route.ts` with GET handler to list published campaigns (status=PUBLISHED, exclude campaigns influencer already applied to)

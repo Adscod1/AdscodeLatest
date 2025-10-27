@@ -5,12 +5,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Check, Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 const CreateNewCampaignPage = () => {
   const [activeStep] = useState(0);
   const isMobile = useIsMobile();
+  const searchParams = useSearchParams();
+  const campaignId = searchParams.get("id");
+  const isEditMode = !!campaignId;
 
   // Form State Management
   const [formData, setFormData] = useState({
@@ -35,6 +39,82 @@ const CreateNewCampaignPage = () => {
   const [locationEnabled, setLocationEnabled] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingCampaign, setIsLoadingCampaign] = useState(false);
+
+  // Load existing campaign data if in edit mode
+  useEffect(() => {
+    if (isEditMode && campaignId) {
+      loadCampaignData(campaignId);
+    }
+  }, [isEditMode, campaignId]);
+
+  const loadCampaignData = async (id: string) => {
+    setIsLoadingCampaign(true);
+    try {
+      const response = await fetch(`/api/campaigns/${id}`);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to load campaign");
+      }
+
+      const campaign = result.campaign;
+
+      // Parse targets from array back to categories
+      const targets = {
+        awareness: [] as string[],
+        advocacy: [] as string[],
+        conversions: [] as string[],
+        contentType: [] as string[],
+      };
+
+      if (Array.isArray(campaign.targets)) {
+        campaign.targets.forEach((target: string) => {
+          // Categorize targets based on their names
+          if (["Brand awareness", "Reach", "Barter"].includes(target)) {
+            targets.awareness.push(target);
+          } else if (["Traffic", "Engagement", "App installs", "Video views"].includes(target)) {
+            targets.advocacy.push(target);
+          } else if (["Conversions", "Catalog Sales"].includes(target)) {
+            targets.conversions.push(target);
+          } else if (["Creation + Posting", "Creation Only", "Posting only"].includes(target)) {
+            targets.contentType.push(target);
+          }
+        });
+      }
+
+      // Pre-fill form data
+      setFormData({
+        title: campaign.title || "",
+        description: campaign.description || "",
+        budget: campaign.budget?.toString() || "",
+        currency: campaign.currency || "UGX",
+        duration: campaign.duration?.toString() || "",
+        influencerLocation: {
+          country: campaign.influencerLocation?.country || "Uganda",
+          stateCity: campaign.influencerLocation?.stateCity || "",
+        },
+        platforms: Array.isArray(campaign.platforms) ? campaign.platforms : [],
+        targets,
+      });
+
+      // Set location enabled state
+      if (campaign.influencerLocation) {
+        setLocationEnabled(true);
+      }
+
+      toast.success("Campaign loaded", {
+        description: "You can now edit your campaign details.",
+      });
+    } catch (error) {
+      console.error("Error loading campaign:", error);
+      toast.error("Failed to load campaign", {
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
+    } finally {
+      setIsLoadingCampaign(false);
+    }
+  };
 
   // Handle input changes
   const handleInputChange = (
@@ -144,8 +224,12 @@ const CreateNewCampaignPage = () => {
         targets: allTargets.length > 0 ? allTargets : undefined,
       };
 
-      const response = await fetch("/api/campaigns", {
-        method: "POST",
+      // Determine API endpoint and method based on edit mode
+      const url = isEditMode ? `/api/campaigns/${campaignId}` : "/api/campaigns";
+      const method = isEditMode ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -155,22 +239,24 @@ const CreateNewCampaignPage = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to create campaign");
+        throw new Error(result.error || `Failed to ${isEditMode ? "update" : "create"} campaign`);
       }
 
       // Success! Show success message
-      toast.success("Campaign created successfully!", {
-        description: "Your campaign has been saved as a draft.",
+      toast.success(`Campaign ${isEditMode ? "updated" : "created"} successfully!`, {
+        description: isEditMode 
+          ? "Your changes have been saved."
+          : "Your campaign has been saved as a draft.",
       });
       
-      // Optionally redirect to campaign dashboard or clear form
+      // Optionally redirect to campaign dashboard
       // window.location.href = '/campaign';
       
     } catch (error) {
-      console.error("Error creating campaign:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to create campaign. Please try again.";
+      console.error(`Error ${isEditMode ? "updating" : "creating"} campaign:`, error);
+      const errorMessage = error instanceof Error ? error.message : `Failed to ${isEditMode ? "update" : "create"} campaign. Please try again.`;
       
-      toast.error("Failed to create campaign", {
+      toast.error(`Failed to ${isEditMode ? "update" : "create"} campaign`, {
         description: errorMessage,
       });
       
@@ -192,10 +278,19 @@ const CreateNewCampaignPage = () => {
 
   return (
     <div className={`max-w-4xl mx-auto my-8 bg-white rounded-xl shadow-sm p-8 ${isMobile ? 'mt-4 ml-4 mr-4' : 'mt-28'}`}>
-      <h1 className="text-2xl font-bold mb-8">Create new campaign</h1>
+      <h1 className="text-2xl font-bold mb-8">
+        {isEditMode ? "Edit Campaign" : "Create new campaign"}
+      </h1>
 
-      {/* Progress Stepper */}
-      <div className="flex items-center justify-between mb-12">
+      {isLoadingCampaign ? (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <p className="mt-4 text-gray-600">Loading campaign data...</p>
+        </div>
+      ) : (
+        <>
+          {/* Progress Stepper */}
+          <div className="flex items-center justify-between mb-12">
         {steps.map((step, index) => (
           <React.Fragment key={index}>
             {/* Step Circle */}
@@ -749,13 +844,17 @@ const CreateNewCampaignPage = () => {
         <div className="flex justify-end">
           <Button
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoadingCampaign}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Creating..." : "Continue"}
+            {isSubmitting 
+              ? (isEditMode ? "Updating..." : "Creating...") 
+              : (isEditMode ? "Save Changes" : "Continue")}
           </Button>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };
