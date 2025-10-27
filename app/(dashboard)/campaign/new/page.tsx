@@ -6,11 +6,181 @@ import { Switch } from "@/components/ui/switch";
 import { Check, Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 const CreateNewCampaignPage = () => {
   const [activeStep] = useState(0);
-  const [locationEnabled, setLocationEnabled] = useState(true);
   const isMobile = useIsMobile();
+
+  // Form State Management
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    budget: "",
+    currency: "UGX",
+    duration: "",
+    influencerLocation: {
+      country: "Uganda",
+      stateCity: "",
+    },
+    platforms: [] as string[],
+    targets: {
+      awareness: [] as string[],
+      advocacy: [] as string[],
+      conversions: [] as string[],
+      contentType: [] as string[],
+    },
+  });
+
+  const [locationEnabled, setLocationEnabled] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Handle input changes
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+    // Clear error when user starts typing
+    if (errors[id]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[id];
+        return newErrors;
+      });
+    }
+  };
+
+  // Handle location changes
+  const handleLocationChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      influencerLocation: {
+        ...prev.influencerLocation,
+        [field]: value,
+      },
+    }));
+  };
+
+  // Handle platform toggle
+  const handlePlatformToggle = (platform: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      platforms: prev.platforms.includes(platform)
+        ? prev.platforms.filter((p) => p !== platform)
+        : [...prev.platforms, platform],
+    }));
+  };
+
+  // Handle target checkbox changes
+  const handleTargetChange = (category: string, target: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      targets: {
+        ...prev.targets,
+        [category]: prev.targets[category as keyof typeof prev.targets].includes(target)
+          ? prev.targets[category as keyof typeof prev.targets].filter((t) => t !== target)
+          : [...prev.targets[category as keyof typeof prev.targets], target],
+      },
+    }));
+  };
+
+  // Validate form before submission
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Campaign title is required";
+    }
+
+    if (!formData.budget || parseFloat(formData.budget) <= 0) {
+      newErrors.budget = "Please enter a valid budget amount";
+    }
+
+    if (formData.platforms.length === 0) {
+      newErrors.platforms = "Please select at least one platform";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      // Prepare data for API
+      const allTargets = [
+        ...formData.targets.awareness,
+        ...formData.targets.advocacy,
+        ...formData.targets.conversions,
+        ...formData.targets.contentType,
+      ];
+
+      const campaignData = {
+        title: formData.title,
+        description: formData.description || undefined,
+        budget: parseFloat(formData.budget),
+        currency: formData.currency,
+        duration: formData.duration ? parseInt(formData.duration) : undefined,
+        influencerLocation: locationEnabled
+          ? {
+              country: formData.influencerLocation.country,
+              stateCity: formData.influencerLocation.stateCity || undefined,
+            }
+          : undefined,
+        platforms: formData.platforms,
+        targets: allTargets.length > 0 ? allTargets : undefined,
+      };
+
+      const response = await fetch("/api/campaigns", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(campaignData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to create campaign");
+      }
+
+      // Success! Show success message
+      toast.success("Campaign created successfully!", {
+        description: "Your campaign has been saved as a draft.",
+      });
+      
+      // Optionally redirect to campaign dashboard or clear form
+      // window.location.href = '/campaign';
+      
+    } catch (error) {
+      console.error("Error creating campaign:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to create campaign. Please try again.";
+      
+      toast.error("Failed to create campaign", {
+        description: errorMessage,
+      });
+      
+      setErrors({
+        submit: errorMessage,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const steps = [
     "Basic details",
@@ -64,6 +234,122 @@ const CreateNewCampaignPage = () => {
       <div>
         <h2 className="font-semibold text-lg mb-6">Basic details</h2>
 
+        {/* Campaign Title */}
+        <div className="mb-8">
+          <label htmlFor="title" className="block text-sm font-medium mb-2">
+            Campaign Title <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="title"
+            type="text"
+            value={formData.title}
+            onChange={handleInputChange}
+            placeholder="Enter campaign title"
+            className={`w-full p-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.title ? "border-red-500" : ""
+            }`}
+          />
+          {errors.title && (
+            <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+          )}
+        </div>
+
+        {/* Campaign Description */}
+        <div className="mb-8">
+          <label htmlFor="description" className="block text-sm font-medium mb-2">
+            Campaign Description
+          </label>
+          <textarea
+            id="description"
+            rows={4}
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Describe your campaign goals, requirements, and expectations..."
+            className="w-full p-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Provide clear details to help influencers understand your campaign
+          </p>
+        </div>
+
+        {/* Budget and Duration Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {/* Budget */}
+          <div>
+            <label htmlFor="budget" className="block text-sm font-medium mb-2">
+              Budget <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="budget"
+              type="number"
+              value={formData.budget}
+              onChange={handleInputChange}
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              className={`w-full p-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.budget ? "border-red-500" : ""
+              }`}
+            />
+            {errors.budget && (
+              <p className="text-xs text-red-500 mt-1">{errors.budget}</p>
+            )}
+          </div>
+
+          {/* Currency */}
+          <div>
+            <label htmlFor="currency" className="block text-sm font-medium mb-2">
+              Currency <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <select
+                id="currency"
+                value={formData.currency}
+                onChange={handleInputChange}
+                className="w-full p-2.5 border rounded-md appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="UGX">UGX - Ugandan Shilling</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="KES">KES - Kenyan Shilling</option>
+                <option value="TZS">TZS - Tanzanian Shilling</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Duration */}
+          <div>
+            <label htmlFor="duration" className="block text-sm font-medium mb-2">
+              Duration (days)
+            </label>
+            <input
+              id="duration"
+              type="number"
+              value={formData.duration}
+              onChange={handleInputChange}
+              placeholder="30"
+              min="1"
+              step="1"
+              className="w-full p-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Leave empty for ongoing</p>
+          </div>
+        </div>
+
         {/* Influencer Location */}
         <div className="border rounded-lg p-6 mb-8">
           <div className="flex justify-between items-center mb-2">
@@ -88,12 +374,16 @@ const CreateNewCampaignPage = () => {
           <div className="mt-4">
             <label className="block text-sm mb-1">State/City</label>
             <div className="relative">
-              <select className="w-full p-2.5 border rounded-md appearance-none bg-white text-gray-500">
-                <option>Select State/City</option>
-                <option>Kampala</option>
-                <option>Entebbe</option>
-                <option>Jinja</option>
-                <option>Mbarara</option>
+              <select
+                value={formData.influencerLocation.stateCity}
+                onChange={(e) => handleLocationChange("stateCity", e.target.value)}
+                className="w-full p-2.5 border rounded-md appearance-none bg-white text-gray-500"
+              >
+                <option value="">Select State/City</option>
+                <option value="Kampala">Kampala</option>
+                <option value="Entebbe">Entebbe</option>
+                <option value="Jinja">Jinja</option>
+                <option value="Mbarara">Mbarara</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <svg
@@ -115,8 +405,19 @@ const CreateNewCampaignPage = () => {
         {/* Campaign Platforms */}
         <div className="mb-8">
           <h3 className="font-medium mb-4">Campaign platforms</h3>
+          {errors.platforms && (
+            <p className="text-xs text-red-500 mb-2">{errors.platforms}</p>
+          )}
           <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-1 px-3 py-2 border rounded-full">
+            <button
+              type="button"
+              onClick={() => handlePlatformToggle("Instagram")}
+              className={`flex items-center gap-1 px-3 py-2 border rounded-full transition-colors ${
+                formData.platforms.includes("Instagram")
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 hover:border-gray-400"
+              }`}
+            >
               <svg
                 width="16"
                 height="16"
@@ -138,8 +439,16 @@ const CreateNewCampaignPage = () => {
                 />
               </svg>
               <span className="text-sm">Instagram</span>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-2 border rounded-full">
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePlatformToggle("Facebook")}
+              className={`flex items-center gap-1 px-3 py-2 border rounded-full transition-colors ${
+                formData.platforms.includes("Facebook")
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 hover:border-gray-400"
+              }`}
+            >
               <svg
                 width="16"
                 height="16"
@@ -153,8 +462,16 @@ const CreateNewCampaignPage = () => {
                 />
               </svg>
               <span className="text-sm">Facebook</span>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-2 border rounded-full">
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePlatformToggle("TikTok")}
+              className={`flex items-center gap-1 px-3 py-2 border rounded-full transition-colors ${
+                formData.platforms.includes("TikTok")
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 hover:border-gray-400"
+              }`}
+            >
               <svg
                 width="16"
                 height="16"
@@ -168,8 +485,16 @@ const CreateNewCampaignPage = () => {
                 />
               </svg>
               <span className="text-sm">TikTok</span>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-2 border rounded-full">
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePlatformToggle("YouTube")}
+              className={`flex items-center gap-1 px-3 py-2 border rounded-full transition-colors ${
+                formData.platforms.includes("YouTube")
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 hover:border-gray-400"
+              }`}
+            >
               <svg
                 width="16"
                 height="16"
@@ -183,8 +508,16 @@ const CreateNewCampaignPage = () => {
                 />
               </svg>
               <span className="text-sm">YouTube</span>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-2 border rounded-full">
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePlatformToggle("Twitter")}
+              className={`flex items-center gap-1 px-3 py-2 border rounded-full transition-colors ${
+                formData.platforms.includes("Twitter")
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 hover:border-gray-400"
+              }`}
+            >
               <svg
                 width="16"
                 height="16"
@@ -198,8 +531,16 @@ const CreateNewCampaignPage = () => {
                 />
               </svg>
               <span className="text-sm">Twitter</span>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-2 border rounded-full">
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePlatformToggle("Blog")}
+              className={`flex items-center gap-1 px-3 py-2 border rounded-full transition-colors ${
+                formData.platforms.includes("Blog")
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 hover:border-gray-400"
+              }`}
+            >
               <svg
                 width="16"
                 height="16"
@@ -213,8 +554,11 @@ const CreateNewCampaignPage = () => {
                 />
               </svg>
               <span className="text-sm">Blog</span>
-            </div>
-            <button className="flex items-center gap-1 px-3 py-2 bg-black text-white rounded-full">
+            </button>
+            <button
+              type="button"
+              className="flex items-center gap-1 px-3 py-2 bg-black text-white rounded-full hover:bg-gray-800"
+            >
               <Plus size={16} />
               <span className="text-sm">Add</span>
             </button>
@@ -238,26 +582,32 @@ const CreateNewCampaignPage = () => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="brand-awareness"
+                    checked={formData.targets.awareness.includes("Brand awareness")}
+                    onCheckedChange={() => handleTargetChange("awareness", "Brand awareness")}
                     className="bg-blue-500 text-white"
-                    defaultChecked
                   />
-                  <label htmlFor="brand-awareness" className="text-sm">
+                  <label htmlFor="brand-awareness" className="text-sm cursor-pointer">
                     Brand awareness
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="reach"
+                    checked={formData.targets.awareness.includes("Reach")}
+                    onCheckedChange={() => handleTargetChange("awareness", "Reach")}
                     className="bg-blue-500 text-white"
-                    defaultChecked
                   />
-                  <label htmlFor="reach" className="text-sm">
+                  <label htmlFor="reach" className="text-sm cursor-pointer">
                     Reach
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="barter" />
-                  <label htmlFor="barter" className="text-sm">
+                  <Checkbox
+                    id="barter"
+                    checked={formData.targets.awareness.includes("Barter")}
+                    onCheckedChange={() => handleTargetChange("awareness", "Barter")}
+                  />
+                  <label htmlFor="barter" className="text-sm cursor-pointer">
                     Barter
                   </label>
                 </div>
@@ -271,32 +621,42 @@ const CreateNewCampaignPage = () => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="traffic"
+                    checked={formData.targets.advocacy.includes("Traffic")}
+                    onCheckedChange={() => handleTargetChange("advocacy", "Traffic")}
                     className="bg-blue-500 text-white"
-                    defaultChecked
                   />
-                  <label htmlFor="traffic" className="text-sm">
+                  <label htmlFor="traffic" className="text-sm cursor-pointer">
                     Traffic
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="engagement"
+                    checked={formData.targets.advocacy.includes("Engagement")}
+                    onCheckedChange={() => handleTargetChange("advocacy", "Engagement")}
                     className="bg-blue-500 text-white"
-                    defaultChecked
                   />
-                  <label htmlFor="engagement" className="text-sm">
+                  <label htmlFor="engagement" className="text-sm cursor-pointer">
                     Engagement
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="app-installs" />
-                  <label htmlFor="app-installs" className="text-sm">
+                  <Checkbox
+                    id="app-installs"
+                    checked={formData.targets.advocacy.includes("App installs")}
+                    onCheckedChange={() => handleTargetChange("advocacy", "App installs")}
+                  />
+                  <label htmlFor="app-installs" className="text-sm cursor-pointer">
                     App installs
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="video-views" />
-                  <label htmlFor="video-views" className="text-sm">
+                  <Checkbox
+                    id="video-views"
+                    checked={formData.targets.advocacy.includes("Video views")}
+                    onCheckedChange={() => handleTargetChange("advocacy", "Video views")}
+                  />
+                  <label htmlFor="video-views" className="text-sm cursor-pointer">
                     Videos Views
                   </label>
                 </div>
@@ -308,14 +668,22 @@ const CreateNewCampaignPage = () => {
               <h4 className="font-medium mb-4">Conversions</h4>
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="conversions" />
-                  <label htmlFor="conversions" className="text-sm">
+                  <Checkbox
+                    id="conversions"
+                    checked={formData.targets.conversions.includes("Conversions")}
+                    onCheckedChange={() => handleTargetChange("conversions", "Conversions")}
+                  />
+                  <label htmlFor="conversions" className="text-sm cursor-pointer">
                     Conversions
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="catalog-sales" />
-                  <label htmlFor="catalog-sales" className="text-sm">
+                  <Checkbox
+                    id="catalog-sales"
+                    checked={formData.targets.conversions.includes("Catalog Sales")}
+                    onCheckedChange={() => handleTargetChange("conversions", "Catalog Sales")}
+                  />
+                  <label htmlFor="catalog-sales" className="text-sm cursor-pointer">
                     Catalog Sales
                   </label>
                 </div>
@@ -327,20 +695,32 @@ const CreateNewCampaignPage = () => {
               <h4 className="font-medium mb-4">Content Type</h4>
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="creation-posting" />
-                  <label htmlFor="creation-posting" className="text-sm">
+                  <Checkbox
+                    id="creation-posting"
+                    checked={formData.targets.contentType.includes("Creation + Posting")}
+                    onCheckedChange={() => handleTargetChange("contentType", "Creation + Posting")}
+                  />
+                  <label htmlFor="creation-posting" className="text-sm cursor-pointer">
                     Creation + Posting
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="creation-only" />
-                  <label htmlFor="creation-only" className="text-sm">
+                  <Checkbox
+                    id="creation-only"
+                    checked={formData.targets.contentType.includes("Creation Only")}
+                    onCheckedChange={() => handleTargetChange("contentType", "Creation Only")}
+                  />
+                  <label htmlFor="creation-only" className="text-sm cursor-pointer">
                     Creation Only
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="posting-only" />
-                  <label htmlFor="posting-only" className="text-sm">
+                  <Checkbox
+                    id="posting-only"
+                    checked={formData.targets.contentType.includes("Posting only")}
+                    onCheckedChange={() => handleTargetChange("contentType", "Posting only")}
+                  />
+                  <label htmlFor="posting-only" className="text-sm cursor-pointer">
                     Posting only
                   </label>
                 </div>
@@ -361,9 +741,18 @@ const CreateNewCampaignPage = () => {
         </div>
 
         {/* Continue Button */}
+        {errors.submit && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{errors.submit}</p>
+          </div>
+        )}
         <div className="flex justify-end">
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md">
-            Continue
+          <Button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Creating..." : "Continue"}
           </Button>
         </div>
       </div>

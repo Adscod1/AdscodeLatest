@@ -32,7 +32,7 @@
 - `actions/notification.ts` - Server actions for notification operations
 
 ### UI Components (Brand)
-- `app/(dashboard)/campaign/new/page.tsx` - Campaign creation form (update existing)
+- `app/(dashboard)/campaign/new/page.tsx` - ✓ Updated - Campaign creation form with title, description, budget, currency, duration, location, platforms, and targets
 - `app/(dashboard)/campaign/page.tsx` - Campaign list dashboard (new page)
 - `app/(dashboard)/campaign/[id]/applicants/page.tsx` - Applicant list view (new page)
 
@@ -75,12 +75,12 @@
 - [ ] 2.0 Campaign Creation & Management (Brand Side)
   - [✓] 2.1 Create `lib/validations/campaign.ts` with Zod schemas: `createCampaignSchema`, `updateCampaignSchema`, `publishCampaignSchema`
   - [✓] 2.2 Create `types/campaign.ts` with TypeScript interfaces for Campaign, CampaignInfluencer, and form data types
-  - [ ] 2.3 Update `app/(dashboard)/campaign/new/page.tsx` to add missing form fields (title, description, budget, currency, duration) above or below existing fields
-  - [ ] 2.4 Add form state management in campaign creation page using React useState or react-hook-form
+  - [✓] 2.3 Update `app/(dashboard)/campaign/new/page.tsx` to add missing form fields (title, description, budget, currency, duration) above or below existing fields
+  - [✓] 2.4 Add form state management in campaign creation page using React useState or react-hook-form
   - [✓] 2.5 Create `app/api/campaigns/route.ts` with POST handler to create draft campaign (validate with Zod, check user has Store, save to DB)
   - [✓] 2.6 Create `app/api/campaigns/route.ts` with GET handler to list campaigns for authenticated brand (filter by brandId from session)
-  - [ ] 2.7 Wire up "Continue" button in campaign form to call POST /api/campaigns and show success/error feedback
-  - [ ] 2.8 Add client-side validation before form submission (required fields, at least one platform/target selected)
+  - [✓] 2.7 Wire up "Continue" button in campaign form to call POST /api/campaigns and show success/error feedback
+  - [✓] 2.8 Add client-side validation before form submission (required fields, at least one platform/target selected)
   - [ ] 2.9 Create `app/(dashboard)/campaign/page.tsx` as campaign dashboard listing all brand's campaigns in a table/grid
   - [ ] 2.10 Display campaign cards/rows with title, status badge, budget, applicant count, created date, and action buttons
   - [✓] 2.11 Create `app/api/campaigns/[id]/route.ts` with GET handler for campaign details
