@@ -3,6 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Plus, Eye, Edit, Trash2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -37,6 +47,9 @@ const CampaignDashboard = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<CampaignStatus | "ALL">("ALL");
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [campaignToPublish, setCampaignToPublish] = useState<Campaign | null>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
     fetchCampaigns();
@@ -77,6 +90,49 @@ const CampaignDashboard = () => {
 
   const handleEditCampaign = (campaignId: string) => {
     router.push(`/campaign/new?id=${campaignId}`);
+  };
+
+  const handlePublishClick = (campaign: Campaign) => {
+    setCampaignToPublish(campaign);
+    setPublishDialogOpen(true);
+  };
+
+  const handlePublishConfirm = async () => {
+    if (!campaignToPublish) return;
+
+    setIsPublishing(true);
+    try {
+      const response = await fetch(`/api/campaigns/${campaignToPublish.id}/publish`, {
+        method: "POST",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to publish campaign");
+      }
+
+      toast.success("Campaign published!", {
+        description: "Your campaign is now live and visible to influencers.",
+      });
+
+      // Update the campaign in the local state
+      setCampaigns((prev) =>
+        prev.map((c) =>
+          c.id === campaignToPublish.id ? { ...c, status: "PUBLISHED" } : c
+        )
+      );
+
+      setPublishDialogOpen(false);
+      setCampaignToPublish(null);
+    } catch (error) {
+      console.error("Error publishing campaign:", error);
+      toast.error("Failed to publish campaign", {
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   const formatCurrency = (amount: number, currency: string) => {
@@ -289,10 +345,7 @@ const CampaignDashboard = () => {
                     {campaign.status === "DRAFT" && (
                       <Button
                         size="sm"
-                        onClick={() => {
-                          // TODO: Implement publish functionality
-                          toast.info("Publish feature coming soon");
-                        }}
+                        onClick={() => handlePublishClick(campaign)}
                         className="bg-green-500 hover:bg-green-600 text-white"
                       >
                         <Upload className="h-4 w-4 mr-1" />
@@ -306,6 +359,32 @@ const CampaignDashboard = () => {
           ))}
         </div>
       )}
+
+      {/* Publish Confirmation Dialog */}
+      <AlertDialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Publish Campaign?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to publish &quot;{campaignToPublish?.title}&quot;? 
+              Once published, this campaign will be visible to all approved influencers 
+              and they can start applying.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPublishing}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handlePublishConfirm}
+              disabled={isPublishing}
+              className="bg-green-500 hover:bg-green-600"
+            >
+              {isPublishing ? "Publishing..." : "Publish Campaign"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

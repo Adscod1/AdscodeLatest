@@ -86,7 +86,7 @@
   - [✓] 2.11 Create `app/api/campaigns/[id]/route.ts` with GET handler for campaign details
   - [✓] 2.12 Create `app/api/campaigns/[id]/route.ts` with PATCH handler to update draft campaigns
   - [✓] 2.13 Create `app/api/campaigns/[id]/publish/route.ts` with POST handler to validate and change status to PUBLISHED
-  - [ ] 2.14 Add "Publish" button to campaign dashboard with confirmation dialog before publishing
+  - [✓] 2.14 Add "Publish" button to campaign dashboard with confirmation dialog before publishing
   - [ ] 2.15 Add "Edit" button for draft campaigns that redirects to campaign creation form with pre-filled data
   - [ ] 2.16 Create `actions/campaign.ts` with server actions: `createCampaign`, `updateCampaign`, `publishCampaign`, `getCampaigns` (optional alternative to API routes)
 
