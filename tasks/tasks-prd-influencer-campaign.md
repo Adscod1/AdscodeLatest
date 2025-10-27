@@ -58,19 +58,19 @@
 
 ## Tasks
 
-- [ ] 1.0 Database Schema & Models Setup
-  - [ ] 1.1 Add Campaign model to `prisma/schema.prisma` with all fields (id, brandId, title, description, budget, currency, duration, influencerLocation, platforms, targets, status, timestamps)
-  - [ ] 1.2 Add CampaignStatus enum to schema (DRAFT, PUBLISHED, ACTIVE, PAUSED, COMPLETED, CANCELLED)
-  - [ ] 1.3 Add CampaignInfluencer model to schema with fields (id, campaignId, influencerId, applicationStatus, appliedAt, selectedAt, timestamps)
-  - [ ] 1.4 Add CampaignApplicationStatus enum to schema (APPLIED, SELECTED, NOT_SELECTED, WITHDRAWN)
-  - [ ] 1.5 Add Notification model to schema with fields (id, userId, type, message, link, read, createdAt)
-  - [ ] 1.6 Add NotificationType enum to schema (CAMPAIGN_SELECTION, APPLICATION_UPDATE, SYSTEM)
-  - [ ] 1.7 Update Store model to add `campaigns Campaign[]` relation
-  - [ ] 1.8 Update Influencer model to add `campaignApplications CampaignInfluencer[]` relation
-  - [ ] 1.9 Update User model to add `notifications Notification[]` relation
-  - [ ] 1.10 Run `npx prisma migrate dev --name add_campaign_system` to create and apply migration
-  - [ ] 1.11 Run `npx prisma generate` to update Prisma client types
-  - [ ] 1.12 Verify migration success by checking database tables in MySQL
+- [✓] 1.0 Database Schema & Models Setup
+  - [✓] 1.1 Add Campaign model to `prisma/schema.prisma` with all fields (id, brandId, title, description, budget, currency, duration, influencerLocation, platforms, targets, status, timestamps)
+  - [✓] 1.2 Add CampaignStatus enum to schema (DRAFT, PUBLISHED, ACTIVE, PAUSED, COMPLETED, CANCELLED)
+  - [✓] 1.3 Add CampaignInfluencer model to schema with fields (id, campaignId, influencerId, applicationStatus, appliedAt, selectedAt, timestamps)
+  - [✓] 1.4 Add CampaignApplicationStatus enum to schema (APPLIED, SELECTED, NOT_SELECTED, WITHDRAWN)
+  - [✓] 1.5 Add Notification model to schema with fields (id, userId, type, message, link, read, createdAt)
+  - [✓] 1.6 Add NotificationType enum to schema (CAMPAIGN_SELECTION, APPLICATION_UPDATE, SYSTEM)
+  - [✓] 1.7 Update Store model to add `campaigns Campaign[]` relation
+  - [✓] 1.8 Update Influencer model to add `campaignApplications CampaignInfluencer[]` relation
+  - [✓] 1.9 Update User model to add `notifications Notification[]` relation
+  - [✓] 1.10 Run `npx prisma migrate dev --name add_campaign_system` to create and apply migration
+  - [✓] 1.11 Run `npx prisma generate` to update Prisma client types
+  - [✓] 1.12 Verify migration success by checking database tables in MySQL
 
 - [ ] 2.0 Campaign Creation & Management (Brand Side)
   - [ ] 2.1 Create `lib/validations/campaign.ts` with Zod schemas: `createCampaignSchema`, `updateCampaignSchema`, `publishCampaignSchema`
