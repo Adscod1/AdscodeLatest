@@ -34,6 +34,8 @@ interface CallToAction {
 interface CampaignData {
   title: string;
   category: string;
+  campaignType: string;
+  contentType: string;
   description: string;
   budget: string;
   currency: string;
@@ -61,6 +63,8 @@ const InfluencerCampaignManager = () => {
   const [campaignData, setCampaignData] = useState<CampaignData>({
     title: '',
     category: '',
+    campaignType: '',
+    contentType: '',
     description: '',
     budget: '',
     currency: 'USD ($)',
@@ -97,7 +101,8 @@ const InfluencerCampaignManager = () => {
       const savedData = localStorage.getItem(key) || localStorage.getItem(legacyKey);
       if (savedData) {
         const parsed = JSON.parse(savedData);
-        setCampaignData(parsed.campaignData ?? parsed);
+        // Merge onto defaults so newly added fields retain defaults
+        setCampaignData(prev => ({ ...prev, ...(parsed.campaignData ?? parsed) }));
         setCurrentStep(parsed.currentStep || 0);
         // Migrate legacy key to scoped key
         if (!localStorage.getItem(key)) {
@@ -144,6 +149,7 @@ const InfluencerCampaignManager = () => {
   const deliverableTypes = ['Instagram Post', 'Instagram Story', 'Instagram Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
   const cattype = ['Product campaign', 'Coupon Campaign', 'Video Campaign'];
+  const contentTypes = ['Post', 'Story', 'Reel', 'Short Video', 'Long Video', 'Blog Post'];
 
   const handleInputChange = (field: keyof CampaignData, value: string | number) => {
     setCampaignData(prev => ({ ...prev, [field]: value }));
@@ -270,6 +276,8 @@ const InfluencerCampaignManager = () => {
       setCampaignData({
         title: '',
         category: '',
+        campaignType: '',
+        contentType: '',
         description: '',
         budget: '',
         currency: 'USD ($)',
@@ -347,13 +355,13 @@ const InfluencerCampaignManager = () => {
               Campaign Type <span className="text-red-500">*</span>
             </label>
             <select
-              value={campaignData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              value={campaignData.campaignType}
+              onChange={(e) => handleInputChange('campaignType', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select campaign type</option>
-              {cattype.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {cattype.map(type => (
+                <option key={type} value={type}>{type}</option>
               ))}
             </select>
           </div>
@@ -364,13 +372,13 @@ const InfluencerCampaignManager = () => {
                Type <span className="text-red-500">*</span>
             </label>
             <select
-              value={campaignData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              value={campaignData.contentType}
+              onChange={(e) => handleInputChange('contentType', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select a content type</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {contentTypes.map(ct => (
+                <option key={ct} value={ct}>{ct}</option>
               ))}
             </select>
           </div>
