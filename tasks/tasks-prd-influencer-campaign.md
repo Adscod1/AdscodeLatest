@@ -15,8 +15,8 @@
 - `app/api/campaigns/route.ts` - ✓ Created - POST (create draft campaign), GET (list brand's campaigns with filters)
 - `app/api/campaigns/[id]/route.ts` - ✓ Created - GET (campaign details), PATCH (update draft campaign)
 - `app/api/campaigns/[id]/publish/route.ts` - ✓ Created - POST (publish campaign with validation)
-- `app/api/campaigns/[id]/applicants/route.ts` - GET (list applicants for campaign)
-- `app/api/campaigns/[id]/applicants/[influencerId]/select/route.ts` - POST (select influencer)
+- `app/api/campaigns/[id]/applicants/route.ts` - ✓ Created - GET (list applicants with influencer details and social stats)
+- `app/api/campaigns/[id]/applicants/[influencerId]/select/route.ts` - ✓ Created - POST (select influencer, update status, create notification)
 
 ### API Routes (Influencer)
 - `app/api/campaigns/available/route.ts` - ✓ Created - GET (list published campaigns excluding already applied)
@@ -33,8 +33,8 @@
 
 ### UI Components (Brand)
 - `app/(dashboard)/campaign/new/page.tsx` - ✓ Updated - Campaign creation form with title, description, budget, currency, duration, location, platforms, and targets
-- `app/(dashboard)/campaign/page.tsx` - ✓ Created - Campaign list dashboard with stats, filters, and campaign cards
-- `app/(dashboard)/campaign/[id]/applicants/page.tsx` - Applicant list view (new page)
+- `app/(dashboard)/campaign/page.tsx` - ✓ Created - Campaign list dashboard with stats, filters, campaign cards, View Applicants button, and applicant count badges
+- `app/(dashboard)/campaign/[id]/applicants/page.tsx` - ✓ Created - Applicant list view with influencer details, social stats, Select button, confirmation dialog, and optimistic updates
 
 ### UI Components (Influencer)
 - `app/influencer/campaigns/page.tsx` - Server component wrapper (existing, no changes)
@@ -112,19 +112,21 @@
 - [✓] 3.0 Campaign Discovery & Application (Influencer Side)
 
 - [ ] 4.0 Applicant Review & Selection (Brand Side)
-  - [ ] 4.1 Create `app/(dashboard)/campaign/[id]/applicants/page.tsx` for viewing campaign applicants
-  - [ ] 4.2 Create `app/api/campaigns/[id]/applicants/route.ts` with GET handler to fetch applicants (join CampaignInfluencer with Influencer and InfluencerSocial)
-  - [ ] 4.3 Display applicant list with influencer name, profile picture, primary niche, application date, follower counts from social platforms
-  - [ ] 4.4 Add "View Applicants" button on campaign dashboard that links to applicants page
-  - [ ] 4.5 Show applicant count badge next to campaign title (e.g., "5 applicants")
-  - [ ] 4.6 Create `app/api/campaigns/[id]/applicants/[influencerId]/select/route.ts` with POST handler to select influencer
-  - [ ] 4.7 In select endpoint: update CampaignInfluencer.applicationStatus to SELECTED and set selectedAt timestamp
-  - [ ] 4.8 Optionally mark other applicants as NOT_SELECTED when one is selected
-  - [ ] 4.9 Add "Select" button next to each applicant (only show if not already selected)
-  - [ ] 4.10 Show confirmation dialog before selecting influencer ("Are you sure you want to select [Name]?")
-  - [ ] 4.11 Update UI to show "Selected" badge after selection without page refresh
-  - [ ] 4.12 Add loading state on "Select" button while processing request
-  - [ ] 4.13 Link influencer name to their profile page for detailed view (if profile page exists)
+  - [✓] 4.1 Create `app/(dashboard)/campaign/[id]/applicants/page.tsx` for viewing campaign applicants
+  - [✓] 4.2 Create `app/api/campaigns/[id]/applicants/route.ts` with GET handler to fetch applicants (join CampaignInfluencer with Influencer and InfluencerSocial)
+  - [✓] 4.3 Display applicant list with influencer name, profile picture, primary niche, application date, follower counts from social platforms
+  - [✓] 4.4 Add "View Applicants" button on campaign dashboard that links to applicants page
+  - [✓] 4.5 Show applicant count badge next to campaign title (e.g., "5 applicants")
+  - [✓] 4.6 Create `app/api/campaigns/[id]/applicants/[influencerId]/select/route.ts` with POST handler to select influencer
+  - [✓] 4.7 In select endpoint: update CampaignInfluencer.applicationStatus to SELECTED and set selectedAt timestamp
+  - [✓] 4.8 Optionally mark other applicants as NOT_SELECTED when one is selected (SKIPPED: Keeping other applicants as APPLIED)
+  - [✓] 4.9 Add "Select" button next to each applicant (only show if not already selected)
+  - [✓] 4.10 Show confirmation dialog before selecting influencer ("Are you sure you want to select [Name]?")
+  - [✓] 4.11 Update UI to show "Selected" badge after selection without page refresh
+  - [✓] 4.12 Add loading state on "Select" button while processing request
+  - [ ] 4.13 Link influencer name to their profile page for detailed view (if profile page exists - OPTIONAL)
+
+- [✓] 4.0 Applicant Review & Selection (Brand Side)
 
 - [ ] 5.0 Notification System Implementation
   - [ ] 5.1 Create `lib/utils/notification-helpers.ts` with helper function `createNotification(userId, type, message, link)`
