@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -33,6 +33,7 @@ interface CallToAction {
 interface CampaignData {
   title: string;
   category: string;
+  campaignType: string;
   description: string;
   budget: string;
   currency: string;
@@ -57,9 +58,11 @@ const InfluencerCampaignManager = () => {
   const storeId = params.storeId as string;
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [showCampaignTypeModal, setShowCampaignTypeModal] = useState(false);
   const [campaignData, setCampaignData] = useState<CampaignData>({
     title: '',
     category: '',
+    campaignType: '',
     description: '',
     budget: '',
     currency: 'USD ($)',
@@ -98,10 +101,15 @@ const InfluencerCampaignManager = () => {
   const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Snapchat', 'Twitch', 'Pinterest', 'Facebook'];
   const deliverableTypes = ['Post', 'Story', 'Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
-  const cattype = ['Product campaign', 'Coupon Campaign', 'Video Campaign'];
+  const campaignTypes = ['Product Campaign', 'Coupon Campaign', 'Video Campaign', 'Profile Campaign'];
 
   const handleInputChange = (field: keyof CampaignData, value: string | number) => {
     setCampaignData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCampaignTypeSelect = (type: string) => {
+    setCampaignData(prev => ({ ...prev, campaignType: type }));
+    setShowCampaignTypeModal(true);
   };
 
   const handleTargetChange = (index: number, field: keyof Target, value: string) => {
@@ -212,6 +220,195 @@ const InfluencerCampaignManager = () => {
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
+  // Campaign Type Modal Component
+  const CampaignTypeModal = () => {
+    if (!showCampaignTypeModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-900">{campaignData.campaignType} Setup</h2>
+            <button 
+              onClick={() => setShowCampaignTypeModal(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="p-4 sm:p-6">
+            {campaignData.campaignType === 'Video Campaign' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Video Campaign Setup</h3>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Upload Video
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
+                    <input type="file" accept="video/*" className="hidden" id="video-upload" />
+                    <label htmlFor="video-upload" className="cursor-pointer">
+                      <div className="text-gray-400 mb-2">
+                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">Choose file</p>
+                      <p className="text-xs text-gray-500 mt-1">No file chosen</p>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Video Caption or Campaign Brief
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Add a video caption or campaign brief..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* <button 
+                  onClick={() => setShowCampaignTypeModal(false)}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Save Video Campaign
+                </button> */}
+              </div>
+            )}
+
+            {campaignData.campaignType === 'Product Campaign' && (
+              <div className="space-y-4">
+                
+
+                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                  Browse Shop
+                </button>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Product Link
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search or paste product link..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* <button 
+                  onClick={() => setShowCampaignTypeModal(false)}
+                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  Save Product Campaign
+                </button> */}
+              </div>
+            )}
+
+            {campaignData.campaignType === 'Profile Campaign' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Profile Campaign Setup</h3>
+                </div>
+
+                <div>
+                 
+                  <input
+                    type="url"
+                    placeholder="Enter profile URL"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Campaign Goals
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Describe your goals for this promotion..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* <button 
+                  onClick={() => setShowCampaignTypeModal(false)}
+                  className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                >
+                  Save Profile Campaign
+                </button> */}
+              </div>
+            )}
+
+            {campaignData.campaignType === 'Coupon Campaign' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                      <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Coupon Campaign Setup</h3>
+                </div>
+
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                  </svg>
+                  <h4 className="text-sm font-semibold text-gray-700">Select from Coupon Database</h4>
+                </div>
+
+                <div>
+                 
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Select an existing coupon</option>
+                    <option value="summer20">SUMMER20 - 20% Off Summer Collection</option>
+                    <option value="first10">FIRST10 - $10 Off First Order</option>
+                    <option value="freeship">FREESHIP - Free Shipping</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Application Instructions
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Describe how this coupon should be applied (influencers/customers/both)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* <button 
+                  onClick={() => setShowCampaignTypeModal(false)}
+                  className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition-colors font-medium"
+                >
+                  Save Coupon Campaign
+                </button> */}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderBasicInfo = () => (
     <div className="space-y-6 sm:space-y-8">
       <div>
@@ -249,33 +446,30 @@ const InfluencerCampaignManager = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          
-          
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Campaign Type <span className="text-red-500">*</span>
             </label>
             <select
-              value={campaignData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              value={campaignData.campaignType}
+              onChange={(e) => handleCampaignTypeSelect(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select campaign type</option>
-              {cattype.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {campaignTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
               ))}
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select content
-               Type <span className="text-red-500">*</span>
+              Select Content Type <span className="text-red-500">*</span>
             </label>
             <select
-              value={campaignData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              value={campaignData.contentStyle}
+              onChange={(e) => handleInputChange('contentStyle', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select a content type</option>
@@ -965,7 +1159,6 @@ const InfluencerCampaignManager = () => {
               </div>
             </div>
           ))}
-          {/* Default metrics if none provided */}
           {campaignData.targets.filter(t => t.metric && t.value).length === 0 && (
             <>
               <div className="bg-white p-4 rounded-lg">
@@ -986,26 +1179,6 @@ const InfluencerCampaignManager = () => {
                     <div className="bg-blue-500 h-2 rounded-full" style={{width: '76%'}}></div>
                   </div>
                   <div className="text-xs text-gray-500 mt-1">76.4% achieved</div>
-                </div>
-              </div>
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900">Website Clicks</h4>
-                <div className="mt-2">
-                  <div className="text-sm text-gray-600">650 / 1000 clicks</div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '65%'}}></div>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">65.0% achieved</div>
-                </div>
-              </div>
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900">Conversions</h4>
-                <div className="mt-2">
-                  <div className="text-sm text-gray-600">28 / 50 sales</div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '56%'}}></div>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">56.0% achieved</div>
                 </div>
               </div>
             </>
@@ -1099,154 +1272,6 @@ const InfluencerCampaignManager = () => {
           </div>
         </div>
       </div>
-
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6">
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Contract Templates</h3>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-white border-2 border-blue-500 rounded-lg p-4">
-            <h4 className="font-medium text-gray-900 mb-2">Standard Influencer Agreement</h4>
-            <p className="text-sm text-gray-600 mb-3">Basic agreement for Instagram collaborations</p>
-            <ul className="space-y-1 text-xs text-gray-500">
-              <li>• Content usage rights</li>
-              <li>• Payment terms</li>
-              <li>• Deliverable timeline</li>
-              <li>• FTC compliance</li>
-            </ul>
-          </div>
-          
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <h4 className="font-medium text-gray-900 mb-2">Exclusive Partnership Contract</h4>
-            <p className="text-sm text-gray-600 mb-3">Long-term exclusive brand partnership</p>
-            <ul className="space-y-1 text-xs text-gray-500">
-              <li>• Exclusivity clause</li>
-              <li>• Performance bonuses</li>
-              <li>• Multi-platform rights</li>
-              <li>• Extended timeline</li>
-            </ul>
-          </div>
-          
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <h4 className="font-medium text-gray-900 mb-2">User-Generated Content License</h4>
-            <p className="text-sm text-gray-600 mb-3">Content creation and usage rights agreement</p>
-            <ul className="space-y-1 text-xs text-gray-500">
-              <li>• Perpetual usage rights</li>
-              <li>• Commercial licensing</li>
-              <li>• Content modifications</li>
-              <li>• Attribution requirements</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div className="flex gap-3 mt-6">
-          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            Preview Contract
-          </button>
-          <button className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
-            Generate Contract
-          </button>
-        </div>
-      </div>
-
-      {/* Campaign Listings Preview */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">How Your Campaign Will Appear</h3>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <div className="h-32 bg-gradient-to-r from-orange-100 to-pink-100 relative">
-              <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center">
-                <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <div className="w-8 h-8 bg-white rounded-full"></div>
-                </div>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-semibold text-gray-900">{campaignData.title || 'Summer Fashion Collection'}</h4>
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Active</span>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">StyleCo • {campaignData.category || 'Fashion & Beauty'}</p>
-              <p className="text-sm text-gray-700 mb-4">
-                {campaignData.description || 'Looking for fashion influencers to showcase our new summer collection. Perfect for style-conscious influencers who love trendy, sustainable fashion.'}
-              </p>
-              
-              <div className="space-y-2 text-xs text-gray-600">
-                <div className="flex items-center justify-between">
-                  <span>Budget Range</span>
-                  <span>${campaignData.budget ? `${campaignData.budget.split('-')[0]} - ${campaignData.budget}` : '$2,000 - $5,000'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Location</span>
-                  <span>{campaignData.location || 'United States'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Campaign Duration</span>
-                  <span>{campaignData.startDate && campaignData.endDate ? `${campaignData.startDate} - ${campaignData.endDate}` : '01/06/2024 - 31/07/2024'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Application Deadline</span>
-                  <span>15/07/2024</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Current Applicants</span>
-                  <span>23</span>
-                </div>
-              </div>
-              
-              <button className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Apply Now
-              </button>
-            </div>
-          </div>
-          
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <div className="h-32 bg-gradient-to-r from-blue-100 to-purple-100 relative">
-              <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center">
-                <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <div className="w-8 h-8 bg-white rounded-full"></div>
-                </div>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-semibold text-gray-900">Fitness App Beta Launch</h4>
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Health & Fitness</span>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">FitTech Pro</p>
-              <p className="text-sm text-gray-700 mb-4">Seeking fitness enthusiasts to promote our new workout app. Great for trainers, athletes, and fitness content creators.</p>
-              
-              <div className="space-y-2 text-xs text-gray-600">
-                <div className="flex items-center justify-between">
-                  <span>Budget Range</span>
-                  <span>$2,000 - $8,000</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Location</span>
-                  <span>Remote</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Campaign Duration</span>
-                  <span>20/07/2024</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Followers</span>
-                  <span>10K - 100K</span>
-                </div>
-              </div>
-              
-              <div className="flex gap-2 mt-3">
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Instagram</span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">YouTube</span>
-              </div>
-              
-              <button className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                View Details & Apply
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
@@ -1264,6 +1289,8 @@ const InfluencerCampaignManager = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <CampaignTypeModal />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header */}
         <div className="flex items-center mb-6 sm:mb-8">
