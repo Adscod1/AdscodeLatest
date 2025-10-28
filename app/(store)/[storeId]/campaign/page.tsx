@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { usePathname, useParams } from 'next/navigation';
 import { 
   Search, 
@@ -22,19 +22,39 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-interface Campaign {
+// API campaign shape (subset)
+interface ApiCampaign {
   id: string;
-  name: string;
-  type: string;
-  target: string;
+  brandId: string;
+  title: string;
+  description?: string | null;
   budget: number;
-  impressions: number;
-  clicks: number;
-  conversions: number;
-  ctr: string;
-  cr: string;
-  duration: string;
-  status: 'Active' | 'Completed' | 'Paused';
+  currency: string;
+  duration: number | null;
+  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+  targets?: any;
+  platforms?: any;
+  createdAt: string;
+  updatedAt: string;
+  _count?: { applicants: number };
+  brand?: { id: string; name: string; logo?: string | null };
+}
+
+// UI campaign row (normalized for display)
+interface UICampaignRow {
+  id: string;
+  title: string;
+  type?: string;
+  target?: string;
+  budget: number;
+  currency: string;
+  impressions?: number | null;
+  clicks?: number | null;
+  conversions?: number | null;
+  ctr?: string | null;
+  cr?: string | null;
+  durationLabel: string;
+  status: string;
 }
 
 const MarketingCampaigns: React.FC = () => {
@@ -44,65 +64,101 @@ const MarketingCampaigns: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [typeFilter, setTypeFilter] = useState('All Types');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [apiCampaigns, setApiCampaigns] = useState<ApiCampaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [noStore, setNoStore] = useState(false);
 
-  const campaigns: Campaign[] = [
-    {
-      id: '1',
-      name: 'Summer Sneaker Sale',
-      type: 'Email',
-      target: 'Sports Enthusiasts',
-      budget: 5000,
-      impressions: 125000,
-      clicks: 3500,
-      conversions: 285,
-      ctr: '2.80%',
-      cr: '8.14%',
-      duration: '2024-01-01 - 2024-01-31',
-      status: 'Active'
-    },
-    {
-      id: '2',
-      name: 'Nike Air Max Promotion',
-      type: 'Social',
-      target: 'Young Adults 18-35',
-      budget: 8000,
-      impressions: 180000,
-      clicks: 5200,
-      conversions: 420,
-      ctr: '2.89%',
-      cr: '8.08%',
-      duration: '2024-01-05 - 2024-02-05',
-      status: 'Active'
-    },
-    {
-      id: '3',
-      name: 'Holiday Collection Launch',
-      type: 'Search',
-      target: 'Fashion Conscious',
-      budget: 3000,
-      impressions: 95000,
-      clicks: 2100,
-      conversions: 145,
-      ctr: '2.21%',
-      cr: '6.90%',
-      duration: '2023-12-01 - 2023-12-31',
-      status: 'Completed'
-    },
-    {
-      id: '4',
-      name: 'Retargeting Campaign',
-      type: 'Display',
-      target: 'Previous Visitors',
-      budget: 2500,
-      impressions: 65000,
-      clicks: 1800,
-      conversions: 95,
-      ctr: '2.77%',
-      cr: '5.28%',
-      duration: '2024-01-10 - 2024-01-25',
-      status: 'Paused'
+  // Fetch real campaigns for the authenticated brand
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch('/api/campaigns', { cache: 'no-store' });
+        if (!res.ok) {
+          // Handle missing store with a friendlier UI
+          if (res.status === 404) {
+            try {
+              const j = await res.json();
+              if (j?.error && String(j.error).toLowerCase().includes('store not found')) {
+                if (active) {
+                  setNoStore(true);
+                  setApiCampaigns([]);
+                  setError(null);
+                }
+                return;
+              }
+            } catch {}
+          }
+          const txt = await res.text();
+          throw new Error(`Failed to fetch campaigns (${res.status}): ${txt}`);
+        }
+        const data = await res.json();
+        const campaigns: ApiCampaign[] = data?.campaigns ?? data?.data ?? [];
+        if (active) setApiCampaigns(Array.isArray(campaigns) ? campaigns : []);
+      } catch (e: any) {
+        console.error('Error loading campaigns:', e);
+        if (active) setError(e?.message || 'Failed to load campaigns');
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => { active = false };
+  }, []);
+
+  // Normalize API data into UI rows and filter by current store when possible
+  const campaigns: UICampaignRow[] = useMemo(() => {
+    const rows = apiCampaigns.map((c) => {
+      // Try to derive impressions from targets (Reach) if present
+      let impressions: number | null = null;
+      try {
+        const t = Array.isArray(c.targets) ? c.targets : [];
+        const reach = t.find((x: any) => (x?.metric || '').toLowerCase() === 'reach');
+        if (reach && reach.value) {
+          const n = parseInt(String(reach.value).replace(/[^0-9]/g, ''));
+          if (!isNaN(n)) impressions = n;
+        }
+      } catch {}
+
+      const durationLabel = c.duration != null ? `${c.duration} days` : '-';
+      // Map statuses to labels used in UI (keep API ones too)
+      const statusMap: Record<string, string> = {
+        PUBLISHED: 'Active',
+        ACTIVE: 'Active',
+        COMPLETED: 'Completed',
+        PAUSED: 'Paused',
+        CANCELLED: 'Cancelled',
+        DRAFT: 'Draft',
+      };
+      const status = statusMap[c.status] || c.status;
+
+      return {
+        id: c.id,
+        title: c.title,
+        type: (Array.isArray(c.platforms) && c.platforms[0]) || 'Campaign',
+        target: undefined,
+        budget: c.budget,
+        currency: c.currency,
+        impressions,
+        clicks: null,
+        conversions: (c as any).conversions ?? null,
+        ctr: null,
+        cr: null,
+        durationLabel,
+        status,
+      } as UICampaignRow;
+    });
+
+    // Filter by current store if any row matches; otherwise show all
+    const forStore = apiCampaigns.filter(c => c.brandId === storeId);
+    if (forStore.length > 0) {
+      const setIds = new Set(forStore.map(c => c.id));
+      return rows.filter(r => setIds.has(r.id));
     }
-  ];
+    return rows;
+  }, [apiCampaigns, storeId]);
 
   const stats = {
     totalBudget: 18500,
@@ -134,17 +190,26 @@ const MarketingCampaigns: React.FC = () => {
         return 'bg-blue-100 text-blue-800';
       case 'Paused':
         return 'bg-yellow-100 text-yellow-800';
+      case 'Cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'Draft':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0
-    }).format(amount);
+  const formatCurrency = (amount: number, currency?: string) => {
+    const code = (currency || 'USD').split(' ')[0].replace(/[^A-Z]/g, '') || 'USD';
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: code as any,
+        minimumFractionDigits: 0,
+      }).format(amount);
+    } catch {
+      return `${currency || 'USD'} ${formatNumber(amount)}`;
+    }
   };
 
   const formatNumber = (num: number) => {
@@ -164,11 +229,38 @@ const MarketingCampaigns: React.FC = () => {
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Marketing Campaigns</h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">Create and manage your marketing campaigns</p>
           </div>
-          <Link href={`/${storeId}/createCampaign`} className="bg-black text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-800 w-full sm:w-auto">
-            <Plus className="w-4 h-4" />
-            <span className="whitespace-nowrap">Create Campaign</span>
-          </Link>
+          {noStore ? (
+            <Link href="/new" className="bg-black text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-800 w-full sm:w-auto">
+              <Plus className="w-4 h-4" />
+              <span className="whitespace-nowrap">Create Store</span>
+            </Link>
+          ) : (
+            <Link href={`/${storeId}/createCampaign`} className="bg-black text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-800 w-full sm:w-auto">
+              <Plus className="w-4 h-4" />
+              <span className="whitespace-nowrap">Create Campaign</span>
+            </Link>
+          )}
         </div>
+
+        {noStore && (
+          <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-10 mb-6">
+            <div className="max-w-3xl mx-auto text-center">
+              <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+                <StoreIcon />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">You don’t have a store yet</h2>
+              <p className="mt-2 text-sm sm:text-base text-gray-600">Create your store to start publishing campaigns, tracking performance, and collaborating with creators.</p>
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link href="/new" className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800 w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" /> Create Store
+                </Link>
+                <Link href="/" className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto">
+                  Learn more
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
@@ -209,8 +301,8 @@ const MarketingCampaigns: React.FC = () => {
           </div>
         </div>
 
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+  {/* Dashboard Cards */}
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Campaign Performance */}
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
             <h3 className="text-base sm:text-lg font-semibold mb-4">Campaign Performance</h3>
@@ -262,6 +354,9 @@ const MarketingCampaigns: React.FC = () => {
 
         {/* Filters */}
         <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          {error && (
+            <div className="mb-4 text-sm text-red-600">{error}</div>
+          )}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
             <div className="relative w-full lg:w-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -314,33 +409,41 @@ const MarketingCampaigns: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {campaigns.map((campaign) => (
+                {loading ? (
+                  <tr className="border-b border-gray-100">
+                    <td className="py-6 px-4 text-sm text-gray-500" colSpan={8}>Loading campaigns…</td>
+                  </tr>
+                ) : campaigns.length === 0 ? (
+                  <tr className="border-b border-gray-100">
+                    <td className="py-6 px-4 text-sm text-gray-500" colSpan={8}>No campaigns found.</td>
+                  </tr>
+                ) : campaigns.map((campaign) => (
                   <tr key={campaign.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-4 px-4">
                       <div>
-                        <div className="font-medium">{campaign.name}</div>
-                        <div className="text-sm text-gray-500">{campaign.type} • Target: {campaign.target}</div>
+                        <div className="font-medium">{campaign.title}</div>
+                        <div className="text-sm text-gray-500">{campaign.type || 'Campaign'}</div>
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold">{formatCurrency(campaign.budget)}</div>
+                      <div className="font-semibold">{formatCurrency(campaign.budget, campaign.currency)}</div>
                       <div className="w-20 h-2 bg-gray-200 rounded-full mt-1">
                         <div className="h-2 bg-blue-500 rounded-full" style={{ width: '75%' }}></div>
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold">{formatNumber(campaign.impressions)}</div>
+                      <div className="font-semibold">{campaign.impressions != null ? formatNumber(campaign.impressions) : '-'}</div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold">{formatNumber(campaign.clicks)}</div>
-                      <div className="text-sm text-gray-500">{campaign.ctr} CTR</div>
+                      <div className="font-semibold">{campaign.clicks != null ? formatNumber(campaign.clicks) : '-'}</div>
+                      <div className="text-sm text-gray-500">{campaign.ctr ?? '-'}{campaign.ctr ? ' CTR' : ''}</div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold">{campaign.conversions}</div>
-                      <div className="text-sm text-gray-500">{campaign.cr} CR</div>
+                      <div className="font-semibold">{campaign.conversions != null ? campaign.conversions : '-'}</div>
+                      <div className="text-sm text-gray-500">{campaign.cr ?? '-'}</div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="text-sm">{campaign.duration}</div>
+                      <div className="text-sm">{campaign.durationLabel}</div>
                     </td>
                     <td className="py-4 px-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
@@ -416,12 +519,16 @@ const MarketingCampaigns: React.FC = () => {
 
           {/* Campaigns Cards - Mobile */}
           <div className="lg:hidden space-y-4">
-            {campaigns.map((campaign) => (
+            {loading ? (
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm text-gray-500">Loading campaigns…</div>
+            ) : campaigns.length === 0 ? (
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm text-gray-500">No campaigns found.</div>
+            ) : campaigns.map((campaign) => (
               <div key={campaign.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                 <div className="flex items-start justify-between mb-3">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-medium text-sm sm:text-base text-gray-900 truncate">{campaign.name}</h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">{campaign.type} • {campaign.target}</p>
+                    <h3 className="font-medium text-sm sm:text-base text-gray-900 truncate">{campaign.title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">{campaign.type || 'Campaign'}</p>
                   </div>
                   <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
@@ -492,33 +599,33 @@ const MarketingCampaigns: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
                   <div>
                     <p className="text-xs text-gray-500">Budget</p>
-                    <p className="font-semibold text-sm">{formatCurrency(campaign.budget)}</p>
+                    <p className="font-semibold text-sm">{formatCurrency(campaign.budget, campaign.currency)}</p>
                     <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1">
                       <div className="h-1.5 bg-blue-500 rounded-full" style={{ width: '75%' }}></div>
                     </div>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Conversions</p>
-                    <p className="font-semibold text-sm">{campaign.conversions}</p>
-                    <p className="text-xs text-gray-500">{campaign.cr} CR</p>
+                    <p className="font-semibold text-sm">{campaign.conversions != null ? campaign.conversions : '-'}</p>
+                    <p className="text-xs text-gray-500">{campaign.cr ?? '-'}</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
                   <div>
                     <p className="text-xs text-gray-500">Impressions</p>
-                    <p className="font-semibold text-sm">{formatNumber(campaign.impressions)}</p>
+                    <p className="font-semibold text-sm">{campaign.impressions != null ? formatNumber(campaign.impressions) : '-'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Clicks</p>
-                    <p className="font-semibold text-sm">{formatNumber(campaign.clicks)}</p>
-                    <p className="text-xs text-gray-500">{campaign.ctr} CTR</p>
+                    <p className="font-semibold text-sm">{campaign.clicks != null ? formatNumber(campaign.clicks) : '-'}</p>
+                    <p className="text-xs text-gray-500">{campaign.ctr ?? '-'}</p>
                   </div>
                 </div>
                 
                 <div>
                   <p className="text-xs text-gray-500">Duration</p>
-                  <p className="text-xs sm:text-sm text-gray-700">{campaign.duration}</p>
+                  <p className="text-xs sm:text-sm text-gray-700">{campaign.durationLabel}</p>
                 </div>
               </div>
             ))}
@@ -530,3 +637,11 @@ const MarketingCampaigns: React.FC = () => {
 };
 
 export default MarketingCampaigns;
+
+// Simple store icon to avoid extra imports
+const StoreIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-blue-600">
+    <path d="M4 7l2-3h12l2 3M4 7h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 22V12h6v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
