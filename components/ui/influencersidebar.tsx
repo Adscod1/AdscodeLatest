@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import NotificationBell from './notification-bell';
 import { 
   Home, 
   BarChart3, 
@@ -36,14 +37,19 @@ const InfluencerSidebar = ({
   return (
     <div className={`w-64 bg-white shadow-sm border-r border-gray-200 h-screen ${className}`}>
       <div className="p-6">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">A</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">A</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Adscod</h1>
+              <p className="text-xs text-gray-500">Influencer Platform</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Adscod</h1>
-            <p className="text-xs text-gray-500">Influencer Platform</p>
-          </div>
+          
+          {/* Notification Bell */}
+          <NotificationBell />
         </div>
       </div>
 
