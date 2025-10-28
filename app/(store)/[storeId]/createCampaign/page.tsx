@@ -96,7 +96,7 @@ const InfluencerCampaignManager = () => {
   ];
 
   const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Snapchat', 'Twitch', 'Pinterest', 'Facebook'];
-  const deliverableTypes = ['Instagram Post', 'Instagram Story', 'Instagram Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
+  const deliverableTypes = ['Post', 'Story', 'Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
   const cattype = ['Product campaign', 'Coupon Campaign', 'Video Campaign'];
 
