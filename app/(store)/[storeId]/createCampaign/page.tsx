@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, Link2, Ticket, UploadCloud, ShoppingBag, X } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -50,6 +50,8 @@ interface CampaignData {
   callToActions: CallToAction[];
   milestones: Milestone[];
   deliverables: Deliverable[];
+  campaignType: string;
+  contentType: string;
 }
 
 const InfluencerCampaignManager = () => {
@@ -83,8 +85,21 @@ const InfluencerCampaignManager = () => {
     ],
     deliverables: [
       { type: 'Instagram Post', quantity: 1, description: '' }
-    ]
+    ],
+    campaignType: '',
+    contentType: ''
   });
+  const [activeCampaignModal, setActiveCampaignModal] = useState<null | 'product' | 'coupon' | 'video'>(null);
+  const [productLink, setProductLink] = useState('');
+  const [couponSelection, setCouponSelection] = useState('');
+  const [couponNotes, setCouponNotes] = useState('');
+  const [videoFileName, setVideoFileName] = useState('');
+  const [videoCaption, setVideoCaption] = useState('');
+  const campaignTypeToModal: Record<string, 'product' | 'coupon' | 'video'> = {
+    'Product campaign': 'product',
+    'Coupon Campaign': 'coupon',
+    'Video Campaign': 'video'
+  };
 
   const steps = [
     { id: 'basic-info', title: 'Basic Info', icon: <Users className="w-4 h-4" /> },
@@ -96,7 +111,7 @@ const InfluencerCampaignManager = () => {
   ];
 
   const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Snapchat', 'Twitch', 'Pinterest', 'Facebook'];
-  const deliverableTypes = ['Instagram Post', 'Instagram Story', 'Instagram Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
+  const deliverableTypes = ['Post', 'Story', 'Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
   const cattype = ['Product campaign', 'Coupon Campaign', 'Video Campaign'];
 
@@ -257,8 +272,8 @@ const InfluencerCampaignManager = () => {
               Campaign Type <span className="text-red-500">*</span>
             </label>
             <select
-              value={campaignData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              value={campaignData.campaignType}
+              onChange={(e) => handleInputChange('campaignType', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select campaign type</option>
@@ -266,16 +281,25 @@ const InfluencerCampaignManager = () => {
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
+            {campaignTypeToModal[campaignData.campaignType] && (
+              <button
+                type="button"
+                onClick={() => setActiveCampaignModal(campaignTypeToModal[campaignData.campaignType])}
+                className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+              >
+                <Link2 className="w-4 h-4" />
+                Configure {campaignData.campaignType}
+              </button>
+            )}
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Select content
                Type <span className="text-red-500">*</span>
             </label>
             <select
-              value={campaignData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              value={campaignData.contentType}
+              onChange={(e) => handleInputChange('contentType', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select a content type</option>
@@ -1250,6 +1274,138 @@ const InfluencerCampaignManager = () => {
     </div>
   );
 
+  const renderCampaignTypeModal = () => {
+    if (!activeCampaignModal) return null;
+    const closeModal = () => setActiveCampaignModal(null);
+    const modalShell = (icon: React.ReactNode, title: string, subtitle: string, body: React.ReactNode) => (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
+          <button
+            type="button"
+            onClick={closeModal}
+            className="absolute right-4 top-4 rounded-full p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+              {icon}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <p className="text-sm text-gray-500">{subtitle}</p>
+            </div>
+          </div>
+          <div className="mt-6 space-y-4 text-sm text-gray-700">{body}</div>
+          <div className="mt-6 flex items-center justify-end gap-2">
+            <button onClick={closeModal} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              Cancel
+            </button>
+            <button onClick={closeModal} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+    if (activeCampaignModal === 'product') {
+      return modalShell(
+        <ShoppingBag className="h-5 w-5" />,
+        'Product Campaign Setup',
+        'Quickly connect items from your catalog.',
+        <>
+          <button className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            Browse Shop
+          </button>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-gray-600">Search or paste product link</label>
+            <input
+              type="text"
+              value={productLink}
+              onChange={(e) => setProductLink(e.target.value)}
+              placeholder="Search or paste product link..."
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
+        </>
+      );
+    }
+    if (activeCampaignModal === 'coupon') {
+      return modalShell(
+        <Ticket className="h-5 w-5" />,
+        'Coupon Campaign Setup',
+        'Surface incentives from your coupon database.',
+        <>
+          <div className="space-y-2">
+            <span className="flex items-center gap-2 text-xs font-medium text-gray-600">
+              <Link2 className="h-4 w-4 text-blue-500" />
+              Select from Coupon Database
+            </span>
+            <select
+              value={couponSelection}
+              onChange={(e) => setCouponSelection(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            >
+              <option value="">Select an existing coupon</option>
+              <option value="SUMMER2024">SUMMER2024</option>
+              <option value="WELCOME10">WELCOME10</option>
+              <option value="FLASHSALE">FLASHSALE</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-gray-600">
+              Describe how this coupon should be applied (influencers/customers/both)
+            </label>
+            <textarea
+              rows={3}
+              value={couponNotes}
+              onChange={(e) => setCouponNotes(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              placeholder="Describe application details..."
+            />
+          </div>
+        </>
+      );
+    }
+    return modalShell(
+      <UploadCloud className="h-5 w-5" />,
+      'Video Campaign Setup',
+      'Share creative assets and your brief in one place.',
+      <>
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-gray-600">Upload video file</label>
+          <label
+            htmlFor="video-upload-input"
+            className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-dashed border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-600 hover:border-blue-400 hover:bg-blue-100"
+          >
+            <span>{videoFileName || 'Choose file'}</span>
+            <UploadCloud className="h-4 w-4" />
+          </label>
+          <input
+            id="video-upload-input"
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              setVideoFileName(file ? file.name : '');
+            }}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-gray-600">Add a video caption or campaign brief</label>
+          <textarea
+            rows={3}
+            value={videoCaption}
+            onChange={(e) => setVideoCaption(e.target.value)}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="Add a video caption or campaign brief..."
+          />
+        </div>
+      </>
+    );
+  };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 0: return renderBasicInfo();
@@ -1330,7 +1486,7 @@ const InfluencerCampaignManager = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8 p-4 sm:p-6 lg:p-8">
           {renderStepContent()}
         </div>
-
+        {renderCampaignTypeModal()}
         {/* Navigation Buttons */}
         <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 sm:gap-0">
           <button

@@ -681,20 +681,9 @@ const CreatorStudioDashboard = () => {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <select className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base">
-            <option>Category</option>
-            <option>Fashion</option>
-            <option>Tech</option>
-            <option>Fitness</option>
-          </select>
-          <select className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base">
-            <option>Followers</option>
-            <option>10K-50K</option>
-            <option>50K-100K</option>
-            <option>100K+</option>
-          </select>
+         
           <button className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <div className="w-4 h-4"></div>
+            <div className="w-4 h-4">filter</div>
           </button>
         </div>
       </div>
