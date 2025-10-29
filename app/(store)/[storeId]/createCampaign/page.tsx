@@ -1291,7 +1291,7 @@ const InfluencerCampaignManager = () => {
     <div className="min-h-screen bg-gray-50">
       <CampaignTypeModal />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header */}
         <div className="flex items-center mb-6 sm:mb-8">
           <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">

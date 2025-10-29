@@ -355,7 +355,7 @@ const CreateNewCampaignPage = () => {
   };
 
   return (
-    <div className={`max-w-4xl mx-auto my-8 bg-white rounded-xl shadow-sm p-8 ${isMobile ? 'mt-4 ml-4 mr-4' : 'mt-28'}`}>
+    <div className={`mx-auto my-8 bg-white rounded-xl shadow-sm p-8 ${isMobile ? 'mt-4 ml-4 mr-4' : 'mt-28'}`}>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">
           {isEditMode ? "Edit Campaign" : "Create new campaign"}

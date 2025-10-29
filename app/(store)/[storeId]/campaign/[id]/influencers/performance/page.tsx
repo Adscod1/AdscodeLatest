@@ -178,7 +178,7 @@ const InfluencerDashboard = () => {
               <p className="text-sm text-gray-500">Track individual creator metrics and campaign contributions</p>
             </div>
           </div>
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2">
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2">
             <span className="text-xl">+</span>
             Add Influencer
           </button>
@@ -276,9 +276,9 @@ const InfluencerDashboard = () => {
               </div>
 
               {/* Campaign */}
-              <div className="mb-4">
-                <p className="text-xs text-gray-500 mb-1">Campaign</p>
-                <p className="text-sm font-medium text-gray-900">{influencer.campaign}</p>
+              <div className="mb-4 gap-2">
+                <span className="text-xs text-gray-500 mb-1">Campaign</span>
+                <span className="text-sm float-right font-medium text-gray-900">{influencer.campaign}</span>
               </div>
 
               {/* Rating */}
@@ -288,7 +288,7 @@ const InfluencerDashboard = () => {
               </div>
 
               {/* Metrics Grid */}
-              <div className="grid grid-cols-2 gap-3 mb-4 pb-4 border-b border-gray-100">
+              <div className="grid grid-cols-4 gap-2 mb-4 pb-4 border-b border-gray-100">
                 <div>
                   <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
                     <Eye size={12} />

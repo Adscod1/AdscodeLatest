@@ -49,7 +49,7 @@ const MarketingCampaigns: React.FC = () => {
     {
       id: '1',
       name: 'Summer Sneaker Sale',
-      type: 'Email',
+      type: 'Fashion',
       target: 'Sports Enthusiasts',
       budget: 5000,
       impressions: 125000,
@@ -62,8 +62,8 @@ const MarketingCampaigns: React.FC = () => {
     },
     {
       id: '2',
-      name: 'Nike Air Max Promotion',
-      type: 'Social',
+      name: 'macbook pro bonaza',
+      type: 'Technology',
       target: 'Young Adults 18-35',
       budget: 8000,
       impressions: 180000,
@@ -76,8 +76,8 @@ const MarketingCampaigns: React.FC = () => {
     },
     {
       id: '3',
-      name: 'Holiday Collection Launch',
-      type: 'Search',
+      name: 'marcedez benz',
+      type: 'Automotive',
       target: 'Fashion Conscious',
       budget: 3000,
       impressions: 95000,
@@ -90,8 +90,8 @@ const MarketingCampaigns: React.FC = () => {
     },
     {
       id: '4',
-      name: 'Retargeting Campaign',
-      type: 'Display',
+      name: 'holiday',
+      type: 'Entertainment',
       target: 'Previous Visitors',
       budget: 2500,
       impressions: 65000,
@@ -164,7 +164,7 @@ const MarketingCampaigns: React.FC = () => {
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Marketing Campaigns</h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">Create and manage your marketing campaigns</p>
           </div>
-          <Link href={`/${storeId}/createCampaign`} className="bg-black text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-800 w-full sm:w-auto">
+          <Link href={`/${storeId}/createCampaign`} className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-800 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             <span className="whitespace-nowrap">Create Campaign</span>
           </Link>

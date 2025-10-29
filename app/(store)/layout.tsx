@@ -43,7 +43,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
     const baseClasses =
       "flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium";
     return isActive(path)
-      ? `${baseClasses} text-white bg-black hover:bg-gray-800`
+      ? `${baseClasses} text-blue-500 hover:bg-gray-50`
       : `${baseClasses} text-gray-600 hover:text-gray-900 hover:bg-gray-50`;
   };
 
@@ -113,48 +113,48 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
                 href={`/${storeId}`} 
                 className={getLinkClassName("/dashboard")}
               >
-                <LayoutDashboard className="w-4 h-4 mr-3" />
+                <LayoutDashboard className="w-6 h-6 mr-3" />
                 Overview
               </Link>
               <Link
                 href={`/${storeId}/listings`}
                 className={getLinkClassName("/listings")}
               >
-                <Package className="w-4 h-4 mr-3" />
+                <Package className="w-6 h-6 mr-3" />
                 Listings
               </Link>
               <Link href={`/${storeId}/campaign`} className={getLinkClassName("/campaign")}>
-                <Megaphone className="w-4 h-4 mr-3" />
+                <Megaphone className="w-6  h-6 mr-3" />
                 Campaigns
               </Link>
               <Link href={`/${storeId}/creator-studio`} className={getLinkClassName("/creator-studio")}>
-                <Settings className="w-4 h-4 mr-3" />
+                <Settings className="w-6 h-6 mr-3" />
                 Creator Studio
               </Link>
               <Link href={`/${storeId}/reviewss`} className={getLinkClassName("/reviewss")}>
-                <Star className="w-4 h-4 mr-3" />
+                <Star className="w-6 h-6 mr-3" />
                 Reviews
               </Link>
               <Link href={`/${storeId}/analytics`} className={getLinkClassName("/analytics")}>
-                <TrendingUp className="w-4 h-4 mr-3" />
+                <TrendingUp className="w-6 h-6 mr-3" />
                 Analytics
               </Link>
               <Link
                 href={`/${storeId}/competitor-analysis`}
                 className={getLinkClassName("/competitor-analysis")}
               >
-                <SearchIcon className="w-4 h-4 mr-3" />
+                <SearchIcon className="w-6 h-6 mr-3" />
                 Competitor Analysis
               </Link>
               <Link
                 href={`/${storeId}/sentiment-analysis`}
                 className={getLinkClassName("/sentiment-analysis")}
               >
-                <Smile className="w-4 h-4 mr-3" />
+                <Smile className="w-6 h-6 mr-3" />
                 Sentiment Analysis
               </Link>
               <Link href={`/${storeId}/coupons`} className={getLinkClassName("/coupons")}>
-                <Ticket className="w-4 h-4 mr-3" />
+                <Ticket className="w-6 h-6 mr-3" />
                 Coupons
               </Link>
             </nav>
@@ -165,18 +165,18 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">PERSONAL</h2>
             <nav className="space-y-1">
               <Link href={`/${storeId}/messages`} className={getLinkClassName("/messages")}>
-                <MessageSquare className="w-4 h-4 mr-3" />
+                <MessageSquare className="w-6 h-6 mr-3" />
                 Messages
                 <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
                   14+
                 </span>
               </Link>
               <Link href={`/${storeId}/notifications`} className={getLinkClassName("/notifications")}>
-                <Bell className="w-4 h-4 mr-3" />
+                <Bell className="w-6 h-6 mr-3" />
                 Notifications
               </Link>
               <Link href={`/${storeId}/settings`} className={getLinkClassName("/settings")}>
-                <Settings className="w-4 h-4 mr-3" />
+                <Settings className="w-6 h-6 mr-3" />
                 Settings
               </Link>
             </nav>
@@ -212,14 +212,14 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
                   <Menu className="w-5 h-5 text-gray-600" />
                 </button>
               )}
-              <div className="relative hidden sm:block">
+              {/* <div className="relative hidden sm:block">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search order ID..."
                   className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
+              </div> */}
             </div>
             <div className="flex items-center gap-4">
               <UserAuthButton />
