@@ -24,6 +24,8 @@ import {
   Filter
 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
+import { format, addMonths, addDays, startOfMonth, startOfWeek, endOfMonth, isSameMonth, isSameDay } from "date-fns";
+
 
 interface Influencer {
   name: string;
@@ -98,11 +100,14 @@ const CreatorStudioDashboard = () => {
   const [eventTitle, setEventTitle] = useState('Campaign Launch: Summer Fashion');
   const [eventSubtitle, setEventSubtitle] = useState('Summer Fashion Collection');
   const [eventType, setEventType] = useState('Meeting');
-  const [selectedDate, setSelectedDate] = useState('October 19th, 2025');
+ 
   const [selectedTime, setSelectedTime] = useState('--:--');
   const [showEventTypeDropdown, setShowEventTypeDropdown] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+ 
+  const [date, setDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
 
   const menuItems = [
     { icon: BarChart3, label: 'Dashboard', path: 'Dashboard' },
@@ -434,40 +439,69 @@ const CreatorStudioDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Calendar Section */}
-          <div className="lg:col-span-2 bg-white rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-center">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border shadow-sm"
-                classNames={{
-                  months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                  month: "space-y-4",
-                  caption: "flex justify-center pt-1 relative items-center",
-                  caption_label: "text-lg font-semibold",
-                  nav: "space-x-1 flex items-center",
-                  nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
-                  nav_button_previous: "absolute left-1",
-                  nav_button_next: "absolute right-1",
-                  table: "w-full border-collapse space-y-1",
-                  head_row: "flex",
-                  head_cell: "text-muted-foreground rounded-md w-16 font-normal text-[0.8rem]",
-                  row: "flex w-full mt-2",
-                  cell: "h-16 w-16 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                  day: "h-16 w-16 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
-                  day_range_end: "day-range-end",
-                  day_selected: "bg-purple-600 text-white hover:bg-purple-600 hover:text-white focus:bg-purple-600 focus:text-white",
-                  day_today: "bg-accent text-accent-foreground",
-                  day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-                  day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-                  day_hidden: "invisible",
-                }}
-              />
-            </div>
-          </div>
+          {/* Full Calendar Section */}
+<div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+  <div className="flex items-center justify-between mb-6">
+    <h2 className="text-lg font-semibold text-gray-800">Campaign Calendar</h2>
+    <div className="flex items-center space-x-2">
+      <button
+        onClick={() => setDate(addMonths(date, -1))}
+        className="p-2 rounded-md hover:bg-gray-100 transition"
+      >
+        ←
+      </button>
+      <span className="font-medium text-gray-700">
+        {format(date, "MMMM yyyy")}
+      </span>
+      <button
+        onClick={() => setDate(addMonths(date, 1))}
+        className="p-2 rounded-md hover:bg-gray-100 transition"
+      >
+        →
+      </button>
+    </div>
+  </div>
+
+  {/* Calendar Grid */}
+  <div className="grid grid-cols-7 text-sm font-medium text-gray-500 border-b pb-2 mb-2">
+    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+      <div key={day} className="text-center uppercase tracking-wide">
+        {day}
+      </div>
+    ))}
+  </div>
+
+  <div className="grid grid-cols-7 gap-1 text-sm">
+    {Array.from({ length: startOfWeek(endOfMonth(date)).getDate() + 7 }).map(
+      (_, i) => {
+        const day = addDays(startOfWeek(startOfMonth(date)), i);
+        const isCurrentMonth = isSameMonth(day, date);
+        const isToday = isSameDay(day, new Date());
+        const isSelected = selectedDate && isSameDay(day, selectedDate);
+
+        return (
+          <button
+            key={i}
+            onClick={() => setSelectedDate(day)}
+            className={`h-24 rounded-md p-2 text-left transition
+              ${isCurrentMonth ? "text-gray-800" : "text-gray-400"}
+              ${isToday ? "border border-blue-500" : ""}
+              ${isSelected ? "bg-blue-600 text-white" : "hover:bg-gray-100"}
+            `}
+          >
+            <div className="font-medium">{format(day, "d")}</div>
+            {/* Example event */}
+            {isSelected && (
+              <div className="mt-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                Event: Meeting
+              </div>
+            )}
+          </button>
+        );
+      }
+    )}
+  </div>
+</div>
 
           {/* Right Sidebar */}
           <div className="space-y-6">
@@ -609,7 +643,7 @@ const CreatorStudioDashboard = () => {
                 </div>
 
                 {/* Date - Using shadcn calendar */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Date <span className="text-red-500">*</span>
                   </label>
@@ -618,10 +652,11 @@ const CreatorStudioDashboard = () => {
                       mode="single"
                       selected={date}
                       onSelect={setDate}
+                      
                       className="rounded-md"
                     />
                   </div>
-                </div>
+                </div> */}
 
                 {/* Time */}
                 <div>
