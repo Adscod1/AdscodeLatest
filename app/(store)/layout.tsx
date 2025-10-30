@@ -1,5 +1,5 @@
 "use client";
-import { Plus, Search, LayoutDashboard, Package, Megaphone, Star, TrendingUp, Search as SearchIcon, Smile, Ticket, MessageSquare, Bell, Settings, User, Menu, X } from "lucide-react";
+import { Plus, Search, LayoutDashboard, Wallet, Package, Megaphone, Star, TrendingUp, Search as SearchIcon, Smile, Ticket, MessageSquare, Bell, Settings, User, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
@@ -12,7 +12,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkScreenSize = () => {
+    const checkScreenSize = () => { 
       setIsMobile(window.innerWidth < 768);
     };
 
@@ -130,6 +130,10 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
               <Link href={`/${storeId}/creator-studio`} className={getLinkClassName("/creator-studio")}>
                 <Settings className="w-6 h-6 mr-3" />
                 Creator Studio
+              </Link>
+              <Link href={`/${storeId}/wallet`} className={getLinkClassName("/wallet")}>
+                <Wallet className="w-6 h-6 mr-3" />
+                Wallet
               </Link>
               <Link href={`/${storeId}/reviewss`} className={getLinkClassName("/reviewss")}>
                 <Star className="w-6 h-6 mr-3" />
