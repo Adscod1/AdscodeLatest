@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Mock data - in production, fetch this from your database
 const influencersData = {
@@ -73,12 +74,222 @@ const influencersData = {
   }
 };
 
+// User Demographics Component
+const UserDemographics = () => {
+  const [activeTab, setActiveTab] = useState('all');
+
+  const ageData = [
+    { age: '18-20', users: 450 },
+    { age: '21-25', users: 380 },
+    { age: '26-30', users: 420 },
+    { age: '31-35', users: 280 },
+    { age: '36-40', users: 550 },
+    { age: '41-45', users: 150 },
+    { age: '46-50', users: 680 }
+  ];
+
+  const genderData = [
+    { name: 'Male', value: 750, percentage: 30 },
+    { name: 'Female', value: 1740, percentage: 70 }
+  ];
+
+  const languageData = [
+    { language: 'English', users: 2800 },
+    { language: 'French', users: 1200 },
+    { language: 'Kiswahili', users: 2600 },
+    { language: 'Arabic', users: 2700 },
+    { language: 'Chinese', users: 2400 },
+    { language: 'Luganda', users: 2300 },
+    { language: 'Others', users: 2200 }
+  ];
+
+  const locationData = [
+    { country: 'Uganda', users: 577 },
+    { country: 'Kenya', users: 554 },
+    { country: 'Rwanda', users: 537 },
+    { country: 'Egypt', users: 501 },
+    { country: 'Nigeria', users: 488 },
+    { country: 'Mexico', users: 452 },
+    { country: 'Tanzania', users: 408 },
+    { country: 'France', users: 399 },
+    { country: 'Germany', users: 388 },
+    { country: 'Others', users: 320 }
+  ];
+
+  const COLORS = ['#3B82F6', '#93C5FD'];
+  const LANGUAGE_COLOR = '#14B8A6';
+
+  return (
+    <Card className="p-6">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-xl font-bold text-gray-800">User Demographics</h2>
+        <button className="text-gray-400 hover:text-gray-600">⋯</button>
+      </div>
+      
+      <p className="text-sm text-gray-500 mb-6">
+        User demographics help businesses and organizations understand their audience better and tailor their offerings to meet their needs
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* Age Distribution */}
+        <div>
+          <h3 className="text-base font-semibold mb-3 text-gray-800">Age</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={ageData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+              <XAxis type="number" />
+              <YAxis dataKey="age" type="category" width={50} tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Bar dataKey="users" fill="#3B82F6" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Gender Distribution */}
+        <div>
+          <h3 className="text-base font-semibold mb-3 text-gray-800">Gender</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                data={genderData}
+                cx="50%"
+                cy="50%"
+                innerRadius={50}
+                outerRadius={75}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {genderData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex justify-center gap-6 mt-2">
+            <div className="text-center">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                <span className="text-xs text-gray-600">Male</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-800">{genderData[0].value} - {genderData[0].percentage}%</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-300"></div>
+                <span className="text-xs text-gray-600">Female</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-800">{genderData[1].value} - {genderData[1].percentage}%</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Language Distribution */}
+        <div>
+          <h3 className="text-base font-semibold mb-3 text-gray-800">Language</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={languageData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+              <XAxis type="number" />
+              <YAxis dataKey="language" type="category" width={60} tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Bar dataKey="users" fill={LANGUAGE_COLOR} radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Location Section */}
+      <div>
+        <h3 className="text-base font-semibold mb-3 text-gray-800">Location</h3>
+        
+        <div className="flex gap-4 mb-4 border-b">
+          <button 
+            onClick={() => setActiveTab('all')}
+            className={`pb-2 px-1 text-sm font-medium transition-colors ${
+              activeTab === 'all' 
+                ? 'text-blue-600 border-b-2 border-blue-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            All users
+          </button>
+          <button 
+            onClick={() => setActiveTab('new')}
+            className={`pb-2 px-1 text-sm font-medium transition-colors ${
+              activeTab === 'new' 
+                ? 'text-blue-600 border-b-2 border-blue-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            New Users
+          </button>
+          <button 
+            onClick={() => setActiveTab('active')}
+            className={`pb-2 px-1 text-sm font-medium transition-colors ${
+              activeTab === 'active' 
+                ? 'text-blue-600 border-b-2 border-blue-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Active Users
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Country List */}
+          <div>
+            {locationData.map((item, index) => (
+              <div key={index} className="mb-2.5">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm text-gray-700">{item.country}</span>
+                  <span className="text-sm font-medium text-gray-600">{item.users}</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                  <div 
+                    className="h-1.5 rounded-full transition-all duration-300 bg-pink-500"
+                    style={{ 
+                      width: `${(item.users / 577) * 100}%`,
+                      opacity: index === 0 ? 1 : 0.6
+                    }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* World Map */}
+          <div className="flex items-center justify-center bg-gray-50 rounded-lg p-6">
+            <div className="relative w-full h-48">
+              <svg viewBox="0 0 800 400" className="w-full h-full">
+                <g className="map" fill="#E5E7EB" stroke="#D1D5DB" strokeWidth="1">
+                  <ellipse cx="450" cy="240" rx="60" ry="80" />
+                  <ellipse cx="430" cy="140" rx="40" ry="35" />
+                  <ellipse cx="580" cy="160" rx="80" ry="60" />
+                  <ellipse cx="220" cy="140" rx="70" ry="50" />
+                  <ellipse cx="260" cy="280" rx="45" ry="70" />
+                  <ellipse cx="680" cy="300" rx="35" ry="30" />
+                </g>
+                <circle cx="450" cy="220" r="16" fill="#3B82F6" opacity="0.8" />
+                <circle cx="460" cy="230" r="12" fill="#3B82F6" opacity="0.8" />
+                <circle cx="220" cy="180" r="8" fill="#3B82F6" opacity="0.6" />
+                <circle cx="430" cy="150" r="10" fill="#3B82F6" opacity="0.6" />
+                <circle cx="580" cy="170" r="8" fill="#3B82F6" opacity="0.5" />
+                <circle cx="520" cy="190" r="7" fill="#3B82F6" opacity="0.5" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 export default function CampaignInfluencerProfilePage() {
   const params = useParams();
   const storeId = params?.storeId as string;
   const campaignId = params?.id as string;
   
-  // In production, fetch the influencer based on campaign context
   const influencer = influencersData["1"];
 
   if (!influencer) {
@@ -109,7 +320,6 @@ export default function CampaignInfluencerProfilePage() {
             {/* Profile Header Card */}
             <Card className="p-6">
               <div className="flex flex-col sm:flex-row gap-6">
-                {/* Avatar */}
                 <div className="flex-shrink-0">
                   <Avatar className="w-32 h-32">
                     <AvatarImage src={influencer.avatar} alt={influencer.name} />
@@ -117,7 +327,6 @@ export default function CampaignInfluencerProfilePage() {
                   </Avatar>
                 </div>
 
-                {/* Profile Info */}
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -136,7 +345,6 @@ export default function CampaignInfluencerProfilePage() {
                     </Button>
                   </div>
 
-                  {/* Stats */}
                   <div className="grid grid-cols-4 gap-4 mb-4">
                     <div className="text-center">
                       <p className="text-2xl font-bold">{influencer.posts}</p>
@@ -156,7 +364,6 @@ export default function CampaignInfluencerProfilePage() {
                     </div>
                   </div>
 
-                  {/* Tags */}
                   <div className="flex gap-2 flex-wrap mb-4">
                     <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
                       {influencer.category}
@@ -169,7 +376,6 @@ export default function CampaignInfluencerProfilePage() {
                     </span>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex gap-3">
                     <Link
                       href={`/${storeId}/campaign/${campaignId}/influencers/details`}
@@ -249,6 +455,10 @@ export default function CampaignInfluencerProfilePage() {
                 ))}
               </div>
             </Card>
+
+            {/* User Demographics Section */}
+            <UserDemographics />
+
           </div>
 
           {/* Right Column - Sidebar */}
