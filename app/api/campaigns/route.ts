@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/utils/auth";
 import { prisma } from "@/lib/prisma";
-import { createCampaignSchema } from "@/lib/validations/campaign";
+import { createCampaignSchema, validateTypeSpecificData } from "@/lib/validations/campaign";
 import { headers } from "next/headers";
 
 // POST /api/campaigns - Create a new draft campaign
@@ -48,6 +48,42 @@ export async function POST(req: NextRequest) {
 
     const data = validationResult.data;
 
+    // Validate type-specific data if provided
+    if (data.typeSpecificData && data.type) {
+      const typeValidation = validateTypeSpecificData(data.type, data.typeSpecificData);
+      
+      if (!typeValidation.success) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: "Type-specific validation failed", 
+            details: typeValidation.error.errors 
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // If productId is provided, verify product exists and belongs to brand
+    if (data.type === "PRODUCT" && data.typeSpecificData) {
+      const productData = data.typeSpecificData as any;
+      if (productData.productId) {
+        const product = await prisma.product.findFirst({
+          where: {
+            id: productData.productId,
+            storeId: store.id,
+          },
+        });
+
+        if (!product) {
+          return NextResponse.json(
+            { success: false, error: "Product not found or doesn't belong to your store" },
+            { status: 404 }
+          );
+        }
+      }
+    }
+
     // Create campaign
     const campaign = await prisma.campaign.create({
       data: {
@@ -60,8 +96,10 @@ export async function POST(req: NextRequest) {
         influencerLocation: data.influencerLocation as any,
         platforms: data.platforms as any,
         targets: data.targets as any,
+        type: data.type,
+        typeSpecificData: data.typeSpecificData,
         status: "DRAFT",
-      },
+      } as any,
     });
 
     return NextResponse.json(
@@ -111,11 +149,15 @@ export async function GET(req: NextRequest) {
     // Get query parameters
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
+    const type = searchParams.get("type");
 
     // Build query
     const where: any = { brandId: store.id };
     if (status) {
       where.status = status;
+    }
+    if (type) {
+      where.type = type;
     }
 
     // Fetch campaigns with applicant count

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/utils/auth";
 import { prisma } from "@/lib/prisma";
-import { updateCampaignSchema } from "@/lib/validations/campaign";
+import { updateCampaignSchema, validateTypeSpecificData } from "@/lib/validations/campaign";
 import { headers } from "next/headers";
 
 // GET /api/campaigns/[id] - Get campaign details
@@ -142,6 +142,66 @@ export async function PATCH(
 
     const data = validationResult.data;
 
+    // Prevent type changes on published campaigns (extra safety check)
+    if (data.type && existingCampaign.status !== "DRAFT") {
+      return NextResponse.json(
+        { success: false, error: "Cannot change campaign type after publishing" },
+        { status: 400 }
+      );
+    }
+
+    // Validate type-specific data if provided
+    if (data.typeSpecificData) {
+      const campaignType = data.type || (existingCampaign.type as string);
+      const typeValidation = validateTypeSpecificData(
+        campaignType as "PRODUCT" | "COUPON" | "VIDEO" | "PROFILE",
+        data.typeSpecificData
+      );
+      
+      if (!typeValidation.success) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: "Type-specific validation failed", 
+            details: typeValidation.error.errors 
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // If updating to PRODUCT type with productId, verify product exists and belongs to brand
+    if (data.typeSpecificData) {
+      const campaignType = data.type || (existingCampaign.type as string);
+      if (campaignType === "PRODUCT") {
+        const productData = data.typeSpecificData as any;
+        if (productData.productId) {
+          const product = await prisma.product.findFirst({
+            where: {
+              id: productData.productId,
+              storeId: store!.id,
+            },
+          });
+
+          if (!product) {
+            return NextResponse.json(
+              { success: false, error: "Product not found or doesn't belong to your store" },
+              { status: 404 }
+            );
+          }
+        }
+      }
+    }
+
+    // Merge typeSpecificData with existing data for partial updates
+    let finalTypeSpecificData = data.typeSpecificData;
+    if (data.typeSpecificData && existingCampaign.typeSpecificData) {
+      finalTypeSpecificData = {
+        ...(existingCampaign.typeSpecificData as object),
+        ...data.typeSpecificData,
+      };
+    }
+
     // Update campaign
     const campaign = await prisma.campaign.update({
       where: { id },
@@ -154,7 +214,9 @@ export async function PATCH(
         ...(data.influencerLocation && { influencerLocation: data.influencerLocation as any }),
         ...(data.platforms && { platforms: data.platforms as any }),
         ...(data.targets && { targets: data.targets as any }),
-      },
+        ...(data.type && { type: data.type }),
+        ...(finalTypeSpecificData && { typeSpecificData: finalTypeSpecificData }),
+      } as any,
     });
 
     return NextResponse.json(
