@@ -1,5 +1,68 @@
 import { Campaign, CampaignInfluencer, CampaignStatus, CampaignApplicationStatus } from "@prisma/client";
 
+// Campaign Type enum
+export type CampaignType = "PRODUCT" | "COUPON" | "VIDEO" | "PROFILE";
+
+// Type-specific data interfaces
+
+// Coupon campaign data
+export interface CouponCampaignData {
+  couponId?: string;
+  couponCode?: string;
+  couponDescription?: string;
+  applicationType: "INFLUENCERS" | "CUSTOMERS" | "BOTH";
+  applicationInstructions: string;
+  usageLimit?: number;
+  expiryDate?: string;
+}
+
+// Product campaign data
+export interface ProductCampaignData {
+  productId?: string;
+  productLink?: string;
+  shopUrl: string;
+  productTitle?: string;
+  productPrice?: number;
+  productImage?: string;
+  productDescription?: string;
+}
+
+// Video campaign data
+export interface VideoCampaignData {
+  videoUrl: string;
+  videoFileName: string;
+  videoSize: number;
+  videoDuration?: number;
+  videoFormat: "mp4" | "mov" | "avi" | "webm";
+  videoCaption: string;
+  campaignBrief: string;
+  contentGuidelines?: string;
+  hashtagRequirements?: string[];
+}
+
+// Profile campaign data
+export interface ProfileCampaignData {
+  profileUrl: string;
+  profilePlatform: string;
+  profileHandle: string;
+  profileType: "PERSONAL" | "BUSINESS" | "BRAND";
+  campaignGoals: string;
+  targetMetrics: {
+    followersTarget?: number;
+    engagementTarget?: number;
+    reachTarget?: number;
+  };
+  successCriteria: string;
+  brandGuidelines?: string;
+}
+
+// Union type for all type-specific data
+export type TypeSpecificData = 
+  | CouponCampaignData 
+  | ProductCampaignData 
+  | VideoCampaignData 
+  | ProfileCampaignData;
+
 // Campaign with relations
 export interface CampaignWithRelations extends Campaign {
   brand?: {
@@ -51,6 +114,8 @@ export interface CampaignFormData {
     conversions?: string[];
     contentType?: string[];
   };
+  type: CampaignType;
+  typeSpecificData?: TypeSpecificData;
 }
 
 // API Response types
