@@ -164,7 +164,7 @@ const MarketingCampaigns: React.FC = () => {
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Marketing Campaigns</h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">Create and manage your marketing campaigns</p>
           </div>
-          <Link href={`/${storeId}/createCampaign`} className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-800 w-full sm:w-auto">
+          <Link href={`/${storeId}/createCampaign`} className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-100 hover:text-gray-800 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             <span className="whitespace-nowrap">Create Campaign</span>
           </Link>

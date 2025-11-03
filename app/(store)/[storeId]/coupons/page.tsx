@@ -99,8 +99,19 @@ export default function CouponsPage() {
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
       {/* Header */}
       <div className="mb-4 sm:mb-6">
+        <div className="flex items-center justify-between">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Coupons & Discounts</h1>
+        <Link
+                href={`/${storeId}/coupons/new`}
+                className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-gray-100 hover:text-gray-800 transition-colors flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Create Coupon</span>
+                <span className="sm:hidden">Create</span>
+              </Link>
+              </div>
         <p className="text-xs sm:text-sm text-gray-500">Manage promotional codes and discount campaigns</p>
+        
       </div>
 
       {/* Stats Cards */}
@@ -152,14 +163,7 @@ export default function CouponsPage() {
                 <option>Fixed Amount</option>
                 <option>Free Shipping</option>
               </select>
-              <Link
-                href={`/${storeId}/coupons/new`}
-                className="px-3 sm:px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Create Coupon</span>
-                <span className="sm:hidden">Create</span>
-              </Link>
+              
             </div>
           </div>
         </div>
