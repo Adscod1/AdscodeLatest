@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useParams } from 'next/navigation';
+import { useSearchParams, useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   BarChart3, 
@@ -81,6 +81,7 @@ type FilterStatus = 'all' | 'pending' | 'approved' | 'rejected';
 const CreatorStudioDashboard = () => {
   const searchParams = useSearchParams();
   const params = useParams();
+  const router = useRouter();
   const storeId = params.storeId as string;
   const initialTab = searchParams.get('tab') || 'Analytics';
   
@@ -1013,156 +1014,161 @@ const CreatorStudioDashboard = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 className="text-base sm:text-lg font-semibold">Influencer Applications</h3>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1">Review and manage influencer applications</p>
+            <h3 className="text-xl font-semibold text-gray-900">Influencer Applications</h3>
+            <p className="text-sm text-gray-500 mt-1">Review and manage applications from influencers wanting to join your campaigns</p>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span className="font-medium">{applications.filter(a => a.status === 'pending').length} pending reviews</span>
+            </div>
             <select 
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-              className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Applications</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
             </select>
-            <div className="px-3 sm:px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
-              <span className="text-xs sm:text-sm font-medium text-blue-900">
-                {applications.filter(a => a.status === 'pending').length} pending reviews
-              </span>
-            </div>
           </div>
         </div>
 
         {/* Applications List */}
         <div className="space-y-4">
           {filteredApplications.map((app) => (
-            <div key={app.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-              <div className={`h-1 ${app.status === 'approved' ? 'bg-green-500' : app.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'}`} />
-              
-              <div className="p-4 sm:p-6">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  {/* Avatar */}
-                  <div className="relative shrink-0">
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-lg sm:text-2xl">
-                      {app.influencer.avatar}
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white" />
+            <div key={app.id} className="bg-white rounded-lg border border-gray-200 p-6">
+              {/* Profile Header */}
+              <div className="flex items-start gap-4 mb-6">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-xl">
+                    {app.influencer.avatar}
                   </div>
-
-                  {/* Main Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <h3 className="text-base sm:text-lg font-bold text-gray-900">{app.influencer.name}</h3>
-                          <span className="text-xs sm:text-sm text-gray-500">{app.influencer.username}</span>
-                          {getStatusBadge(app.status)}
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                          <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{app.influencer.category}</span>
-                          <span>Applied on {app.appliedDate}</span>
-                        </div>
-                      </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-400 rounded-full border-2 border-white flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">!</span>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900">{app.influencer.name}</h4>
+                      <p className="text-sm text-gray-500">{app.influencer.username}</p>
+                      <p className="text-xs text-gray-400">Applied {app.appliedDate}</p>
                     </div>
-
-                    {/* Campaign Info */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">CAMPAIGN</p>
-                        <p className="font-semibold text-gray-900 text-xs sm:text-sm truncate">{app.campaign}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">FOLLOWERS</p>
-                        <p className="font-semibold text-gray-900 text-xs sm:text-sm">{app.influencer.followers}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">ENGAGEMENT</p>
-                        <p className="font-semibold text-gray-900 text-xs sm:text-sm">{app.influencer.engagement}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">PROPOSED RATE</p>
-                        <p className="font-semibold text-gray-900 text-xs sm:text-sm">{app.proposedRate}</p>
-                      </div>
-                    </div>
-
-                    {/* Application Message */}
-                    <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4">
-                      <p className="text-xs font-semibold text-gray-500 mb-2">APPLICATION MESSAGE</p>
-                      <p className="text-xs sm:text-sm text-gray-700 italic">"{app.message}"</p>
-                    </div>
-
-                    {/* Deliverables */}
-                    <div className="mb-4">
-                      <p className="text-xs font-semibold text-gray-500 mb-2">PROPOSED DELIVERABLES</p>
-                      <div className="flex flex-wrap gap-2 sm:gap-3">
-                        <span className="px-2 sm:px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
-                          {app.deliverables.instagramPosts} Instagram Posts
-                        </span>
-                        <span className="px-2 sm:px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
-                          {app.deliverables.stories} Stories
-                        </span>
-                        {app.deliverables.reels > 0 && (
-                          <span className="px-2 sm:px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium">
-                            {app.deliverables.reels} Reels
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <div className="text-right">
                       {app.status === 'pending' && (
-                        <>
-                          <button 
-                            onClick={() => {
-                              setSelectedApplication(app);
-                              setShowContractModal(true);
-                            }}
-                            className="w-full sm:flex-1 px-3 sm:px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 text-sm"
-                          >
-                            ✓ <span className="hidden sm:inline">Approve Application</span><span className="sm:hidden">Approve</span>
-                          </button>
-                          <button className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm">
-                            Decline
-                          </button>
-                        </>
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                          Pending
+                        </span>
                       )}
                       {app.status === 'approved' && (
-                        <button 
-                          onClick={() => {
-                            setSelectedApplication(app);
-                            setShowContractModal(true);
-                          }}
-                          className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 text-sm"
-                        >
-                          📄 <span className="hidden sm:inline">Send Contract</span><span className="sm:hidden">Contract</span>
-                        </button>
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          Approved
+                        </span>
                       )}
-                      <div className="flex gap-2 sm:gap-3">
-                        <button 
-                          onClick={() => {
-                            setSelectedApplication(app);
-                            setShowMessageModal(true);
-                          }}
-                          className="flex-1 sm:flex-none px-3 sm:px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
-                        >
-                          💬 <span className="hidden sm:inline">Message</span><span className="sm:hidden">Message</span>
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setSelectedApplication(app);
-                            setShowInfluencerDetails(true);
-                          }}
-                          className="flex-1 sm:flex-none px-3 sm:px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
-                        >
-                          👁️ <span className="hidden sm:inline">View Details</span><span className="sm:hidden">View</span>
-                        </button>
-                      </div>
+                      {app.status === 'rejected' && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                          Rejected
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Campaign and Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Campaign</p>
+                  <p className="font-semibold text-gray-900">{app.campaign}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Followers</p>
+                  <p className="font-semibold text-gray-900">{app.influencer.followers}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Engagement</p>
+                  <p className="font-semibold text-gray-900">{app.influencer.engagement}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Proposed Rate</p>
+                  <p className="font-semibold text-green-600">{app.proposedRate}</p>
+                </div>
+              </div>
+
+              {/* Application Message */}
+              <div className="mb-6">
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Application Message</p>
+                <p className="text-sm text-gray-700 italic">"{app.message}"</p>
+              </div>
+
+              {/* Proposed Deliverables */}
+              <div className="mb-6">
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Proposed Deliverables</p>
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                    <span className="text-sm font-medium">{app.deliverables.instagramPosts} Instagram Posts</span>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                    <span className="text-sm font-medium">{app.deliverables.stories} Stories</span>
+                  </div>
+                  {app.deliverables.reels > 0 && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                      <span className="text-sm font-medium">{app.deliverables.reels} Reels</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3">
+                {app.status === 'pending' && (
+                  <button 
+                    onClick={() => {
+                      setSelectedApplication(app);
+                      setShowContractModal(true);
+                    }}
+                    className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center gap-2"
+                  >
+                    <span>📋</span>
+                    Approve
+                  </button>
+                )}
+                {app.status === 'approved' && (
+                  <button 
+                    onClick={() => {
+                      setSelectedApplication(app);
+                      setShowContractModal(true);
+                    }}
+                    className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center gap-2"
+                  >
+                    <span>📄</span>
+                    Send Contract
+                  </button>
+                )}
+                <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
+                  <span>❌</span>
+                  Decline
+                </button>
+                <button 
+                  onClick={() => {
+                    setSelectedApplication(app);
+                    setShowMessageModal(true);
+                  }}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                >
+                  <span>💬</span>
+                  Message
+                </button>
+                <button 
+                  onClick={() => {
+                    router.push(`/${storeId}/creator-studio/influencer/${app.id}`);
+                  }}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                >
+                  <span>👁️</span>
+                  View Details
+                </button>
               </div>
             </div>
           ))}

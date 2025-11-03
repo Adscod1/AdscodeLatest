@@ -349,16 +349,17 @@ const StoreListings = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleViewDetails(product as any)}>
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/${storeId}/product/${product.id}/edit`}>
                             <Pencil className="w-4 h-4 mr-2" />
                             Edit
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleViewDetails(product as any)}>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
+                        
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <DropdownMenuItem
@@ -427,22 +428,22 @@ const StoreListings = () => {
 
       {/* Product Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogContent className="max-w-[98vw] sm:max-w-[95vw] md:max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl max-h-[95vh] overflow-y-auto p-4 sm:p-6 lg:p-8">
           <DialogHeader className="space-y-0">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
                 <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
               </div>
-              <DialogTitle className="text-base sm:text-lg">Product Details</DialogTitle>
+              <DialogTitle className="text-base sm:text-lg lg:text-xl">Product Details</DialogTitle>
             </div>
           </DialogHeader>
 
           {selectedProduct && (
             <div className="space-y-4 sm:space-y-6">
               {/* Product Header */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-8">
                 <div className="flex-shrink-0">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-xl overflow-hidden relative">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 bg-gray-100 rounded-xl overflow-hidden relative">
                     {selectedProduct.images && selectedProduct.images[0] ? (
                       <Image
                         src={selectedProduct.images[0].url}
@@ -489,23 +490,23 @@ const StoreListings = () => {
                       </div>
                     </div>
                     <div className="text-left sm:text-right flex-shrink-0">
-                      <div className="text-xl sm:text-2xl font-bold text-gray-900">UGX {selectedProduct.price.toLocaleString()}</div>
-                      <div className="text-xs sm:text-sm text-gray-500">Current Price</div>
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">UGX {selectedProduct.price.toLocaleString()}</div>
+                      <div className="text-xs sm:text-sm lg:text-base text-gray-500">Current Price</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-                <Card className="p-3 sm:p-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                <Card className="p-3 sm:p-4 lg:p-5">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg flex-shrink-0">
                       <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Total Sold</div>
-                      <div className="text-base sm:text-xl font-bold truncate">{selectedProduct.totalSold || 0}</div>
+                      <div className="text-[10px] sm:text-xs lg:text-sm text-gray-600 uppercase truncate">Total Sold</div>
+                      <div className="text-base sm:text-xl lg:text-2xl font-bold truncate">{selectedProduct.totalSold || 0}</div>
                     </div>
                   </div>
                 </Card>
@@ -515,8 +516,8 @@ const StoreListings = () => {
                       <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Revenue</div>
-                      <div className="text-base sm:text-xl font-bold truncate">UGX {((selectedProduct.revenue || 0) / 1000000).toFixed(1)}M</div>
+                      <div className="text-[10px] sm:text-xs lg:text-sm text-gray-600 uppercase truncate">Revenue</div>
+                      <div className="text-base sm:text-xl lg:text-2xl font-bold truncate">UGX {((selectedProduct.revenue || 0) / 1000000).toFixed(1)}M</div>
                     </div>
                   </div>
                 </Card>
@@ -530,8 +531,8 @@ const StoreListings = () => {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Stock Status</div>
-                      <div className={`text-sm sm:text-lg font-bold ${selectedProduct.stockStatus?.color || 'text-gray-600'} truncate`}>
+                      <div className="text-[10px] sm:text-xs lg:text-sm text-gray-600 uppercase truncate">Stock Status</div>
+                      <div className={`text-sm sm:text-lg lg:text-xl font-bold ${selectedProduct.stockStatus?.color || 'text-gray-600'} truncate`}>
                         {selectedProduct.stockStatus?.label || 'Unknown'}
                       </div>
                     </div>
@@ -543,16 +544,16 @@ const StoreListings = () => {
                       <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[10px] sm:text-xs text-gray-600 uppercase truncate">Growth</div>
-                      <div className="text-base sm:text-xl font-bold text-green-600 truncate">{selectedProduct.growth || '0%'}</div>
+                      <div className="text-[10px] sm:text-xs lg:text-sm text-gray-600 uppercase truncate">Growth</div>
+                      <div className="text-base sm:text-xl lg:text-2xl font-bold text-green-600 truncate">{selectedProduct.growth || '0%'}</div>
                     </div>
                   </div>
                 </Card>
               </div>
 
               {/* Product Information & Inventory Management */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                <Card className="p-4 sm:p-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                <Card className="p-4 sm:p-5 lg:p-6">
                   <div className="flex items-center gap-2 mb-3 sm:mb-4">
                     <Package className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                     <h3 className="font-semibold text-base sm:text-lg">Product Information</h3>
@@ -581,7 +582,7 @@ const StoreListings = () => {
                   </div>
                 </Card>
 
-                <Card className="p-4 sm:p-5">
+                <Card className="p-4 sm:p-5 lg:p-6">
                   <div className="flex items-center gap-2 mb-3 sm:mb-4">
                     <Package className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                     <h3 className="font-semibold text-base sm:text-lg">Inventory Management</h3>
@@ -614,8 +615,8 @@ const StoreListings = () => {
               </div>
 
               {/* Sales Performance & Customer Engagement */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                <Card className="p-4 sm:p-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                <Card className="p-4 sm:p-5 lg:p-6">
                   <div className="flex items-center gap-2 mb-3 sm:mb-4">
                     <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                     <h3 className="font-semibold text-base sm:text-lg">Sales Performance</h3>
@@ -648,7 +649,7 @@ const StoreListings = () => {
                   </div>
                 </Card>
 
-                <Card className="p-4 sm:p-5">
+                <Card className="p-4 sm:p-5 lg:p-6">
                   <div className="flex items-center gap-2 mb-3 sm:mb-4">
                     <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                     <h3 className="font-semibold text-base sm:text-lg">Customer Engagement</h3>
@@ -683,12 +684,12 @@ const StoreListings = () => {
               </div>
 
               {/* Pricing Analysis */}
-              <Card className="p-4 sm:p-5">
+              <Card className="p-4 sm:p-5 lg:p-6">
                 <div className="flex items-center gap-2 mb-3 sm:mb-4">
                   <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                  <h3 className="font-semibold text-base sm:text-lg">Pricing Analysis</h3>
+                  <h3 className="font-semibold text-base sm:text-lg lg:text-xl">Pricing Analysis</h3>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                   <div>
                     <div className="text-xs sm:text-sm text-gray-600 mb-1">Cost Price</div>
                     <div className="text-xl sm:text-2xl font-bold">UGX {((selectedProduct.costPrice ?? 0)).toLocaleString()}</div>

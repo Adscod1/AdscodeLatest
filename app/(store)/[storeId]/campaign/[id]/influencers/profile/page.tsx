@@ -262,20 +262,89 @@ const UserDemographics = () => {
           <div className="flex items-center justify-center bg-gray-50 rounded-lg p-6">
             <div className="relative w-full h-48">
               <svg viewBox="0 0 800 400" className="w-full h-full">
-                <g className="map" fill="#E5E7EB" stroke="#D1D5DB" strokeWidth="1">
-                  <ellipse cx="450" cy="240" rx="60" ry="80" />
-                  <ellipse cx="430" cy="140" rx="40" ry="35" />
-                  <ellipse cx="580" cy="160" rx="80" ry="60" />
-                  <ellipse cx="220" cy="140" rx="70" ry="50" />
-                  <ellipse cx="260" cy="280" rx="45" ry="70" />
-                  <ellipse cx="680" cy="300" rx="35" ry="30" />
+                <defs>
+                  <pattern id="ocean" patternUnits="userSpaceOnUse" width="4" height="4">
+                    <rect width="4" height="4" fill="#F0F9FF"/>
+                    <circle cx="2" cy="2" r="0.5" fill="#E0F2FE" opacity="0.3"/>
+                  </pattern>
+                </defs>
+                
+                {/* Ocean Background */}
+                <rect width="800" height="400" fill="url(#ocean)"/>
+                
+                {/* Continents */}
+                <g className="continents" fill="#E5E7EB" stroke="#D1D5DB" strokeWidth="0.5">
+                  {/* North America */}
+                  <path d="M 120 80 Q 140 70 160 75 L 180 85 Q 200 90 220 100 L 240 120 Q 250 140 245 160 L 240 180 Q 230 200 220 210 L 200 220 Q 180 225 160 220 L 140 210 Q 120 200 110 180 L 105 160 Q 100 140 105 120 L 110 100 Q 115 90 120 80 Z"/>
+                  
+                  {/* South America */}
+                  <path d="M 180 240 Q 190 230 200 235 L 210 245 Q 220 260 225 280 L 230 300 Q 235 320 230 340 L 225 360 Q 220 375 210 380 L 200 385 Q 190 380 185 370 L 180 350 Q 175 330 180 310 L 185 290 Q 180 270 175 250 L 180 240 Z"/>
+                  
+                  {/* Europe */}
+                  <path d="M 350 100 Q 370 95 390 100 L 410 110 Q 420 120 425 135 L 430 150 Q 425 165 415 170 L 400 175 Q 385 170 375 160 L 365 145 Q 360 130 355 115 L 350 100 Z"/>
+                  
+                  {/* Africa */}
+                  <path d="M 380 180 Q 400 175 420 180 L 440 190 Q 450 210 455 230 L 460 250 Q 465 270 460 290 L 455 310 Q 450 330 440 340 L 420 350 Q 400 355 380 350 L 360 340 Q 350 320 355 300 L 360 280 Q 365 260 370 240 L 375 220 Q 380 200 380 180 Z"/>
+                  
+                  {/* Asia */}
+                  <path d="M 450 80 Q 480 75 510 80 L 540 90 Q 570 100 590 120 L 610 140 Q 620 160 615 180 L 610 200 Q 600 220 580 230 L 560 235 Q 540 230 520 220 L 500 210 Q 480 200 470 180 L 465 160 Q 460 140 465 120 L 470 100 Q 460 90 450 80 Z"/>
+                  
+                  {/* Australia */}
+                  <path d="M 580 300 Q 600 295 620 300 L 640 310 Q 650 320 655 335 L 650 350 Q 640 360 625 365 L 605 360 Q 590 355 580 345 L 575 330 Q 575 315 580 300 Z"/>
+                  
+                  {/* Antarctica */}
+                  <path d="M 100 360 Q 200 355 300 360 L 400 365 Q 500 370 600 365 L 700 360 Q 750 365 780 370 L 800 375 L 800 400 L 0 400 L 0 375 Q 50 370 100 360 Z"/>
                 </g>
-                <circle cx="450" cy="220" r="16" fill="#3B82F6" opacity="0.8" />
-                <circle cx="460" cy="230" r="12" fill="#3B82F6" opacity="0.8" />
-                <circle cx="220" cy="180" r="8" fill="#3B82F6" opacity="0.6" />
-                <circle cx="430" cy="150" r="10" fill="#3B82F6" opacity="0.6" />
-                <circle cx="580" cy="170" r="8" fill="#3B82F6" opacity="0.5" />
-                <circle cx="520" cy="190" r="7" fill="#3B82F6" opacity="0.5" />
+                
+                {/* Data Points based on location data */}
+                <g className="data-points">
+                  {/* Uganda */}
+                  <circle cx="420" cy="230" r="8" fill="#DC2626" opacity="0.8">
+                    <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <text x="430" y="235" fontSize="10" fill="#374151" className="font-medium">577</text>
+                  
+                  {/* Kenya */}
+                  <circle cx="430" cy="240" r="7" fill="#DC2626" opacity="0.75"/>
+                  <text x="438" y="245" fontSize="9" fill="#374151">554</text>
+                  
+                  {/* Europe (France/Germany) */}
+                  <circle cx="380" cy="130" r="6" fill="#3B82F6" opacity="0.7"/>
+                  <text x="388" y="135" fontSize="9" fill="#374151">787</text>
+                  
+                  {/* North America (Mexico) */}
+                  <circle cx="180" cy="200" r="5" fill="#10B981" opacity="0.6"/>
+                  <text x="188" y="205" fontSize="8" fill="#374151">452</text>
+                  
+                  {/* Egypt */}
+                  <circle cx="400" cy="190" r="6" fill="#F59E0B" opacity="0.7"/>
+                  <text x="408" y="195" fontSize="9" fill="#374151">501</text>
+                  
+                  {/* Nigeria */}
+                  <circle cx="360" cy="220" r="5" fill="#8B5CF6" opacity="0.6"/>
+                  <text x="368" y="225" fontSize="8" fill="#374151">488</text>
+                  
+                  {/* Tanzania */}
+                  <circle cx="440" cy="250" r="4" fill="#EC4899" opacity="0.6"/>
+                  <text x="446" y="255" fontSize="8" fill="#374151">408</text>
+                  
+                  {/* Rwanda */}
+                  <circle cx="425" cy="235" r="6" fill="#06B6D4" opacity="0.7"/>
+                  <text x="433" y="240" fontSize="9" fill="#374151">537</text>
+                </g>
+                
+                {/* Connection lines showing data flow */}
+                <g className="connections" stroke="#3B82F6" strokeWidth="1" fill="none" opacity="0.3">
+                  <path d="M 420 230 Q 400 200 380 130" strokeDasharray="2,2">
+                    <animate attributeName="stroke-dashoffset" values="0;-4" dur="1s" repeatCount="indefinite"/>
+                  </path>
+                  <path d="M 430 240 Q 300 220 180 200" strokeDasharray="2,2">
+                    <animate attributeName="stroke-dashoffset" values="0;-4" dur="1.5s" repeatCount="indefinite"/>
+                  </path>
+                  <path d="M 400 190 Q 390 160 380 130" strokeDasharray="2,2">
+                    <animate attributeName="stroke-dashoffset" values="0;-4" dur="2s" repeatCount="indefinite"/>
+                  </path>
+                </g>
               </svg>
             </div>
           </div>

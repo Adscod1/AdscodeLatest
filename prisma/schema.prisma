@@ -322,6 +322,8 @@ model Campaign {
   platforms          Json?
   targets            Json?
   status             CampaignStatus @default(DRAFT)
+  type               CampaignType   @default(PRODUCT)
+  typeSpecificData   Json?
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
@@ -330,6 +332,7 @@ model Campaign {
 
   @@index([brandId])
   @@index([status])
+  @@index([type])
   @@map("campaign")
 }
 
@@ -417,6 +420,13 @@ enum CampaignApplicationStatus {
   SELECTED
   NOT_SELECTED
   WITHDRAWN
+}
+
+enum CampaignType {
+  PRODUCT
+  COUPON
+  VIDEO
+  PROFILE
 }
 
 enum NotificationType {

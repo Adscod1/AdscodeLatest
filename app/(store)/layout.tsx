@@ -1,15 +1,58 @@
 "use client";
-import { Plus, Search, LayoutDashboard, Wallet, Package, Megaphone, Star, TrendingUp, Search as SearchIcon, Smile, Ticket, MessageSquare, Bell, Settings, User, Menu, X } from "lucide-react";
+import { Plus, Search, LayoutDashboard, Wallet, Package, Megaphone, Star, TrendingUp, Search as SearchIcon, Smile, Ticket, MessageSquare, Bell, Settings, User, Menu, X, MoreHorizontal, UserPlus, Users as UsersIcon, LogOut, ChevronDown, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { UserAuthButton } from "../(main)/components/UserAuthButton";
+import { useQuery } from "@tanstack/react-query";
+import { getStoreById } from "@/actions/store";
 
 const StoreLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const storeId = pathname.split("/")[1];
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isStoreMenuOpen, setIsStoreMenuOpen] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showManageUsersModal, setShowManageUsersModal] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [userRole, setUserRole] = useState("User");
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+
+  // Fetch store data using the same pattern as the dashboard
+  const {
+    data: store,
+    isLoading: isLoadingStore,
+  } = useQuery({
+    queryKey: ["store", storeId],
+    queryFn: () => getStoreById(storeId as string),
+    enabled: !!storeId,
+  });
+
+  // Mock users data
+  const [users, setUsers] = useState([
+    { id: 1, email: "admin@adscod.com", role: "Admin" },
+    { id: 2, email: "moderator@adscod.com", role: "Moderator" },
+    { id: 3, email: "user@adscod.com", role: "User" },
+  ]);
+
+  const handleAddUser = () => {
+    if (userEmail.trim()) {
+      const newUser = {
+        id: users.length + 1,
+        email: userEmail.trim(),
+        role: userRole,
+      };
+      setUsers([...users, newUser]);
+      setUserEmail("");
+      setUserRole("User");
+      setShowAddUserModal(false);
+    }
+  };
+
+  const handleDeleteUser = (userId: number) => {
+    setUsers(users.filter(user => user.id !== userId));
+  };
 
   useEffect(() => {
     const checkScreenSize = () => { 
@@ -21,6 +64,26 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
 
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
+
+  // Close store menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isStoreMenuOpen) {
+        setIsStoreMenuOpen(false);
+      }
+      if (showRoleDropdown) {
+        setShowRoleDropdown(false);
+      }
+    };
+
+    if (isStoreMenuOpen || showRoleDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isStoreMenuOpen, showRoleDropdown]);
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -48,6 +111,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
+    <>
     <div className="flex h-screen bg-gray-50">
       {/* Mobile overlay */}
       {isMobileMenuOpen && (
@@ -187,17 +251,58 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </div>
 
-        {/* User Profile at bottom */}
-        <div className="px-6 py-4 border-t border-gray-200">
+        {/* Store Profile at bottom */}
+        <div className="px-6 py-4 border-t border-gray-200 relative">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center mr-3">
-              <span className="text-white text-sm font-medium">IG</span>
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+              <span className="text-white text-sm font-medium">
+                {isLoadingStore ? 'S' : (store?.name?.charAt(0).toUpperCase() || 'S')}
+              </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">Iga</p>
-              <p className="text-xs text-gray-500 truncate">Administrator</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {isLoadingStore ? 'Loading...' : (store?.name || 'Store Name')}
+              </p>
+              <p className="text-xs text-gray-500 truncate">Active Store</p>
             </div>
+            <button 
+              className="p-1 hover:bg-gray-100 rounded"
+              onClick={() => setIsStoreMenuOpen(!isStoreMenuOpen)}
+            >
+              <MoreHorizontal className="w-4 h-4 text-gray-400" />
+            </button>
           </div>
+
+          {/* Dropdown Menu */}
+          {isStoreMenuOpen && (
+            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <button 
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                onClick={() => {
+                  setShowAddUserModal(true);
+                  setIsStoreMenuOpen(false);
+                }}
+              >
+                <UserPlus className="w-4 h-4 mr-3 text-gray-400" />
+                Add User
+              </button>
+              <button 
+                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                onClick={() => {
+                  setShowManageUsersModal(true);
+                  setIsStoreMenuOpen(false);
+                }}
+              >
+                <UsersIcon className="w-4 h-4 mr-3 text-gray-400" />
+                Manage Users
+              </button>
+              <div className="border-t border-gray-100 my-1"></div>
+              <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center">
+                <LogOut className="w-4 h-4 mr-3 text-red-500" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -234,6 +339,144 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="p-4 md:p-8">{children}</div>
       </main>
     </div>
+
+    {/* Add User Modal */}
+      {showAddUserModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Add New User</h2>
+              <button 
+                onClick={() => setShowAddUserModal(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-4">
+              Add a new user to your organization with a specific role.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role
+                </label>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <span className="text-gray-900">{userRole}</span>
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  </button>
+                  
+                  {showRoleDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                      {["Admin", "Moderator", "User"].map((role) => (
+                        <button
+                          key={role}
+                          onClick={() => {
+                            setUserRole(role);
+                            setShowRoleDropdown(false);
+                          }}
+                          className={`w-full px-3 py-2 text-left hover:bg-gray-50 ${
+                            userRole === role ? "bg-blue-50 text-blue-600" : "text-gray-900"
+                          }`}
+                        >
+                          {role}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowAddUserModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddUser}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+              >
+                Add User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manage Users Modal */}
+      {showManageUsersModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Manage Users</h2>
+              <button 
+                onClick={() => setShowManageUsersModal(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-4">
+              View and manage all users in your organization.
+            </p>
+
+            <div className="space-y-3 max-h-64 overflow-y-auto">
+              {users.map((user) => (
+                <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user.email}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {user.role}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteUser(user.id)}
+                    className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                    title="Delete user"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setShowManageUsersModal(false)}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
