@@ -2,7 +2,7 @@
 
 ## 1. Introduction/Overview
 
-This document outlines the requirements for the Minimum Viable Product (MVP) of the Influencer Campaign Marketplace. The primary goal of this feature is to create a platform where brands can post marketing campaigns and influencers can apply to participate. This initial version will focus exclusively on the creation, discovery, and application process, establishing the core marketplace functionality. All financial transactions, performance tracking, and detailed milestone management will be handled outside the platform for this MVP.
+This document outlines the requirements for the Minimum Viable Product (MVP) of the Influencer Campaign Marketplace. The primary goal of this feature is to create a platform where brands can post marketing campaigns and influencers can apply to participate. This initial version will focus exclusively on the creation, discovery, and application process, establishing the core marketplace functionality. All financial transactions, performance tracking, and detailed milestone management will be handled later.
 
 **Context:** The application already has:
 - An existing multi-step campaign creation UI at `/campaign/new` (currently non-functional)
