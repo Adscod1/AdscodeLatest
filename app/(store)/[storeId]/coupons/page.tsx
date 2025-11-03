@@ -1,14 +1,17 @@
 "use client";
-import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useRef, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, TrendingUp, DollarSign, Users, BarChart3, MoreVertical, Plus } from 'lucide-react';
+import { Search, TrendingUp, DollarSign, Users, BarChart3, MoreVertical, Plus, Eye, Edit, Copy, Trash2 } from 'lucide-react';
 
 export default function CouponsPage() {
   const pathname = usePathname();
+  const router = useRouter();
   const storeId = pathname.split("/")[1];
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [typeFilter, setTypeFilter] = useState('All Types');
+  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const dropdownRefs = useRef<{[key: number]: HTMLDivElement | null}>({});
 
   const coupons = [
     {
@@ -94,6 +97,54 @@ export default function CouponsPage() {
     { label: 'Avg. Usage Rate', value: '45%', subtext: 'Coupon effectiveness', icon: TrendingUp },
     { label: 'Revenue Impact', value: '$12,450', subtext: 'Generated this month', icon: DollarSign }
   ];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const clickedOutside = Object.values(dropdownRefs.current).every(ref => 
+        !ref || !ref.contains(event.target as Node)
+      );
+      
+      if (clickedOutside) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleDropdownToggle = (couponId: number) => {
+    setOpenDropdown(openDropdown === couponId ? null : couponId);
+  };
+
+  const handleMenuAction = (action: string, coupon: any) => {
+    setOpenDropdown(null);
+    
+    switch (action) {
+      case 'view':
+        // Navigate to coupon details
+        console.log('Navigating to:', `/${storeId}/coupons/${coupon.id}`);
+        router.push(`/${storeId}/coupons/${coupon.id}`);
+        break;
+      case 'edit':
+        // Navigate to edit coupon
+        console.log('Edit coupon:', coupon);
+        break;
+      case 'duplicate':
+        // Duplicate coupon logic
+        console.log('Duplicate coupon:', coupon);
+        break;
+      case 'delete':
+        // Delete coupon logic
+        console.log('Delete coupon:', coupon);
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
@@ -200,9 +251,48 @@ export default function CouponsPage() {
                       }`}>
                         {coupon.status}
                       </span>
-                      <button className="p-1 hover:bg-gray-100 rounded">
-                        <MoreVertical className="w-4 h-4 text-gray-400" />
-                      </button>
+                      <div className="relative" ref={el => { dropdownRefs.current[coupon.id] = el; }}>
+                        <button 
+                          onClick={() => handleDropdownToggle(coupon.id)}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
+                          <MoreVertical className="w-4 h-4 text-gray-400" />
+                        </button>
+                        
+                        {openDropdown === coupon.id && (
+                          <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                            <button
+                              onClick={() => handleMenuAction('view', coupon)}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                            >
+                              <Eye className="w-4 h-4" />
+                              View Details
+                            </button>
+                            <button
+                              onClick={() => handleMenuAction('edit', coupon)}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                            >
+                              <Edit className="w-4 h-4" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleMenuAction('duplicate', coupon)}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                            >
+                              <Copy className="w-4 h-4" />
+                              Duplicate
+                            </button>
+                            <hr className="my-1" />
+                            <button
+                              onClick={() => handleMenuAction('delete', coupon)}
+                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
