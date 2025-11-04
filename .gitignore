@@ -49,3 +49,8 @@ next-env.d.ts
 /.github
 
 /campaign-videos
+
+# uploads (large files)
+/public/uploads/**/*.mp4
+/public/uploads/**/*.mov
+/public/uploads/**/*.avi
