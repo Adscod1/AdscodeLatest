@@ -2,7 +2,11 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, X } from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { createCampaign } from '@/actions/campaign';
+
+// Campaign type enum matching backend
+type CampaignType = 'PRODUCT' | 'COUPON' | 'VIDEO' | 'PROFILE';
 
 // Define types for the campaign data
 interface Target {
@@ -30,10 +34,43 @@ interface CallToAction {
   description: string;
 }
 
+// Type-specific campaign data interfaces
+interface CouponCampaignData {
+  couponId?: string;
+  couponCode?: string;
+  applicationInstructions?: string;
+}
+
+interface ProductCampaignData {
+  productId?: string;
+  productLink?: string;
+  shopUrl?: string;
+}
+
+interface VideoCampaignData {
+  videoUrl: string;
+  videoSize: number;
+  videoFormat: string;
+  caption: string;
+}
+
+interface ProfileCampaignData {
+  profileUrl: string;
+  targetMetrics?: {
+    followers?: number;
+    engagement?: number;
+    reach?: number;
+  };
+}
+
+type TypeSpecificData = CouponCampaignData | ProductCampaignData | VideoCampaignData | ProfileCampaignData | null;
+
 interface CampaignData {
   title: string;
   category: string;
-  campaignType: string;
+  campaignType: string; // Frontend display name
+  type?: CampaignType; // Backend enum value
+  typeSpecificData?: TypeSpecificData; // Type-specific data
   description: string;
   budget: string;
   currency: string;
@@ -55,10 +92,29 @@ interface CampaignData {
 
 const InfluencerCampaignManager = () => {
   const params = useParams();
+  const router = useRouter();
   const storeId = params.storeId as string;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [showCampaignTypeModal, setShowCampaignTypeModal] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [showProductBrowser, setShowProductBrowser] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [productSearchQuery, setProductSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedCoupon, setSelectedCoupon] = useState<string>('');
+  const [couponCode, setCouponCode] = useState<string>('');
+  const [applicationInstructions, setApplicationInstructions] = useState<string>('');
+  const [profileUrl, setProfileUrl] = useState<string>('');
+  const [profileUrlError, setProfileUrlError] = useState<string>('');
+  const [targetFollowers, setTargetFollowers] = useState<string>('');
+  const [targetEngagement, setTargetEngagement] = useState<string>('');
+  const [targetReach, setTargetReach] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [campaignData, setCampaignData] = useState<CampaignData>({
     title: '',
     category: '',
@@ -89,6 +145,310 @@ const InfluencerCampaignManager = () => {
     ]
   });
 
+  // Map frontend campaign type strings to backend enum
+  const mapCampaignTypeToEnum = (displayName: string): CampaignType => {
+    switch (displayName) {
+      case 'Product Campaign':
+        return 'PRODUCT';
+      case 'Coupon Campaign':
+        return 'COUPON';
+      case 'Video Campaign':
+        return 'VIDEO';
+      case 'Profile Campaign':
+        return 'PROFILE';
+      default:
+        return 'PRODUCT';
+    }
+  };
+
+  // Handle video file upload
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
+    if (!validTypes.includes(file.type)) {
+      setUploadError('Invalid file type. Please upload MP4, MOV, AVI, or WEBM files.');
+      return;
+    }
+
+    // Validate file size (500MB max)
+    const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+    if (file.size > maxSize) {
+      setUploadError('File size exceeds 500MB limit.');
+      return;
+    }
+
+    setIsUploadingVideo(true);
+    setUploadError(null);
+    setVideoUploadProgress(0);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);  // Changed from 'video' to 'file'
+      formData.append('caption', ''); // Optional caption
+
+      const xhr = new XMLHttpRequest();
+
+      // Track upload progress
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const progress = Math.round((e.loaded / e.total) * 100);
+          setVideoUploadProgress(progress);
+        }
+      });
+
+      // Handle upload completion
+      xhr.addEventListener('load', () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          const videoData: VideoCampaignData = {
+            videoUrl: response.videoUrl,
+            videoSize: response.videoSize,
+            videoFormat: response.videoFormat,
+            caption: ''
+          };
+          
+          setCampaignData(prev => ({
+            ...prev,
+            typeSpecificData: videoData
+          }));
+          
+          setIsUploadingVideo(false);
+          setVideoUploadProgress(0);
+        } else {
+          const error = JSON.parse(xhr.responseText);
+          setUploadError(error.error || 'Upload failed. Please try again.');
+          setIsUploadingVideo(false);
+          setVideoUploadProgress(0);
+        }
+      });
+
+      // Handle upload error
+      xhr.addEventListener('error', () => {
+        setUploadError('Network error. Please check your connection and try again.');
+        setIsUploadingVideo(false);
+        setVideoUploadProgress(0);
+      });
+
+      xhr.open('POST', '/api/campaigns/upload-video');
+      xhr.send(formData);
+
+    } catch (error) {
+      console.error('Video upload error:', error);
+      setUploadError('An unexpected error occurred. Please try again.');
+      setIsUploadingVideo(false);
+      setVideoUploadProgress(0);
+    }
+  };
+
+  // Handle video caption change
+  const handleVideoCaptionChange = (caption: string) => {
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: {
+        ...(prev.typeSpecificData as VideoCampaignData),
+        caption
+      }
+    }));
+  };
+
+  // Fetch products from store
+  const fetchProducts = async () => {
+    setIsLoadingProducts(true);
+    try {
+      const params = new URLSearchParams({
+        storeId,
+        limit: '50'
+      });
+      
+      if (productSearchQuery) {
+        params.append('search', productSearchQuery);
+      }
+
+      const response = await fetch(`/api/campaigns/products?${params}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
+      const data = await response.json();
+      setProducts(data.products || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setUploadError('Failed to load products. Please try again.');
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
+
+  // Handle product selection from browser
+  const handleProductSelect = (product: any) => {
+    setSelectedProduct(product);
+    const productData: ProductCampaignData = {
+      productId: product.id,
+      productLink: product.link || '',
+      shopUrl: product.shopUrl || ''
+    };
+    
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: productData
+    }));
+    
+    setShowProductBrowser(false);
+  };
+
+  // Handle product link change (manual entry)
+  const handleProductLinkChange = (link: string) => {
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: {
+        ...(prev.typeSpecificData as ProductCampaignData || {}),
+        productLink: link
+      }
+    }));
+  };
+
+  // Handle shop URL change
+  const handleShopUrlChange = (url: string) => {
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: {
+        ...(prev.typeSpecificData as ProductCampaignData || {}),
+        shopUrl: url
+      }
+    }));
+  };
+
+  // Open product browser and fetch products
+  const openProductBrowser = () => {
+    setShowProductBrowser(true);
+    fetchProducts();
+  };
+
+  // Handle coupon selection from dropdown
+  const handleCouponSelect = (couponId: string) => {
+    setSelectedCoupon(couponId);
+    const couponData: CouponCampaignData = {
+      couponId: couponId,
+      applicationInstructions: applicationInstructions
+    };
+    
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: couponData
+    }));
+  };
+
+  // Handle coupon code manual entry
+  const handleCouponCodeChange = (code: string) => {
+    setCouponCode(code);
+    const couponData: CouponCampaignData = {
+      couponCode: code,
+      applicationInstructions: applicationInstructions
+    };
+    
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: couponData
+    }));
+  };
+
+  // Handle application instructions change
+  const handleApplicationInstructionsChange = (instructions: string) => {
+    setApplicationInstructions(instructions);
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: {
+        ...(prev.typeSpecificData as CouponCampaignData || {}),
+        applicationInstructions: instructions
+      }
+    }));
+  };
+
+  // Validate profile URL
+  const validateProfileUrl = (url: string): boolean => {
+    if (!url) {
+      setProfileUrlError('Profile URL is required');
+      return false;
+    }
+
+    try {
+      const urlObj = new URL(url);
+      
+      // Check if it's a valid social media profile URL
+      const validDomains = [
+        'instagram.com',
+        'tiktok.com',
+        'youtube.com',
+        'twitter.com',
+        'facebook.com',
+        'linkedin.com',
+        'twitch.tv'
+      ];
+
+      const isValidDomain = validDomains.some(domain => 
+        urlObj.hostname.includes(domain)
+      );
+
+      if (!isValidDomain) {
+        setProfileUrlError('Please enter a valid social media profile URL');
+        return false;
+      }
+
+      setProfileUrlError('');
+      return true;
+    } catch (error) {
+      setProfileUrlError('Please enter a valid URL (e.g., https://instagram.com/username)');
+      return false;
+    }
+  };
+
+  // Handle profile URL change
+  const handleProfileUrlChange = (url: string) => {
+    setProfileUrl(url);
+    
+    if (url) {
+      validateProfileUrl(url);
+      
+      const profileData: ProfileCampaignData = {
+        profileUrl: url,
+        targetMetrics: {
+          followers: targetFollowers ? parseInt(targetFollowers) : undefined,
+          engagement: targetEngagement ? parseInt(targetEngagement) : undefined,
+          reach: targetReach ? parseInt(targetReach) : undefined
+        }
+      };
+      
+      setCampaignData(prev => ({
+        ...prev,
+        typeSpecificData: profileData
+      }));
+    }
+  };
+
+  // Handle target metrics change
+  const handleTargetMetricChange = (metric: 'followers' | 'engagement' | 'reach', value: string) => {
+    const numValue = value ? parseInt(value) : undefined;
+    
+    if (metric === 'followers') setTargetFollowers(value);
+    if (metric === 'engagement') setTargetEngagement(value);
+    if (metric === 'reach') setTargetReach(value);
+
+    setCampaignData(prev => ({
+      ...prev,
+      typeSpecificData: {
+        ...(prev.typeSpecificData as ProfileCampaignData || { profileUrl }),
+        targetMetrics: {
+          ...((prev.typeSpecificData as ProfileCampaignData)?.targetMetrics || {}),
+          [metric]: numValue
+        }
+      }
+    }));
+  };
+
   const steps = [
     { id: 'basic-info', title: 'Basic Info', icon: <Users className="w-4 h-4" /> },
     { id: 'targets-goals', title: 'Targets & Goals', icon: <Target className="w-4 h-4" /> },
@@ -102,25 +462,52 @@ const InfluencerCampaignManager = () => {
   const deliverableTypes = ['Post', 'Story', 'Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
   const campaignTypes = ['Product Campaign', 'Coupon Campaign', 'Video Campaign', 'Profile Campaign'];
+  const metricOptions = ['Reach', 'Views', 'Sales', 'Clicks', 'Conversion Rate', 'Engagement Rate', 'Reviews'];
 
-  const handleInputChange = (field: keyof CampaignData, value: string | number) => {
-    setCampaignData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleCampaignTypeSelect = (type: string) => {
-    setCampaignData(prev => ({ ...prev, campaignType: type }));
-    setShowCampaignTypeModal(true);
-  };
-
-  const handleTargetChange = (index: number, field: keyof Target, value: string) => {
-    const newTargets = [...campaignData.targets];
-    newTargets[index] = {
-      ...newTargets[index],
-      [field]: value
+  // Helper function to get appropriate unit based on metric
+  const getUnitForMetric = (metric: string): string => {
+    const metricUnitMap: Record<string, string> = {
+      'Reach': 'Users',
+      'Views': 'Views',
+      'Sales': 'Sales',
+      'Clicks': 'Clicks',
+      'Conversion Rate': 'Percentage',
+      'Engagement Rate': 'Percentage',
+      'Reviews': 'Reviews'
     };
-    setCampaignData(prev => ({ ...prev, targets: newTargets }));
+    return metricUnitMap[metric] || 'Users';
   };
 
+  // Helper function to get placeholder based on metric
+  const getPlaceholderForMetric = (metric: string): string => {
+    const metricPlaceholderMap: Record<string, string> = {
+      'Reach': 'e.g., 100000',
+      'Views': 'e.g., 50000',
+      'Sales': 'e.g., 1000',
+      'Clicks': 'e.g., 5000',
+      'Conversion Rate': 'e.g., 5.5',
+      'Engagement Rate': 'e.g., 3.2',
+      'Reviews': 'e.g., 50'
+    };
+    return metricPlaceholderMap[metric] || 'Enter target value';
+  };
+
+  // Handle target change with auto-unit selection
+  const handleTargetChange = (index: number, field: 'metric' | 'value' | 'unit', value: string) => {
+    setCampaignData(prev => {
+      const newTargets = [...prev.targets];
+      newTargets[index] = { ...newTargets[index], [field]: value };
+      
+      // Auto-update unit when metric changes
+      if (field === 'metric' && value) {
+        newTargets[index].unit = getUnitForMetric(value);
+      }
+      
+      return { ...prev, targets: newTargets };
+    });
+  };
+
+  // Add new target
   const addTarget = () => {
     setCampaignData(prev => ({
       ...prev,
@@ -128,11 +515,27 @@ const InfluencerCampaignManager = () => {
     }));
   };
 
+  // Remove target
   const removeTarget = (index: number) => {
     setCampaignData(prev => ({
       ...prev,
       targets: prev.targets.filter((_, i) => i !== index)
     }));
+  };
+
+  const handleInputChange = (field: keyof CampaignData, value: string | number) => {
+    setCampaignData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCampaignTypeSelect = (type: string) => {
+    const backendType = mapCampaignTypeToEnum(type);
+    setCampaignData(prev => ({ 
+      ...prev, 
+      campaignType: type,
+      type: backendType,
+      typeSpecificData: null // Reset type-specific data when changing type
+    }));
+    setShowCampaignTypeModal(true);
   };
 
   const handlePlatformChange = (platform: string) => {
@@ -220,6 +623,248 @@ const InfluencerCampaignManager = () => {
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
+  // Validate type-specific data
+  const validateTypeSpecificData = (): { valid: boolean; error?: string } => {
+    if (!campaignData.type) {
+      return { valid: false, error: 'Please select a campaign type' };
+    }
+
+    switch (campaignData.type) {
+      case 'VIDEO':
+        if (!campaignData.typeSpecificData || !('videoUrl' in campaignData.typeSpecificData)) {
+          return { valid: false, error: 'Please upload a video for Video Campaign' };
+        }
+        const videoData = campaignData.typeSpecificData as VideoCampaignData;
+        if (!videoData.caption || videoData.caption.trim() === '') {
+          return { valid: false, error: 'Video caption is required' };
+        }
+        if (videoData.videoSize > 500 * 1024 * 1024) {
+          return { valid: false, error: 'Video size must not exceed 500MB' };
+        }
+        break;
+
+      case 'PRODUCT':
+        if (!campaignData.typeSpecificData) {
+          return { valid: false, error: 'Please select a product or provide product details' };
+        }
+        const productData = campaignData.typeSpecificData as ProductCampaignData;
+        if (!productData.productId && !productData.productLink) {
+          return { valid: false, error: 'Either product selection or product link is required' };
+        }
+        if (productData.productLink && !productData.shopUrl) {
+          return { valid: false, error: 'Shop URL is required when using product link' };
+        }
+        break;
+
+      case 'COUPON':
+        if (!campaignData.typeSpecificData) {
+          return { valid: false, error: 'Please provide coupon details' };
+        }
+        const couponData = campaignData.typeSpecificData as CouponCampaignData;
+        if (!couponData.couponId && !couponData.couponCode) {
+          return { valid: false, error: 'Either coupon selection or coupon code is required' };
+        }
+        if (!applicationInstructions || applicationInstructions.trim() === '') {
+          return { valid: false, error: 'Application instructions are required for Coupon Campaign' };
+        }
+        break;
+
+      case 'PROFILE':
+        if (!profileUrl || profileUrl.trim() === '') {
+          return { valid: false, error: 'Profile URL is required for Profile Campaign' };
+        }
+        if (profileUrlError) {
+          return { valid: false, error: profileUrlError };
+        }
+        if (!campaignData.typeSpecificData || !('profileUrl' in campaignData.typeSpecificData)) {
+          return { valid: false, error: 'Please provide a valid profile URL' };
+        }
+        break;
+
+      default:
+        return { valid: false, error: 'Invalid campaign type' };
+    }
+
+    return { valid: true };
+  };
+
+  // Validate basic campaign fields
+  const validateBasicFields = (): { valid: boolean; error?: string } => {
+    if (!campaignData.title || campaignData.title.trim() === '') {
+      return { valid: false, error: 'Campaign title is required' };
+    }
+
+    if (campaignData.title.length < 3) {
+      return { valid: false, error: 'Campaign title must be at least 3 characters' };
+    }
+
+    if (!campaignData.category) {
+      return { valid: false, error: 'Campaign category is required' };
+    }
+
+    if (!campaignData.campaignType) {
+      return { valid: false, error: 'Campaign type is required' };
+    }
+
+    if (!campaignData.description || campaignData.description.trim() === '') {
+      return { valid: false, error: 'Campaign description is required' };
+    }
+
+    if (campaignData.description.length < 10) {
+      return { valid: false, error: 'Campaign description must be at least 10 characters' };
+    }
+
+    if (!campaignData.budget || parseFloat(campaignData.budget) <= 0) {
+      return { valid: false, error: 'Valid budget amount is required' };
+    }
+
+    if (!campaignData.startDate) {
+      return { valid: false, error: 'Start date is required' };
+    }
+
+    if (!campaignData.endDate) {
+      return { valid: false, error: 'End date is required' };
+    }
+
+    const startDate = new Date(campaignData.startDate);
+    const endDate = new Date(campaignData.endDate);
+
+    if (endDate <= startDate) {
+      return { valid: false, error: 'End date must be after start date' };
+    }
+
+    return { valid: true };
+  };
+
+  // Handle campaign submission
+  const handleSubmitCampaign = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Validate basic fields
+      const basicValidation = validateBasicFields();
+      if (!basicValidation.valid) {
+        setSubmitError(basicValidation.error || 'Validation failed');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate platforms on submission
+      if (campaignData.platforms.length === 0) {
+        setSubmitError('Please select at least one platform');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate type-specific data
+      const typeValidation = validateTypeSpecificData();
+      if (!typeValidation.valid) {
+        setSubmitError(typeValidation.error || 'Type-specific validation failed');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Prepare campaign data for submission
+      const submissionData: any = {
+        title: campaignData.title,
+        description: campaignData.description,
+        budget: parseFloat(campaignData.budget),
+        currency: campaignData.currency || 'USD',
+        duration: campaignData.startDate && campaignData.endDate 
+          ? Math.ceil((new Date(campaignData.endDate).getTime() - new Date(campaignData.startDate).getTime()) / (1000 * 60 * 60 * 24))
+          : undefined,
+        platforms: campaignData.platforms,
+        targets: {
+          awareness: campaignData.targets.filter(t => t.metric && t.value).map(t => `${t.metric}: ${t.value} ${t.unit}`),
+          advocacy: [],
+          conversions: [],
+          contentType: [campaignData.contentStyle].filter(Boolean),
+        },
+        type: campaignData.type,
+        typeSpecificData: campaignData.typeSpecificData || undefined,
+      };
+
+      // Call server action
+      const result = await createCampaign(submissionData);
+
+      if (result.success) {
+        // Success! Redirect to campaigns list
+        router.push(`/${storeId}/campaigns`);
+      } else {
+        setSubmitError(result.error || 'Failed to create campaign');
+      }
+    } catch (error) {
+      console.error('Error submitting campaign:', error);
+      setSubmitError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Validate current step before proceeding
+  const validateCurrentStep = (): boolean => {
+    setSubmitError(null);
+
+    switch (currentStep) {
+      case 0: // Basic Info
+        const basicValidation = validateBasicFields();
+        if (!basicValidation.valid) {
+          setSubmitError(basicValidation.error || 'Please complete all required fields');
+          return false;
+        }
+        
+        // Also validate type-specific data if type is selected
+        if (campaignData.type) {
+          const typeValidation = validateTypeSpecificData();
+          if (!typeValidation.valid) {
+            setSubmitError(typeValidation.error || 'Please complete type-specific requirements');
+            return false;
+          }
+        }
+        break;
+
+      case 1: // Targets & Goals
+        if (campaignData.platforms.length === 0) {
+          setSubmitError('Please select at least one platform');
+          return false;
+        }
+        break;
+
+      case 2: // Campaign Objective
+        if (!campaignData.campaignObjective) {
+          setSubmitError('Please select a campaign objective');
+          return false;
+        }
+        break;
+
+      case 3: // Milestones
+        const validMilestones = campaignData.milestones.filter(m => m.title && m.dueDate);
+        if (validMilestones.length === 0) {
+          setSubmitError('Please add at least one milestone');
+          return false;
+        }
+        break;
+
+      case 4: // Deliverables
+        const validDeliverables = campaignData.deliverables.filter(d => d.type && d.quantity > 0);
+        if (validDeliverables.length === 0) {
+          setSubmitError('Please add at least one deliverable');
+          return false;
+        }
+        break;
+    }
+
+    return true;
+  };
+
+  // Enhanced nextStep with validation
+  const handleNextStep = () => {
+    if (validateCurrentStep()) {
+      nextStep();
+    }
+  };
+
   // Campaign Type Modal Component
   const CampaignTypeModal = () => {
     if (!showCampaignTypeModal) return null;
@@ -251,67 +896,168 @@ const InfluencerCampaignManager = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Video
+                    Upload Video <span className="text-red-500">*</span>
                   </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                    <input type="file" accept="video/*" className="hidden" id="video-upload" />
-                    <label htmlFor="video-upload" className="cursor-pointer">
-                      <div className="text-gray-400 mb-2">
-                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  
+                  {!campaignData.typeSpecificData && !isUploadingVideo && (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
+                      <input 
+                        type="file" 
+                        accept="video/mp4,video/quicktime,video/x-msvideo,video/webm" 
+                        className="hidden" 
+                        id="video-upload"
+                        onChange={handleVideoUpload}
+                        disabled={isUploadingVideo}
+                      />
+                      <label htmlFor="video-upload" className="cursor-pointer">
+                        <div className="text-gray-400 mb-2">
+                          <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        </div>
+                        <p className="text-sm text-gray-600 font-medium">Click to upload video</p>
+                        <p className="text-xs text-gray-500 mt-1">MP4, MOV, AVI, or WEBM (max 500MB)</p>
+                      </label>
+                    </div>
+                  )}
+
+                  {isUploadingVideo && (
+                    <div className="border-2 border-blue-300 rounded-lg p-8 text-center bg-blue-50">
+                      <div className="text-blue-600 mb-2">
+                        <svg className="w-12 h-12 mx-auto animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                       </div>
-                      <p className="text-sm text-gray-600 font-medium">Choose file</p>
-                      <p className="text-xs text-gray-500 mt-1">No file chosen</p>
-                    </label>
-                  </div>
+                      <p className="text-sm text-blue-700 font-medium mb-2">Uploading video...</p>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div 
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                          style={{ width: `${videoUploadProgress}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-blue-600">{videoUploadProgress}%</p>
+                    </div>
+                  )}
+
+                  {campaignData.typeSpecificData && 'videoUrl' in campaignData.typeSpecificData && (
+                    <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
+                          <CheckCircle className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-green-900">Video uploaded successfully</p>
+                          <p className="text-xs text-green-700 mt-1">
+                            {((campaignData.typeSpecificData as VideoCampaignData).videoSize / (1024 * 1024)).toFixed(2)} MB · {(campaignData.typeSpecificData as VideoCampaignData).videoFormat}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setCampaignData(prev => ({ ...prev, typeSpecificData: null }))}
+                          className="text-green-700 hover:text-green-900"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {uploadError && (
+                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-700">{uploadError}</p>
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Video Caption or Campaign Brief
+                    Video Caption or Campaign Brief <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     rows={4}
+                    value={campaignData.typeSpecificData && 'caption' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as VideoCampaignData).caption : ''}
+                    onChange={(e) => handleVideoCaptionChange(e.target.value)}
                     placeholder="Add a video caption or campaign brief..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-
-                {/* <button 
-                  onClick={() => setShowCampaignTypeModal(false)}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                  Save Video Campaign
-                </button> */}
               </div>
             )}
 
             {campaignData.campaignType === 'Product Campaign' && (
               <div className="space-y-4">
-                
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Product Campaign Setup</h3>
+                </div>
 
-                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                  Browse Shop
-                </button>
+                {selectedProduct ? (
+                  <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
+                    <div className="flex items-center gap-3">
+                      {selectedProduct.image && (
+                        <img 
+                          src={selectedProduct.image} 
+                          alt={selectedProduct.title}
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-green-900">{selectedProduct.title}</p>
+                        <p className="text-xs text-green-700 mt-1">
+                          {selectedProduct.price && `$${selectedProduct.price}`}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(null);
+                          setCampaignData(prev => ({ ...prev, typeSpecificData: null }));
+                        }}
+                        className="text-green-700 hover:text-green-900"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={openProductBrowser}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    <Package className="w-5 h-5" />
+                    Browse Shop
+                  </button>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product Link
+                    Product Link (Optional)
                   </label>
                   <input
                     type="text"
-                    placeholder="Search or paste product link..."
+                    value={campaignData.typeSpecificData && 'productLink' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).productLink : ''}
+                    onChange={(e) => handleProductLinkChange(e.target.value)}
+                    placeholder="https://example.com/product"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Enter a direct link to the product (if not selected from shop)</p>
                 </div>
 
-                {/* <button 
-                  onClick={() => setShowCampaignTypeModal(false)}
-                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
-                >
-                  Save Product Campaign
-                </button> */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Shop URL (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={campaignData.typeSpecificData && 'shopUrl' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).shopUrl : ''}
+                    onChange={(e) => handleShopUrlChange(e.target.value)}
+                    placeholder="https://myshop.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Your shop URL where the product is available</p>
+                </div>
               </div>
             )}
 
@@ -327,31 +1073,126 @@ const InfluencerCampaignManager = () => {
                 </div>
 
                 <div>
-                 
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Profile URL <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="url"
-                    placeholder="Enter profile URL"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={profileUrl}
+                    onChange={(e) => handleProfileUrlChange(e.target.value)}
+                    onBlur={(e) => validateProfileUrl(e.target.value)}
+                    placeholder="https://instagram.com/yourprofile"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                      profileUrlError 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
                   />
+                  {profileUrlError ? (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {profileUrlError}
+                    </p>
+                  ) : profileUrl && !profileUrlError ? (
+                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      Valid profile URL
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Enter Instagram, TikTok, YouTube, Twitter, Facebook, LinkedIn, or Twitch profile URL
+                    </p>
+                  )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Campaign Goals
-                  </label>
-                  <textarea
-                    rows={4}
-                    placeholder="Describe your goals for this promotion..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                {profileUrl && !profileUrlError && (
+                  <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-purple-900">Profile URL Set</p>
+                        <p className="text-xs text-purple-700 mt-1 truncate">{profileUrl}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Target className="w-4 h-4" />
+                    Target Metrics (Optional)
+                  </h4>
+                  <p className="text-xs text-gray-500 mb-3">Set goals for profile growth</p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Followers Goal
+                      </label>
+                      <input
+                        type="number"
+                        value={targetFollowers}
+                        onChange={(e) => handleTargetMetricChange('followers', e.target.value)}
+                        placeholder="e.g., 10000"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Engagement Goal
+                      </label>
+                      <input
+                        type="number"
+                        value={targetEngagement}
+                        onChange={(e) => handleTargetMetricChange('engagement', e.target.value)}
+                        placeholder="e.g., 500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Reach Goal
+                      </label>
+                      <input
+                        type="number"
+                        value={targetReach}
+                        onChange={(e) => handleTargetMetricChange('reach', e.target.value)}
+                        placeholder="e.g., 50000"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* <button 
-                  onClick={() => setShowCampaignTypeModal(false)}
-                  className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium"
-                >
-                  Save Profile Campaign
-                </button> */}
+                {(targetFollowers || targetEngagement || targetReach) && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                    <h5 className="text-xs font-semibold text-purple-900 mb-2">Target Metrics Summary</h5>
+                    <div className="space-y-1 text-xs text-purple-700">
+                      {targetFollowers && (
+                        <div className="flex justify-between">
+                          <span>Followers:</span>
+                          <span className="font-medium">{parseInt(targetFollowers).toLocaleString()}</span>
+                        </div>
+                      )}
+                      {targetEngagement && (
+                        <div className="flex justify-between">
+                          <span>Engagement:</span>
+                          <span className="font-medium">{parseInt(targetEngagement).toLocaleString()}</span>
+                        </div>
+                      )}
+                      {targetReach && (
+                        <div className="flex justify-between">
+                          <span>Reach:</span>
+                          <span className="font-medium">{parseInt(targetReach).toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -375,34 +1216,161 @@ const InfluencerCampaignManager = () => {
                 </div>
 
                 <div>
-                 
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Existing Coupon (Optional)
+                  </label>
+                  <select 
+                    value={selectedCoupon}
+                    onChange={(e) => handleCouponSelect(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
                     <option value="">Select an existing coupon</option>
                     <option value="summer20">SUMMER20 - 20% Off Summer Collection</option>
                     <option value="first10">FIRST10 - $10 Off First Order</option>
                     <option value="freeship">FREESHIP - Free Shipping</option>
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">Choose a coupon from your database</p>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-2 bg-white text-gray-500">OR</span>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Application Instructions
+                    Coupon Code (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => handleCouponCodeChange(e.target.value)}
+                    placeholder="Enter coupon code (e.g., SAVE20)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Enter a custom coupon code manually</p>
+                </div>
+
+                {(selectedCoupon || couponCode) && (
+                  <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-orange-900">Coupon Selected</p>
+                        <p className="text-xs text-orange-700 mt-1">
+                          {selectedCoupon ? `ID: ${selectedCoupon}` : `Code: ${couponCode}`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Application Instructions <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="Describe how this coupon should be applied (influencers/customers/both)"
+                    value={applicationInstructions}
+                    onChange={(e) => handleApplicationInstructionsChange(e.target.value)}
+                    placeholder="Describe how this coupon should be applied (e.g., influencers only, customers only, or both)"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Specify who can use this coupon and any special conditions</p>
                 </div>
-
-                {/* <button 
-                  onClick={() => setShowCampaignTypeModal(false)}
-                  className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition-colors font-medium"
-                >
-                  Save Coupon Campaign
-                </button> */}
               </div>
             )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Product Browser Modal Component
+  const ProductBrowserModal = () => {
+    if (!showProductBrowser) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-900">Select Product from Shop</h2>
+            <button 
+              onClick={() => setShowProductBrowser(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="p-4 sm:p-6">
+            <div className="mb-4">
+              <input
+                type="text"
+                value={productSearchQuery}
+                onChange={(e) => setProductSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && fetchProducts()}
+                placeholder="Search products..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="overflow-y-auto max-h-[calc(90vh-250px)]">
+              {isLoadingProducts ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                    <p className="text-gray-600">Loading products...</p>
+                  </div>
+                </div>
+              ) : products.length === 0 ? (
+                <div className="text-center py-12">
+                  <Package className="w-16 h-16 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-600 font-medium">No products found</p>
+                  <p className="text-gray-500 text-sm mt-1">Try adjusting your search or add products to your store</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {products.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleProductSelect(product)}
+                      className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer"
+                    >
+                      {product.image && (
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          className="w-full h-40 object-cover rounded-lg mb-3"
+                        />
+                      )}
+                      <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">{product.title}</h3>
+                      {product.price && (
+                        <p className="text-blue-600 font-semibold">${product.price}</p>
+                      )}
+                      {product.description && (
+                        <p className="text-xs text-gray-500 mt-2 line-clamp-2">{product.description}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 p-4 bg-gray-50">
+            <button
+              onClick={() => setShowProductBrowser(false)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
@@ -897,45 +1865,47 @@ const InfluencerCampaignManager = () => {
   );
 
   const renderTargetsGoals = () => (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
-        <div className="flex items-center mb-4">
-          <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2" />
-          <h2 className="text-lg sm:text-xl font-semibold text-blue-900">Campaign Targets & Goals</h2>
+    <div className="space-y-6">
+      {/* Campaign Targets Card */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Target className="w-5 h-5 text-blue-600" />
+          <h2 className="text-lg font-semibold text-gray-900">Campaign Targets & Goals</h2>
         </div>
+        <p className="text-sm text-gray-500 mb-6">Define measurable goals for your campaign performance</p>
         
         <div className="space-y-4">
           {campaignData.targets.map((target, index) => (
-            <div key={index} className="flex items-center gap-4 bg-white p-4 rounded-lg">
+            <div key={index} className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
               <div className="flex-1">
-                <input
-                  type="text"
+                <select
                   value={target.metric}
                   onChange={(e) => handleTargetChange(index, 'metric', e.target.value)}
-                  placeholder="Metric"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
+                >
+                  <option value="">Select Metric</option>
+                  {metricOptions.map(metric => (
+                    <option key={metric} value={metric}>{metric}</option>
+                  ))}
+                </select>
               </div>
               <div className="flex-1">
                 <input
                   type="text"
                   value={target.value}
                   onChange={(e) => handleTargetChange(index, 'value', e.target.value)}
-                  placeholder="Target Value"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={target.metric ? getPlaceholderForMetric(target.metric) : "Select a metric first"}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
               <div className="flex-1">
-                <select
+                <input
+                  type="text"
                   value={target.unit}
-                  onChange={(e) => handleTargetChange(index, 'unit', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option>Users</option>
-                  <option>Percentage</option>
-                  <option>Clicks</option>
-                  <option>Sales</option>
-                </select>
+                  readOnly
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-600 text-sm cursor-not-allowed"
+                  placeholder="Auto-selected"
+                />
               </div>
               <button
                 onClick={() => removeTarget(index)}
@@ -948,7 +1918,7 @@ const InfluencerCampaignManager = () => {
           
           <button
             onClick={addTarget}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-blue-300 text-blue-600 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
             Add Target
@@ -956,60 +1926,64 @@ const InfluencerCampaignManager = () => {
         </div>
       </div>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+      {/* Target Influencers Section */}
+      <div className="border-t border-gray-200 pt-6">
         <Link 
           href={`/${storeId}/creator-studio?tab=Discovery`}
-          className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-blue-300 text-blue-600 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer"
+          className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group"
         >
-          <Users className="w-5 h-5" />
-          <h3 className="text-xl font-semibold text-gray-900">Target Influencers</h3>
-          <span className="ml-2 text-sm text-gray-600">→</span>
-        </Link>
-        <p className="text-sm text-gray-600 text-center mt-3">
-          Click to discover and select influencers for your campaign
-        </p>
-
-        {/* Preferred Content Style Section */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3">Preferred Content Style</h4>
-          <div className="space-y-2">
-            {['Casual & Authentic', 'Professional & Polished', 'Fun & Energetic', 'Educational', 'Minimalist'].map((style) => (
-              <div key={style} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={style.toLowerCase().replace(/\s+/g, '-')}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <label 
-                  htmlFor={style.toLowerCase().replace(/\s+/g, '-')} 
-                  className="text-sm text-gray-700"
-                >
-                  {style}
-                </label>
-              </div>
-            ))}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+              <Users className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">Target Influencers</h3>
+              <p className="text-xs text-gray-500">Click to discover and select influencers for your campaign</p>
+            </div>
           </div>
+          <ChevronLeft className="w-5 h-5 text-gray-400 rotate-180 group-hover:text-blue-600 transition-colors" />
+        </Link>
+      </div>
+
+      {/* Preferred Content Style */}
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-base font-semibold text-gray-900 mb-4">Preferred Content Style</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {['Casual & Authentic', 'Professional & Polished', 'Fun & Energetic', 'Educational', 'Minimalist'].map(style => (
+            <label key={style} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all group">
+              <input
+                type="checkbox"
+                checked={campaignData.contentStyle === style}
+                onChange={() => handleInputChange('contentStyle', style)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <span className="text-sm text-gray-700 group-hover:text-blue-600 transition-colors">{style}</span>
+            </label>
+          ))}
         </div>
       </div>
     </div>
   );
 
   const renderMilestones = () => (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Campaign Milestones</h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Define key milestones and deadlines for your campaign</p>
+        <div className="flex items-center gap-2 mb-2">
+          <Calendar className="w-5 h-5 text-blue-600" />
+          <h2 className="text-lg font-semibold text-gray-900">Campaign Milestones</h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">Define key milestones and deadlines for your campaign</p>
       </div>
 
       <div className="space-y-4">
         {campaignData.milestones.map((milestone, index) => (
-          <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+          <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors">
             <div className="flex justify-between items-start mb-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900">Milestone {index + 1}</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Milestone {index + 1}</h3>
               {index > 0 && (
                 <button 
                   onClick={() => removeMilestone(index)}
-                  className="p-1 text-red-500 hover:bg-red-50 rounded shrink-0 ml-2"
+                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -1024,7 +1998,7 @@ const InfluencerCampaignManager = () => {
                   value={milestone.title}
                   onChange={(e) => handleMilestoneChange(index, 'title', e.target.value)}
                   placeholder="e.g., Campaign Kickoff"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
               <div>
@@ -1033,7 +2007,7 @@ const InfluencerCampaignManager = () => {
                   type="date"
                   value={milestone.dueDate}
                   onChange={(e) => handleMilestoneChange(index, 'dueDate', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
             </div>
@@ -1041,11 +2015,11 @@ const InfluencerCampaignManager = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
               <textarea
-                rows={3}
+                rows={2}
                 value={milestone.description}
                 onChange={(e) => handleMilestoneChange(index, 'description', e.target.value)}
                 placeholder="Describe this milestone..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all resize-none"
               />
             </div>
           </div>
@@ -1053,7 +2027,7 @@ const InfluencerCampaignManager = () => {
         
         <button
           onClick={addMilestone}
-          className="w-full flex items-center justify-center gap-2 py-4 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Milestone
@@ -1063,48 +2037,51 @@ const InfluencerCampaignManager = () => {
   );
 
   const renderDeliverables = () => (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Expected Deliverables</h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Specify what content you expect from influencers</p>
+        <div className="flex items-center gap-2 mb-2">
+          <Package className="w-5 h-5 text-blue-600" />
+          <h2 className="text-lg font-semibold text-gray-900">Expected Deliverables</h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">Specify what content you expect from influencers</p>
       </div>
 
       <div className="space-y-4">
         {campaignData.deliverables.map((deliverable, index) => (
-          <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+          <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors">
             <div className="flex justify-between items-start mb-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900">Deliverable {index + 1}</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Deliverable {index + 1}</h3>
               {index > 0 && (
                 <button 
                   onClick={() => removeDeliverable(index)}
-                  className="p-1 text-red-500 hover:bg-red-50 rounded shrink-0 ml-2"
+                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               )}
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
                 <select
                   value={deliverable.type}
                   onChange={(e) => handleDeliverableChange(index, 'type', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 >
                   {deliverableTypes.map(type => (
                     <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
               </div>
-              <div className="sm:col-span-1 lg:col-span-1">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
                 <input
                   type="number"
                   min="1"
                   value={deliverable.quantity}
                   onChange={(e) => handleDeliverableChange(index, 'quantity', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
             </div>
@@ -1112,11 +2089,11 @@ const InfluencerCampaignManager = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
               <textarea
-                rows={3}
+                rows={2}
                 value={deliverable.description}
                 onChange={(e) => handleDeliverableChange(index, 'description', e.target.value)}
                 placeholder="Describe the specific requirements for this deliverable..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all resize-none"
               />
             </div>
           </div>
@@ -1124,7 +2101,7 @@ const InfluencerCampaignManager = () => {
         
         <button
           onClick={addDeliverable}
-          className="w-full flex items-center justify-center gap-2 py-4 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Deliverable
@@ -1290,82 +2267,96 @@ const InfluencerCampaignManager = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <CampaignTypeModal />
+      <ProductBrowserModal />
       
-      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center mb-6 sm:mb-8">
-          <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-            <span className="text-sm sm:text-base">Back to Dashboard</span>
+        <div className="mb-6">
+          <button className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-4">
+            <ChevronLeft className="w-5 h-5 mr-1" />
+            <span className="text-sm">Back to Dashboard</span>
           </button>
+          
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-1">Create New Campaign</h1>
+            <p className="text-sm text-gray-500">Set up your comprehensive influencer marketing campaign</p>
+          </div>
         </div>
 
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Campaign</h1>
-          <p className="text-sm sm:text-base text-gray-600">Set up your comprehensive influencer marketing campaign</p>
-        </div>
-
-        {/* Step Navigation */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8">
+        {/* Tab Navigation - Wallet Style */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
           {/* Mobile Step Navigation */}
-          <div className="block sm:hidden">
-            <div className="p-4 border-b">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900">
+          <div className="block sm:hidden border-b border-gray-200">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">
                   Step {currentStep + 1} of {steps.length}
                 </span>
                 <span className="text-xs text-gray-500">
                   {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
                 </span>
               </div>
-              <div className="mt-2">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
-                    style={{width: `${((currentStep + 1) / steps.length) * 100}%`}}
-                  ></div>
-                </div>
+              <div className="w-full bg-gray-100 rounded-full h-1.5">
+                <div 
+                  className="bg-blue-600 h-1.5 rounded-full transition-all duration-300" 
+                  style={{width: `${((currentStep + 1) / steps.length) * 100}%`}}
+                ></div>
               </div>
-              <h2 className="mt-3 text-lg font-semibold text-gray-900">
+              <h2 className="mt-3 text-base font-medium text-gray-900">
                 {steps[currentStep].title}
               </h2>
             </div>
           </div>
           
-          {/* Desktop Step Navigation */}
-          <div className="hidden sm:flex">
+          {/* Desktop Tab Navigation - Wallet Style */}
+          <div className="hidden sm:flex border-b border-gray-200">
             {steps.map((step, index) => (
               <button
                 key={step.id}
                 onClick={() => setCurrentStep(index)}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 px-3 lg:px-6 border-b-2 transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-4 border-b-2 transition-all relative ${
                   currentStep === index
-                    ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ? 'border-blue-600 text-blue-600 bg-white'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                {step.icon}
-                <span className="font-medium text-sm lg:text-base hidden md:inline">{step.title}</span>
-                <span className="font-medium text-sm md:hidden">{index + 1}</span>
-                {index < currentStep && <CheckCircle className="w-4 h-4 text-green-500" />}
+                <span className={`${currentStep === index ? 'text-blue-600' : 'text-gray-400'}`}>
+                  {step.icon}
+                </span>
+                <span className={`font-medium text-sm ${currentStep === index ? 'text-blue-600' : 'text-gray-600'}`}>
+                  {step.title}
+                </span>
+                {index < currentStep && (
+                  <CheckCircle className="w-4 h-4 text-green-500 absolute top-2 right-2" />
+                )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8 p-4 sm:p-6 lg:p-8">
+        {/* Step Content - Wallet Card Style */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8">
           {renderStepContent()}
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 sm:gap-0">
+        {/* Error Display */}
+        {submitError && (
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+              <p className="text-sm text-red-700">{submitError}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Buttons - Wallet Style */}
+        <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 mt-6">
           <button
             onClick={prevStep}
-            disabled={currentStep === 0}
-            className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2 border border-gray-300 rounded-lg transition-colors text-sm sm:text-base ${
-              currentStep === 0
-                ? 'text-gray-400 cursor-not-allowed'
+            disabled={currentStep === 0 || isSubmitting}
+            className={`w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg transition-colors text-sm font-medium ${
+              currentStep === 0 || isSubmitting
+                ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -1373,10 +2364,20 @@ const InfluencerCampaignManager = () => {
           </button>
           
           <button
-            onClick={currentStep === steps.length - 1 ? () => alert('Campaign Published!') : nextStep}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base font-medium"
+            onClick={currentStep === steps.length - 1 ? handleSubmitCampaign : handleNextStep}
+            disabled={isSubmitting}
+            className={`w-full sm:w-auto px-6 py-2.5 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2 ${
+              isSubmitting
+                ? 'bg-blue-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            } text-white shadow-sm`}
           >
-            {currentStep === steps.length - 1 ? 'Publish Campaign' : 'Next'}
+            {isSubmitting && (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            )}
+            {currentStep === steps.length - 1 
+              ? (isSubmitting ? 'Publishing...' : 'Publish Campaign')
+              : 'Next'}
           </button>
         </div>
       </div>
