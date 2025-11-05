@@ -345,9 +345,9 @@ const ProductDetailsPage = () => {
                           <Search className="w-4 h-4 text-blue-500" />
                           <span className="text-sm">Organic Search</span>
                         </div>
-                        <span className="font-medium">45%</span>
+                        <span className="font-medium">35%</span>
                       </div>
-                      <Progress value={45} className="h-2" />
+                      <Progress value={35} className="h-2" />
                     </div>
                     
                     <div className="space-y-2">
