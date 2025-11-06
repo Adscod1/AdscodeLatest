@@ -48,9 +48,10 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   const reviewCount = 324;
 
   return (
-    <Card className="w-full border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 p-0">
-      {/* Header with store info */}
-  <div className="flex items-center justify-between p-3 pb-1.5">
+    <Link href={`/${product.store.id}/product/${product.id}`} className="block">
+      <Card className="w-full border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 p-0 cursor-pointer">
+        {/* Header with store info */}
+    <div className="flex items-center justify-between p-3 pb-1.5">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
             {product.store.avatarUrl ? (
@@ -82,7 +83,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Image */}
-  <div className="relative w-full h-[260px] bg-gray-100">
+  <div className="relative w-full h-[280px] bg-gray-100">
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images[0].url}
@@ -100,7 +101,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         
         {/* Discount Badge */}
         {product.comparePrice && product.comparePrice > product.price && (
-          <div className="absolute top-3 right-3 bg-pink-500 text-white px-3 py-1.5 rounded-full text-sm font-bold">
+          <div className="absolute top-3 right-3 bg-pink-500 text-white px-3 text-sm w-[15%] rounded-full">
             {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
           </div>
         )}
@@ -122,24 +123,16 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
           </div>
         </div>
 
-        {/* Price and CTA */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-bold text-blue-600">
-              {formatCurrency(product.price)}
+        {/* Price */}
+        <div className="flex items-baseline gap-2">
+          <p className="text-xl font-bold text-blue-600">
+            {formatCurrency(product.price)}
+          </p>
+          {product.comparePrice && product.comparePrice > product.price && (
+            <p className="text-base text-gray-400 line-through">
+              {formatCurrency(product.comparePrice)}
             </p>
-            {product.comparePrice && product.comparePrice > product.price && (
-              <p className="text-base text-gray-400 line-through">
-                {formatCurrency(product.comparePrice)}
-              </p>
-            )}
-          </div>
-          <Link
-            href={`/${product.store.id}/product/${product.id}`}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm font-medium"
-          >
-            See more
-          </Link>
+          )}
         </div>
 
         {/* Engagement Metrics */}
@@ -167,5 +160,6 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         </div>
       </div>
     </Card>
+    </Link>
   );
 };

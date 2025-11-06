@@ -426,13 +426,13 @@ export const FeedNavbar = () => {
       </>
 
       {/* Category Navigation */}
-      <div className="bg-white w-full mt-4 border-t border-gray-100">
+      <div className="bg-white w-full border-t border-gray-100">
         <div className="w-full px-4 sm:px-6 lg:px-8 relative">
           {/* Left chevron */}
           {showLeftScroll && (
             <button
               onClick={() => scrollCategories('left')}
-              className="absolute left-1 top-1/2 -translate-y-1/2 bg-white shadow-sm rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition-colors z-10 hidden sm:inline-flex"
+              className="absolute left-4 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 bg-white shadow-sm rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition-colors z-10 hidden sm:inline-flex"
               aria-label="Scroll left"
             >
               {/* Reuse right icon rotated */}
@@ -463,7 +463,7 @@ export const FeedNavbar = () => {
           {showRightScroll && (
             <button
               onClick={() => scrollCategories('right')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 bg-white shadow-sm rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition-colors z-10 hidden sm:inline-flex"
+              className="absolute right-4 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 bg-white shadow-sm rounded-full p-2 border border-gray-200 hover:bg-gray-50 transition-colors z-10 hidden sm:inline-flex"
               aria-label="Scroll right"
             >
               <ChevronRightIcon />

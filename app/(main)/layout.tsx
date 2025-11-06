@@ -6,7 +6,7 @@ const FeedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen">
       <FeedNavbar />
-      <main className="pt-24">{children}</main>
+      <main className="pt-4">{children}</main>
       
     </div>
   );

@@ -18,7 +18,7 @@ const FeedPage = () => {
 
   return (
     <>    
-      <div className="w-full py-8 px-4 sm:px-6 lg:px-8">
+      <div className="w-full pt-4 pb-8 px-4 sm:px-6 lg:px-8">
         {/* <SearchBar /> */}
 
       {isLoading ? (
@@ -37,7 +37,7 @@ const FeedPage = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-32 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 mb-12">
           {products?.map((product) => (
             <MainProductCard key={product.id} product={product} />
           ))}
