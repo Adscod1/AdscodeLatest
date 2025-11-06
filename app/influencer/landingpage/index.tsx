@@ -202,7 +202,7 @@ const TestimonialsSection: React.FC = () => (
 
 const AdsccodLandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen">
+    <div className="">
       <FeedNavbar />
       <HeroSection />
       <StatsSection />
