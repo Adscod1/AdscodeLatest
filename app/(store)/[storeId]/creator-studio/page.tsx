@@ -14,6 +14,7 @@ import {
   Star,
   MapPin,
   Send,
+  UserPlus,
   MoreHorizontal,
   Calendar as CalendarIcon,
   Camera,
@@ -798,17 +799,17 @@ const CreatorStudioDashboard = () => {
             </div>
 
             <div className="flex gap-2">
-              <button className="flex-1 bg-black text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-gray-800 flex items-center justify-center gap-2">
-                <Send className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Contact</span>
-                <span className="sm:hidden">Contact</span>
-              </button>
               <Link
                 href={`/${storeId}/campaign/1/influencers/profile`}
-                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center"
+                className="flex-1 bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-blue-700 flex items-center justify-center gap-2"
               >
                 <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>View Profile</span>
               </Link>
+              <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Invite</span>
+              </button>
             </div>
           </div>
         ))}

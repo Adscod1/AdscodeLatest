@@ -133,7 +133,7 @@ export const createCampaignSchema = z.object({
   ),
   type: z.enum(["PRODUCT", "COUPON", "VIDEO", "PROFILE"], {
     required_error: "Campaign type is required",
-  }),
+  }).default("PRODUCT"), // Default to PRODUCT for backward compatibility
   typeSpecificData: z.union([
     couponCampaignDataSchema,
     productCampaignDataSchema,

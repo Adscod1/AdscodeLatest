@@ -165,7 +165,6 @@ export const FeedNavbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const categoriesRef = useRef<HTMLDivElement>(null);
 
   const isPathActive = (linkPath: string) => {
@@ -185,19 +184,6 @@ export const FeedNavbar = () => {
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/business/all?search=${encodeURIComponent(searchQuery.trim())}`);
-      setIsSearchOpen(false);
-      setSearchQuery("");
-    }
-  };
-
-  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
   };
 
   const scrollCategories = (direction: 'left' | 'right') => {
@@ -296,16 +282,16 @@ export const FeedNavbar = () => {
 
             {/* Center Section - Search Bar */}
             <div className="flex-1 max-w-1xl mx-8 ">
-              <form onSubmit={handleSearch} className="relative">
+              <div className="relative">
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <SearchIcon />
                 </div>
                 <Input
                   type="text"
                   placeholder="Search creators, products, or deals..."
-                  className="w-full px-4 py-2.5 h-12 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  className="w-full px-4 py-2.5 h-10 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 />
-              </form>
+              </div>
               
             </div>
             {/* Create Button */}
@@ -339,22 +325,23 @@ export const FeedNavbar = () => {
       {/* Mobile Search Bar (when open) */}
       {isSearchOpen && (
         <div className="md:hidden border-t border-gray-200 p-4">
-          <form onSubmit={handleSearch} className="relative">
+          <div className="relative">
             <Input
               type="text"
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              placeholder="Search businesses, services..."
+              placeholder="Search"
               className="w-full px-4 py-2 pl-4 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               autoFocus
             />
             <button 
-              type="submit"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600" 
+              onClick={() => {
+                router.push("/business/all");
+                setIsSearchOpen(false);
+              }}
             >
               <SearchIcon />
             </button>
-          </form>
+          </div>
         </div>
       )}
 

@@ -19,6 +19,7 @@ import {
   BarChart3,
   CheckCircle2,
   ArrowLeft,
+  UserPlus,
 } from "lucide-react";
 import Image from "next/image";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -451,7 +452,8 @@ export default function CampaignInfluencerProfilePage() {
                       className="flex-1"
                     >
                       <Button className="w-full bg-blue-500 hover:bg-blue-600">
-                        View Campaign Details
+                        <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+                        Invite
                       </Button>
                     </Link>
                     <Button variant="outline">
@@ -594,7 +596,7 @@ export default function CampaignInfluencerProfilePage() {
               </div>
 
               <Button className="w-full mt-6 bg-blue-500 hover:bg-blue-600">
-                Connect
+                <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />  <span>Follow</span>
               </Button>
             </Card>
           </div>
