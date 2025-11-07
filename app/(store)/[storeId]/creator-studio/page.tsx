@@ -22,11 +22,34 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Filter
+  Filter,
+  Loader2
 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
 import { format, addMonths, addDays, startOfMonth, startOfWeek, endOfMonth, isSameMonth, isSameDay } from "date-fns";
 
+
+interface Creator {
+  id: string;
+  name: string;
+  handle: string;
+  followers: string;
+  engagement: string;
+  category: string;
+  rating: string;
+  rate: string;
+  location: string;
+  icon?: string;
+  email?: string;
+  bio?: string;
+  platforms?: {
+    instagram: string;
+    youtube: string;
+    tiktok: string;
+  };
+  userId?: string;
+  image?: string;
+}
 
 interface Influencer {
   name: string;
@@ -89,6 +112,11 @@ const CreatorStudioDashboard = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [activeSection, setActiveSection] = useState('Dashboard');
   
+  // Creators/Influencers state
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [creatorsLoading, setCreatorsLoading] = useState(false);
+  const [creatorsError, setCreatorsError] = useState<string | null>(null);
+  
   // Applications state
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [showInfluencerDetails, setShowInfluencerDetails] = useState(false);
@@ -124,6 +152,35 @@ const CreatorStudioDashboard = () => {
   ];
 
   const tabs = ['Discovery', 'Calender', 'Applications', 'Content', 'Analytics'];
+
+  // Fetch creators on mount
+  useEffect(() => {
+    const fetchCreators = async () => {
+      try {
+        setCreatorsLoading(true);
+        setCreatorsError(null);
+        const response = await fetch('/api/influencer/list');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch creators');
+        }
+        
+        const data = await response.json();
+        if (data.success && Array.isArray(data.data)) {
+          setCreators(data.data);
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (error) {
+        console.error('Error fetching creators:', error);
+        setCreatorsError(error instanceof Error ? error.message : 'Failed to fetch creators');
+      } finally {
+        setCreatorsLoading(false);
+      }
+    };
+
+    fetchCreators();
+  }, []);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -725,95 +782,87 @@ const CreatorStudioDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {[
-          {
-            name: 'Sarah Johnson',
-            handle: '@sarahjfashion',
-            followers: '125K',
-            engagement: '4.2%',
-            category: 'Fashion',
-            rating: 4.8,
-            rate: '$500-800',
-            location: 'New York',
-            icon: '⭐'
-          },
-          {
-            name: 'Mike Chen',
-            handle: '@mikechen tech',
-            followers: '89K',
-            engagement: '3.8%',
-            category: 'Tech',
-            rating: 4.6,
-            rate: '$300-600',
-            location: 'San Francisco',
-            icon: '💻'
-          },
-          {
-            name: 'Emma Wilson',
-            handle: '@emmawilsonfit',
-            followers: '210K',
-            engagement: '5.1%',
-            category: 'Fitness',
-            rating: 4.9,
-            rate: '$800-1200',
-            location: 'Los Angeles',
-            icon: '💪'
-          }
-        ].map((creator, index) => (
-          <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center text-lg sm:text-xl shrink-0">
-                {creator.icon}
-              </div>
-              <div className="min-w-0">
-                <h4 className="font-semibold text-sm sm:text-base truncate">{creator.name}</h4>
-                <p className="text-gray-600 text-xs sm:text-sm truncate">{creator.handle}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-              <div>
-                <p className="text-gray-600 text-xs sm:text-sm">Followers</p>
-                <p className="font-semibold text-sm sm:text-base">{creator.followers}</p>
-              </div>
-              <div>
-                <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
-                <p className="font-semibold text-sm sm:text-base">{creator.engagement}</p>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs sm:text-sm bg-gray-100 px-2 py-1 rounded">{creator.category}</span>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 fill-current" />
-                  <span className="text-xs sm:text-sm font-medium">{creator.rating}</span>
+      {creatorsLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <p className="text-gray-600">Loading creators...</p>
+          </div>
+        </div>
+      ) : creatorsError ? (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 text-sm">{creatorsError}</p>
+        </div>
+      ) : creators.length === 0 ? (
+        <div className="text-center py-12">
+          <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-600">No approved creators found yet</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {creators.map((creator) => (
+            <div key={creator.id} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+              <div className="flex items-center gap-3 mb-4">
+                {creator.image ? (
+                  <img
+                    src={creator.image}
+                    alt={creator.name}
+                    className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center text-lg sm:text-xl shrink-0">
+                    {creator.icon || '⭐'}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-sm sm:text-base truncate">{creator.name}</h4>
+                  <p className="text-gray-600 text-xs sm:text-sm truncate">{creator.handle}</p>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600">Rate: {creator.rate}</p>
-              <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
-                <MapPin className="w-3 h-3" />
-                <span className="truncate">{creator.location}</span>
+
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
+                <div>
+                  <p className="text-gray-600 text-xs sm:text-sm">Followers</p>
+                  <p className="font-semibold text-sm sm:text-base">{creator.followers}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
+                  <p className="font-semibold text-sm sm:text-base">{creator.engagement}</p>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs sm:text-sm bg-gray-100 px-2 py-1 rounded">{creator.category}</span>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 fill-current" />
+                    <span className="text-xs sm:text-sm font-medium">{creator.rating}</span>
+                  </div>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-600">Rate: {creator.rate}</p>
+                <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
+                  <MapPin className="w-3 h-3" />
+                  <span className="truncate">{creator.location}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Link
+                  href={`/${storeId}/campaign/1/influencers/profile`}
+                  className="flex-1 bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-blue-700 flex items-center justify-center gap-2"
+                >
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span>View Profile</span>
+                </Link>
+                <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                  <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span>Invite</span>
+                </button>
               </div>
             </div>
-
-            <div className="flex gap-2">
-              <Link
-                href={`/${storeId}/campaign/1/influencers/profile`}
-                className="flex-1 bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-blue-700 flex items-center justify-center gap-2"
-              >
-                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>View Profile</span>
-              </Link>
-              <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2 text-xs sm:text-sm">
-                <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Invite</span>
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
