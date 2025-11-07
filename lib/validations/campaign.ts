@@ -113,7 +113,8 @@ export const createCampaignSchema = z.object({
     country: z.string(),
     city: z.string(),
   }).optional(),
-  platforms: z.array(z.string()).min(1, "Select at least one platform"),
+  // Platforms optional (UI inputs removed)
+  platforms: z.array(z.string()).optional(),
   targets: z.object({
     awareness: z.array(z.string()).optional(),
     advocacy: z.array(z.string()).optional(),

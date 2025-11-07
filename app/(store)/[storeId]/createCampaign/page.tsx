@@ -99,9 +99,14 @@ interface CampaignData {
 const InfluencerCampaignManager = () => {
   const params = useParams();
   const router = useRouter();
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const storeId = params.storeId as string;
 
-  const [currentStep, setCurrentStep] = useState(0);
+  // Check if there's a returnStep parameter in URL
+  const returnStep = searchParams?.get('step');
+  const initialStep = returnStep ? parseInt(returnStep) : 0;
+
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [videoUploadProgress, setVideoUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -184,11 +189,21 @@ const InfluencerCampaignManager = () => {
       
       if (savedCampaignData) {
         const parsedData = JSON.parse(savedCampaignData);
-        // Restore campaign data but keep current influencers if they exist
-        setCampaignData(prev => ({
+        
+        // Also check for influencers saved with campaign title key
+        const campaignTitle = parsedData.title || 'New Campaign';
+        const campaignKey = `campaign_${campaignTitle}`;
+        const savedInfluencers = localStorage.getItem(campaignKey);
+        
+        const influencersToUse = savedInfluencers 
+          ? JSON.parse(savedInfluencers)
+          : (parsedData.selectedInfluencers || []);
+        
+        // Restore campaign data with merged influencers
+        setCampaignData({
           ...parsedData,
-          selectedInfluencers: prev.selectedInfluencers || parsedData.selectedInfluencers || []
-        }));
+          selectedInfluencers: influencersToUse
+        });
       }
     } catch (error) {
       console.error('Error loading campaign data from localStorage:', error);
@@ -836,12 +851,7 @@ const InfluencerCampaignManager = () => {
         return;
       }
 
-      // Validate platforms on submission
-      if (campaignData.platforms.length === 0) {
-        setSubmitError('Please select at least one platform');
-        setIsSubmitting(false);
-        return;
-      }
+      // Platforms validation removed: UI no longer collects platforms
 
       // Validate type-specific data
       const typeValidation = validateTypeSpecificData();
@@ -911,10 +921,7 @@ const InfluencerCampaignManager = () => {
         break;
 
       case 1: // Targets & Goals
-        if (campaignData.platforms.length === 0) {
-          setSubmitError('Please select at least one platform');
-          return false;
-        }
+        // Platforms requirement removed; proceed without platform selection
         break;
 
       case 2: // Campaign Objective
@@ -2007,7 +2014,7 @@ const InfluencerCampaignManager = () => {
               <p className="text-sm text-gray-500">Selected influencers for this campaign</p>
             </div>
             <Link 
-              href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}`}
+              href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}&step=1`}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
             >
               <Plus className="w-4 h-4" />
@@ -2050,7 +2057,7 @@ const InfluencerCampaignManager = () => {
         </div>
 
         <Link 
-          href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}`}
+          href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}&step=1`}
           className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group"
         >
           <div className="flex items-center gap-3">

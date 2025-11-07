@@ -22,7 +22,7 @@ export type CreateCampaignActionInput = {
     country: string;
     city: string;
   };
-  platforms: string[];
+  platforms?: string[]; // optional: UI no longer enforces platform selection
   targets: {
     awareness?: string[];
     advocacy?: string[];
@@ -122,7 +122,7 @@ export const createCampaign = async (data: CreateCampaignActionInput) => {
         currency: validatedData.currency,
         duration: validatedData.duration,
         influencerLocation: validatedData.influencerLocation as any,
-        platforms: validatedData.platforms as any,
+        platforms: validatedData.platforms ? validatedData.platforms as any : [],
         targets: validatedData.targets as any,
         type: validatedData.type,
         typeSpecificData: validatedData.typeSpecificData,
