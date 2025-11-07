@@ -174,6 +174,28 @@ const InfluencerCampaignManager = () => {
     }
   }, []);
 
+  // Load entire campaign data from localStorage on mount
+  useEffect(() => {
+    try {
+      // Only run on client-side
+      if (typeof window === 'undefined') return;
+      
+      const draftCampaignKey = `draft_campaign_${storeId}`;
+      const savedCampaignData = localStorage.getItem(draftCampaignKey);
+      
+      if (savedCampaignData) {
+        const parsedData = JSON.parse(savedCampaignData);
+        // Restore campaign data but keep current influencers if they exist
+        setCampaignData(prev => ({
+          ...parsedData,
+          selectedInfluencers: prev.selectedInfluencers || parsedData.selectedInfluencers || []
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading campaign data from localStorage:', error);
+    }
+  }, [storeId]);
+
   // Update localStorage whenever selectedInfluencers or campaign title changes
   useEffect(() => {
     try {
@@ -192,6 +214,24 @@ const InfluencerCampaignManager = () => {
       console.error('Error saving influencers to localStorage:', error);
     }
   }, [campaignData.title, campaignData.selectedInfluencers]);
+
+  // Auto-save entire campaign data to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      // Only run on client-side
+      if (typeof window === 'undefined') return;
+      
+      // Debounce the save to avoid excessive localStorage writes
+      const debounceTimer = setTimeout(() => {
+        const draftCampaignKey = `draft_campaign_${storeId}`;
+        localStorage.setItem(draftCampaignKey, JSON.stringify(campaignData));
+      }, 1000); // Save 1 second after user stops typing
+      
+      return () => clearTimeout(debounceTimer);
+    } catch (error) {
+      console.error('Error saving campaign data to localStorage:', error);
+    }
+  }, [campaignData, storeId]);
 
   // Map frontend campaign type strings to backend enum
   const mapCampaignTypeToEnum = (displayName: string): CampaignType => {
