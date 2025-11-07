@@ -22,7 +22,7 @@ export interface Influencer {
   image: string;
 }
 
-export const influencers: Influencer[] = [
+const influencers: Influencer[] = [
   {
     id: "1",
     name: "Sophia Chen",
