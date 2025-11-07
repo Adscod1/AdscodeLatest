@@ -102,7 +102,6 @@ const InfluencerCampaignManager = () => {
   const storeId = params.storeId as string;
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [showCampaignTypeModal, setShowCampaignTypeModal] = useState(false);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [videoUploadProgress, setVideoUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -623,7 +622,6 @@ const InfluencerCampaignManager = () => {
       type: backendType,
       typeSpecificData: null // Reset type-specific data when changing type
     }));
-    setShowCampaignTypeModal(true);
   };
 
   const handlePlatformChange = (platform: string) => {
@@ -953,433 +951,6 @@ const InfluencerCampaignManager = () => {
     }
   };
 
-  // Campaign Type Modal Component
-  const CampaignTypeModal = () => {
-    if (!showCampaignTypeModal) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-900">{campaignData.campaignType} Setup</h2>
-            <button 
-              onClick={() => setShowCampaignTypeModal(false)}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          <div className="p-4 sm:p-6">
-            {campaignData.campaignType === 'Video Campaign' && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Video Campaign Setup</h3>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Video <span className="text-red-500">*</span>
-                  </label>
-                  
-                  {!campaignData.typeSpecificData && !isUploadingVideo && (
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                      <input 
-                        type="file" 
-                        accept="video/mp4,video/quicktime,video/x-msvideo,video/webm" 
-                        className="hidden" 
-                        id="video-upload"
-                        onChange={handleVideoUpload}
-                        disabled={isUploadingVideo}
-                      />
-                      <label htmlFor="video-upload" className="cursor-pointer">
-                        <div className="text-gray-400 mb-2">
-                          <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                          </svg>
-                        </div>
-                        <p className="text-sm text-gray-600 font-medium">Click to upload video</p>
-                        <p className="text-xs text-gray-500 mt-1">MP4, MOV, AVI, or WEBM (max 500MB)</p>
-                      </label>
-                    </div>
-                  )}
-
-                  {isUploadingVideo && (
-                    <div className="border-2 border-blue-300 rounded-lg p-8 text-center bg-blue-50">
-                      <div className="text-blue-600 mb-2">
-                        <svg className="w-12 h-12 mx-auto animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                      </div>
-                      <p className="text-sm text-blue-700 font-medium mb-2">Uploading video...</p>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                          style={{ width: `${videoUploadProgress}%` }}
-                        ></div>
-                      </div>
-                      <p className="text-xs text-blue-600">{videoUploadProgress}%</p>
-                    </div>
-                  )}
-
-                  {campaignData.typeSpecificData && 'videoUrl' in campaignData.typeSpecificData && (
-                    <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
-                          <CheckCircle className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-green-900">Video uploaded successfully</p>
-                          <p className="text-xs text-green-700 mt-1">
-                            {((campaignData.typeSpecificData as VideoCampaignData).videoSize / (1024 * 1024)).toFixed(2)} MB · {(campaignData.typeSpecificData as VideoCampaignData).videoFormat}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => setCampaignData(prev => ({ ...prev, typeSpecificData: null }))}
-                          className="text-green-700 hover:text-green-900"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {uploadError && (
-                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-700">{uploadError}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Video Caption or Campaign Brief <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={campaignData.typeSpecificData && 'caption' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as VideoCampaignData).caption : ''}
-                    onChange={(e) => handleVideoCaptionChange(e.target.value)}
-                    placeholder="Add a video caption or campaign brief..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            )}
-
-            {campaignData.campaignType === 'Product Campaign' && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Product Campaign Setup</h3>
-                </div>
-
-                {selectedProduct ? (
-                  <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
-                    <div className="flex items-center gap-3">
-                      {selectedProduct.image && (
-                        <img 
-                          src={selectedProduct.image} 
-                          alt={selectedProduct.title}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      )}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-green-900">{selectedProduct.title}</p>
-                        <p className="text-xs text-green-700 mt-1">
-                          {selectedProduct.price && `$${selectedProduct.price}`}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setSelectedProduct(null);
-                          setCampaignData(prev => ({ ...prev, typeSpecificData: null }));
-                        }}
-                        className="text-green-700 hover:text-green-900"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button 
-                    onClick={openProductBrowser}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                  >
-                    <Package className="w-5 h-5" />
-                    Browse Shop
-                  </button>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product Link (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={campaignData.typeSpecificData && 'productLink' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).productLink : ''}
-                    onChange={(e) => handleProductLinkChange(e.target.value)}
-                    placeholder="https://example.com/product"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Enter a direct link to the product (if not selected from shop)</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Shop URL (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={campaignData.typeSpecificData && 'shopUrl' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).shopUrl : ''}
-                    onChange={(e) => handleShopUrlChange(e.target.value)}
-                    placeholder="https://myshop.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Your shop URL where the product is available</p>
-                </div>
-              </div>
-            )}
-
-            {campaignData.campaignType === 'Profile Campaign' && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Profile Campaign Setup</h3>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Profile URL <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="url"
-                    value={profileUrl}
-                    onChange={(e) => handleProfileUrlChange(e.target.value)}
-                    onBlur={(e) => validateProfileUrl(e.target.value)}
-                    placeholder="https://instagram.com/yourprofile"
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
-                      profileUrlError 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300 focus:ring-blue-500'
-                    }`}
-                  />
-                  {profileUrlError ? (
-                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" />
-                      {profileUrlError}
-                    </p>
-                  ) : profileUrl && !profileUrlError ? (
-                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      Valid profile URL
-                    </p>
-                  ) : (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Enter Instagram, TikTok, YouTube, Twitter, Facebook, LinkedIn, or Twitch profile URL
-                    </p>
-                  )}
-                </div>
-
-                {profileUrl && !profileUrlError && (
-                  <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
-                        <CheckCircle className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-purple-900">Profile URL Set</p>
-                        <p className="text-xs text-purple-700 mt-1 truncate">{profileUrl}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    Target Metrics (Optional)
-                  </h4>
-                  <p className="text-xs text-gray-500 mb-3">Set goals for profile growth</p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Followers Goal
-                      </label>
-                      <input
-                        type="number"
-                        value={targetFollowers}
-                        onChange={(e) => handleTargetMetricChange('followers', e.target.value)}
-                        placeholder="e.g., 10000"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Engagement Goal
-                      </label>
-                      <input
-                        type="number"
-                        value={targetEngagement}
-                        onChange={(e) => handleTargetMetricChange('engagement', e.target.value)}
-                        placeholder="e.g., 500"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Reach Goal
-                      </label>
-                      <input
-                        type="number"
-                        value={targetReach}
-                        onChange={(e) => handleTargetMetricChange('reach', e.target.value)}
-                        placeholder="e.g., 50000"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {(targetFollowers || targetEngagement || targetReach) && (
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                    <h5 className="text-xs font-semibold text-purple-900 mb-2">Target Metrics Summary</h5>
-                    <div className="space-y-1 text-xs text-purple-700">
-                      {targetFollowers && (
-                        <div className="flex justify-between">
-                          <span>Followers:</span>
-                          <span className="font-medium">{parseInt(targetFollowers).toLocaleString()}</span>
-                        </div>
-                      )}
-                      {targetEngagement && (
-                        <div className="flex justify-between">
-                          <span>Engagement:</span>
-                          <span className="font-medium">{parseInt(targetEngagement).toLocaleString()}</span>
-                        </div>
-                      )}
-                      {targetReach && (
-                        <div className="flex justify-between">
-                          <span>Reach:</span>
-                          <span className="font-medium">{parseInt(targetReach).toLocaleString()}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {campaignData.campaignType === 'Coupon Campaign' && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                      <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Coupon Campaign Setup</h3>
-                </div>
-
-                <div className="flex items-center gap-2 mb-2">
-                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                  </svg>
-                  <h4 className="text-sm font-semibold text-gray-700">Select from Coupon Database</h4>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Existing Coupon (Optional)
-                  </label>
-                  <select 
-                    value={selectedCoupon}
-                    onChange={(e) => handleCouponSelect(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select an existing coupon</option>
-                    <option value="summer20">SUMMER20 - 20% Off Summer Collection</option>
-                    <option value="first10">FIRST10 - $10 Off First Order</option>
-                    <option value="freeship">FREESHIP - Free Shipping</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">Choose a coupon from your database</p>
-                </div>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="px-2 bg-white text-gray-500">OR</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Coupon Code (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => handleCouponCodeChange(e.target.value)}
-                    placeholder="Enter coupon code (e.g., SAVE20)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Enter a custom coupon code manually</p>
-                </div>
-
-                {(selectedCoupon || couponCode) && (
-                  <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
-                        <CheckCircle className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-orange-900">Coupon Selected</p>
-                        <p className="text-xs text-orange-700 mt-1">
-                          {selectedCoupon ? `ID: ${selectedCoupon}` : `Code: ${couponCode}`}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Application Instructions <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={applicationInstructions}
-                    onChange={(e) => handleApplicationInstructionsChange(e.target.value)}
-                    placeholder="Describe how this coupon should be applied (e.g., influencers only, customers only, or both)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Specify who can use this coupon and any special conditions</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // Product Browser Modal Component
   const ProductBrowserModal = () => {
     if (!showProductBrowser) return null;
@@ -1535,6 +1106,419 @@ const InfluencerCampaignManager = () => {
             </select>
           </div>
         </div>
+
+        {/* Campaign Type Specific Forms - Inline Sections */}
+        {campaignData.campaignType === 'Video Campaign' && (
+          <div className="mt-6 border-t-2 border-blue-200 pt-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Video Campaign Setup</h3>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Video <span className="text-red-500">*</span>
+                </label>
+                
+                {!campaignData.typeSpecificData && !isUploadingVideo && (
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
+                    <input 
+                      type="file" 
+                      accept="video/mp4,video/quicktime,video/x-msvideo,video/webm" 
+                      className="hidden" 
+                      id="video-upload"
+                      onChange={handleVideoUpload}
+                      disabled={isUploadingVideo}
+                    />
+                    <label htmlFor="video-upload" className="cursor-pointer">
+                      <div className="text-gray-400 mb-2">
+                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">Click to upload video</p>
+                      <p className="text-xs text-gray-500 mt-1">MP4, MOV, AVI, or WEBM (max 500MB)</p>
+                    </label>
+                  </div>
+                )}
+
+                {isUploadingVideo && (
+                  <div className="border-2 border-blue-300 rounded-lg p-8 text-center bg-blue-50">
+                    <div className="text-blue-600 mb-2">
+                      <svg className="w-12 h-12 mx-auto animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <p className="text-sm text-blue-700 font-medium mb-2">Uploading video...</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${videoUploadProgress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-blue-600">{videoUploadProgress}%</p>
+                  </div>
+                )}
+
+                {campaignData.typeSpecificData && 'videoUrl' in campaignData.typeSpecificData && (
+                  <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-green-900">Video uploaded successfully</p>
+                        <p className="text-xs text-green-700 mt-1">
+                          {((campaignData.typeSpecificData as VideoCampaignData).videoSize / (1024 * 1024)).toFixed(2)} MB · {(campaignData.typeSpecificData as VideoCampaignData).videoFormat}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setCampaignData(prev => ({ ...prev, typeSpecificData: null }))}
+                        className="text-green-700 hover:text-green-900"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {uploadError && (
+                  <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-700">{uploadError}</p>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Video Caption or Campaign Brief <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={campaignData.typeSpecificData && 'caption' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as VideoCampaignData).caption : ''}
+                  onChange={(e) => handleVideoCaptionChange(e.target.value)}
+                  placeholder="Add a video caption or campaign brief..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {campaignData.campaignType === 'Product Campaign' && (
+          <div className="mt-6 border-t-2 border-green-200 pt-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Product Campaign Setup</h3>
+              </div>
+
+              {selectedProduct ? (
+                <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
+                  <div className="flex items-center gap-3">
+                    {selectedProduct.image && (
+                      <img 
+                        src={selectedProduct.image} 
+                        alt={selectedProduct.title}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-green-900">{selectedProduct.title}</p>
+                      <p className="text-xs text-green-700 mt-1">
+                        {selectedProduct.price && `$${selectedProduct.price}`}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSelectedProduct(null);
+                        setCampaignData(prev => ({ ...prev, typeSpecificData: null }));
+                      }}
+                      className="text-green-700 hover:text-green-900"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button 
+                  onClick={openProductBrowser}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <Package className="w-5 h-5" />
+                  Browse Shop
+                </button>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Product Link (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={campaignData.typeSpecificData && 'productLink' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).productLink : ''}
+                  onChange={(e) => handleProductLinkChange(e.target.value)}
+                  placeholder="https://example.com/product"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Enter a direct link to the product (if not selected from shop)</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Shop URL (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={campaignData.typeSpecificData && 'shopUrl' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).shopUrl : ''}
+                  onChange={(e) => handleShopUrlChange(e.target.value)}
+                  placeholder="https://myshop.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Your shop URL where the product is available</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {campaignData.campaignType === 'Profile Campaign' && (
+          <div className="mt-6 border-t-2 border-purple-200 pt-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Profile Campaign Setup</h3>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Profile URL <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="url"
+                  value={profileUrl}
+                  onChange={(e) => handleProfileUrlChange(e.target.value)}
+                  onBlur={(e) => validateProfileUrl(e.target.value)}
+                  placeholder="https://instagram.com/yourprofile"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                    profileUrlError 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
+                />
+                {profileUrlError ? (
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {profileUrlError}
+                  </p>
+                ) : profileUrl && !profileUrlError ? (
+                  <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Valid profile URL
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter Instagram, TikTok, YouTube, Twitter, Facebook, LinkedIn, or Twitch profile URL
+                  </p>
+                )}
+              </div>
+
+              {profileUrl && !profileUrlError && (
+                <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-purple-900">Profile URL Set</p>
+                      <p className="text-xs text-purple-700 mt-1 truncate">{profileUrl}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Target Metrics (Optional)
+                </h4>
+                <p className="text-xs text-gray-500 mb-3">Set goals for profile growth</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Followers Goal
+                    </label>
+                    <input
+                      type="number"
+                      value={targetFollowers}
+                      onChange={(e) => handleTargetMetricChange('followers', e.target.value)}
+                      placeholder="e.g., 10000"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Engagement Goal
+                    </label>
+                    <input
+                      type="number"
+                      value={targetEngagement}
+                      onChange={(e) => handleTargetMetricChange('engagement', e.target.value)}
+                      placeholder="e.g., 500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Reach Goal
+                    </label>
+                    <input
+                      type="number"
+                      value={targetReach}
+                      onChange={(e) => handleTargetMetricChange('reach', e.target.value)}
+                      placeholder="e.g., 50000"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {(targetFollowers || targetEngagement || targetReach) && (
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                  <h5 className="text-xs font-semibold text-purple-900 mb-2">Target Metrics Summary</h5>
+                  <div className="space-y-1 text-xs text-purple-700">
+                    {targetFollowers && (
+                      <div className="flex justify-between">
+                        <span>Followers:</span>
+                        <span className="font-medium">{parseInt(targetFollowers).toLocaleString()}</span>
+                      </div>
+                    )}
+                    {targetEngagement && (
+                      <div className="flex justify-between">
+                        <span>Engagement:</span>
+                        <span className="font-medium">{parseInt(targetEngagement).toLocaleString()}</span>
+                      </div>
+                    )}
+                    {targetReach && (
+                      <div className="flex justify-between">
+                        <span>Reach:</span>
+                        <span className="font-medium">{parseInt(targetReach).toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {campaignData.campaignType === 'Coupon Campaign' && (
+          <div className="mt-6 border-t-2 border-orange-200 pt-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                    <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Coupon Campaign Setup</h3>
+              </div>
+
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                </svg>
+                <h4 className="text-sm font-semibold text-gray-700">Select from Coupon Database</h4>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Existing Coupon (Optional)
+                </label>
+                <select 
+                  value={selectedCoupon}
+                  onChange={(e) => handleCouponSelect(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select an existing coupon</option>
+                  <option value="summer20">SUMMER20 - 20% Off Summer Collection</option>
+                  <option value="first10">FIRST10 - $10 Off First Order</option>
+                  <option value="freeship">FREESHIP - Free Shipping</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Choose a coupon from your database</p>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white text-gray-500">OR</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Coupon Code (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(e) => handleCouponCodeChange(e.target.value)}
+                  placeholder="Enter coupon code (e.g., SAVE20)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                />
+                <p className="text-xs text-gray-500 mt-1">Enter a custom coupon code manually</p>
+              </div>
+
+              {(selectedCoupon || couponCode) && (
+                <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-orange-900">Coupon Selected</p>
+                      <p className="text-xs text-orange-700 mt-1">
+                        {selectedCoupon ? `ID: ${selectedCoupon}` : `Code: ${couponCode}`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Application Instructions <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={applicationInstructions}
+                  onChange={(e) => handleApplicationInstructionsChange(e.target.value)}
+                  placeholder="Describe how this coupon should be applied (e.g., influencers only, customers only, or both)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Specify who can use this coupon and any special conditions</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2403,7 +2387,6 @@ const InfluencerCampaignManager = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <CampaignTypeModal />
       <ProductBrowserModal />
       
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
