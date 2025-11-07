@@ -4,9 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Fetch approved influencers with their social accounts
+    // Include all statuses except REJECTED and SUSPENDED for now
     const influencers = await prisma.influencer.findMany({
       where: {
-        status: 'APPROVED'
+        status: {
+          in: ['APPROVED', 'PENDING']  // Include both APPROVED and PENDING
+        }
       },
       include: {
         socialAccounts: true,
