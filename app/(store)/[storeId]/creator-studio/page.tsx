@@ -116,6 +116,12 @@ const CreatorStudioDashboard = () => {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
+  const [selectedInfluencers, setSelectedInfluencers] = useState<string[]>([]);
+  
+  // Campaign mode state
+  const campaignMode = searchParams.get('campaignMode') === 'true';
+  const campaignTitle = searchParams.get('campaignTitle') || 'New Campaign';
+  const [addedToastMessage, setAddedToastMessage] = useState<string | null>(null);
   
   // Applications state
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
@@ -758,10 +764,37 @@ const CreatorStudioDashboard = () => {
 
   const renderDiscovery = () => (
     <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-2 mb-4 sm:mb-6">
-        <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-        <h3 className="text-base sm:text-lg font-semibold">Influencer Discovery</h3>
+      <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2">
+          <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+          <h3 className="text-base sm:text-lg font-semibold">
+            {campaignMode ? `Select Influencers for "${campaignTitle}"` : 'Influencer Discovery'}
+          </h3>
+        </div>
+        {campaignMode && selectedInfluencers.length > 0 && (
+          <Link
+            href={`/${storeId}/createCampaign`}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+          >
+            Back to Campaign ({selectedInfluencers.length})
+          </Link>
+        )}
       </div>
+
+      {/* Toast Notification */}
+      {addedToastMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 flex items-center gap-3">
+          <div className="flex-1">
+            <p className="text-sm text-green-800 font-medium">{addedToastMessage}</p>
+          </div>
+          <button
+            onClick={() => setAddedToastMessage(null)}
+            className="text-green-600 hover:text-green-700"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex-1">
@@ -854,9 +887,52 @@ const CreatorStudioDashboard = () => {
                   <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>View Profile</span>
                 </Link>
-                <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <button 
+                  onClick={() => {
+                    if (campaignMode && typeof window !== 'undefined') {
+                      const isAlreadySelected = selectedInfluencers.includes(creator.id);
+                      
+                      if (isAlreadySelected) {
+                        // Remove from selection
+                        setSelectedInfluencers(selectedInfluencers.filter(id => id !== creator.id));
+                        setAddedToastMessage(`Removed from campaign: ${creator.name}`);
+                      } else {
+                        // Add to campaign
+                        setSelectedInfluencers([...selectedInfluencers, creator.id]);
+                        
+                        // Save to localStorage
+                        try {
+                          const campaignKey = `campaign_${campaignTitle}`;
+                          const currentSelected = JSON.parse(localStorage.getItem(campaignKey) || '[]');
+                          const creatorData = {
+                            id: creator.id,
+                            name: creator.name,
+                            handle: creator.handle,
+                            followers: creator.followers
+                          };
+                          if (!currentSelected.find((c: any) => c.id === creator.id)) {
+                            currentSelected.push(creatorData);
+                            localStorage.setItem(campaignKey, JSON.stringify(currentSelected));
+                          }
+                        } catch (error) {
+                          console.error('Error saving to localStorage:', error);
+                        }
+                        
+                        setAddedToastMessage(`Added to campaign: ${creator.name}`);
+                      }
+                      
+                      // Clear toast after 3 seconds
+                      setTimeout(() => setAddedToastMessage(null), 3000);
+                    }
+                  }}
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-xs sm:text-sm font-medium transition-colors ${
+                    campaignMode && selectedInfluencers.includes(creator.id)
+                      ? 'bg-green-100 border border-green-300 text-green-700 hover:bg-green-200'
+                      : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
                   <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>Invite</span>
+                  <span>{campaignMode && selectedInfluencers.includes(creator.id) ? 'Added' : 'Invite'}</span>
                 </button>
               </div>
             </div>

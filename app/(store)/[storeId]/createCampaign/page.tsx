@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -88,6 +88,12 @@ interface CampaignData {
   callToActions: CallToAction[];
   milestones: Milestone[];
   deliverables: Deliverable[];
+  selectedInfluencers: Array<{
+    id: string;
+    name: string;
+    handle: string;
+    followers: string;
+  }>;
 }
 
 const InfluencerCampaignManager = () => {
@@ -142,8 +148,50 @@ const InfluencerCampaignManager = () => {
     ],
     deliverables: [
       { type: 'Instagram Post', quantity: 1, description: '' }
-    ]
+    ],
+    selectedInfluencers: []
   });
+
+  // Load selected influencers from localStorage on mount
+  useEffect(() => {
+    try {
+      // Only run on client-side
+      if (typeof window === 'undefined') return;
+      
+      const campaignTitle = campaignData.title || 'New Campaign';
+      const campaignKey = `campaign_${campaignTitle}`;
+      const savedInfluencers = localStorage.getItem(campaignKey);
+      
+      if (savedInfluencers) {
+        const influencers = JSON.parse(savedInfluencers);
+        setCampaignData(prev => ({
+          ...prev,
+          selectedInfluencers: influencers
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading influencers from localStorage:', error);
+    }
+  }, []);
+
+  // Update localStorage whenever selectedInfluencers or campaign title changes
+  useEffect(() => {
+    try {
+      // Only run on client-side
+      if (typeof window === 'undefined') return;
+      
+      if (campaignData.title) {
+        const campaignKey = `campaign_${campaignData.title}`;
+        if (campaignData.selectedInfluencers.length > 0) {
+          localStorage.setItem(campaignKey, JSON.stringify(campaignData.selectedInfluencers));
+        } else {
+          localStorage.removeItem(campaignKey);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving influencers to localStorage:', error);
+    }
+  }, [campaignData.title, campaignData.selectedInfluencers]);
 
   // Map frontend campaign type strings to backend enum
   const mapCampaignTypeToEnum = (displayName: string): CampaignType => {
@@ -1928,8 +1976,57 @@ const InfluencerCampaignManager = () => {
 
       {/* Target Influencers Section */}
       <div className="border-t border-gray-200 pt-6">
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">Target Influencers</h3>
+              <p className="text-sm text-gray-500">Selected influencers for this campaign</p>
+            </div>
+            <Link 
+              href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              <Plus className="w-4 h-4" />
+              Add Influencers
+            </Link>
+          </div>
+
+          {/* Selected Influencers List */}
+          {campaignData.selectedInfluencers.length > 0 ? (
+            <div className="space-y-2">
+              {campaignData.selectedInfluencers.map((influencer) => (
+                <div 
+                  key={influencer.id} 
+                  className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900">{influencer.name}</p>
+                    <p className="text-sm text-gray-600">{influencer.handle} • {influencer.followers} followers</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setCampaignData({
+                        ...campaignData,
+                        selectedInfluencers: campaignData.selectedInfluencers.filter(i => i.id !== influencer.id)
+                      });
+                    }}
+                    className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 text-center">
+              <p className="text-sm text-gray-600">No influencers selected yet.</p>
+              <p className="text-xs text-gray-500 mt-1">Click "Add Influencers" to discover and select creators for your campaign.</p>
+            </div>
+          )}
+        </div>
+
         <Link 
-          href={`/${storeId}/creator-studio?tab=Discovery`}
+          href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}`}
           className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group"
         >
           <div className="flex items-center gap-3">
@@ -1937,8 +2034,8 @@ const InfluencerCampaignManager = () => {
               <Users className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">Target Influencers</h3>
-              <p className="text-xs text-gray-500">Click to discover and select influencers for your campaign</p>
+              <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">Discover More Influencers</h3>
+              <p className="text-xs text-gray-500">Browse and select additional influencers for your campaign</p>
             </div>
           </div>
           <ChevronLeft className="w-5 h-5 text-gray-400 rotate-180 group-hover:text-blue-600 transition-colors" />
