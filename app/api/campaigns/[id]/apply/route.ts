@@ -6,9 +6,11 @@ import { headers } from "next/headers";
 // POST /api/campaigns/[id]/apply - Apply to a campaign
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: campaignId } = await params;
+
     // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -20,8 +22,6 @@ export async function POST(
         { status: 401 }
       );
     }
-
-    const { id: campaignId } = params;
 
     // Get influencer record for the authenticated user
     const influencer = await prisma.influencer.findFirst({

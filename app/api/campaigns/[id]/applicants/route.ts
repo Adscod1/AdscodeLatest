@@ -6,9 +6,11 @@ import { headers } from "next/headers";
 // GET /api/campaigns/[id]/applicants - Get all applicants for a campaign
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: campaignId } = await params;
+
     // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -20,8 +22,6 @@ export async function GET(
         { status: 401 }
       );
     }
-
-    const { id: campaignId } = params;
 
     // Get campaign and verify ownership
     const campaign = await prisma.campaign.findUnique({

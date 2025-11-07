@@ -7,9 +7,11 @@ import { headers } from "next/headers";
 // POST /api/campaigns/[id]/publish - Publish a draft campaign
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -21,8 +23,6 @@ export async function POST(
         { status: 401 }
       );
     }
-
-    const { id } = params;
 
     // Check if campaign exists and is owned by user
     const existingCampaign = await prisma.campaign.findUnique({

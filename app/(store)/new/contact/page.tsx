@@ -79,10 +79,10 @@ const ContactInformationPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Secondary Website <span className="text-gray-400">(optional)</span>
+                      Website <span className="text-gray-400">(optional)</span>
                     </label>
                     <Input
-                      {...methods.register("website2")}
+                      {...methods.register("website")}
                       type="url"
                       placeholder="www.horizonelectronics.com"
                       className="w-full"
@@ -181,9 +181,9 @@ const ContactInformationPage = () => {
                         <Facebook className="h-4 w-4 text-blue-600" />
                       </div>
                       <Input
-                        {...methods.register("facebook")}
                         placeholder="https://facebook.com/mystore"
                         className="pl-10 w-full"
+                        disabled
                       />
                     </div>
                   </div>
@@ -197,9 +197,9 @@ const ContactInformationPage = () => {
                         <Instagram className="h-4 w-4 text-pink-600" />
                       </div>
                       <Input
-                        {...methods.register("instagram")}
                         placeholder="https://instagram.com/mystore"
                         className="pl-10 w-full"
+                        disabled
                       />
                     </div>
                   </div>
@@ -215,9 +215,9 @@ const ContactInformationPage = () => {
                         </svg>
                       </div>
                       <Input
-                        {...methods.register("x")}
                         placeholder="https://x.com/mystore"
                         className="pl-10 w-full"
+                        disabled
                       />
                     </div>
                   </div>

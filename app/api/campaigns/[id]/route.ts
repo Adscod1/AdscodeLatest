@@ -7,9 +7,11 @@ import { headers } from "next/headers";
 // GET /api/campaigns/[id] - Get campaign details
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -21,8 +23,6 @@ export async function GET(
         { status: 401 }
       );
     }
-
-    const { id } = params;
 
     // Fetch campaign
     const campaign = await prisma.campaign.findUnique({
@@ -76,9 +76,11 @@ export async function GET(
 // PATCH /api/campaigns/[id] - Update a draft campaign
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -90,8 +92,6 @@ export async function PATCH(
         { status: 401 }
       );
     }
-
-    const { id } = params;
 
     // Check if campaign exists and is owned by user
     const existingCampaign = await prisma.campaign.findUnique({

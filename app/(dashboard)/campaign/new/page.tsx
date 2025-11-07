@@ -5,15 +5,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Check, Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 
-const CreateNewCampaignPage = () => {
+const CreateNewCampaignPageContent = () => {
   const [activeStep] = useState(0);
   const isMobile = useIsMobile();
   const searchParams = useSearchParams();
-  const campaignId = searchParams.get("id");
+  const campaignId = searchParams?.get("id") || null;
   const isEditMode = !!campaignId;
 
   // LocalStorage key
@@ -946,6 +946,14 @@ const CreateNewCampaignPage = () => {
         </>
       )}
     </div>
+  );
+};
+
+const CreateNewCampaignPage = () => {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8">Loading...</div>}>
+      <CreateNewCampaignPageContent />
+    </Suspense>
   );
 };
 

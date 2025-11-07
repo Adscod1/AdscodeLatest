@@ -7,8 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  CheckCircle, 
-  MapPin, 
   Clock, 
 
   Users, 
@@ -18,7 +16,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 const StarRating = ({ rating }: { rating: number }) => {
@@ -234,9 +232,9 @@ const CategoryButton = ({ label, active = false }: { label: string; active?: boo
   </button>
 );
 
-const BusinessesPage = () => {
+const BusinessesPageContent = () => {
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get('search') || '';
+  const searchQuery = searchParams?.get('search') || '';
   
   const { data: stores, isLoading } = useQuery({
     queryKey: ["stores"],
@@ -354,4 +352,13 @@ const BusinessesPage = () => {
   );
 };
 
+const BusinessesPage = () => {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8">Loading...</div>}>
+      <BusinessesPageContent />
+    </Suspense>
+  );
+};
+
+export const dynamic = 'force-dynamic';
 export default BusinessesPage;

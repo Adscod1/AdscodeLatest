@@ -6,9 +6,11 @@ import { markNotificationAsRead } from "@/lib/utils/notification-helpers";
 // PATCH /api/notifications/[id]/read - Mark a notification as read
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: notificationId } = await params;
+
     // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -20,8 +22,6 @@ export async function PATCH(
         { status: 401 }
       );
     }
-
-    const { id: notificationId } = params;
 
     const result = await markNotificationAsRead(notificationId, session.user.id);
 

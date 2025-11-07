@@ -6,9 +6,11 @@ import { headers } from "next/headers";
 // POST /api/campaigns/[id]/applicants/[influencerId]/select - Select an influencer for the campaign
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string; influencerId: string } }
+  { params }: { params: Promise<{ id: string; influencerId: string }> }
 ) {
   try {
+    const { id: campaignId, influencerId } = await params;
+
     // Check authentication
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -20,10 +22,6 @@ export async function POST(
         { status: 401 }
       );
     }
-
-    const { id: campaignId, influencerId } = params;
-
-    // Get campaign and verify ownership
     const campaign = await prisma.campaign.findUnique({
       where: { id: campaignId },
       select: {
