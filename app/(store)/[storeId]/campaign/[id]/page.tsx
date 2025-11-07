@@ -1,8 +1,43 @@
 "use client";
 import React, { useState } from 'react';
-import { ArrowLeft, Play, Share2, Edit, Trash2, DollarSign, Users, Eye, MousePointer, Clock, TrendingUp, Zap } from 'lucide-react';
+import { ArrowLeft, Play, Share2, Edit, Trash2, DollarSign, Users, Eye, MousePointer, Clock, TrendingUp, Zap, Star, X } from 'lucide-react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from "@/components/ui/card";
+
+// Star Rating Component
+interface StarRatingProps {
+  rating: number;
+  onRatingChange?: (rating: number) => void;
+  readonly?: boolean;
+}
+
+const StarRating = ({ rating, onRatingChange, readonly = false }: StarRatingProps) => {
+  const [hover, setHover] = useState(0);
+
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          disabled={readonly}
+          onMouseEnter={() => !readonly && setHover(star)}
+          onMouseLeave={() => !readonly && setHover(0)}
+          onClick={() => !readonly && onRatingChange?.(star)}
+          className={`w-6 h-6 transition-colors ${readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'}`}
+        >
+          <Star
+            className={`w-full h-full ${
+              star <= (hover || rating)
+                ? 'fill-yellow-400 text-yellow-400'
+                : 'text-gray-300'
+            }`}
+          />
+        </button>
+      ))}
+    </div>
+  );
+};
 // User Demographics Component
 const UserDemographics = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -214,8 +249,116 @@ const UserDemographics = () => {
   );
 };
 
+// Types
+interface Influencer {
+  id: number;
+  name: string;
+  platform: string;
+  followers: string;
+  engagement: string;
+  posts: number;
+  performance: number;
+  avatar: string;
+  color: string;
+  hasRating?: boolean;
+  currentRating?: number;
+}
+
 export default function CampaignDetailPage() {
   const [activeTab, setActiveTab] = useState('Metrics');
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [selectedInfluencer, setSelectedInfluencer] = useState<Influencer | null>(null);
+  const [ratings, setRatings] = useState({
+    overall: 0,
+    communication: 0,
+    contentQuality: 0,
+    timeliness: 0,
+    audienceEngagement: 0
+  });
+  const [workAgain, setWorkAgain] = useState('');
+  const [feedback, setFeedback] = useState('');
+
+  const influencers = [
+    {
+      id: 1,
+      name: 'Sarah Johnson',
+      platform: 'Instagram',
+      followers: '125K',
+      engagement: '4.8%',
+      posts: 8,
+      performance: 85,
+      avatar: 'S',
+      color: 'purple'
+    },
+    {
+      id: 2,
+      name: 'Mike Chen',
+      platform: 'YouTube',
+      followers: '350K',
+      engagement: '6.2%',
+      posts: 5,
+      performance: 92,
+      avatar: 'M',
+      color: 'blue'
+    },
+    {
+      id: 3,
+      name: 'Emma Davis',
+      platform: 'TikTok',
+      followers: '500K',
+      engagement: '7.5%',
+      posts: 12,
+      performance: 96,
+      avatar: 'E',
+      color: 'green',
+      hasRating: true,
+      currentRating: 4.5
+    }
+  ];
+
+  const openRatingModal = (influencer: Influencer) => {
+    setSelectedInfluencer(influencer);
+    if (influencer.hasRating) {
+      // Pre-fill with existing ratings if updating
+      setRatings({
+        overall: Math.floor(influencer.currentRating || 0),
+        communication: Math.floor(influencer.currentRating || 0),
+        contentQuality: Math.floor(influencer.currentRating || 0),
+        timeliness: Math.floor(influencer.currentRating || 0),
+        audienceEngagement: Math.floor(influencer.currentRating || 0)
+      });
+    } else {
+      // Reset for new rating
+      setRatings({
+        overall: 0,
+        communication: 0,
+        contentQuality: 0,
+        timeliness: 0,
+        audienceEngagement: 0
+      });
+    }
+    setWorkAgain('');
+    setFeedback('');
+    setShowRatingModal(true);
+  };
+
+  const closeRatingModal = () => {
+    setShowRatingModal(false);
+    setSelectedInfluencer(null);
+  };
+
+  const submitRating = () => {
+    // Here you would typically submit to your API
+    if (selectedInfluencer) {
+      console.log('Rating submitted:', {
+        influencerId: selectedInfluencer.id,
+        ratings,
+        workAgain,
+        feedback
+      });
+    }
+    closeRatingModal();
+  };
 
   const stats = [
     { label: 'Total Revenue', value: '$28,500', change: '+12.5%', icon: DollarSign, color: 'purple' },
@@ -370,7 +513,7 @@ export default function CampaignDetailPage() {
               
               <div className="border-b border-gray-200">
                 <div className="flex">
-                  {['Metrics', 'Demographics', 'Ad Sets'].map((tab) => (
+                  {['Metrics', 'Demographics', 'Ad Sets', 'Influencers'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -515,6 +658,72 @@ export default function CampaignDetailPage() {
                     ))}
                   </div>
                 )}
+
+                {activeTab === 'Influencers' && (
+                  <div className="space-y-6">
+                    {/* Rate Influencer Performance Header */}
+                    <div className="bg-purple-50 rounded-lg p-4">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">Rate Influencer Performance</h3>
+                      <p className="text-xs text-gray-600">Help others by sharing your experience working with these influencers</p>
+                    </div>
+
+                    {/* Influencers List */}
+                    <div className="space-y-4">
+                      {influencers.map((influencer) => (
+                        <div key={influencer.id} className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 bg-${influencer.color}-100 rounded-full flex items-center justify-center`}>
+                                <span className={`text-${influencer.color}-600 font-semibold text-sm`}>{influencer.avatar}</span>
+                              </div>
+                              <div>
+                                <h3 className="text-sm font-semibold text-gray-900">{influencer.name}</h3>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <span>{influencer.platform} • {influencer.followers} followers</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <span>Engagement: {influencer.engagement}</span>
+                                  <span>•</span>
+                                  <span>Content: {influencer.posts} posts</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-purple-600 mb-1">{influencer.performance}%</div>
+                              <div className="text-xs text-gray-500 mb-2">Performance</div>
+                              <div className="flex items-center gap-2">
+                                {influencer.hasRating ? (
+                                  <>
+                                    <div className="flex text-yellow-400 text-xs">
+                                      <StarRating rating={Math.floor(influencer.currentRating)} readonly />
+                                    </div>
+                                    <span className="text-xs text-gray-500">{influencer.currentRating}</span>
+                                    <button 
+                                      onClick={() => openRatingModal(influencer)}
+                                      className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full hover:bg-gray-200 transition-colors"
+                                    >
+                                      Update Rating
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-xs text-gray-500">Not Rated</span>
+                                    <button 
+                                      onClick={() => openRatingModal(influencer)}
+                                      className="px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded-full hover:bg-purple-700 transition-colors"
+                                    >
+                                      Rate Now
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -620,6 +829,176 @@ export default function CampaignDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Rating Modal */}
+        {showRatingModal && selectedInfluencer && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-8">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-1">Rate Influencer Performance</h2>
+                    <p className="text-sm text-gray-500">Provide feedback on {selectedInfluencer.name}'s performance during the campaign</p>
+                  </div>
+                  <button
+                    onClick={closeRatingModal}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+
+                {/* Influencer Info */}
+                <div className="flex items-center gap-4 mb-8 p-4 bg-gray-50 rounded-lg">
+                  <div className={`w-14 h-14 bg-${selectedInfluencer.color}-100 rounded-full flex items-center justify-center`}>
+                    <span className={`text-${selectedInfluencer.color}-600 font-semibold text-xl`}>
+                      {selectedInfluencer.avatar}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{selectedInfluencer.name}</h3>
+                    <p className="text-sm text-gray-500">{selectedInfluencer.platform} • {selectedInfluencer.followers} followers</p>
+                  </div>
+                </div>
+
+                {/* Rating Categories */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    {/* Overall Rating */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                        Overall Rating
+                      </label>
+                      <StarRating
+                        rating={ratings.overall}
+                        onRatingChange={(rating: number) => setRatings(prev => ({ ...prev, overall: rating }))}
+                      />
+                    </div>
+
+                    {/* Communication */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Communication
+                      </label>
+                      <p className="text-xs text-gray-500 mb-3">How responsive and professional was their communication?</p>
+                      <StarRating
+                        rating={ratings.communication}
+                        onRatingChange={(rating: number) => setRatings(prev => ({ ...prev, communication: rating }))}
+                      />
+                    </div>
+
+                    {/* Content Quality */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Content Quality
+                      </label>
+                      <p className="text-xs text-gray-500 mb-3">How would you rate the quality of their content?</p>
+                      <StarRating
+                        rating={ratings.contentQuality}
+                        onRatingChange={(rating: number) => setRatings(prev => ({ ...prev, contentQuality: rating }))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Timeliness */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Timeliness
+                      </label>
+                      <p className="text-xs text-gray-500 mb-3">Did they meet deadlines and deliver on time?</p>
+                      <StarRating
+                        rating={ratings.timeliness}
+                        onRatingChange={(rating: number) => setRatings(prev => ({ ...prev, timeliness: rating }))}
+                      />
+                    </div>
+
+                    {/* Audience Engagement */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Audience Engagement
+                      </label>
+                      <p className="text-xs text-gray-500 mb-3">How well did their content engage their audience?</p>
+                      <StarRating
+                        rating={ratings.audienceEngagement}
+                        onRatingChange={(rating: number) => setRatings(prev => ({ ...prev, audienceEngagement: rating }))}
+                      />
+                    </div>
+
+                    {/* Work Again */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                        Would you work with this influencer again?
+                      </label>
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setWorkAgain('Yes')}
+                          className={`flex-1 px-4 py-3 rounded-lg border transition-colors ${
+                            workAgain === 'Yes'
+                              ? 'bg-purple-50 border-purple-600 text-purple-700'
+                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            {workAgain === 'Yes' && <span className="text-purple-600">✓</span>}
+                            <span>Yes</span>
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWorkAgain('No')}
+                          className={`flex-1 px-4 py-3 rounded-lg border transition-colors ${
+                            workAgain === 'No'
+                              ? 'bg-purple-50 border-purple-600 text-purple-700'
+                              : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            {workAgain === 'No' && <span className="text-purple-600">✓</span>}
+                            <span>No</span>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Feedback - Full Width */}
+                <div className="mt-8">
+                  <label className="block text-sm font-medium text-gray-900 mb-3">
+                    Additional Feedback (Optional)
+                  </label>
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    placeholder="Share your experience working with this influencer..."
+                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
+                    rows={4}
+                  />
+                </div>
+
+                {/* Footer */}
+                <div className="flex gap-4 mt-8">
+                  <button
+                    onClick={closeRatingModal}
+                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={submitRating}
+                    disabled={ratings.overall === 0}
+                    className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+                  >
+                    {selectedInfluencer.hasRating ? 'Update Rating' : 'Submit Rating'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
