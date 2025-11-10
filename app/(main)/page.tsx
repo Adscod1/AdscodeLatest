@@ -3,6 +3,8 @@
 import { getProducts } from "@/actions/product";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
+import { useSearch } from "@/contexts/SearchContext";
+import { useMemo } from "react";
 
 import { MainProductCard } from "./components/main-product-card";
 
@@ -10,11 +12,39 @@ import { MainProductCard } from "./components/main-product-card";
 
 const FeedPage = () => {
   const { storeId } = useParams();
+  const { searchTerm, activeCategory } = useSearch();
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products", storeId],
     queryFn: () => getProducts(storeId as string),
   });
+
+  // Filter products based on search term and category
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+
+    let filtered = products;
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((product) => 
+        product.title.toLowerCase().includes(term) ||
+        product.description?.toLowerCase().includes(term) ||
+        product.store?.name?.toLowerCase().includes(term) ||
+        product.category?.toLowerCase().includes(term)
+      );
+    }
+
+    // Filter by category
+    if (activeCategory && activeCategory !== "All") {
+      filtered = filtered.filter((product) =>
+        product.category?.toLowerCase() === activeCategory.toLowerCase()
+      );
+    }
+
+    return filtered;
+  }, [products, searchTerm, activeCategory]);
 
   return (
     <>    
@@ -36,11 +66,30 @@ const FeedPage = () => {
             </div>
           ))}
         </div>
-      ) : (
+      ) : filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 mb-12">
-          {products?.map((product) => (
+          {filteredProducts.map((product) => (
             <MainProductCard key={product.id} product={product} />
           ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="text-gray-400 mb-4">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+              <path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
+          <p className="text-gray-600 max-w-md">
+            {searchTerm ? (
+              `No products match "${searchTerm}"${activeCategory !== "All" ? ` in ${activeCategory}` : ""}`
+            ) : activeCategory !== "All" ? (
+              `No products found in ${activeCategory} category`
+            ) : (
+              "No products available at the moment"
+            )}
+          </p>
         </div>
       )}
       </div>

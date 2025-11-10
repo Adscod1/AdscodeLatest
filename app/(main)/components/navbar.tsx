@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { UserAuthButton } from "./UserAuthButton";
+import { useSearch } from "@/contexts/SearchContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -160,9 +161,11 @@ export const Logo = () => {
 export const FeedNavbar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState("All");
+  const { searchTerm, setSearchTerm, activeCategory, setActiveCategory } = useSearch();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [localSearchValue, setLocalSearchValue] = useState("");
+  const [mobileSearchValue, setMobileSearchValue] = useState("");
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
@@ -184,6 +187,20 @@ export const FeedNavbar = () => {
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setLocalSearchValue(value);
+    setSearchTerm(value);
+  };
+
+  const handleMobileSearchChange = (value: string) => {
+    setMobileSearchValue(value);
+    setSearchTerm(value);
   };
 
   const scrollCategories = (direction: 'left' | 'right') => {
@@ -289,8 +306,19 @@ export const FeedNavbar = () => {
                 <Input
                   type="text"
                   placeholder="Search creators, products, or deals..."
-                  className="w-full px-4 py-2.5 h-10 pl-12 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  value={localSearchValue}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="w-full px-4 py-2.5 h-10 pl-12 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 />
+                {localSearchValue && (
+                  <button
+                    onClick={() => handleSearchChange("")}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <CloseIcon />
+                  </button>
+                )}
               </div>
               
             </div>
@@ -329,18 +357,31 @@ export const FeedNavbar = () => {
             <Input
               type="text"
               placeholder="Search"
-              className="w-full px-4 py-2 pl-4 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={mobileSearchValue}
+              onChange={(e) => handleMobileSearchChange(e.target.value)}
+              className="w-full px-4 py-2 pl-4 pr-20 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               autoFocus
             />
-            <button 
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600" 
-              onClick={() => {
-                router.push("/business/all");
-                setIsSearchOpen(false);
-              }}
-            >
-              <SearchIcon />
-            </button>
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+              {mobileSearchValue && (
+                <button
+                  onClick={() => handleMobileSearchChange("")}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label="Clear search"
+                >
+                  <CloseIcon />
+                </button>
+              )}
+              <button 
+                className="text-gray-400 hover:text-gray-600" 
+                onClick={() => {
+                  router.push("/business/all");
+                  setIsSearchOpen(false);
+                }}
+              >
+                <SearchIcon />
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -447,7 +488,7 @@ export const FeedNavbar = () => {
             {categoryItems.map((category) => (
               <button
                 key={category}
-                onClick={() => setActiveCategory(category)}
+                onClick={() => handleCategoryChange(category)}
                 className={`px-5 py-2 text-sm font-medium whitespace-nowrap rounded-full transition-colors border ${
                   activeCategory === category
                     ? "bg-blue-600 text-white border-blue-600"
