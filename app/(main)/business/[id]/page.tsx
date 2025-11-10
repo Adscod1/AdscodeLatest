@@ -144,80 +144,116 @@ const BusinessPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className=" p-20 mx-auto">
-        {/* Hero Carousel Section */}
-        <div className="relative h-80 bg-gradient-to-br from-blue-100 to-purple-100 rounded-b-3xl overflow-hidden mb-8">
-          <div className="absolute inset-0">
-            <Image
-              src={carouselImages[currentImageIndex]}
-              alt="Business Hero"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      <div className="mx-auto">
+        {/* Hero Carousel Section with Three Images - Full Width */}
+        <div className="relative h-96 overflow-hidden">
+          <div className="absolute inset-0 grid grid-cols-3 gap-0">
+            {/* Left Image */}
+            <div className="relative bg-gray-200 overflow-hidden">
+              <Image
+                src={carouselImages[0]}
+                alt="Business Image 1"
+                fill
+                className="object-cover"
+              />
+            </div>
+            
+            {/* Center Image (Main) */}
+            <div className="relative bg-gray-100 overflow-hidden">
+              <Image
+                src={carouselImages[1]}
+                alt="Business Image 2"
+                fill
+                className="object-cover"
+              />
+            </div>
+            
+            {/* Right Image */}
+            <div className="relative bg-gray-300 overflow-hidden">
+              <Image
+                src={carouselImages[2]}
+                alt="Business Image 3"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
+          
+          {/* Dark Overlay for Better Text Readability */}
+          <div className="absolute inset-0 bg-black bg-opacity-10"></div>
           
           {/* Navigation Arrows */}
           <button 
             onClick={() => setCurrentImageIndex(prev => prev === 0 ? carouselImages.length - 1 : prev - 1)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all z-10"
           >
             <ChevronLeft className="w-5 h-5 text-gray-700" />
           </button>
           <button 
             onClick={() => setCurrentImageIndex(prev => prev === carouselImages.length - 1 ? 0 : prev + 1)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all z-10"
           >
             <ChevronRight className="w-5 h-5 text-gray-700" />
           </button>
+
+          {/* Business Avatar with White Circle Background - Overlapping */}
+          <div className="absolute bottom-0 left-12 transform translate-y-1/2 z-30">
+            <div className="w-40 h-40 bg-white rounded-full flex items-center justify-center shadow-xl">
+              <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 shadow-md">
+                {store.logo ? (
+                  <Image
+                    src={store.logo}
+                    alt={store.name}
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-3xl font-bold text-white">
+                      {store.name.charAt(0)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-         {/* Top Section: Business Name + Action Buttons */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-8 py-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center overflow-hidden shadow-lg">
-                      {store.logo ? (
-                        <Image
-                          src={store.logo}
-                          alt={store.name}
-                          width={80}
-                          height={80}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-2xl font-bold text-white">
-                          {store.name.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <h1 className="text-3xl font-bold text-gray-900 mb-2">{store.name}</h1>
-                      {store.tagline && (
-                        <p className="text-gray-600">{store.tagline}</p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <Button className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-6">
-                      <Heart className="w-4 h-4 mr-2" />
-                      Favourite
-                    </Button>
-                    <Button variant="outline" className="rounded-lg px-6 bg-white">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Inbox
-                    </Button>
-                    <Button variant="outline" className="rounded-lg px-6 bg-white">
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Share
-                    </Button>
-                  </div>
-                </div>
+         {/* Top Section: Business Profile + Action Buttons */}
+        <div className="bg-white shadow-sm px-12 py-8 pt-5">
+          <div className="flex items-center justify-between">
+            {/* Left Side: Business Profile - Adjusted for overlapping avatar */}
+            <div className="flex items-center gap-6 ml-40">
+              {/* Business Info */}
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">{store.name}</h1>
+                <p className="text-gray-600 text-xl">
+                  {store.tagline || "Lorem ipsum dolor sit amet"}
+                </p>
               </div>
+            </div>
+            
+            {/* Right Side: Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Button className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-6 py-2.5 flex items-center gap-2">
+                <Heart className="w-4 h-4" />
+                Favourite
+              </Button>
+              <Button variant="outline" className="rounded-lg px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Inbox
+              </Button>
+              <Button variant="outline" className="rounded-lg px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+                <Share2 className="w-4 h-4" />
+                Share
+              </Button>
+            </div>
+          </div>
+        </div>
 
-        {/* Main Content */}
-        <div className="px-6 flex gap-8">
+        {/* Main Content - Add padding here */}
+        <div className="px-20 flex gap-8">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-8">
             {/* Business Header - Full Width */}
@@ -281,7 +317,7 @@ const BusinessPage = () => {
                   Listing main services
                 </h2>
                 <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
-                  See all Services
+                  See all
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>

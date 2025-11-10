@@ -49,9 +49,9 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
 
   return (
     <Link href={`/${product.store.id}/product/${product.id}`} className="block">
-      <Card className="w-full border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 p-0 cursor-pointer">
+  <Card className="w-full border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 p-0 cursor-pointer ">
         {/* Header with store info */}
-    <div className="flex items-center justify-between p-3 pb-1.5">
+      <div className="flex items-center justify-between p-3 pb-1">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
             {product.store.avatarUrl ? (
@@ -83,7 +83,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Image */}
-  <div className="relative w-full h-[280px] bg-gray-100">
+      <div className="relative w-full h-96 bg-gray-100">
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images[0].url}
@@ -94,7 +94,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
             priority={false}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-80 flex items-center justify-center">
             <div className="text-white text-6xl opacity-50">📱</div>
           </div>
         )}
@@ -108,7 +108,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
 
       {/* Product Details */}
-  <div className="p-4 pt-2.5 space-y-2.5">
+  <div className="p-4  space-y-2.5">
         {/* Title and Rating */}
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-semibold text-base text-gray-900 leading-tight line-clamp-1 flex-1">
@@ -166,7 +166,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
           </button>
         </div>
       </div>
-    </Card>
+  </Card>
     </Link>
   );
 };

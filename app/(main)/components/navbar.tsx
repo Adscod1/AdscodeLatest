@@ -120,6 +120,7 @@ const mainNavItems = [
   { label: "Deals", href: "/deals", icon: TagIcon },
   { label: "Reviews", href: "/reviews", icon: StarIcon },
   { label: "Creators", href: "/influencer/all", icon: UsersIcon },
+  { label: "Businesses", href: "/business/all", icon: UsersIcon },
   { label: "Campaigns", href: "/campaigns", icon: MegaphoneIcon },
 ];
 

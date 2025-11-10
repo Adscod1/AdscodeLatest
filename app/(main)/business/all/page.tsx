@@ -85,7 +85,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
           <div className="w-20 grid grid-cols-1 gap-1">
             <div className="relative h-full">
               <Image
-                src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?q=80&w=400"
+                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400"
                 alt="Restaurant interior"
                 fill
                 className="object-cover"
@@ -118,9 +118,9 @@ const BusinessCard = ({ store }: { store: Store }) => {
           </div>
         </div>
         {/* Image indicators */}
-        <div className="absolute top-3 right-3 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+        {/* <div className="absolute top-3 right-3 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
           1/5
-        </div>
+        </div> */}
       </div>
 
       {/* Content */}
@@ -144,7 +144,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
           {/* Categories */}
           <div className="flex gap-2 mb-4">
             <span className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">
-              {/* Seafood */}
+               Seafood 
             </span>
             <span className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">
               Wines Bars
