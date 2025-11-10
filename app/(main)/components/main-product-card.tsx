@@ -6,7 +6,7 @@ import {
   Share2,
   Bookmark,
   TrendingUp,
-  MoreVertical,
+  MoreHorizontal,
 } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@prisma/client";
@@ -78,7 +78,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
           </div>
         </div>
         <button className="text-gray-500 hover:text-gray-700">
-          <MoreVertical className="w-5 h-5" />
+          <MoreHorizontal className="w-5 h-5" />
         </button>
       </div>
 
@@ -101,7 +101,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         
         {/* Discount Badge */}
         {product.comparePrice && product.comparePrice > product.price && (
-          <div className="absolute top-3 right-3 bg-pink-500 text-white px-3 text-sm w-[15%] rounded-full">
+          <div className="absolute top-3 right-3 bg-pink-500 text-white px-3 text-sm w-auto rounded-full ">
             {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
           </div>
         )}
@@ -143,26 +143,26 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         </div>
 
         {/* Engagement Metrics */}
-        <div className="flex items-center justify-between pt-3 mt-2 text-gray-500">
+        <div className="flex items-center justify-between pt-3 mt-2 text-gray-500 border-t border-gray-200">
           <button className="flex items-center gap-1 hover:text-red-500 transition-colors">
             <Heart className="w-4 h-4" />
-            <span className="text-sm font-medium">{engagementData.likes}</span>
+            <span className="text-sm ">{engagementData.likes}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
             <MessageCircle className="w-4 h-4" />
-            <span className="text-sm font-medium">{engagementData.comments}</span>
+            <span className="text-sm ">{engagementData.comments}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-green-500 transition-colors">
             <TrendingUp className="w-4 h-4" />
-            <span className="text-sm font-medium">{engagementData.views}</span>
+            <span className="text-sm ">{engagementData.views}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-purple-500 transition-colors">
             <Share2 className="w-4 h-4" />
-            <span className="text-sm font-medium">{engagementData.shares}</span>
+            <span className="text-sm ">{engagementData.shares}</span>
           </button>
           <button className="flex items-center gap-1 hover:text-yellow-500 transition-colors">
             <Bookmark className="w-4 h-4" />
-            <span className="text-sm font-medium">{engagementData.bookmarks}</span>
+            <span className="text-sm ">{engagementData.bookmarks}</span>
           </button>
         </div>
       </div>
