@@ -122,7 +122,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         {/* Header with store info */}
       <div className="flex items-center justify-between p-3 pb-1">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-gray-200">
+          <div className="w-10 h-10 rounded overflow-hidden flex items-center justify-center bg-gray-200">
             {product.store.logo || product.store.avatarUrl ? (
               <Image
                 src={product.store.logo || product.store.avatarUrl || ''}
