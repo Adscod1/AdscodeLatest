@@ -123,6 +123,13 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
           </div>
         </div>
 
+        {/* Description */}
+        {product.description && (
+          <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+            {product.description}
+          </p>
+        )}
+
         {/* Price */}
         <div className="flex items-baseline gap-2">
           <p className="text-xl font-bold text-blue-600">
