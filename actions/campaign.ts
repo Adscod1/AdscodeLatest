@@ -31,6 +31,7 @@ export type CreateCampaignActionInput = {
   };
   type?: CampaignType;
   typeSpecificData?: TypeSpecificData;
+  publish?: boolean; // If true, campaign will be published immediately
 };
 
 export type UpdateCampaignActionInput = Partial<CreateCampaignActionInput> & {
@@ -126,17 +127,20 @@ export const createCampaign = async (data: CreateCampaignActionInput) => {
         targets: validatedData.targets as any,
         type: validatedData.type,
         typeSpecificData: validatedData.typeSpecificData,
-        status: "DRAFT",
+        status: data.publish ? "PUBLISHED" : "DRAFT",
       } as any,
     });
 
     // Revalidate campaigns page
     revalidatePath("/campaigns");
+    if (data.publish) {
+      revalidatePath("/influencer/campaigns"); // For influencers to see new campaigns
+    }
 
     return {
       success: true,
       campaign,
-      message: "Campaign created successfully",
+      message: data.publish ? "Campaign published successfully" : "Campaign created successfully",
     };
   } catch (error) {
     console.error("Error creating campaign:", error);

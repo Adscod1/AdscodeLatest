@@ -1,6 +1,6 @@
 "use client"
-import React, { useState } from 'react';
-import { usePathname, useParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { 
   Search, 
   Plus, 
@@ -21,20 +21,19 @@ import {
   UserCheck
 } from 'lucide-react';
 import Link from 'next/link';
+import { getCampaigns } from '@/actions/campaign';
 
 interface Campaign {
   id: string;
-  name: string;
+  title: string;
   type: string;
-  target: string;
   budget: number;
-  impressions: number;
-  clicks: number;
-  conversions: number;
-  ctr: string;
-  cr: string;
-  duration: string;
-  status: 'Active' | 'Completed' | 'Paused';
+  duration?: number;
+  status: string;
+  createdAt: Date;
+  _count?: {
+    applicants: number;
+  };
 }
 
 const MarketingCampaigns: React.FC = () => {
@@ -44,98 +43,79 @@ const MarketingCampaigns: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [typeFilter, setTypeFilter] = useState('All Types');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const campaigns: Campaign[] = [
-    {
-      id: '1',
-      name: 'Summer Sneaker Sale',
-      type: 'Fashion',
-      target: 'Sports Enthusiasts',
-      budget: 5000,
-      impressions: 125000,
-      clicks: 3500,
-      conversions: 285,
-      ctr: '2.80%',
-      cr: '8.14%',
-      duration: '2024-01-01 - 2024-01-31',
-      status: 'Active'
-    },
-    {
-      id: '2',
-      name: 'macbook pro bonaza',
-      type: 'Technology',
-      target: 'Young Adults 18-35',
-      budget: 8000,
-      impressions: 180000,
-      clicks: 5200,
-      conversions: 420,
-      ctr: '2.89%',
-      cr: '8.08%',
-      duration: '2024-01-05 - 2024-02-05',
-      status: 'Active'
-    },
-    {
-      id: '3',
-      name: 'marcedez benz',
-      type: 'Automotive',
-      target: 'Fashion Conscious',
-      budget: 3000,
-      impressions: 95000,
-      clicks: 2100,
-      conversions: 145,
-      ctr: '2.21%',
-      cr: '6.90%',
-      duration: '2023-12-01 - 2023-12-31',
-      status: 'Completed'
-    },
-    {
-      id: '4',
-      name: 'holiday',
-      type: 'Entertainment',
-      target: 'Previous Visitors',
-      budget: 2500,
-      impressions: 65000,
-      clicks: 1800,
-      conversions: 95,
-      ctr: '2.77%',
-      cr: '5.28%',
-      duration: '2024-01-10 - 2024-01-25',
-      status: 'Paused'
-    }
-  ];
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const result = await getCampaigns();
+        if (result.success && result.campaigns) {
+          // Deduplicate campaigns by ID
+          const uniqueCampaigns = Array.from(
+            new Map(result.campaigns.map(c => [c.id, c])).values()
+          );
+          setCampaigns(uniqueCampaigns);
+        }
+      } catch (error) {
+        console.error('Error fetching campaigns:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchCampaigns();
+  }, []);
+
+  // Calculate stats from real campaigns
   const stats = {
-    totalBudget: 18500,
-    budgetSpent: 12500,
-    activeCampaigns: 2,
-    totalConversions: 945,
-    conversionIncrease: 16,
-    avgRoas: 3.2
+    totalBudget: campaigns.reduce((sum, c) => sum + c.budget, 0),
+    budgetSpent: 0, // TODO: Calculate from campaign analytics
+    activeCampaigns: campaigns.filter(c => c.status === 'PUBLISHED').length,
+    totalConversions: 0, // TODO: Calculate from campaign analytics
+    conversionIncrease: 0,
+    avgRoas: 0
   };
 
-  const budgetAllocation = [
-    { type: 'Email', amount: 5500, color: 'bg-blue-500' },
-    { type: 'Social', amount: 8000, color: 'bg-green-500' },
-    { type: 'Search', amount: 3000, color: 'bg-yellow-500' },
-    { type: 'Display', amount: 2000, color: 'bg-purple-500' }
-  ];
-
-  const topPerforming = [
-    { name: 'Nike Air Max Promotion', conversions: 420, cr: '8.08%' },
-    { name: 'Summer Sneaker Sale', conversions: 285, cr: '8.14%' },
-    { name: 'Holiday Collection', conversions: 145, cr: '6.90%' }
-  ];
+  // Filter campaigns based on search and filters
+  const filteredCampaigns = campaigns.filter(campaign => {
+    const matchesSearch = campaign.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All Status' || 
+      (statusFilter === 'Active' && campaign.status === 'PUBLISHED') ||
+      (statusFilter === 'Paused' && campaign.status === 'DRAFT') ||
+      campaign.status === statusFilter;
+    const matchesType = typeFilter === 'All Types' || campaign.type === typeFilter;
+    
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Active':
+      case 'PUBLISHED':
         return 'bg-green-100 text-green-800';
-      case 'Completed':
+      case 'COMPLETED':
         return 'bg-blue-100 text-blue-800';
-      case 'Paused':
+      case 'DRAFT':
         return 'bg-yellow-100 text-yellow-800';
+      case 'PAUSED':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'PUBLISHED':
+        return 'Active';
+      case 'DRAFT':
+        return 'Draft';
+      case 'COMPLETED':
+        return 'Completed';
+      case 'PAUSED':
+        return 'Paused';
+      default:
+        return status;
     }
   };
 
@@ -178,7 +158,7 @@ const MarketingCampaigns: React.FC = () => {
               <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(stats.totalBudget)}</div>
-            <div className="text-xs sm:text-sm text-gray-500">{formatCurrency(stats.budgetSpent)} spent (68%)</div>
+            <div className="text-xs sm:text-sm text-gray-500">Across {campaigns.length} campaigns</div>
           </div>
 
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
@@ -187,75 +167,83 @@ const MarketingCampaigns: React.FC = () => {
               <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.activeCampaigns}</div>
-            <div className="text-xs sm:text-sm text-gray-500">2 running campaigns</div>
+            <div className="text-xs sm:text-sm text-gray-500">{stats.activeCampaigns} published</div>
           </div>
 
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-xs sm:text-sm">Total Conversions</span>
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+              <span className="text-gray-600 text-xs sm:text-sm">Draft Campaigns</span>
+              <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatNumber(stats.totalConversions)}</div>
-            <div className="text-xs sm:text-sm text-green-600">+{stats.conversionIncrease}% from last month</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{campaigns.filter(c => c.status === 'DRAFT').length}</div>
+            <div className="text-xs sm:text-sm text-gray-500">Ready to publish</div>
           </div>
 
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-xs sm:text-sm">Avg. ROAS</span>
-              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+              <span className="text-gray-600 text-xs sm:text-sm">Total Applicants</span>
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.avgRoas}x</div>
-            <div className="text-xs sm:text-sm text-gray-500">Return on ad spend</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">
+              {campaigns.reduce((sum, c) => sum + (c._count?.applicants || 0), 0)}
+            </div>
+            <div className="text-xs sm:text-sm text-gray-500">Influencer applications</div>
           </div>
         </div>
 
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          {/* Campaign Performance */}
+        {/* Dashboard Cards - Simplified */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          {/* Campaign Types Breakdown */}
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
-            <h3 className="text-base sm:text-lg font-semibold mb-4">Campaign Performance</h3>
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">This Week</span>
-                <span className="font-semibold text-sm sm:text-base">72 conversions</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Revenue</span>
-                <span className="font-semibold text-sm sm:text-base">{formatCurrency(8640)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Spend</span>
-                <span className="font-semibold text-sm sm:text-base">{formatCurrency(2500)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Budget Allocation */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
-            <h3 className="text-base sm:text-lg font-semibold mb-4">Budget Allocation</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Campaign Types</h3>
             <div className="space-y-3">
-              {budgetAllocation.map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${item.color}`}></div>
-                    <span className="text-gray-700 text-sm sm:text-base truncate">{item.type}</span>
+              {['PRODUCT', 'COUPON', 'VIDEO', 'PROFILE'].map((type) => {
+                const count = campaigns.filter(c => c.type === type).length;
+                const totalBudget = campaigns
+                  .filter(c => c.type === type)
+                  .reduce((sum, c) => sum + c.budget, 0);
+                
+                return (
+                  <div key={type} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                        type === 'PRODUCT' ? 'bg-blue-500' :
+                        type === 'COUPON' ? 'bg-green-500' :
+                        type === 'VIDEO' ? 'bg-purple-500' :
+                        'bg-orange-500'
+                      }`}></div>
+                      <span className="text-gray-700 text-sm sm:text-base truncate">{type}</span>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-2">
+                      <div className="font-semibold text-sm sm:text-base">{count}</div>
+                      <div className="text-xs text-gray-500">{formatCurrency(totalBudget)}</div>
+                    </div>
                   </div>
-                  <span className="font-semibold text-sm sm:text-base flex-shrink-0 ml-2">{formatCurrency(item.amount)}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
-          {/* Top Performing */}
+          {/* Recent Activity */}
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
-            <h3 className="text-base sm:text-lg font-semibold mb-4">Top Performing</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Recent Campaigns</h3>
             <div className="space-y-3">
-              {topPerforming.map((item, index) => (
-                <div key={index} className="border-b border-gray-100 pb-3 last:border-b-0">
-                  <div className="font-medium text-xs sm:text-sm truncate">{item.name}</div>
-                  <div className="text-xs text-gray-500 mt-1">{item.conversions} conversions • {item.cr} CR</div>
+              {campaigns.slice(0, 4).map((campaign) => (
+                <div key={campaign.id} className="border-b border-gray-100 pb-3 last:border-b-0">
+                  <div className="font-medium text-xs sm:text-sm truncate">{campaign.title}</div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-gray-500">{campaign.type}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${getStatusColor(campaign.status)}`}>
+                      {getStatusLabel(campaign.status)}
+                    </span>
+                  </div>
                 </div>
               ))}
+              {campaigns.length === 0 && (
+                <div className="text-center py-4 text-gray-500 text-sm">
+                  No campaigns yet. Create your first campaign!
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -281,6 +269,7 @@ const MarketingCampaigns: React.FC = () => {
               >
                 <option>All Status</option>
                 <option>Active</option>
+                <option>Draft</option>
                 <option>Completed</option>
                 <option>Paused</option>
               </select>
@@ -290,10 +279,10 @@ const MarketingCampaigns: React.FC = () => {
                 className="px-3 sm:px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base w-full sm:w-auto"
               >
                 <option>All Types</option>
-                <option>Email</option>
-                <option>Social</option>
-                <option>Search</option>
-                <option>Display</option>
+                <option>PRODUCT</option>
+                <option>COUPON</option>
+                <option>VIDEO</option>
+                <option>PROFILE</option>
               </select>
             </div>
           </div>
@@ -314,37 +303,49 @@ const MarketingCampaigns: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {campaigns.map((campaign) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-gray-500">
+                      Loading campaigns...
+                    </td>
+                  </tr>
+                ) : filteredCampaigns.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-gray-500">
+                      No campaigns found. Create your first campaign!
+                    </td>
+                  </tr>
+                ) : filteredCampaigns.map((campaign) => (
                   <tr key={campaign.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-4 px-4">
                       <div>
-                        <div className="font-medium">{campaign.name}</div>
-                        <div className="text-sm text-gray-500">{campaign.type} • Target: {campaign.target}</div>
+                        <div className="font-medium">{campaign.title}</div>
+                        <div className="text-sm text-gray-500">{campaign.type}</div>
                       </div>
                     </td>
                     <td className="py-4 px-4">
                       <div className="font-semibold">{formatCurrency(campaign.budget)}</div>
-                      <div className="w-20 h-2 bg-gray-200 rounded-full mt-1">
-                        <div className="h-2 bg-blue-500 rounded-full" style={{ width: '75%' }}></div>
-                      </div>
+                      <div className="text-xs text-gray-500 mt-1">{campaign._count?.applicants || 0} applicants</div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold">{formatNumber(campaign.impressions)}</div>
+                      <div className="font-semibold">-</div>
+                      <div className="text-xs text-gray-500">Not tracked</div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold">{formatNumber(campaign.clicks)}</div>
-                      <div className="text-sm text-gray-500">{campaign.ctr} CTR</div>
+                      <div className="font-semibold">-</div>
+                      <div className="text-xs text-gray-500">Not tracked</div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold">{campaign.conversions}</div>
-                      <div className="text-sm text-gray-500">{campaign.cr} CR</div>
+                      <div className="font-semibold">-</div>
+                      <div className="text-xs text-gray-500">Not tracked</div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="text-sm">{campaign.duration}</div>
+                      <div className="text-sm">{campaign.duration ? `${campaign.duration} days` : 'Ongoing'}</div>
+                      <div className="text-xs text-gray-500">{new Date(campaign.createdAt).toLocaleDateString()}</div>
                     </td>
                     <td className="py-4 px-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
-                        {campaign.status}
+                        {getStatusLabel(campaign.status)}
                       </span>
                     </td>
                     <td className="py-4 px-4">
@@ -416,16 +417,24 @@ const MarketingCampaigns: React.FC = () => {
 
           {/* Campaigns Cards - Mobile */}
           <div className="lg:hidden space-y-4">
-            {campaigns.map((campaign) => (
+            {loading ? (
+              <div className="text-center py-8 text-gray-500">
+                Loading campaigns...
+              </div>
+            ) : filteredCampaigns.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No campaigns found. Create your first campaign!
+              </div>
+            ) : filteredCampaigns.map((campaign) => (
               <div key={campaign.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                 <div className="flex items-start justify-between mb-3">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-medium text-sm sm:text-base text-gray-900 truncate">{campaign.name}</h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">{campaign.type} • {campaign.target}</p>
+                    <h3 className="font-medium text-sm sm:text-base text-gray-900 truncate">{campaign.title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">{campaign.type}</p>
                   </div>
                   <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(campaign.status)}`}>
-                      {campaign.status}
+                      {getStatusLabel(campaign.status)}
                     </span>
                     <div className="relative">
                       <button 
@@ -493,32 +502,22 @@ const MarketingCampaigns: React.FC = () => {
                   <div>
                     <p className="text-xs text-gray-500">Budget</p>
                     <p className="font-semibold text-sm">{formatCurrency(campaign.budget)}</p>
-                    <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1">
-                      <div className="h-1.5 bg-blue-500 rounded-full" style={{ width: '75%' }}></div>
-                    </div>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Conversions</p>
-                    <p className="font-semibold text-sm">{campaign.conversions}</p>
-                    <p className="text-xs text-gray-500">{campaign.cr} CR</p>
+                    <p className="text-xs text-gray-500">Applicants</p>
+                    <p className="font-semibold text-sm">{campaign._count?.applicants || 0}</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
                   <div>
-                    <p className="text-xs text-gray-500">Impressions</p>
-                    <p className="font-semibold text-sm">{formatNumber(campaign.impressions)}</p>
+                    <p className="text-xs text-gray-500">Duration</p>
+                    <p className="font-semibold text-sm">{campaign.duration ? `${campaign.duration} days` : 'Ongoing'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Clicks</p>
-                    <p className="font-semibold text-sm">{formatNumber(campaign.clicks)}</p>
-                    <p className="text-xs text-gray-500">{campaign.ctr} CTR</p>
+                    <p className="text-xs text-gray-500">Created</p>
+                    <p className="font-semibold text-sm">{new Date(campaign.createdAt).toLocaleDateString()}</p>
                   </div>
-                </div>
-                
-                <div>
-                  <p className="text-xs text-gray-500">Duration</p>
-                  <p className="text-xs sm:text-sm text-gray-700">{campaign.duration}</p>
                 </div>
               </div>
             ))}

@@ -24,19 +24,19 @@ export const couponCampaignDataSchema = z.object({
 // Product campaign data schema
 export const productCampaignDataSchema = z.object({
   productId: z.string().uuid().optional(),
-  productLink: z.string().url("Invalid product link URL").optional(),
-  shopUrl: z.string().url("Shop URL is required and must be valid"),
+  productLink: z.string().optional().refine(
+    (val) => !val || val === '' || z.string().url().safeParse(val).success,
+    { message: "Invalid product link URL" }
+  ),
+  shopUrl: z.string().optional().refine(
+    (val) => !val || val === '' || z.string().url().safeParse(val).success,
+    { message: "Invalid shop URL" }
+  ),
   productTitle: z.string().optional(),
   productPrice: z.number().positive().optional(),
   productImage: z.string().url().optional(),
   productDescription: z.string().optional(),
-}).refine(
-  (data) => data.productId || data.productLink,
-  { 
-    message: "Either productId or productLink must be provided",
-    path: ["productLink"],
-  }
-);
+});
 
 // Video campaign data schema
 export const videoCampaignDataSchema = z.object({
@@ -120,18 +120,7 @@ export const createCampaignSchema = z.object({
     advocacy: z.array(z.string()).optional(),
     conversions: z.array(z.string()).optional(),
     contentType: z.array(z.string()).optional(),
-  }).refine(
-    (data) => {
-      // At least one target category must have selections
-      return (
-        (data.awareness && data.awareness.length > 0) ||
-        (data.advocacy && data.advocacy.length > 0) ||
-        (data.conversions && data.conversions.length > 0) ||
-        (data.contentType && data.contentType.length > 0)
-      );
-    },
-    { message: "Select at least one campaign target" }
-  ),
+  }).optional(), // Made optional since UI may not collect all target data
   type: z.enum(["PRODUCT", "COUPON", "VIDEO", "PROFILE"], {
     required_error: "Campaign type is required",
   }).default("PRODUCT"), // Default to PRODUCT for backward compatibility

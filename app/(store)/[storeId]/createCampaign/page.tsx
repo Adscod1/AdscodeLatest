@@ -870,7 +870,7 @@ const InfluencerCampaignManager = () => {
         duration: campaignData.startDate && campaignData.endDate 
           ? Math.ceil((new Date(campaignData.endDate).getTime() - new Date(campaignData.startDate).getTime()) / (1000 * 60 * 60 * 24))
           : undefined,
-        platforms: campaignData.platforms,
+        platforms: campaignData.platforms.length > 0 ? campaignData.platforms : undefined,
         targets: {
           awareness: campaignData.targets.filter(t => t.metric && t.value).map(t => `${t.metric}: ${t.value} ${t.unit}`),
           advocacy: [],
@@ -881,14 +881,25 @@ const InfluencerCampaignManager = () => {
         typeSpecificData: campaignData.typeSpecificData || undefined,
       };
 
-      // Call server action
-      const result = await createCampaign(submissionData);
+      // Call server action with publish flag to publish immediately
+      const result = await createCampaign({ ...submissionData, publish: true });
 
       if (result.success) {
+        // Clear localStorage on success
+        localStorage.removeItem(`campaign-draft-${storeId}`);
+        
         // Success! Redirect to campaigns list
-        router.push(`/${storeId}/campaigns`);
+        router.push(`/${storeId}/campaign`);
       } else {
-        setSubmitError(result.error || 'Failed to create campaign');
+        // Log validation details if available
+        if (result.details) {
+          console.error('Validation errors:', result.details);
+          // Show detailed validation errors
+          const errorMessages = result.details.map((err: any) => `${err.path.join('.')}: ${err.message}`).join(', ');
+          setSubmitError(`Validation failed: ${errorMessages}`);
+        } else {
+          setSubmitError(result.error || 'Failed to create campaign');
+        }
       }
     } catch (error) {
       console.error('Error submitting campaign:', error);
@@ -2238,147 +2249,205 @@ const InfluencerCampaignManager = () => {
     </div>
   );
 
-  const renderPreview = () => (
-    <div className="space-y-6 sm:space-y-8">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Campaign Preview</h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Review your campaign details before publishing</p>
-      </div>
+  const renderPreview = () => {
+    // Check if required fields are filled
+    const hasRequiredData = campaignData.title && 
+                           campaignData.category && 
+                           campaignData.description && 
+                           campaignData.budget && 
+                           campaignData.startDate && 
+                           campaignData.endDate;
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
-        <div className="flex items-center mb-4">
-          <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2" />
-          <h3 className="text-lg sm:text-xl font-semibold text-blue-900">Campaign Targets</h3>
+    const formatDate = (dateString: string) => {
+      if (!dateString) return '';
+      return new Date(dateString).toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    };
+
+    const formatDeadline = (dateString: string) => {
+      if (!dateString) return '';
+      return new Date(dateString).toLocaleDateString('en-GB'); // DD/MM/YYYY format
+    };
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">How Your Campaign Will Appear</h2>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">This is how influencers will see your campaign</p>
         </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          {campaignData.targets.filter(t => t.metric && t.value).map((target, index) => (
-            <div key={index} className="bg-white p-4 rounded-lg">
-              <h4 className="font-medium text-gray-900">{target.metric}</h4>
-              <div className="mt-2">
-                <div className="text-sm text-gray-600">{target.value} {target.unit}</div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{width: `${Math.random() * 80 + 10}%`}}></div>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">{Math.floor(Math.random() * 40 + 40)}% achieved</div>
+
+        {!hasRequiredData ? (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-8 h-8 text-yellow-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Complete Campaign Details</h3>
+              <p className="text-gray-600 mb-4">
+                Fill in the required campaign information to preview how your campaign will appear to influencers.
+              </p>
+              <div className="text-left bg-white rounded-lg p-4 mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Required fields:</p>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  {!campaignData.title && <li className="flex items-center gap-2"><span className="text-red-500">✗</span> Campaign Title</li>}
+                  {!campaignData.category && <li className="flex items-center gap-2"><span className="text-red-500">✗</span> Category</li>}
+                  {!campaignData.description && <li className="flex items-center gap-2"><span className="text-red-500">✗</span> Description</li>}
+                  {!campaignData.budget && <li className="flex items-center gap-2"><span className="text-red-500">✗</span> Budget</li>}
+                  {!campaignData.startDate && <li className="flex items-center gap-2"><span className="text-red-500">✗</span> Start Date</li>}
+                  {!campaignData.endDate && <li className="flex items-center gap-2"><span className="text-red-500">✗</span> End Date</li>}
+                </ul>
               </div>
             </div>
-          ))}
-          {campaignData.targets.filter(t => t.metric && t.value).length === 0 && (
-            <>
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900">Reach</h4>
-                <div className="mt-2">
-                  <div className="text-sm text-gray-600">35,000 / 50,000 users</div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '70%'}}></div>
+          </div>
+        ) : (
+          <>
+            {/* Campaign Card Preview */}
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                {/* Campaign Header Image */}
+                <div className="h-48 sm:h-64 bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 relative">
+                  <div className="absolute inset-0 bg-black bg-opacity-5 flex items-center justify-center">
+                    <div className="w-20 h-20 bg-white bg-opacity-30 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <div className="w-12 h-12 bg-white rounded-full"></div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">70.0% achieved</div>
                 </div>
-              </div>
-              <div className="bg-white p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900">Engagement Rate</h4>
-                <div className="mt-2">
-                  <div className="text-sm text-gray-600">4.2 / 5.5 %</div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '76%'}}></div>
+
+                {/* Campaign Details */}
+                <div className="p-6">
+                  {/* Title and Status */}
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 flex-1">
+                      {campaignData.title}
+                    </h3>
+                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium ml-3 shrink-0">
+                      Active
+                    </span>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">76.4% achieved</div>
+
+                  {/* Brand and Category */}
+                  <p className="text-gray-600 text-sm mb-6">
+                    Your Brand • {campaignData.category}
+                  </p>
+
+                  {/* Description */}
+                  <div className="mb-6">
+                    <p className="text-gray-700 text-sm leading-relaxed line-clamp-6">
+                      {campaignData.description}
+                    </p>
+                  </div>
+
+                  {/* Campaign Info Grid */}
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-gray-600 text-sm">Budget Range</span>
+                      <span className="text-gray-900 font-semibold text-sm">
+                        {campaignData.currency?.replace(/\s*\(.*\)/, '') || '$'}{campaignData.budget} - {campaignData.currency?.replace(/\s*\(.*\)/, '') || '$'}{campaignData.budget}
+                      </span>
+                    </div>
+                    
+                    {campaignData.location && (
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span className="text-gray-600 text-sm">Location</span>
+                        <span className="text-gray-900 font-semibold text-sm">
+                          {campaignData.location}
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-gray-600 text-sm">Campaign Duration</span>
+                      <span className="text-gray-900 font-semibold text-sm">
+                        {formatDate(campaignData.startDate)} - {formatDate(campaignData.endDate)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-gray-600 text-sm">Application Deadline</span>
+                      <span className="text-gray-900 font-semibold text-sm">
+                        {formatDeadline(campaignData.endDate)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-gray-600 text-sm">Current Applicants</span>
+                      <span className="text-gray-900 font-semibold text-sm">0</span>
+                    </div>
+                  </div>
+
+                  {/* Campaign Requirements Section - Combined */}
+                  {(campaignData.targets.some(t => t.metric && t.value) || campaignData.milestones.some(m => m.title) || campaignData.deliverables.some(d => d.type)) && (
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <h4 className="text-base font-semibold text-gray-900 mb-4">Campaign Requirements</h4>
+                      
+                      <div className="space-y-4">
+                        {/* Performance Targets */}
+                        {campaignData.targets.some(t => t.metric && t.value) && (
+                          <div>
+                            <h5 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Performance Targets</h5>
+                            <div className="space-y-1.5">
+                              {campaignData.targets
+                                .filter(t => t.metric && t.value)
+                                .map((target, index) => (
+                                  <div key={index} className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">{target.metric}</span>
+                                    <span className="text-gray-900 font-medium">{target.value} {target.unit}</span>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Expected Deliverables */}
+                        {campaignData.deliverables.some(d => d.type) && (
+                          <div>
+                            <h5 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Expected Deliverables</h5>
+                            <div className="space-y-1.5">
+                              {campaignData.deliverables
+                                .filter(d => d.type)
+                                .map((deliverable, index) => (
+                                  <div key={index} className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">{deliverable.type}</span>
+                                    <span className="text-gray-900 font-medium">x{deliverable.quantity}</span>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Key Milestones */}
+                        {campaignData.milestones.some(m => m.title) && (
+                          <div>
+                            <h5 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Key Milestones</h5>
+                            <div className="space-y-1.5">
+                              {campaignData.milestones
+                                .filter(m => m.title)
+                                .map((milestone, index) => (
+                                  <div key={index} className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">{milestone.title}</span>
+                                    {milestone.dueDate && (
+                                      <span className="text-gray-900 font-medium">{formatDate(milestone.dueDate)}</span>
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Apply Button */}
+                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors shadow-sm mt-6">
+                    View Details & Apply Now
+                  </button>
                 </div>
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
-
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6">
-        <div className="flex items-center mb-4">
-          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mr-2" />
-          <h3 className="text-lg sm:text-xl font-semibold text-green-900">Campaign Milestones</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-lg">
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-gray-900 text-sm sm:text-base">Campaign Kickoff</h4>
-              <p className="text-xs sm:text-sm text-gray-600">Initial content planning and brand guidelines review</p>
-            </div>
-            <div className="text-right shrink-0">
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">completed</span>
-              <div className="text-gray-500 mt-1 text-xs">2024-06-01</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4 p-4 bg-white rounded-lg">
-            <Clock className="w-5 h-5 text-blue-500" />
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">Content Creation</h4>
-              <p className="text-sm text-gray-600">Create and submit initial content for approval</p>
-            </div>
-            <div className="text-sm">
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">in progress</span>
-              <div className="text-gray-500 mt-1">2024-06-15</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4 p-4 bg-white rounded-lg">
-            <AlertCircle className="w-5 h-5 text-gray-400" />
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">Campaign Launch</h4>
-              <p className="text-sm text-gray-600">Publish approved content and begin promotion</p>
-            </div>
-            <div className="text-sm">
-              <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full">pending</span>
-              <div className="text-gray-500 mt-1">2024-06-20</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 sm:p-6">
-        <div className="flex items-center mb-4">
-          <Package className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 mr-2" />
-          <h3 className="text-lg sm:text-xl font-semibold text-purple-900">Deliverables Tracker</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-white rounded-lg">
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">Instagram Post</h4>
-              <p className="text-sm text-gray-600">Summer collection showcase - lifestyle shot</p>
-              <div className="text-xs text-gray-500 mt-1">Due: 2024-06-10</div>
-            </div>
-            <div className="text-sm">
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">approved</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4 p-4 bg-white rounded-lg">
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">Instagram Story</h4>
-              <p className="text-sm text-gray-600">Behind-the-scenes content creation</p>
-              <div className="text-xs text-gray-500 mt-1">Due: 2024-06-12</div>
-            </div>
-            <div className="text-sm">
-              <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">in review</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4 p-4 bg-white rounded-lg">
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">Reel</h4>
-              <p className="text-sm text-gray-600">Product styling and outfit ideas</p>
-              <div className="text-xs text-gray-500 mt-1">Due: 2024-06-15</div>
-            </div>
-            <div className="text-sm">
-              <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full">pending</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
