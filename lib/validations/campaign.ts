@@ -2,11 +2,11 @@ import { z } from "zod";
 
 // Type-specific validation schemas
 
-// Coupon campaign data schema
-export const couponCampaignDataSchema = z.object({
-  couponId: z.string().uuid().optional(),
-  couponCode: z.string().min(3).max(50).optional(),
-  couponDescription: z.string().optional(),
+// Discount campaign data schema
+export const discountCampaignDataSchema = z.object({
+  discountId: z.string().uuid().optional(),
+  discountCode: z.string().min(3).max(50).optional(),
+  discountDescription: z.string().optional(),
   applicationType: z.enum(["INFLUENCERS", "CUSTOMERS", "BOTH"], {
     required_error: "Application type is required",
   }),
@@ -14,10 +14,10 @@ export const couponCampaignDataSchema = z.object({
   usageLimit: z.number().int().positive().optional(),
   expiryDate: z.string().datetime().optional(),
 }).refine(
-  (data) => data.couponId || data.couponCode,
-  { 
-    message: "Either couponId or couponCode must be provided",
-    path: ["couponCode"],
+  (data) => data.discountId || data.discountCode,
+  {
+    message: "Either discountId or discountCode must be provided",
+    path: ["discountCode"],
   }
 );
 
@@ -78,10 +78,10 @@ export const profileCampaignDataSchema = z.object({
 });
 
 // Helper function to get the appropriate schema based on campaign type
-export function getTypeSpecificSchema(type: "PRODUCT" | "COUPON" | "VIDEO" | "PROFILE") {
+export function getTypeSpecificSchema(type: "PRODUCT" | "DISCOUNT" | "VIDEO" | "PROFILE") {
   switch (type) {
-    case "COUPON":
-      return couponCampaignDataSchema;
+    case "DISCOUNT":
+      return discountCampaignDataSchema;
     case "PRODUCT":
       return productCampaignDataSchema;
     case "VIDEO":
@@ -95,7 +95,7 @@ export function getTypeSpecificSchema(type: "PRODUCT" | "COUPON" | "VIDEO" | "PR
 
 // Helper function to validate type-specific data
 export function validateTypeSpecificData(
-  type: "PRODUCT" | "COUPON" | "VIDEO" | "PROFILE",
+  type: "PRODUCT" | "DISCOUNT" | "VIDEO" | "PROFILE",
   data: any
 ) {
   const schema = getTypeSpecificSchema(type);
@@ -121,11 +121,11 @@ export const createCampaignSchema = z.object({
     conversions: z.array(z.string()).optional(),
     contentType: z.array(z.string()).optional(),
   }).optional(), // Made optional since UI may not collect all target data
-  type: z.enum(["PRODUCT", "COUPON", "VIDEO", "PROFILE"], {
+  type: z.enum(["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"], {
     required_error: "Campaign type is required",
   }).default("PRODUCT"), // Default to PRODUCT for backward compatibility
   typeSpecificData: z.union([
-    couponCampaignDataSchema,
+    discountCampaignDataSchema,
     productCampaignDataSchema,
     videoCampaignDataSchema,
     profileCampaignDataSchema,
@@ -150,11 +150,11 @@ export const updateCampaignSchema = z.object({
     conversions: z.array(z.string()).optional(),
     contentType: z.array(z.string()).optional(),
   }).optional(),
-  type: z.enum(["PRODUCT", "COUPON", "VIDEO", "PROFILE"], {
+  type: z.enum(["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"], {
     invalid_type_error: "Invalid campaign type",
   }).optional(),
   typeSpecificData: z.union([
-    couponCampaignDataSchema,
+    discountCampaignDataSchema,
     productCampaignDataSchema,
     videoCampaignDataSchema,
     profileCampaignDataSchema,
@@ -172,7 +172,7 @@ export type UpdateCampaignInput = z.infer<typeof updateCampaignSchema>;
 export type PublishCampaignInput = z.infer<typeof publishCampaignSchema>;
 
 // Type-specific data type exports
-export type CouponCampaignDataInput = z.infer<typeof couponCampaignDataSchema>;
+export type DiscountCampaignDataInput = z.infer<typeof discountCampaignDataSchema>;
 export type ProductCampaignDataInput = z.infer<typeof productCampaignDataSchema>;
 export type VideoCampaignDataInput = z.infer<typeof videoCampaignDataSchema>;
 export type ProfileCampaignDataInput = z.infer<typeof profileCampaignDataSchema>;

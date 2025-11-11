@@ -1,14 +1,14 @@
 import { Campaign } from "@prisma/client";
 import {
   CampaignType,
-  CouponCampaignData,
+  DiscountCampaignData,
   ProductCampaignData,
   VideoCampaignData,
   ProfileCampaignData,
   TypeSpecificData,
 } from "@/types/campaign";
 import {
-  couponCampaignDataSchema,
+  discountCampaignDataSchema,
   productCampaignDataSchema,
   videoCampaignDataSchema,
   profileCampaignDataSchema,
