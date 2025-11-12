@@ -117,7 +117,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   const reviewCount = 324;
 
   return (
-    <Link href={`/${product.store.id}/product/${product.id}`} className="block">
+    <Link href={`/product/${product.id}`} className="block">
       <Card className="w-full border border-gray-200 rounded-lg overflow-hidden bg-white hover:bg-gray-50 transition-shadow duration-300 p-0 cursor-pointer ">
         {/* Header with store info */}
       <div className="flex items-center justify-between p-3 pb-1">

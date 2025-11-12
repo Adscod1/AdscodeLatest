@@ -53,7 +53,7 @@ const MarketingCampaigns: React.FC = () => {
         if (result.success && result.campaigns) {
           // Deduplicate campaigns by ID
           const uniqueCampaigns = Array.from(
-            new Map(result.campaigns.map(c => [c.id, c])).values()
+            new Map(result.campaigns.map((c: Campaign) => [c.id, c])).values()
           ) as Campaign[];
           setCampaigns(uniqueCampaigns);
         }

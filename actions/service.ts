@@ -178,6 +178,7 @@ export const getServicesByStore = async (storeId: string) => {
       variations: true,
       images: true,
       videos: true,
+      store: true,
     },
   });
 };

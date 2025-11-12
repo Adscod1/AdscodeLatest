@@ -315,7 +315,7 @@ const BusinessPage = () => {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                   <MessageCircle className="w-6 h-6 mr-3" />
-                  Listing main services
+                  Listing main Products and Services
                 </h2>
                 <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
                   See all
