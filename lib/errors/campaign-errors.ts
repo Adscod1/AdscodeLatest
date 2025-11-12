@@ -131,7 +131,7 @@ export class InvalidCampaignTypeError extends CampaignTypeError {
       `Invalid campaign type: ${type}. Supported types: PRODUCT, COUPON, VIDEO, PROFILE`,
       "INVALID_CAMPAIGN_TYPE",
       400,
-      { providedType: type, supportedTypes: ["PRODUCT", "COUPON", "VIDEO", "PROFILE"] }
+      { providedType: type, supportedTypes: ["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"] }
     );
     this.name = "InvalidCampaignTypeError";
   }
@@ -331,7 +331,7 @@ export function validateTypeSpecificDataExists(
 
   // Type-specific validation
   switch (campaignType) {
-    case "COUPON":
+    case "DISCOUNT":
       if (!typeSpecificData.couponId && !typeSpecificData.couponCode) {
         throw new InvalidTypeSpecificDataError(campaignType, [
           { message: "Either couponId or couponCode must be provided" },

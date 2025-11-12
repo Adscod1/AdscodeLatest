@@ -154,7 +154,7 @@ export async function PATCH(
     if (data.typeSpecificData) {
       const campaignType = data.type || (existingCampaign.type as string);
       const typeValidation = validateTypeSpecificData(
-        campaignType as "PRODUCT" | "COUPON" | "VIDEO" | "PROFILE",
+        campaignType as "PRODUCT" | "DISCOUNT" | "VIDEO" | "PROFILE",
         data.typeSpecificData
       );
       

@@ -28,7 +28,7 @@ interface Campaign {
   title: string;
   type: string;
   budget: number;
-  duration?: number;
+  duration?: number | null;
   status: string;
   createdAt: Date;
   _count?: {
@@ -54,7 +54,7 @@ const MarketingCampaigns: React.FC = () => {
           // Deduplicate campaigns by ID
           const uniqueCampaigns = Array.from(
             new Map(result.campaigns.map(c => [c.id, c])).values()
-          );
+          ) as Campaign[];
           setCampaigns(uniqueCampaigns);
         }
       } catch (error) {

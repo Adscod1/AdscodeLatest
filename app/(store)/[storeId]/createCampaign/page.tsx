@@ -757,7 +757,7 @@ const InfluencerCampaignManager = () => {
         }
         break;
 
-      case 'COUPON':
+      case 'DISCOUNT':
         if (!campaignData.typeSpecificData) {
           return { valid: false, error: 'Please provide discount details' };
         }
