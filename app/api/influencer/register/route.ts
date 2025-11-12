@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create influencer profile with social accounts
+    // Auto-approve for development/testing (in production, admin approval would be required)
     const influencer = await prisma.influencer.create({
       data: {
         userId: session.user.id,
@@ -83,6 +84,8 @@ export async function POST(request: NextRequest) {
         websiteUrl,
         ratePerPost,
         brandCollaborations,
+        status: 'APPROVED', // Auto-approve for testing
+        approvalDate: new Date(),
         socialAccounts: {
           create: socialAccounts?.map((account: { platform: SocialPlatform; handle: string; followers?: string; url?: string }) => ({
             platform: account.platform,

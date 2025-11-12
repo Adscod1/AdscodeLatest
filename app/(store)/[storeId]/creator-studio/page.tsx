@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getStoreApplications } from '@/actions/campaign';
 import { 
   BarChart3, 
   Users, 
@@ -124,6 +125,8 @@ const CreatorStudioDashboard = () => {
   const [addedToastMessage, setAddedToastMessage] = useState<string | null>(null);
   
   // Applications state
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [showInfluencerDetails, setShowInfluencerDetails] = useState(false);
   const [showContractModal, setShowContractModal] = useState(false);
@@ -187,6 +190,97 @@ const CreatorStudioDashboard = () => {
 
     fetchCreators();
   }, []);
+
+  // Fetch applications on mount and when tab changes to Applications
+  useEffect(() => {
+    const fetchApplications = async () => {
+      if (activeTab !== 'Applications') return;
+      
+      try {
+        setApplicationsLoading(true);
+        const result = await getStoreApplications();
+        
+        if (result.success && result.applications) {
+          // Transform database applications to UI format
+          const transformedApplications: Application[] = result.applications.map((app: any, index: number) => {
+            const influencer = app.influencer;
+            const instagramAccount = influencer.socialAccounts?.find((acc: any) => acc.platform === 'INSTAGRAM');
+            const tiktokAccount = influencer.socialAccounts?.find((acc: any) => acc.platform === 'TIKTOK');
+            const youtubeAccount = influencer.socialAccounts?.find((acc: any) => acc.platform === 'YOUTUBE');
+            
+            // Default engagement rate (can be calculated from actual metrics later)
+            const avgEngagement = 3.5;
+            
+            // Get total followers
+            const totalFollowers = influencer.socialAccounts
+              ?.reduce((sum: number, acc: any) => sum + (acc.followers || 0), 0) || 0;
+            
+            const formatFollowers = (count: number) => {
+              if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+              if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+              return count.toString();
+            };
+
+            return {
+              id: index + 1,
+              influencer: {
+                name: `${influencer.firstName} ${influencer.lastName}`,
+                username: instagramAccount?.handle || tiktokAccount?.handle || youtubeAccount?.handle || 'N/A',
+                avatar: '👤',
+                category: influencer.primaryNiche || 'General',
+                followers: formatFollowers(totalFollowers),
+                engagement: `${avgEngagement?.toFixed(1) || '0.0'}%`,
+                rating: 4.5,
+                location: 'N/A',
+                joinedDate: new Date(app.appliedAt).toLocaleDateString(),
+                bio: influencer.bio || 'No bio available',
+                platforms: {
+                  instagram: instagramAccount ? formatFollowers(instagramAccount.followers) : '0',
+                  tiktok: tiktokAccount ? formatFollowers(tiktokAccount.followers) : '0',
+                  youtube: youtubeAccount ? formatFollowers(youtubeAccount.followers) : '0',
+                },
+                demographics: {
+                  '18-24': 0,
+                  '25-34': 0,
+                  '35-44': 0,
+                  '45+': 0,
+                },
+                audienceGender: { female: 0, male: 0 },
+                topLocations: [],
+                performance: {
+                  totalCampaigns: 0,
+                  avgEngagement: avgEngagement || 0,
+                  successRate: 0,
+                },
+                avgLikes: '0',
+                avgComments: 0,
+                avgReach: '0',
+              },
+              campaign: app.campaign.title,
+              appliedDate: new Date(app.appliedAt).toLocaleDateString(),
+              proposedRate: `${app.campaign.currency} ${app.campaign.budget}`,
+              status: app.applicationStatus === 'APPLIED' ? 'pending' : 
+                      app.applicationStatus === 'SELECTED' ? 'approved' : 'rejected',
+              message: 'Application submitted',
+              deliverables: {
+                instagramPosts: 0,
+                stories: 0,
+                reels: 0,
+              },
+            };
+          });
+          
+          setApplications(transformedApplications);
+        }
+      } catch (error) {
+        console.error('Error fetching applications:', error);
+      } finally {
+        setApplicationsLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, [activeTab]);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -943,179 +1037,6 @@ const CreatorStudioDashboard = () => {
   );
 
   const renderApplications = () => {
-    const applications: Application[] = [
-      {
-        id: 1,
-        influencer: {
-          name: 'Alex Rivera',
-          username: '@alexrivera',
-          avatar: '🌸',
-          category: 'Lifestyle',
-          followers: '95K',
-          engagement: '4.5%',
-          rating: 4.8,
-          location: 'Los Angeles, CA',
-          joinedDate: 'March 2020',
-          bio: 'Fashion & lifestyle content creator passionate about sustainable fashion and authentic storytelling. Collaborating with brands that align with my values.',
-          platforms: {
-            instagram: '250K',
-            tiktok: '180K',
-            youtube: '95K'
-          },
-          demographics: {
-            '18-24': 35,
-            '25-34': 45,
-            '35-44': 15,
-            '45+': 5
-          },
-          audienceGender: { female: 78, male: 22 },
-          topLocations: [
-            { country: 'United States', rank: 1 },
-            { country: 'Canada', rank: 2 },
-            { country: 'United Kingdom', rank: 3 },
-            { country: 'Australia', rank: 4 }
-          ],
-          performance: {
-            totalCampaigns: 47,
-            avgEngagement: 4.2,
-            successRate: 94
-          },
-          avgLikes: '12.5K',
-          avgComments: 485,
-          avgReach: '180K'
-        },
-        campaign: 'Summer Collection Launch',
-        appliedDate: '15/01/2024',
-        proposedRate: '$400',
-        status: 'pending' as const,
-        message: "I love your brand's aesthetic and would be thrilled to showcase your summer collection to my engaged audience of fashion enthusiasts.",
-        deliverables: {
-          instagramPosts: 2,
-          stories: 5,
-          reels: 1
-        }
-      },
-      {
-        id: 2,
-        influencer: {
-          name: 'Jordan Kim',
-          username: '@jordankimfit',
-          avatar: '🦊',
-          category: 'Fitness',
-          followers: '180K',
-          engagement: '3.9%',
-          rating: 4.6,
-          location: 'New York, NY',
-          joinedDate: 'January 2019',
-          bio: 'Certified personal trainer and nutrition coach. Helping people achieve their fitness goals through sustainable lifestyle changes.',
-          platforms: {
-            instagram: '180K',
-            tiktok: '220K',
-            youtube: '145K'
-          },
-          demographics: {
-            '18-24': 42,
-            '25-34': 38,
-            '35-44': 15,
-            '45+': 5
-          },
-          audienceGender: { female: 65, male: 35 },
-          topLocations: [
-            { country: 'United States', rank: 1 },
-            { country: 'United Kingdom', rank: 2 },
-            { country: 'Canada', rank: 3 },
-            { country: 'Germany', rank: 4 }
-          ],
-          performance: {
-            totalCampaigns: 52,
-            avgEngagement: 3.7,
-            successRate: 96
-          },
-          avgLikes: '15.2K',
-          avgComments: 620,
-          avgReach: '220K'
-        },
-        campaign: 'Holiday Promo Campaign',
-        appliedDate: '12/01/2024',
-        proposedRate: '$650',
-        status: 'approved' as const,
-        message: "Your holiday campaign aligns perfectly with my content strategy. I can create authentic content that resonates with my fitness community.",
-        deliverables: {
-          instagramPosts: 3,
-          stories: 10,
-          reels: 2
-        }
-      },
-      {
-        id: 3,
-        influencer: {
-          name: 'Sophie Martinez',
-          username: '@sophiemartinez',
-          avatar: '🎨',
-          category: 'Beauty',
-          followers: '67K',
-          engagement: '5.2%',
-          rating: 4.5,
-          location: 'Miami, FL',
-          joinedDate: 'June 2020',
-          bio: 'Beauty enthusiast and makeup artist. Creating honest reviews and tutorials for products I truly believe in.',
-          platforms: {
-            instagram: '67K',
-            tiktok: '92K',
-            youtube: '45K'
-          },
-          demographics: {
-            '18-24': 48,
-            '25-34': 35,
-            '35-44': 12,
-            '45+': 5
-          },
-          audienceGender: { female: 85, male: 15 },
-          topLocations: [
-            { country: 'United States', rank: 1 },
-            { country: 'Mexico', rank: 2 },
-            { country: 'Spain', rank: 3 },
-            { country: 'Brazil', rank: 4 }
-          ],
-          performance: {
-            totalCampaigns: 34,
-            avgEngagement: 5.1,
-            successRate: 91
-          },
-          avgLikes: '8.3K',
-          avgComments: 380,
-          avgReach: '95K'
-        },
-        campaign: 'Summer Collection Launch',
-        appliedDate: '10/01/2024',
-        proposedRate: '$300',
-        status: 'rejected' as const,
-        message: "I'm excited about the opportunity to collaborate and create beautiful content featuring your products.",
-        deliverables: {
-          instagramPosts: 1,
-          stories: 3,
-          reels: 0
-        }
-      }
-    ];
-
-    const recentCampaigns = [
-      { name: 'EcoFashion Co.', type: 'Product Launch', roi: '250%', badge: 'Excellent' },
-      { name: 'Sustainable Beauty', type: 'Brand Awareness', roi: '180%', badge: 'Good' },
-      { name: 'Green Living', type: 'Lifestyle Content', roi: '220%', badge: 'Excellent' }
-    ];
-
-    const quickMessages = [
-      "Thank you for your application! We're reviewing it and will get back to you soon.",
-      "Could you please provide more information about your content creation process?",
-      "We'd like to schedule a brief call to discuss this opportunity further.",
-      "Your application looks great! We have a few questions about the proposed timeline."
-    ];
-
-    const filteredApplications = applications.filter(app => 
-      filterStatus === 'all' || app.status === filterStatus
-    );
-
     const getStatusBadge = (status: 'pending' | 'approved' | 'rejected') => {
       const styles: Record<'pending' | 'approved' | 'rejected', string> = {
         pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -1134,6 +1055,38 @@ const CreatorStudioDashboard = () => {
         </span>
       );
     };
+
+    // Show loading state
+    if (applicationsLoading) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <span className="ml-3 text-gray-600">Loading applications...</span>
+        </div>
+      );
+    }
+
+    // Show empty state if no applications
+    if (applications.length === 0) {
+      return (
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Yet</h3>
+          <p className="text-gray-600 mb-6">
+            You haven&apos;t received any influencer applications yet. Make sure your campaigns are published to start receiving applications.
+          </p>
+          <Link href={`/${storeId}/campaign`} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            View Campaigns
+          </Link>
+        </div>
+      );
+    }
+
+    const filteredApplications = applications.filter(app => 
+      filterStatus === 'all' || app.status === filterStatus
+    );
 
     return (
       <div className="space-y-6">
@@ -1159,6 +1112,13 @@ const CreatorStudioDashboard = () => {
             </select>
           </div>
         </div>
+
+        {/* Show filtered empty state */}
+        {filteredApplications.length === 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <p className="text-gray-600">No {filterStatus !== 'all' ? filterStatus : ''} applications found.</p>
+          </div>
+        )}
 
         {/* Applications List */}
         <div className="space-y-4">
