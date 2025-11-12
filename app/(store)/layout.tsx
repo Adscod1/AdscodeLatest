@@ -221,9 +221,9 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
                 <Smile className="w-6 h-6 mr-3" />
                 Sentiment Analysis
               </Link>
-              <Link href={`/${storeId}/coupons`} className={getLinkClassName("/coupons")}>
+              <Link href={`/${storeId}/discounts`} className={getLinkClassName("/discounts")}>
                 <Ticket className="w-6 h-6 mr-3" />
-                Coupons
+                Discounts
               </Link>
             </nav>
           </div>

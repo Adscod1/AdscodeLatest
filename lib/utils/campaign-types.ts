@@ -1,14 +1,14 @@
 import { Campaign } from "@prisma/client";
 import {
   CampaignType,
-  CouponCampaignData,
+  DiscountCampaignData,
   ProductCampaignData,
   VideoCampaignData,
   ProfileCampaignData,
   TypeSpecificData,
 } from "@/types/campaign";
 import {
-  couponCampaignDataSchema,
+  discountCampaignDataSchema,
   productCampaignDataSchema,
   videoCampaignDataSchema,
   profileCampaignDataSchema,
@@ -16,15 +16,15 @@ import {
 } from "@/lib/validations/campaign";
 
 /**
- * Type guard to check if a campaign is a Coupon campaign
+ * Type guard to check if a campaign is a Discount campaign
  * @param campaign - Campaign object or campaign type string
  * @returns True if campaign type is COUPON
  */
-export function isCouponCampaign(
+export function isDiscountCampaign(
   campaign: any | string
 ): boolean {
   const type = typeof campaign === "string" ? campaign : (campaign as any).type;
-  return type === "COUPON";
+  return type === "DISCOUNT";
 }
 
 /**
@@ -64,18 +64,18 @@ export function isProfileCampaign(
 }
 
 /**
- * Safely extracts coupon campaign data from a campaign
+ * Safely extracts discount campaign data from a campaign
  * @param campaign - Campaign object with typeSpecificData
- * @returns Coupon campaign data or null if not a coupon campaign
+ * @returns Discount campaign data or null if not a discount campaign
  */
-export function getCouponCampaignData(
+export function getDiscountCampaignData(
   campaign: any
-): CouponCampaignData | null {
-  if (!isCouponCampaign(campaign)) return null;
+): DiscountCampaignData | null {
+  if (!isDiscountCampaign(campaign)) return null;
   if (!campaign.typeSpecificData) return null;
 
   try {
-    const result = couponCampaignDataSchema.safeParse(campaign.typeSpecificData);
+    const result = discountCampaignDataSchema.safeParse(campaign.typeSpecificData);
     return result.success ? result.data : null;
   } catch {
     return null;
@@ -95,7 +95,7 @@ export function getProductCampaignData(
 
   try {
     const result = productCampaignDataSchema.safeParse(campaign.typeSpecificData);
-    return result.success ? result.data : null;
+    return result.success ? (result.data as ProductCampaignData) : null;
   } catch {
     return null;
   }
@@ -146,8 +146,8 @@ export function getProfileCampaignData(
  */
 export function getSchemaForCampaignType(type: CampaignType) {
   switch (type) {
-    case "COUPON":
-      return couponCampaignDataSchema;
+    case "DISCOUNT":
+      return discountCampaignDataSchema;
     case "PRODUCT":
       return productCampaignDataSchema;
     case "VIDEO":
@@ -213,8 +213,8 @@ export function deserializeTypeSpecificData(
  */
 export function getCampaignTypeLabel(type: CampaignType | string): string {
   switch (type) {
-    case "COUPON":
-      return "Coupon Campaign";
+    case "DISCOUNT":
+      return "Discount Campaign";
     case "PRODUCT":
       return "Product Campaign";
     case "VIDEO":
@@ -233,7 +233,7 @@ export function getCampaignTypeLabel(type: CampaignType | string): string {
  */
 export function getCampaignTypeIcon(type: CampaignType | string): string {
   switch (type) {
-    case "COUPON":
+    case "DISCOUNT":
       return "ticket";
     case "PRODUCT":
       return "package";
@@ -253,7 +253,7 @@ export function getCampaignTypeIcon(type: CampaignType | string): string {
  */
 export function getCampaignTypeDescription(type: CampaignType | string): string {
   switch (type) {
-    case "COUPON":
+    case "DISCOUNT":
       return "Promote discount codes and special offers to drive sales";
     case "PRODUCT":
       return "Showcase specific products to increase awareness and conversions";
@@ -273,7 +273,7 @@ export function getCampaignTypeDescription(type: CampaignType | string): string 
  */
 export function isTypeSpecificDataRequired(type: CampaignType | string): boolean {
   // All campaign types require type-specific data
-  return ["COUPON", "PRODUCT", "VIDEO", "PROFILE"].includes(type);
+  return ["DISCOUNT", "PRODUCT", "VIDEO", "PROFILE"].includes(type);
 }
 
 /**
@@ -287,8 +287,8 @@ export function extractTypeSpecificData(
   const type = (campaign as any).type as CampaignType;
 
   switch (type) {
-    case "COUPON":
-      return getCouponCampaignData(campaign);
+    case "DISCOUNT":
+      return getDiscountCampaignData(campaign);
     case "PRODUCT":
       return getProductCampaignData(campaign);
     case "VIDEO":

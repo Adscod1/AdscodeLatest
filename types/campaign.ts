@@ -1,15 +1,15 @@
 import { Campaign, CampaignInfluencer, CampaignStatus, CampaignApplicationStatus } from "@prisma/client";
 
 // Campaign Type enum
-export type CampaignType = "PRODUCT" | "COUPON" | "VIDEO" | "PROFILE";
+export type CampaignType = "PRODUCT" | "DISCOUNT" | "VIDEO" | "PROFILE";
 
 // Type-specific data interfaces
 
-// Coupon campaign data
-export interface CouponCampaignData {
-  couponId?: string;
-  couponCode?: string;
-  couponDescription?: string;
+// Discount campaign data
+export interface DiscountCampaignData {
+  discountId?: string;
+  discountCode?: string;
+  discountDescription?: string;
   applicationType: "INFLUENCERS" | "CUSTOMERS" | "BOTH";
   applicationInstructions: string;
   usageLimit?: number;
@@ -58,7 +58,7 @@ export interface ProfileCampaignData {
 
 // Union type for all type-specific data
 export type TypeSpecificData = 
-  | CouponCampaignData 
+  | DiscountCampaignData 
   | ProductCampaignData 
   | VideoCampaignData 
   | ProfileCampaignData;

@@ -31,6 +31,7 @@ export type CreateCampaignActionInput = {
   };
   type?: CampaignType;
   typeSpecificData?: TypeSpecificData;
+  publish?: boolean; // If true, campaign will be published immediately
 };
 
 export type UpdateCampaignActionInput = Partial<CreateCampaignActionInput> & {
@@ -126,17 +127,20 @@ export const createCampaign = async (data: CreateCampaignActionInput) => {
         targets: validatedData.targets as any,
         type: validatedData.type,
         typeSpecificData: validatedData.typeSpecificData,
-        status: "DRAFT",
+        status: data.publish ? "PUBLISHED" : "DRAFT",
       } as any,
     });
 
     // Revalidate campaigns page
     revalidatePath("/campaigns");
+    if (data.publish) {
+      revalidatePath("/influencer/campaigns"); // For influencers to see new campaigns
+    }
 
     return {
       success: true,
       campaign,
-      message: "Campaign created successfully",
+      message: data.publish ? "Campaign published successfully" : "Campaign created successfully",
     };
   } catch (error) {
     console.error("Error creating campaign:", error);
@@ -590,6 +594,73 @@ export const publishCampaign = async (id: string) => {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to publish campaign",
+    };
+  }
+};
+
+/**
+ * Gets all published campaigns for influencers to browse
+ * @returns Published campaigns or error
+ */
+export const getPublishedCampaigns = async (options?: {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+}) => {
+  try {
+    // Build where clause
+    const where: any = {
+      status: "PUBLISHED",
+    };
+
+    if (options?.category) {
+      where.category = options.category;
+    }
+
+    if (options?.search) {
+      where.OR = [
+        { title: { contains: options.search, mode: "insensitive" } },
+        { description: { contains: options.search, mode: "insensitive" } },
+        { brand: { name: { contains: options.search, mode: "insensitive" } } },
+      ];
+    }
+
+    // Fetch published campaigns
+    const campaigns = await prisma.campaign.findMany({
+      where,
+      include: {
+        _count: {
+          select: { applicants: true },
+        },
+        brand: {
+          select: {
+            id: true,
+            name: true,
+            logo: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(options?.page && options?.limit
+        ? {
+            skip: (options.page - 1) * options.limit,
+            take: options.limit,
+          }
+        : {}),
+    });
+
+    return {
+      success: true,
+      campaigns,
+    };
+  } catch (error) {
+    console.error("Error fetching published campaigns:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch campaigns",
     };
   }
 };

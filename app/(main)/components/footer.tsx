@@ -79,7 +79,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link href="#" className="text-gray-600 hover:text-gray-900">
-                  Coupon Codes
+                  Discount Codes
                 </Link>
               </li>
               <li>

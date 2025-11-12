@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Search, Filter, Plus, MapPin, Users, Calendar, DollarSign, ArrowLeft, Check, Video, Image, Package, Film, Camera, MessageSquare, LucideIcon, UserCheck, Briefcase, Laptop } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Plus, MapPin, Users, Calendar, DollarSign, ArrowLeft, Check, Video, Image, Package, Film, Camera, MessageSquare, LucideIcon, UserCheck, Briefcase, Laptop, Loader } from 'lucide-react';
 import InfluencerSidebar from '@/components/ui/influencersidebar';
+import { getPublishedCampaigns } from '@/actions/campaign';
 
 interface ActiveCampaign {
   id: string;
@@ -41,60 +42,47 @@ const CampaignsPage = () => {
   const [uploadStep, setUploadStep] = useState(1);
   const [selectedContentType, setSelectedContentType] = useState('');
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const campaigns = [
-    {
-      id: 1,
-      name: 'Summer Fashion Collection Launch',
-      brand: 'Fashion Brand Co.',
-      budget: 2500,
-      dueDate: '15/07/2024',
-      category: 'Banking',
-      deliverables: 3,
-      progress: 65,
-      status: 'In Progress',
-      statusColor: 'blue',
-      location: 'Remote',
-      applicants: '45,100',
-      deliveryItems: [
-        { name: 'Posts', dueDate: '10/07/2024', status: 'In Progress', statusColor: 'blue' },
-        { name: 'Stories', dueDate: '12/07/2024', status: 'Pending', statusColor: 'gray' },
-        { name: 'Reel', dueDate: '14/07/2024', status: 'Pending', statusColor: 'gray' }
-      ],
-      description: 'Create engaging content showcasing our new summer collection. Focus on vibrant colors, beach vibes, and comfortable everyday wear. Target audience: 18-35 year old fashion-conscious individuals.',
-      requirements: [
-        '3 high-quality Banking posts featuring different outfits',
-        '2 Banking stories with behind-the-scenes content',
-        '1 Banking Reel (30-60 seconds) showing outfit transitions',
-        'Use branded hashtags: #SummerVibes2024 #FashionBrandCo',
-        'Tag @fashionbrandco in all posts'
-      ]
-    },
-    {
-      id: 2,
-      name: 'Fitness App Beta Launch',
-      brand: 'Fitness Sensations',
-      budget: 1800,
-      dueDate: '20/07/2024',
-      category: 'Technology',
-      deliverables: 2,
-      progress: 100,
-      status: 'Review',
-      statusColor: 'orange',
-      location: 'Kampala',
-      applicants: '23,350',
-      deliveryItems: [
-        { name: 'Video Review', dueDate: '18/07/2024', status: 'Completed', statusColor: 'green' },
-        { name: 'Posts', dueDate: '20/07/2024', status: 'Completed', statusColor: 'green' }
-      ],
-      description: 'Review our new fitness app and create engaging content for your audience.',
-      requirements: [
-        '1 comprehensive video review (10-15 minutes)',
-        '2 social media posts promoting the app',
-        'Honest feedback about features and user experience'
-      ]
-    }
-  ];
+  // Fetch published campaigns on component mount
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setIsLoading(true);
+        const result = await getPublishedCampaigns({ limit: 100 });
+        if (result.success && result.campaigns) {
+          // Transform campaigns to match the UI expectations
+          const transformedCampaigns = result.campaigns.map((campaign: any) => ({
+            id: campaign.id,
+            name: campaign.title,
+            brand: campaign.brand?.name || 'Unknown Brand',
+            budget: campaign.budget,
+            dueDate: campaign.endDate ? new Date(campaign.endDate).toLocaleDateString() : 'TBD',
+            category: campaign.type,
+            deliverables: campaign._count?.applicants || 0,
+            progress: 0,
+            status: 'Active',
+            statusColor: 'blue' as const,
+            location: campaign.influencerLocation?.city || 'Remote',
+            applicants: (campaign._count?.applicants || 0).toString(),
+            deliveryItems: [],
+            description: campaign.description || '',
+            requirements: [],
+            startDate: campaign.startDate,
+            endDate: campaign.endDate,
+          }));
+          setCampaigns(transformedCampaigns);
+        }
+      } catch (error) {
+        console.error('Error fetching campaigns:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
 
   const recentTransactions = [
     { id: 1, title: 'Payment from Fashion Brand Co.', campaign: 'Summer Campaign', date: '14/06/2024', amount: 2500, status: 'completed', type: 'credit' },
@@ -144,23 +132,38 @@ const CampaignsPage = () => {
 
   const renderDashboard = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
-          {campaigns.map((campaign) => (
-            <div key={campaign.id} className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{campaign.name}</h3>
-                    <span className={`px-2 py-1 text-xs font-medium rounded ${
-                      campaign.statusColor === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
-                    }`}>
-                      {campaign.status}
-                    </span>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <Loader className="w-8 h-8 text-blue-600 animate-spin" />
+            <p className="text-gray-600">Loading active campaigns...</p>
+          </div>
+        </div>
+      ) : campaigns.length === 0 ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-gray-600 text-lg">No active campaigns available</p>
+            <p className="text-gray-500 text-sm mt-1">Check back soon for new opportunities</p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
+            {campaigns.map((campaign) => (
+              <div key={campaign.id} className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900">{campaign.name}</h3>
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${
+                        campaign.statusColor === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+                      }`}>
+                        {campaign.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600">{campaign.brand}</p>
                   </div>
-                  <p className="text-sm text-gray-600">{campaign.brand}</p>
                 </div>
-              </div>
 
               <div className="flex items-center gap-6 mb-4 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
@@ -222,13 +225,13 @@ const CampaignsPage = () => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
 
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Recent Transactions</h3>
-            <div className="space-y-3">
-              {recentTransactions.map((transaction) => (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Recent Transactions</h3>
+              <div className="space-y-3">
+                {recentTransactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-start justify-between py-2 border-b border-gray-100 last:border-0">
                   <div className="flex-1">
                     <div className="text-sm font-medium text-gray-900">{transaction.title}</div>
@@ -247,13 +250,14 @@ const CampaignsPage = () => {
                   </div>
                 </div>
               ))}
+              </div>
+              <button className="w-full mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium">
+                View All Transactions
+              </button>
             </div>
-            <button className="w-full mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium">
-              View All Transactions
-            </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 
