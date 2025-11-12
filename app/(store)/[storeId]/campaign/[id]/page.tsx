@@ -430,7 +430,11 @@ export default function CampaignDetailPage() {
     { label: 'Clicks', value: '3,500', change: '+10.1%', icon: MousePointer, color: 'orange' }
   ];
 
-  const timelineEvents = [
+  const timelineEvents = campaign?.createdAt ? [
+    { title: 'Campaign Created', date: new Date(campaign.createdAt).toLocaleDateString(), icon: Play, color: 'purple' },
+    { title: 'Campaign ' + (campaign.status === 'PUBLISHED' ? 'Published' : campaign.status.toLowerCase()), date: new Date(campaign.updatedAt).toLocaleDateString(), icon: MousePointer, color: 'green' },
+    ...(campaign._count?.applicants ? [{ title: `${campaign._count.applicants} Influencer${campaign._count.applicants !== 1 ? 's' : ''} Applied`, date: new Date(campaign.updatedAt).toLocaleDateString(), icon: Users, color: 'green' }] : []),
+  ] : [
     { title: 'Campaign Launched', date: '2024-01-01', icon: Play, color: 'purple' },
     { title: 'First 1000 clicks reached', date: '2024-01-05', icon: MousePointer, color: 'green' },
     { title: 'Budget increased by $1000', date: '2024-01-10', icon: DollarSign, color: 'gray' },
@@ -438,11 +442,7 @@ export default function CampaignDetailPage() {
     { title: 'Ad creative refreshed', date: '2024-01-20', icon: Edit, color: 'gray' }
   ];
 
-  const adSets = [
-    { name: 'Morning Rush', conversions: 95, budget: '$980 / $1500', spent: 65, status: 'Active' },
-    { name: 'Lunch Break', conversions: 120, budget: '$1320 / $2000', spent: 66, status: 'Active' },
-    { name: 'Evening Wind Down', conversions: 70, budget: '$900 / $1500', spent: 60, status: 'Paused' }
-  ];
+  const adSets: Array<{name: string; conversions: number; budget: string; spent: number; status: string}> = []; // Ad sets not yet implemented in campaign model
 
   const ageDistribution = [
     { range: '18-24', percentage: 28 },
@@ -658,128 +658,149 @@ export default function CampaignDetailPage() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
-                        <div className="text-xs text-gray-500 mb-1">CTR (Click-Through Rate)</div>
-                        <div className="text-2xl font-bold text-gray-900">2.8%</div>
+                        <div className="text-xs text-gray-500 mb-1">Campaign Status</div>
+                        <div className="text-2xl font-bold text-gray-900">{campaign?.status || 'DRAFT'}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500 mb-1">CPC (Cost Per Click)</div>
-                        <div className="text-2xl font-bold text-gray-900">$0.01</div>
+                        <div className="text-xs text-gray-500 mb-1">Total Budget</div>
+                        <div className="text-2xl font-bold text-gray-900">{campaign?.currency} {campaign?.budget?.toLocaleString() || '0'}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500 mb-1">CPA (Cost Per Acquisition)</div>
-                        <div className="text-2xl font-bold text-gray-900">$11.23</div>
+                        <div className="text-xs text-gray-500 mb-1">Campaign Type</div>
+                        <div className="text-2xl font-bold text-gray-900">{campaign?.type || 'PRODUCT'}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500 mb-1">Engagement Rate</div>
-                        <div className="text-2xl font-bold text-gray-900">5.4%</div>
+                        <div className="text-xs text-gray-500 mb-1">Total Applicants</div>
+                        <div className="text-2xl font-bold text-gray-900">{(campaign?._count?.applicants || 0)}</div>
                       </div>
                     </div>
 
                     <div className="space-y-4 pt-4 border-t border-gray-200">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">ROAS (Return on Ad Spend)</span>
-                          <span className="text-sm font-semibold text-green-600">8.5x</span>
+                          <span className="text-sm font-medium text-gray-700">Campaign Duration</span>
+                          <span className="text-sm font-semibold text-gray-900">{campaign?.duration || 'TBD'} days</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: '85%' }}></div>
+                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${Math.min((campaign?.duration || 0) / 30 * 100, 100)}%` }}></div>
                         </div>
                       </div>
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">Bounce Rate</span>
-                          <span className="text-sm font-semibold text-gray-900">32.5%</span>
+                          <span className="text-sm font-medium text-gray-700">Campaign Progress</span>
+                          <span className="text-sm font-semibold text-gray-900">{campaign?.status === 'PUBLISHED' ? 'Live' : campaign?.status === 'COMPLETED' ? '100%' : '0%'}</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: '32.5%' }}></div>
+                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: campaign?.status === 'COMPLETED' ? '100%' : campaign?.status === 'PUBLISHED' ? '50%' : '0%' }}></div>
                         </div>
                       </div>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                      <p className="text-xs text-blue-700">
+                        <strong>Note:</strong> Detailed analytics will be available once the campaign receives more traffic and conversions. 
+                        Real-time metrics are coming soon!
+                      </p>
                     </div>
                   </div>
                 )}
 
                 {activeTab === 'Demographics' && (
                   <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-900 mb-4">Age Distribution</h3>
-                      <div className="space-y-3">
-                        {ageDistribution.map((age, idx) => (
-                          <div key={idx}>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-gray-700">{age.range}</span>
-                              <span className="text-sm font-semibold text-gray-900">{age.percentage}%</span>
+                    {campaign?.status === 'PUBLISHED' || campaign?.status === 'ACTIVE' ? (
+                      <>
+                        <div>
+                          <h3 className="text-sm font-semibold text-gray-900 mb-4">Age Distribution</h3>
+                          <div className="space-y-3">
+                            {ageDistribution.map((age, idx) => (
+                              <div key={idx}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-sm text-gray-700">{age.range}</span>
+                                  <span className="text-sm font-semibold text-gray-900">{age.percentage}%</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${age.percentage}%` }}></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-gray-200">
+                          <h3 className="text-sm font-semibold text-gray-900 mb-4">Gender Split</h3>
+                          <div className="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                              <div className="text-3xl font-bold text-gray-900 mb-1">58%</div>
+                              <div className="text-xs text-gray-500">Male</div>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${age.percentage}%` }}></div>
+                            <div>
+                              <div className="text-3xl font-bold text-gray-900 mb-1">40%</div>
+                              <div className="text-xs text-gray-500">Female</div>
+                            </div>
+                            <div>
+                              <div className="text-3xl font-bold text-gray-900 mb-1">2%</div>
+                              <div className="text-xs text-gray-500">Other</div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
+                        </div>
 
-                    <div className="pt-4 border-t border-gray-200">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-4">Gender Split</h3>
-                      <div className="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                          <div className="text-3xl font-bold text-gray-900 mb-1">58%</div>
-                          <div className="text-xs text-gray-500">Male</div>
-                        </div>
-                        <div>
-                          <div className="text-3xl font-bold text-gray-900 mb-1">40%</div>
-                          <div className="text-xs text-gray-500">Female</div>
-                        </div>
-                        <div>
-                          <div className="text-3xl font-bold text-gray-900 mb-1">2%</div>
-                          <div className="text-xs text-gray-500">Other</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-gray-200">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-3">Top Locations</h3>
-                      <div className="space-y-2">
-                        {locations.map((location, idx) => (
-                          <div key={idx} className="flex items-center justify-between py-2 text-sm">
-                            <span className="text-gray-700">{location.country}</span>
-                            <span className="font-semibold text-gray-900">{location.percentage}</span>
+                        <div className="pt-4 border-t border-gray-200">
+                          <h3 className="text-sm font-semibold text-gray-900 mb-3">Top Locations</h3>
+                          <div className="space-y-2">
+                            {locations.map((location, idx) => (
+                              <div key={idx} className="flex items-center justify-between py-2 text-sm">
+                                <span className="text-gray-700">{location.country}</span>
+                                <span className="font-semibold text-gray-900">{location.percentage}</span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        </div>
+                        <UserDemographics />
+                      </>
+                    ) : (
+                      <div className="text-center py-12">
+                        <p className="text-gray-500 text-sm">Demographics data will appear here once the campaign is published</p>
+                        <p className="text-gray-400 text-xs mt-1">Publish your campaign to start collecting audience insights</p>
                       </div>
-                    </div>
-                    <UserDemographics />
-
-
+                    )}
                   </div>
                 )}
 
                 {activeTab === 'Ad Sets' && (
                   <div className="space-y-4">
-                    {adSets.map((adSet, idx) => (
-                      <div key={idx} className="p-4 border border-gray-200 rounded-lg">
-                        <div className="flex items-start justify-between mb-3">
+                    {adSets.length > 0 ? (
+                      adSets.map((adSet, idx) => (
+                        <div key={idx} className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h3 className="text-sm font-semibold text-gray-900">{adSet.name}</h3>
+                              <p className="text-xs text-gray-500">{adSet.conversions} conversions</p>
+                            </div>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              adSet.status === 'Active' 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-orange-100 text-orange-700'
+                            }`}>
+                              {adSet.status}
+                            </span>
+                          </div>
                           <div>
-                            <h3 className="text-sm font-semibold text-gray-900">{adSet.name}</h3>
-                            <p className="text-xs text-gray-500">{adSet.conversions} conversions</p>
-                          </div>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            adSet.status === 'Active' 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-orange-100 text-orange-700'
-                          }`}>
-                            {adSet.status}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-gray-600">Budget</span>
-                            <span className="text-xs font-semibold text-gray-900">{adSet.budget}</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${adSet.spent}%` }}></div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-gray-600">Budget</span>
+                              <span className="text-xs font-semibold text-gray-900">{adSet.budget}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${adSet.spent}%` }}></div>
+                            </div>
                           </div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500 text-sm">No ad sets created yet</p>
+                        <p className="text-gray-400 text-xs mt-1">Ad sets will appear here once they are created</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
 
