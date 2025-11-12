@@ -44,6 +44,8 @@ const CampaignsPage = () => {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [appliedCampaigns, setAppliedCampaigns] = useState<Set<string>>(new Set());
+  const [applyingCampaignId, setApplyingCampaignId] = useState<string | null>(null);
 
   // Fetch published campaigns on component mount
   useEffect(() => {
@@ -73,6 +75,21 @@ const CampaignsPage = () => {
             endDate: campaign.endDate,
           }));
           setCampaigns(transformedCampaigns);
+
+          // Check which campaigns the influencer has applied to
+          const appliedSet = new Set<string>();
+          for (const campaign of transformedCampaigns) {
+            try {
+              const response = await fetch(`/api/campaigns/${campaign.id}/apply`);
+              const data = await response.json();
+              if (data.hasApplied) {
+                appliedSet.add(campaign.id);
+              }
+            } catch (error) {
+              // Silently fail for individual checks
+            }
+          }
+          setAppliedCampaigns(appliedSet);
         }
       } catch (error) {
         console.error('Error fetching campaigns:', error);
@@ -127,6 +144,33 @@ const CampaignsPage = () => {
         name: file.name,
         size: (file.size / (1024 * 1024)).toFixed(2)
       });
+    }
+  };
+
+  const handleApplyCampaign = async (campaignId: string) => {
+    try {
+      setApplyingCampaignId(campaignId);
+      const response = await fetch(`/api/campaigns/${campaignId}/apply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Add to applied campaigns
+        setAppliedCampaigns(prev => new Set(prev).add(campaignId));
+        alert('Successfully applied to campaign!');
+      } else {
+        alert(result.error || 'Failed to apply to campaign');
+      }
+    } catch (error) {
+      console.error('Error applying to campaign:', error);
+      alert('Failed to apply to campaign');
+    } finally {
+      setApplyingCampaignId(null);
     }
   };
 
@@ -216,12 +260,22 @@ const CampaignsPage = () => {
                 >
                   View Details
                 </button>
-                <button 
-                  onClick={() => handleUploadContent(campaign)}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Upload Content
-                </button>
+                {appliedCampaigns.has(campaign.id) ? (
+                  <button 
+                    disabled
+                    className="flex-1 px-4 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-lg cursor-not-allowed"
+                  >
+                    Applied ✓
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => handleApplyCampaign(campaign.id)}
+                    disabled={applyingCampaignId === campaign.id}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+                  >
+                    {applyingCampaignId === campaign.id ? 'Applying...' : 'Apply Now'}
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -384,9 +438,22 @@ const CampaignsPage = () => {
           </div>
 
           <div className="flex gap-3">
-            <button className="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-              Apply Now
-            </button>
+            {appliedCampaigns.has(selectedCampaign.id) ? (
+              <button 
+                disabled
+                className="px-6 py-2 bg-green-100 text-green-700 font-medium rounded-lg cursor-not-allowed"
+              >
+                Applied ✓
+              </button>
+            ) : (
+              <button 
+                onClick={() => handleApplyCampaign(selectedCampaign.id)}
+                disabled={applyingCampaignId === selectedCampaign.id}
+                className="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                {applyingCampaignId === selectedCampaign.id ? 'Applying...' : 'Apply Now'}
+              </button>
+            )}
             <button 
               onClick={() => handleUploadContent(selectedCampaign)}
               className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"

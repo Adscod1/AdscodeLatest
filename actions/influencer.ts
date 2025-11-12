@@ -89,3 +89,135 @@ export async function getInfluencerStats(userId: string) {
     return null;
   }
 }
+
+/**
+ * Apply for a campaign as an influencer
+ */
+export async function applyCampaign(campaignId: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session || !session.user) {
+      return {
+        success: false,
+        error: 'You must be logged in to apply for campaigns',
+      };
+    }
+
+    // Get influencer profile
+    const influencer = await prisma.influencer.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!influencer) {
+      return {
+        success: false,
+        error: 'You must complete your influencer profile to apply for campaigns',
+      };
+    }
+
+    // Check if influencer is approved
+    if (influencer.status !== 'APPROVED') {
+      return {
+        success: false,
+        error: 'Your influencer profile must be approved before applying to campaigns',
+      };
+    }
+
+    // Check if campaign exists and is published
+    const campaign = await prisma.campaign.findUnique({
+      where: { id: campaignId },
+    });
+
+    if (!campaign) {
+      return {
+        success: false,
+        error: 'Campaign not found',
+      };
+    }
+
+    if (campaign.status !== 'PUBLISHED') {
+      return {
+        success: false,
+        error: 'This campaign is not accepting applications',
+      };
+    }
+
+    // Check if already applied
+    const existingApplication = await prisma.campaignInfluencer.findUnique({
+      where: {
+        campaignId_influencerId: {
+          campaignId,
+          influencerId: influencer.id,
+        },
+      },
+    });
+
+    if (existingApplication) {
+      return {
+        success: false,
+        error: 'You have already applied to this campaign',
+      };
+    }
+
+    // Create application
+    const application = await prisma.campaignInfluencer.create({
+      data: {
+        campaignId,
+        influencerId: influencer.id,
+        applicationStatus: 'APPLIED',
+      },
+    });
+
+    return {
+      success: true,
+      application,
+      message: 'Successfully applied to campaign',
+    };
+  } catch (error) {
+    console.error('Error applying to campaign:', error);
+    return {
+      success: false,
+      error: 'Failed to apply to campaign',
+    };
+  }
+}
+
+/**
+ * Check if influencer has applied to a campaign
+ */
+export async function hasAppliedToCampaign(campaignId: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session || !session.user) {
+      return false;
+    }
+
+    const influencer = await prisma.influencer.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!influencer) {
+      return false;
+    }
+
+    const application = await prisma.campaignInfluencer.findUnique({
+      where: {
+        campaignId_influencerId: {
+          campaignId,
+          influencerId: influencer.id,
+        },
+      },
+    });
+
+    return !!application;
+  } catch (error) {
+    console.error('Error checking application status:', error);
+    return false;
+  }
+}

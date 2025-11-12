@@ -664,3 +664,162 @@ export const getPublishedCampaigns = async (options?: {
     };
   }
 };
+
+/**
+ * Gets influencers who applied for a specific campaign
+ * @param campaignId - The campaign ID
+ * @returns List of influencers with their application status and details
+ */
+export const getCampaignInfluencers = async (campaignId: string) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      redirect("/auth/login");
+    }
+
+    // Verify campaign belongs to user's store
+    const campaign = await prisma.campaign.findUnique({
+      where: { id: campaignId },
+      select: { brandId: true },
+    });
+
+    if (!campaign) {
+      return {
+        success: false,
+        error: "Campaign not found",
+        influencers: [],
+      };
+    }
+
+    // Verify user owns this campaign
+    const store = await prisma.store.findFirst({
+      where: { userId: session.user.id },
+    });
+
+    if (campaign.brandId !== store?.id) {
+      return {
+        success: false,
+        error: "Forbidden",
+        influencers: [],
+      };
+    }
+
+    // Fetch influencers who applied
+    const campaignInfluencers = await prisma.campaignInfluencer.findMany({
+      where: { campaignId },
+      include: {
+        influencer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            primaryNiche: true,
+            bio: true,
+            socialAccounts: {
+              select: {
+                platform: true,
+                followers: true,
+                handle: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      influencers: campaignInfluencers,
+    };
+  } catch (error) {
+    console.error("Error fetching campaign influencers:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch influencers",
+      influencers: [],
+    };
+  }
+};
+
+/**
+ * Gets all applications for all campaigns belonging to the user's store
+ * @returns List of applications with influencer and campaign details
+ */
+export const getStoreApplications = async () => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      redirect("/auth/login");
+    }
+
+    // Get user's store
+    const store = await prisma.store.findFirst({
+      where: { userId: session.user.id },
+    });
+
+    if (!store) {
+      return {
+        success: false,
+        error: "Store not found",
+        applications: [],
+      };
+    }
+
+    // Fetch all applications for store's campaigns
+    const applications = await prisma.campaignInfluencer.findMany({
+      where: {
+        campaign: {
+          brandId: store.id,
+        },
+      },
+      include: {
+        influencer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            primaryNiche: true,
+            bio: true,
+            socialAccounts: {
+              select: {
+                platform: true,
+                followers: true,
+                handle: true,
+              },
+            },
+          },
+        },
+        campaign: {
+          select: {
+            id: true,
+            title: true,
+            type: true,
+            budget: true,
+            currency: true,
+          },
+        },
+      },
+      orderBy: {
+        appliedAt: 'desc',
+      },
+    });
+
+    return {
+      success: true,
+      applications,
+    };
+  } catch (error) {
+    console.error("Error fetching store applications:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch applications",
+      applications: [],
+    };
+  }
+};
