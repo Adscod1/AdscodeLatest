@@ -650,7 +650,7 @@ const ProfileContent = ({ user }: { user: Profile }) => {
                             <div>1K - 5K</div>
                             <div>5K - 20K</div>
                             <div>20K - 50K</div>
-                            <div>50K - 100K</div>
+                            <div>50K</div>
                             <div>100K+</div>
                           </div>
                         </div>

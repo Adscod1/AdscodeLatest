@@ -27,13 +27,6 @@ interface Deliverable {
   description: string;
 }
 
-interface CallToAction {
-  action: string;
-  buttonText: string;
-  destinationUrl: string;
-  description: string;
-}
-
 // Type-specific campaign data interfaces
 interface DiscountCampaignData {
   discountId?: string;
@@ -82,7 +75,6 @@ interface CampaignData {
   gender: string;
   location: string;
   campaignObjective: string;
-  callToActions: CallToAction[];
   milestones: Milestone[];
   deliverables: Deliverable[];
   selectedInfluencers: Array<{
@@ -147,7 +139,6 @@ const InfluencerCampaignManager = () => {
     gender: '',
     location: '',
     campaignObjective: '',
-    callToActions: [],
     milestones: [
       { title: 'Campaign Kickoff', description: '', dueDate: '' }
     ],
@@ -675,28 +666,7 @@ const InfluencerCampaignManager = () => {
     setCampaignData(prev => ({ ...prev, campaignObjective: objective }));
   };
 
-  const handleCTAChange = (index: number, field: keyof CallToAction, value: string) => {
-    const newCTAs = [...campaignData.callToActions];
-    newCTAs[index] = {
-      ...newCTAs[index],
-      [field]: value
-    };
-    setCampaignData(prev => ({ ...prev, callToActions: newCTAs }));
-  };
 
-  const addCTA = () => {
-    setCampaignData(prev => ({
-      ...prev,
-      callToActions: [...prev.callToActions, { action: '', buttonText: '', destinationUrl: '', description: '' }]
-    }));
-  };
-
-  const removeCTA = (index: number) => {
-    setCampaignData(prev => ({
-      ...prev,
-      callToActions: prev.callToActions.filter((_, i) => i !== index)
-    }));
-  };
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
@@ -1722,164 +1692,7 @@ const InfluencerCampaignManager = () => {
         </div>
       </div>
 
-      {/* Call-to-Action Section */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
-        <div className="flex items-center mb-4 sm:mb-6">
-          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 shrink-0">
-            <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-          </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Add Call-to-Action <span className="text-red-500">*</span>
-          </h2>
-        </div>
 
-        {campaignData.callToActions.length === 0 && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CTA Action <span className="text-red-500">*</span>
-                </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base">
-                  <option value="">Select Campaign Action</option>
-                  <option value="app-download">App Download</option>
-                  <option value="website-visit">Website Visit</option>
-                  <option value="product-purchase">Product Purchase</option>
-                  <option value="sign-up">Sign Up</option>
-                  <option value="contact-us">Contact Us</option>
-                  <option value="book-appointment">Book Appointment</option>
-                  <option value="watch-video">Watch Video</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Button Text <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter button text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Destination URL
-              </label>
-              <input
-                type="url"
-                placeholder="https://example.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                rows={3}
-                placeholder="Brief explanation of what happens when users click"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <button
-              onClick={addCTA}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Add CTA
-            </button>
-          </div>
-        )}
-
-        {campaignData.callToActions.length > 0 && (
-          <div className="space-y-6">
-            {campaignData.callToActions.map((cta, index) => (
-              <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">Call-to-Action {index + 1}</h3>
-                  <button 
-                    onClick={() => removeCTA(index)}
-                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      CTA Action <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={cta.action}
-                      onChange={(e) => handleCTAChange(index, 'action', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Campaign Action</option>
-                      <option value="app-download">App Download</option>
-                      <option value="website-visit">Website Visit</option>
-                      <option value="product-purchase">Product Purchase</option>
-                      <option value="sign-up">Sign Up</option>
-                      <option value="contact-us">Contact Us</option>
-                      <option value="book-appointment">Book Appointment</option>
-                      <option value="watch-video">Watch Video</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Button Text <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={cta.buttonText}
-                      onChange={(e) => handleCTAChange(index, 'buttonText', e.target.value)}
-                      placeholder="Enter button text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Destination URL
-                  </label>
-                  <input
-                    type="url"
-                    value={cta.destinationUrl}
-                    onChange={(e) => handleCTAChange(index, 'destinationUrl', e.target.value)}
-                    placeholder="https://example.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={cta.description}
-                    onChange={(e) => handleCTAChange(index, 'description', e.target.value)}
-                    placeholder="Brief explanation of what happens when users click"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            ))}
-
-            <button
-              onClick={addCTA}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Another CTA
-            </button>
-          </div>
-        )}
-      </div>
     </div>
   );
 
@@ -1951,7 +1764,7 @@ const InfluencerCampaignManager = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-base font-semibold text-gray-900">Target Influencers</h3>
-              <p className="text-sm text-gray-500">Selected influencers for this campaign</p>
+              <p className="text-sm text-gray-500">Browse and select influencers for your campaign</p>
             </div>
             <Link 
               href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}&step=1`}
@@ -1984,13 +1797,46 @@ const InfluencerCampaignManager = () => {
                           {influencer.icon || influencer.name.substring(0, 2).toUpperCase()}
                         </div>
                       )}
+                      {/* Verified Badge */}
+                      <div className="absolute -bottom-0.5 -right-0.5">
+                        <svg 
+                          className="w-4 h-4" 
+                          viewBox="0,0,256,256"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g 
+                            fill="#228be6" 
+                            fillRule="nonzero" 
+                            stroke="none" 
+                            strokeWidth="1" 
+                            strokeLinecap="butt" 
+                            strokeLinejoin="miter" 
+                            strokeMiterlimit="10" 
+                            strokeDasharray="" 
+                            strokeDashoffset="0" 
+                            fontFamily="none" 
+                            fontWeight="none" 
+                            fontSize="none" 
+                            textAnchor="none" 
+                            style={{mixBlendMode: 'normal'}}
+                          >
+                            <g transform="scale(8.53333,8.53333)">
+                              <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                            </g>
+                          </g>
+                        </svg>
+                      </div>
                     </div>
 
                     {/* Influencer Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">{influencer.name}</h4>
-                        <span className="text-sm text-gray-500">{influencer.followers}</span>
+                        <span className="text-sm text-gray-500">
+                          {influencer.followers?.includes('-') 
+                            ? influencer.followers.split('-')[0].trim() 
+                            : influencer.followers}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
                         {influencer.category && influencer.category.split(',').map((cat, idx) => (
@@ -2014,24 +1860,37 @@ const InfluencerCampaignManager = () => {
                         </div>
                       )}
                       <div className="text-center">
-                        <div className="text-xs text-gray-400">Compensation Type</div>
-                        <div className="font-medium text-gray-700">Negotiable</div>
+                        <div className="text-xs text-gray-400">Performance Score</div>
+                        <div className="font-medium text-gray-700">85%</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-400">Estimate Price</div>
+                        <div className="font-medium text-gray-700">$100 - $200</div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Remove Button */}
-                  <button
-                    onClick={() => {
-                      setCampaignData({
-                        ...campaignData,
-                        selectedInfluencers: campaignData.selectedInfluencers.filter(i => i.id !== influencer.id)
-                      });
-                    }}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0 ml-4"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  {/* View Profile & Remove Buttons */}
+                  <div className="flex gap-2 ml-4">
+                    <Link
+                      href={`/${storeId}/campaign/1/influencers/profile`}
+                      className="px-3 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-2"
+                    >
+                      {/* <Eye className="w-4 h-4" /> */}
+                      Profile
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setCampaignData({
+                          ...campaignData,
+                          selectedInfluencers: campaignData.selectedInfluencers.filter(i => i.id !== influencer.id)
+                        });
+                      }}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -2447,12 +2306,12 @@ const InfluencerCampaignManager = () => {
           </div>
           
           {/* Desktop Tab Navigation - Wallet Style */}
-          <div className="hidden sm:flex border-b border-gray-200">
+          <div className="hidden sm:flex border-b border-gray-200 overflow-x-auto">
             {steps.map((step, index) => (
               <button
                 key={step.id}
                 onClick={() => setCurrentStep(index)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-4 border-b-2 transition-all relative ${
+                className={`flex items-center justify-center gap-2 py-3.5 px-3 border-b-2 transition-all relative whitespace-nowrap flex-shrink-0 ${
                   currentStep === index
                     ? 'border-blue-600 text-blue-600 bg-white'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -2461,11 +2320,11 @@ const InfluencerCampaignManager = () => {
                 <span className={`${currentStep === index ? 'text-blue-600' : 'text-gray-400'}`}>
                   {step.icon}
                 </span>
-                <span className={`font-medium text-sm ${currentStep === index ? 'text-blue-600' : 'text-gray-600'}`}>
+                <span className={`font-medium text-xs sm:text-sm ${currentStep === index ? 'text-blue-600' : 'text-gray-600'}`}>
                   {step.title}
                 </span>
                 {index < currentStep && (
-                  <CheckCircle className="w-4 h-4 text-green-500 absolute top-2 right-2" />
+                  <CheckCircle className="w-4 h-4 text-green-500 absolute top-1 right-1" />
                 )}
               </button>
             ))}
