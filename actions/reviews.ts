@@ -49,6 +49,18 @@ export const getStoreReviews = async (storeId: string) => {
       where: {
         storeId,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
     return reviews;

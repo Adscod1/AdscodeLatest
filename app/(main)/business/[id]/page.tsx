@@ -2,6 +2,8 @@
 
 import { getStoreById } from "@/app/actions/store";
 import { getProducts } from "@/app/actions/product";
+import { getServicesByStore } from "@/actions/service";
+import { getStoreReviews } from "@/actions/reviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -66,6 +68,26 @@ const BusinessPage = () => {
     enabled: !!businessId,
   });
 
+  const { data: services, isLoading: isLoadingServices } = useQuery({
+    queryKey: ["services", businessId],
+    queryFn: () => getServicesByStore(businessId),
+    enabled: !!businessId,
+  });
+
+  const { data: reviews, isLoading: isLoadingReviews } = useQuery({
+    queryKey: ["reviews", businessId],
+    queryFn: () => getStoreReviews(businessId),
+    enabled: !!businessId,
+  });
+
+  // Combine products and services for the main listing
+  const allItems = [...(products || []), ...(services || [])].slice(0, 4); // Show only first 4 items
+
+  // Calculate average rating
+  const averageRating = reviews && reviews.length > 0
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+    : 0;
+
   // Sample images for carousel - replace with actual store images
   const carouselImages = [
     "https://images.unsplash.com/photo-1441986300917-64674bd600d8",
@@ -92,13 +114,6 @@ const BusinessPage = () => {
     { day: "Sunday", hours: "08:30 AM - 05:30 PM", isOpen: false }
   ];
 
-  const services = [
-    { title: "Main page SEO", description: "Lorem ipsum dolor sit amet.", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f" },
-    { title: "Main page SEO", description: "Lorem ipsum dolor sit amet.", image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f" },
-    { title: "Main page SEO", description: "Lorem ipsum dolor sit amet.", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71" },
-    { title: "Main page SEO", description: "Lorem ipsum dolor sit amet.", image: "https://images.unsplash.com/photo-1553484771-371a605b060b" }
-  ];
-
   const campaigns = [
     { image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d" },
     { image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd" },
@@ -106,7 +121,7 @@ const BusinessPage = () => {
     { image: "https://images.unsplash.com/photo-1556155092-490a1ba16284" }
   ];
 
-  if (isLoadingStore || isLoadingProducts) {
+  if (isLoadingStore || isLoadingProducts || isLoadingServices || isLoadingReviews) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-6">
@@ -159,7 +174,7 @@ const BusinessPage = () => {
             </div>
             
             {/* Center Image (Main) */}
-            <div className="relative bg-gray-100 overflow-hidden">
+            <div className="relative bg-gray-100 overflow-hidden border-l-2 border-white/30">
               <Image
                 src={carouselImages[1]}
                 alt="Business Image 2"
@@ -169,7 +184,7 @@ const BusinessPage = () => {
             </div>
             
             {/* Right Image */}
-            <div className="relative bg-gray-300 overflow-hidden">
+            <div className="relative bg-gray-300 overflow-hidden border-l-2 border-white/30">
               <Image
                 src={carouselImages[2]}
                 alt="Business Image 3"
@@ -195,66 +210,74 @@ const BusinessPage = () => {
           >
             <ChevronRight className="w-5 h-5 text-gray-700" />
           </button>
-
-          {/* Business Avatar with White Circle Background - Overlapping */}
-         
         </div>
 
-         {/* Top Section: Business Profile + Action Buttons */}
-        <div className="bg-white shadow-sm px-12 py-8 pt-5">
-          <div className="flex items-center justify-between">
+        
+
+        {/* Top Section: Business Profile + Action Buttons */}
+        <div className="bg-white shadow-sm px-6 sm:px-12 py-8 ">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {/* Left Side: Business Profile - Adjusted for overlapping avatar */}
-             <div className="absolute bottom-[400px] left-12 transform translate-y-1/2 z-30">
-            <div className="w-36 h-36 bg-white rounded flex items-center justify-center ">
-              <div className="w-32 h-32 rounded overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 shadow-md">
-                {store.logo ? (
-                  <Image
-                    src={store.logo}
-                    alt={store.name}
-                    width={128}
-                    height={128}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-3xl font-bold text-white">
-                      {store.name.charAt(0)}
-                    </span>
-                  </div>
-                )}
-              </div>
+            {/* Business Avatar - Positioned outside carousel to ensure proper z-index */}
+        <div className="absolute top-[460px] left-12 z-50">
+          <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-xl flex items-center justify-center shadow-xl border-4 border-white">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 shadow-md">
+              {store.logo ? (
+                <Image
+                  src={store.logo}
+                  alt={store.name}
+                  width={112}
+                  height={112}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl font-bold text-white">
+                    {store.name.charAt(0)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-            <div className="flex items-center gap-6 ml-40">
+        </div>
+            <div className="flex items-center gap-6 ml-0 sm:ml-40 mt-4 sm:mt-0">
               {/* Business Info */}
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">{store.name}</h1>
-                <p className="text-gray-600 text-xl">
+                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">{store.name}</h1>
+                <p className="text-gray-600 text-lg sm:text-xl">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
                 </p>
               </div>
             </div>
             
             {/* Right Side: Action Buttons */}
-            <div className="flex items-center gap-3">
-              <Button className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-6 py-2.5 flex items-center gap-2">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Button className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-4 sm:px-6 py-2.5 flex items-center gap-2">
                 <Heart className="w-4 h-4" />
-                Favourite
+                <span className="hidden sm:inline">Favourite</span>
               </Button>
-              <Button variant="outline" className="rounded-lg px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+              <Button variant="outline" className="rounded-lg px-4 sm:px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
                 <MessageCircle className="w-4 h-4" />
-                Inbox
+                <span className="hidden sm:inline">Inbox</span>
               </Button>
-              <Button variant="outline" className="rounded-lg px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+              <Button variant="outline" className="rounded-lg px-4 sm:px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
                 <Share2 className="w-4 h-4" />
-                Share
+                <span className="hidden sm:inline">Share</span>
               </Button>
+              <Link href={`/business/${store.id}/reviews/write`}>
+                <Button variant="outline" className="rounded-lg px-4 sm:px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span className="hidden sm:inline">Write Review</span>
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Main Content - Add padding here */}
-        <div className="px-20 flex gap-8">
+        {/* Main Content - Responsive padding */}
+        <div className="px-4 sm:px-8 lg:px-20 flex flex-col lg:flex-row gap-8 bg-blue-50 pt-5">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-8">
             {/* Business Header - Full Width */}
@@ -263,7 +286,7 @@ const BusinessPage = () => {
 
               {/* Description Section */}
               <div className="p-8">
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                <h3 className="font-semibold text-gray-900 mb-4 border-b flex items-center">
                   <MessageCircle className="w-5 h-5 mr-2" />
                   Description
                 </h3>
@@ -322,25 +345,60 @@ const BusinessPage = () => {
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {services.map((service, index) => (
-                  <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-square bg-gray-100">
-                      <Image
-                        src={service.image}
-                        alt={service.title}
-                        width={300}
-                        height={300}
-                        className="w-full h-full object-cover"
-                      />
+              
+              {isLoadingProducts || isLoadingServices ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="animate-pulse">
+                      <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-1">{service.title}</h3>
-                      <p className="text-gray-600 text-sm">{service.description}</p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : allItems.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {allItems.map((item, index) => (
+                    <Link key={item.id} href={`/product/${item.id}`}>
+                      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                        <div className="aspect-square bg-gray-100">
+                          {item.images && item.images.length > 0 ? (
+                            <Image
+                              src={item.images[0].url}
+                              alt={item.title}
+                              width={300}
+                              height={300}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-4xl">
+                              📦
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{item.title}</h3>
+                          <p className="text-gray-600 text-sm line-clamp-2 mb-2">
+                            {item.description || "No description available"}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold text-gray-900">${item.price}</span>
+                            {item.comparePrice && item.comparePrice > item.price && (
+                              <span className="text-sm text-gray-400 line-through">${item.comparePrice}</span>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">🛍️</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Products or Services</h3>
+                  <p className="text-gray-600">This business hasn't added any products or services yet.</p>
+                </div>
+              )}
             </div>
 
             {/* Highlights */}
@@ -360,45 +418,151 @@ const BusinessPage = () => {
 
             {/* Reviews */}
             <div className="bg-white rounded-2xl shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Recommended Reviews</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                  <div className="mb-4">
-                    <span className="text-sm text-gray-600">Overall rating</span>
-                    <div className="flex items-center mt-2">
-                      <div className="flex items-center mr-3">
-                        {[...Array(3)].map((_, i) => (
-                          <Star key={i} className="w-5 h-5 fill-orange-400 text-orange-400" />
-                        ))}
-                        {[...Array(2)].map((_, i) => (
-                          <Star key={i + 3} className="w-5 h-5 text-gray-300" />
-                        ))}
-                      </div>
-                      <span className="font-bold text-lg">4.0</span>
-                      <span className="text-gray-500 ml-2">(45 Reviews)</span>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Recommended Reviews</h2>
+                <Link href={`/business/${store.id}/reviews`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
+                  See all reviews
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+              
+              {isLoadingReviews ? (
+                <div className="animate-pulse">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                      <div className="h-6 bg-gray-200 rounded mb-4 w-32"></div>
+                      <div className="h-8 bg-gray-200 rounded mb-2 w-48"></div>
+                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                    </div>
+                    <div className="space-y-2">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="h-3 bg-gray-200 rounded"></div>
+                      ))}
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {[5, 4, 3, 2, 1].map((rating) => (
-                    <div key={rating} className="flex items-center text-sm">
-                      <span className="w-12">{rating} Stars</span>
-                      <div className="flex-1 mx-3 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-orange-400 rounded-full"
-                          style={{ width: rating === 5 ? '60%' : rating === 4 ? '30%' : '10%' }}
-                        ></div>
+              ) : reviews && reviews.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div>
+                      <div className="mb-4">
+                        <span className="text-sm text-gray-600">Overall rating</span>
+                        <div className="flex items-center mt-2">
+                          <div className="flex items-center mr-3">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star 
+                                key={star} 
+                                className={`w-5 h-5 ${
+                                  star <= Math.round(averageRating) 
+                                    ? 'fill-orange-400 text-orange-400' 
+                                    : 'text-gray-300'
+                                }`} 
+                              />
+                            ))}
+                          </div>
+                          <span className="font-bold text-lg">{averageRating.toFixed(1)}</span>
+                          <span className="text-gray-500 ml-2">({reviews.length} Reviews)</span>
+                        </div>
                       </div>
                     </div>
-                  ))}
+                    <div className="space-y-2">
+                      {[5, 4, 3, 2, 1].map((rating) => {
+                        const count = reviews.filter(r => r.rating === rating).length;
+                        const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                        return (
+                          <div key={rating} className="flex items-center text-sm">
+                            <span className="w-12">{rating} Stars</span>
+                            <div className="flex-1 mx-3 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-orange-400 rounded-full transition-all"
+                                style={{ width: `${percentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="w-12 text-right text-gray-500">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Recent Reviews */}
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-semibold text-gray-900">Recent Reviews</h3>
+                    {reviews.slice(0, 3).map((review) => (
+                      <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                            {review.user.image ? (
+                              <Image
+                                src={review.user.image}
+                                alt={review.user.name || "User"}
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <span className="text-lg font-bold text-white">
+                                {(review.user.name || "U").charAt(0)}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-medium text-gray-900">
+                                {review.user.name || "Anonymous User"}
+                              </span>
+                              <Badge variant="outline" className="text-xs">Verified</Badge>
+                              <span className="text-sm text-gray-500">
+                                {new Date(review.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center mb-3">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${
+                                    star <= review.rating
+                                      ? 'text-orange-400 fill-orange-400'
+                                      : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {reviews.length > 3 && (
+                    <div className="mt-6 text-center">
+                      <Link href={`/business/${store.id}/reviews`}>
+                        <Button variant="outline">
+                          View all {reviews.length} reviews
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-4">💬</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
+                  <p className="text-gray-600 mb-4">Be the first to share your experience!</p>
+                  <Link href={`/business/${store.id}/reviews/write`}>
+                    <Button className="bg-blue-600 hover:bg-blue-700">
+                      Write First Review
+                    </Button>
+                  </Link>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
           {/* Right Column - About Section (Sticky) */}
           <div className="w-80 sticky top-6 self-start">
-            <div className="bg-blue-50 rounded-2xl shadow-sm p-8">
+            <div className="bg-white rounded-2xl shadow-sm p-8">
               <h3 className="font-semibold text-gray-900 mb-6">About</h3>
               <div className="space-y-4">
                 <div className="flex items-center text-gray-700">
@@ -459,7 +623,7 @@ const BusinessPage = () => {
                 </button>
               </div>
 
-              <Button className="w-full mt-6 bg-gray-800 hover:bg-gray-900 text-white rounded-lg">
+              <Button className="w-full mt-6 hover:bg-gray-900 text-white rounded-lg">
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Send message
               </Button>
