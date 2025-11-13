@@ -522,7 +522,6 @@ const InfluencerCampaignManager = () => {
   const steps = [
     { id: 'basic-info', title: 'Basic Info', icon: <Users className="w-4 h-4" /> },
     { id: 'targets-goals', title: 'Targets & Goals', icon: <Target className="w-4 h-4" /> },
-    { id: 'campaign-objective', title: 'Campaign Objective', icon: <Target className="w-4 h-4" /> },
     { id: 'milestones', title: 'Milestones', icon: <Calendar className="w-4 h-4" /> },
     { id: 'deliverables', title: 'Deliverables', icon: <Package className="w-4 h-4" /> },
     { id: 'preview', title: 'Preview', icon: <Eye className="w-4 h-4" /> }
@@ -878,14 +877,7 @@ const InfluencerCampaignManager = () => {
         // Platforms requirement removed; proceed without platform selection
         break;
 
-      case 2: // Campaign Objective
-        if (!campaignData.campaignObjective) {
-          setSubmitError('Please select a campaign objective');
-          return false;
-        }
-        break;
-
-      case 3: // Milestones
+      case 2: // Milestones
         const validMilestones = campaignData.milestones.filter(m => m.title && m.dueDate);
         if (validMilestones.length === 0) {
           setSubmitError('Please add at least one milestone');
@@ -893,7 +885,7 @@ const InfluencerCampaignManager = () => {
         }
         break;
 
-      case 4: // Deliverables
+      case 3: // Deliverables
         const validDeliverables = campaignData.deliverables.filter(d => d.type && d.quantity > 0);
         if (validDeliverables.length === 0) {
           setSubmitError('Please add at least one deliverable');
@@ -1452,80 +1444,7 @@ const InfluencerCampaignManager = () => {
       </div>
 
       <div>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Budget & Timeline</h3>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="sm:col-span-2 lg:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Total Budget <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={campaignData.budget}
-              onChange={(e) => handleInputChange('budget', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-              placeholder="e.g., 5000"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
-            <select
-              value={campaignData.currency}
-              onChange={(e) => handleInputChange('currency', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-            >
-              <option>USD ($)</option>
-              <option>EUR (€)</option>
-              <option>GBP (£)</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start Date <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              value={campaignData.startDate}
-              onChange={(e) => handleInputChange('startDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              End Date <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              value={campaignData.endDate}
-              onChange={(e) => handleInputChange('endDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderCampaignObjective = () => (
-    <div className="space-y-8">
-      {/* Campaign Objective Section */}
-      <div>
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M13 3l3.293 3.293-7 7-1.586-1.586L13 3z"/>
-              <path d="m11 3.207-6.793 6.793 1.586 1.586L12 5.379 11 3.207z"/>
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Campaign Objective <span className="text-red-500">*</span>
-          </h1>
-        </div>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Campaign Objective</h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {/* App Installs */}
@@ -1692,7 +1611,63 @@ const InfluencerCampaignManager = () => {
         </div>
       </div>
 
+      <div>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Budget & Timeline</h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Total Budget <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={campaignData.budget}
+              onChange={(e) => handleInputChange('budget', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              placeholder="e.g., 5000"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+            <select
+              value={campaignData.currency}
+              onChange={(e) => handleInputChange('currency', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+            >
+              <option>USD ($)</option>
+              <option>EUR (€)</option>
+              <option>GBP (£)</option>
+            </select>
+          </div>
+        </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Start Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={campaignData.startDate}
+              onChange={(e) => handleInputChange('startDate', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              End Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={campaignData.endDate}
+              onChange={(e) => handleInputChange('endDate', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 
@@ -2254,10 +2229,9 @@ const InfluencerCampaignManager = () => {
     switch (currentStep) {
       case 0: return renderBasicInfo();
       case 1: return renderTargetsGoals();
-      case 2: return renderCampaignObjective();
-      case 3: return renderMilestones();
-      case 4: return renderDeliverables();
-      case 5: return renderPreview();
+      case 2: return renderMilestones();
+      case 3: return renderDeliverables();
+      case 4: return renderPreview();
       default: return renderBasicInfo();
     }
   };
