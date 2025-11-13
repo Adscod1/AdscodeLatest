@@ -19,8 +19,6 @@ export interface DiscountCampaignData {
 // Product campaign data
 export interface ProductCampaignData {
   productId?: string;
-  productLink?: string;
-  shopUrl: string;
   productTitle?: string;
   productPrice?: number;
   productImage?: string;

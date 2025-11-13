@@ -43,8 +43,6 @@ interface DiscountCampaignData {
 
 interface ProductCampaignData {
   productId?: string;
-  productLink?: string;
-  shopUrl?: string;
 }
 
 interface VideoCampaignData {
@@ -83,7 +81,6 @@ interface CampaignData {
   ageRange: string;
   gender: string;
   location: string;
-  contentStyle: string;
   campaignObjective: string;
   callToActions: CallToAction[];
   milestones: Milestone[];
@@ -93,6 +90,11 @@ interface CampaignData {
     name: string;
     handle: string;
     followers: string;
+    image?: string;
+    icon?: string;
+    category?: string;
+    engagement?: string;
+    rating?: string;
   }>;
 }
 
@@ -144,7 +146,6 @@ const InfluencerCampaignManager = () => {
     ageRange: '',
     gender: '',
     location: '',
-    contentStyle: '',
     campaignObjective: '',
     callToActions: [],
     milestones: [
@@ -390,8 +391,6 @@ const InfluencerCampaignManager = () => {
     setSelectedProduct(product);
     const productData: ProductCampaignData = {
       productId: product.id,
-      productLink: product.link || '',
-      shopUrl: product.shopUrl || ''
     };
     
     setCampaignData(prev => ({
@@ -400,28 +399,6 @@ const InfluencerCampaignManager = () => {
     }));
     
     setShowProductBrowser(false);
-  };
-
-  // Handle product link change (manual entry)
-  const handleProductLinkChange = (link: string) => {
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as ProductCampaignData || {}),
-        productLink: link
-      }
-    }));
-  };
-
-  // Handle shop URL change
-  const handleShopUrlChange = (url: string) => {
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as ProductCampaignData || {}),
-        shopUrl: url
-      }
-    }));
   };
 
   // Open product browser and fetch products
@@ -746,14 +723,11 @@ const InfluencerCampaignManager = () => {
 
       case 'PRODUCT':
         if (!campaignData.typeSpecificData) {
-          return { valid: false, error: 'Please select a product or provide product details' };
+          return { valid: false, error: 'Please select a product' };
         }
         const productData = campaignData.typeSpecificData as ProductCampaignData;
-        if (!productData.productId && !productData.productLink) {
-          return { valid: false, error: 'Either product selection or product link is required' };
-        }
-        if (productData.productLink && !productData.shopUrl) {
-          return { valid: false, error: 'Shop URL is required when using product link' };
+        if (!productData.productId) {
+          return { valid: false, error: 'Product selection is required' };
         }
         break;
 
@@ -875,7 +849,6 @@ const InfluencerCampaignManager = () => {
           awareness: campaignData.targets.filter(t => t.metric && t.value).map(t => `${t.metric}: ${t.value} ${t.unit}`),
           advocacy: [],
           conversions: [],
-          contentType: [campaignData.contentStyle].filter(Boolean),
         },
         type: campaignData.type,
         typeSpecificData: campaignData.typeSpecificData || undefined,
@@ -1107,22 +1080,6 @@ const InfluencerCampaignManager = () => {
               ))}
             </select>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Content Type <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={campaignData.contentStyle}
-              onChange={(e) => handleInputChange('contentStyle', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select a content type</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {/* Campaign Type Specific Forms - Inline Sections */}
@@ -1276,34 +1233,6 @@ const InfluencerCampaignManager = () => {
                   Browse Shop
                 </button>
               )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Link (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={campaignData.typeSpecificData && 'productLink' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).productLink : ''}
-                  onChange={(e) => handleProductLinkChange(e.target.value)}
-                  placeholder="https://example.com/product"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">Enter a direct link to the product (if not selected from shop)</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Shop URL (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={campaignData.typeSpecificData && 'shopUrl' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).shopUrl : ''}
-                  onChange={(e) => handleShopUrlChange(e.target.value)}
-                  placeholder="https://myshop.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">Your shop URL where the product is available</p>
-              </div>
             </div>
           </div>
         )}
@@ -2035,16 +1964,63 @@ const InfluencerCampaignManager = () => {
 
           {/* Selected Influencers List */}
           {campaignData.selectedInfluencers.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {campaignData.selectedInfluencers.map((influencer) => (
                 <div 
                   key={influencer.id} 
-                  className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                  className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
                 >
-                  <div>
-                    <p className="font-medium text-gray-900">{influencer.name}</p>
-                    <p className="text-sm text-gray-600">{influencer.handle} • {influencer.followers} followers</p>
+                  <div className="flex items-center gap-4 flex-1">
+                    {/* Profile Picture/Icon */}
+                    <div className="relative flex-shrink-0">
+                      {influencer.image ? (
+                        <img 
+                          src={influencer.image} 
+                          alt={influencer.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
+                          {influencer.icon || influencer.name.substring(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Influencer Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold text-gray-900">{influencer.name}</h4>
+                        <span className="text-sm text-gray-500">{influencer.followers}</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {influencer.category && influencer.category.split(',').map((cat, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
+                            {cat.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="hidden md:flex items-center gap-6 text-sm text-gray-500">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-400">Campaign Milestones</div>
+                        <div className="font-medium text-gray-700">0-5</div>
+                      </div>
+                      {influencer.engagement && (
+                        <div className="text-center">
+                          <div className="text-xs text-gray-400">Engagement Rate</div>
+                          <div className="font-medium text-gray-700">{influencer.engagement}</div>
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <div className="text-xs text-gray-400">Compensation Type</div>
+                        <div className="font-medium text-gray-700">Negotiable</div>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Remove Button */}
                   <button
                     onClick={() => {
                       setCampaignData({
@@ -2052,9 +2028,9 @@ const InfluencerCampaignManager = () => {
                         selectedInfluencers: campaignData.selectedInfluencers.filter(i => i.id !== influencer.id)
                       });
                     }}
-                    className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0 ml-4"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
               ))}
@@ -2065,40 +2041,6 @@ const InfluencerCampaignManager = () => {
               <p className="text-xs text-gray-500 mt-1">Click "Add Influencers" to discover and select creators for your campaign.</p>
             </div>
           )}
-        </div>
-
-        <Link 
-          href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}&step=1`}
-          className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-              <Users className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">Discover More Influencers</h3>
-              <p className="text-xs text-gray-500">Browse and select additional influencers for your campaign</p>
-            </div>
-          </div>
-          <ChevronLeft className="w-5 h-5 text-gray-400 rotate-180 group-hover:text-blue-600 transition-colors" />
-        </Link>
-      </div>
-
-      {/* Preferred Content Style */}
-      <div className="border-t border-gray-200 pt-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Preferred Content Style</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {['Casual & Authentic', 'Professional & Polished', 'Fun & Energetic', 'Educational', 'Minimalist'].map(style => (
-            <label key={style} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all group">
-              <input
-                type="checkbox"
-                checked={campaignData.contentStyle === style}
-                onChange={() => handleInputChange('contentStyle', style)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-              />
-              <span className="text-sm text-gray-700 group-hover:text-blue-600 transition-colors">{style}</span>
-            </label>
-          ))}
         </div>
       </div>
     </div>

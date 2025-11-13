@@ -27,7 +27,6 @@ export type CreateCampaignActionInput = {
     awareness?: string[];
     advocacy?: string[];
     conversions?: string[];
-    contentType?: string[];
   };
   type?: CampaignType;
   typeSpecificData?: TypeSpecificData;

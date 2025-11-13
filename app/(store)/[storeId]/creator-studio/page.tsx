@@ -1002,7 +1002,12 @@ const CreatorStudioDashboard = () => {
                             id: creator.id,
                             name: creator.name,
                             handle: creator.handle,
-                            followers: creator.followers
+                            followers: creator.followers,
+                            image: creator.image,
+                            icon: creator.icon,
+                            category: creator.category,
+                            engagement: creator.engagement,
+                            rating: creator.rating
                           };
                           if (!currentSelected.find((c: any) => c.id === creator.id)) {
                             currentSelected.push(creatorData);
