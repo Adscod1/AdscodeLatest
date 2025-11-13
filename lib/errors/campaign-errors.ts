@@ -64,13 +64,13 @@ export class InvalidTypeSpecificDataError extends CampaignTypeError {
  * Error thrown when product reference is invalid
  */
 export class InvalidProductReferenceError extends CampaignTypeError {
-  constructor(productId?: string, productLink?: string) {
-    const reference = productId ? `productId: ${productId}` : `productLink: ${productLink}`;
+  constructor(productId?: string) {
+    const reference = productId ? `productId: ${productId}` : 'unknown';
     super(
       `Product not found or doesn't belong to your store (${reference})`,
       "INVALID_PRODUCT_REFERENCE",
       404,
-      { productId, productLink }
+      { productId }
     );
     this.name = "InvalidProductReferenceError";
   }
@@ -340,14 +340,9 @@ export function validateTypeSpecificDataExists(
       break;
 
     case "PRODUCT":
-      if (!typeSpecificData.productId && !typeSpecificData.productLink) {
+      if (!typeSpecificData.productId) {
         throw new InvalidTypeSpecificDataError(campaignType, [
-          { message: "Either productId or productLink must be provided" },
-        ]);
-      }
-      if (!typeSpecificData.shopUrl) {
-        throw new InvalidTypeSpecificDataError(campaignType, [
-          { message: "shopUrl is required for PRODUCT campaigns" },
+          { message: "productId is required for PRODUCT campaigns" },
         ]);
       }
       break;

@@ -266,7 +266,7 @@ const CreatorNetworkForm: React.FC = () => {
   const followerRanges = [
     '1K - 10K',
     '10K - 50K',
-    '50K - 100K',
+    '50K',
     '100K - 500K',
     '500K - 1M',
     '1M+'

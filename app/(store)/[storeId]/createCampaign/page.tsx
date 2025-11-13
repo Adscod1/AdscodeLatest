@@ -27,13 +27,6 @@ interface Deliverable {
   description: string;
 }
 
-interface CallToAction {
-  action: string;
-  buttonText: string;
-  destinationUrl: string;
-  description: string;
-}
-
 // Type-specific campaign data interfaces
 interface DiscountCampaignData {
   discountId?: string;
@@ -43,8 +36,6 @@ interface DiscountCampaignData {
 
 interface ProductCampaignData {
   productId?: string;
-  productLink?: string;
-  shopUrl?: string;
 }
 
 interface VideoCampaignData {
@@ -83,9 +74,7 @@ interface CampaignData {
   ageRange: string;
   gender: string;
   location: string;
-  contentStyle: string;
   campaignObjective: string;
-  callToActions: CallToAction[];
   milestones: Milestone[];
   deliverables: Deliverable[];
   selectedInfluencers: Array<{
@@ -93,6 +82,11 @@ interface CampaignData {
     name: string;
     handle: string;
     followers: string;
+    image?: string;
+    icon?: string;
+    category?: string;
+    engagement?: string;
+    rating?: string;
   }>;
 }
 
@@ -144,9 +138,7 @@ const InfluencerCampaignManager = () => {
     ageRange: '',
     gender: '',
     location: '',
-    contentStyle: '',
     campaignObjective: '',
-    callToActions: [],
     milestones: [
       { title: 'Campaign Kickoff', description: '', dueDate: '' }
     ],
@@ -390,8 +382,6 @@ const InfluencerCampaignManager = () => {
     setSelectedProduct(product);
     const productData: ProductCampaignData = {
       productId: product.id,
-      productLink: product.link || '',
-      shopUrl: product.shopUrl || ''
     };
     
     setCampaignData(prev => ({
@@ -400,28 +390,6 @@ const InfluencerCampaignManager = () => {
     }));
     
     setShowProductBrowser(false);
-  };
-
-  // Handle product link change (manual entry)
-  const handleProductLinkChange = (link: string) => {
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as ProductCampaignData || {}),
-        productLink: link
-      }
-    }));
-  };
-
-  // Handle shop URL change
-  const handleShopUrlChange = (url: string) => {
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as ProductCampaignData || {}),
-        shopUrl: url
-      }
-    }));
   };
 
   // Open product browser and fetch products
@@ -554,7 +522,6 @@ const InfluencerCampaignManager = () => {
   const steps = [
     { id: 'basic-info', title: 'Basic Info', icon: <Users className="w-4 h-4" /> },
     { id: 'targets-goals', title: 'Targets & Goals', icon: <Target className="w-4 h-4" /> },
-    { id: 'campaign-objective', title: 'Campaign Objective', icon: <Target className="w-4 h-4" /> },
     { id: 'milestones', title: 'Milestones', icon: <Calendar className="w-4 h-4" /> },
     { id: 'deliverables', title: 'Deliverables', icon: <Package className="w-4 h-4" /> },
     { id: 'preview', title: 'Preview', icon: <Eye className="w-4 h-4" /> }
@@ -698,28 +665,7 @@ const InfluencerCampaignManager = () => {
     setCampaignData(prev => ({ ...prev, campaignObjective: objective }));
   };
 
-  const handleCTAChange = (index: number, field: keyof CallToAction, value: string) => {
-    const newCTAs = [...campaignData.callToActions];
-    newCTAs[index] = {
-      ...newCTAs[index],
-      [field]: value
-    };
-    setCampaignData(prev => ({ ...prev, callToActions: newCTAs }));
-  };
 
-  const addCTA = () => {
-    setCampaignData(prev => ({
-      ...prev,
-      callToActions: [...prev.callToActions, { action: '', buttonText: '', destinationUrl: '', description: '' }]
-    }));
-  };
-
-  const removeCTA = (index: number) => {
-    setCampaignData(prev => ({
-      ...prev,
-      callToActions: prev.callToActions.filter((_, i) => i !== index)
-    }));
-  };
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
@@ -746,14 +692,11 @@ const InfluencerCampaignManager = () => {
 
       case 'PRODUCT':
         if (!campaignData.typeSpecificData) {
-          return { valid: false, error: 'Please select a product or provide product details' };
+          return { valid: false, error: 'Please select a product' };
         }
         const productData = campaignData.typeSpecificData as ProductCampaignData;
-        if (!productData.productId && !productData.productLink) {
-          return { valid: false, error: 'Either product selection or product link is required' };
-        }
-        if (productData.productLink && !productData.shopUrl) {
-          return { valid: false, error: 'Shop URL is required when using product link' };
+        if (!productData.productId) {
+          return { valid: false, error: 'Product selection is required' };
         }
         break;
 
@@ -875,7 +818,6 @@ const InfluencerCampaignManager = () => {
           awareness: campaignData.targets.filter(t => t.metric && t.value).map(t => `${t.metric}: ${t.value} ${t.unit}`),
           advocacy: [],
           conversions: [],
-          contentType: [campaignData.contentStyle].filter(Boolean),
         },
         type: campaignData.type,
         typeSpecificData: campaignData.typeSpecificData || undefined,
@@ -886,7 +828,23 @@ const InfluencerCampaignManager = () => {
 
       if (result.success) {
         // Clear localStorage on success
-        localStorage.removeItem(`campaign-draft-${storeId}`);
+        try {
+          // Clear draft campaign data
+          localStorage.removeItem(`draft_campaign_${storeId}`);
+          
+          // Clear selected influencers data
+          if (campaignData.title) {
+            localStorage.removeItem(`campaign_${campaignData.title}`);
+          }
+          
+          // Clear any other campaign-related data
+          const keysToRemove = Object.keys(localStorage).filter(key => 
+            key.includes('draft_campaign') || key.includes('campaign_')
+          );
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+        } catch (error) {
+          console.error('Error clearing localStorage:', error);
+        }
         
         // Success! Redirect to campaigns list
         router.push(`/${storeId}/campaign`);
@@ -935,14 +893,7 @@ const InfluencerCampaignManager = () => {
         // Platforms requirement removed; proceed without platform selection
         break;
 
-      case 2: // Campaign Objective
-        if (!campaignData.campaignObjective) {
-          setSubmitError('Please select a campaign objective');
-          return false;
-        }
-        break;
-
-      case 3: // Milestones
+      case 2: // Milestones
         const validMilestones = campaignData.milestones.filter(m => m.title && m.dueDate);
         if (validMilestones.length === 0) {
           setSubmitError('Please add at least one milestone');
@@ -950,7 +901,7 @@ const InfluencerCampaignManager = () => {
         }
         break;
 
-      case 4: // Deliverables
+      case 3: // Deliverables
         const validDeliverables = campaignData.deliverables.filter(d => d.type && d.quantity > 0);
         if (validDeliverables.length === 0) {
           setSubmitError('Please add at least one deliverable');
@@ -1107,22 +1058,6 @@ const InfluencerCampaignManager = () => {
               ))}
             </select>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Content Type <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={campaignData.contentStyle}
-              onChange={(e) => handleInputChange('contentStyle', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select a content type</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {/* Campaign Type Specific Forms - Inline Sections */}
@@ -1268,42 +1203,16 @@ const InfluencerCampaignManager = () => {
                   </div>
                 </div>
               ) : (
-                <button 
-                  onClick={openProductBrowser}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                >
-                  <Package className="w-5 h-5" />
-                  Browse Shop
-                </button>
+                <div className="flex justify-center">
+                  <button 
+                    onClick={openProductBrowser}
+                    className="w-1/2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    <Package className="w-5 h-5" />
+                    Browse Shop
+                  </button>
+                </div>
               )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Link (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={campaignData.typeSpecificData && 'productLink' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).productLink : ''}
-                  onChange={(e) => handleProductLinkChange(e.target.value)}
-                  placeholder="https://example.com/product"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">Enter a direct link to the product (if not selected from shop)</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Shop URL (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={campaignData.typeSpecificData && 'shopUrl' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as ProductCampaignData).shopUrl : ''}
-                  onChange={(e) => handleShopUrlChange(e.target.value)}
-                  placeholder="https://myshop.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">Your shop URL where the product is available</p>
-              </div>
             </div>
           </div>
         )}
@@ -1553,80 +1462,7 @@ const InfluencerCampaignManager = () => {
       </div>
 
       <div>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Budget & Timeline</h3>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="sm:col-span-2 lg:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Total Budget <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={campaignData.budget}
-              onChange={(e) => handleInputChange('budget', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-              placeholder="e.g., 5000"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
-            <select
-              value={campaignData.currency}
-              onChange={(e) => handleInputChange('currency', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-            >
-              <option>USD ($)</option>
-              <option>EUR (€)</option>
-              <option>GBP (£)</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start Date <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              value={campaignData.startDate}
-              onChange={(e) => handleInputChange('startDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              End Date <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              value={campaignData.endDate}
-              onChange={(e) => handleInputChange('endDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderCampaignObjective = () => (
-    <div className="space-y-8">
-      {/* Campaign Objective Section */}
-      <div>
-        <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M13 3l3.293 3.293-7 7-1.586-1.586L13 3z"/>
-              <path d="m11 3.207-6.793 6.793 1.586 1.586L12 5.379 11 3.207z"/>
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Campaign Objective <span className="text-red-500">*</span>
-          </h1>
-        </div>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Campaign Objective</h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {/* App Installs */}
@@ -1793,163 +1629,62 @@ const InfluencerCampaignManager = () => {
         </div>
       </div>
 
-      {/* Call-to-Action Section */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
-        <div className="flex items-center mb-4 sm:mb-6">
-          <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 shrink-0">
-            <Plus className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+      <div>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Budget & Timeline</h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Total Budget <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={campaignData.budget}
+              onChange={(e) => handleInputChange('budget', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              placeholder="e.g., 5000"
+            />
           </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Add Call-to-Action <span className="text-red-500">*</span>
-          </h2>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+            <select
+              value={campaignData.currency}
+              onChange={(e) => handleInputChange('currency', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+            >
+              <option>USD ($)</option>
+              <option>EUR (€)</option>
+              <option>GBP (£)</option>
+            </select>
+          </div>
         </div>
 
-        {campaignData.callToActions.length === 0 && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CTA Action <span className="text-red-500">*</span>
-                </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base">
-                  <option value="">Select Campaign Action</option>
-                  <option value="app-download">App Download</option>
-                  <option value="website-visit">Website Visit</option>
-                  <option value="product-purchase">Product Purchase</option>
-                  <option value="sign-up">Sign Up</option>
-                  <option value="contact-us">Contact Us</option>
-                  <option value="book-appointment">Book Appointment</option>
-                  <option value="watch-video">Watch Video</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Button Text <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter button text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Destination URL
-              </label>
-              <input
-                type="url"
-                placeholder="https://example.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                rows={3}
-                placeholder="Brief explanation of what happens when users click"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <button
-              onClick={addCTA}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Add CTA
-            </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Start Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={campaignData.startDate}
+              onChange={(e) => handleInputChange('startDate', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
-        )}
-
-        {campaignData.callToActions.length > 0 && (
-          <div className="space-y-6">
-            {campaignData.callToActions.map((cta, index) => (
-              <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">Call-to-Action {index + 1}</h3>
-                  <button 
-                    onClick={() => removeCTA(index)}
-                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      CTA Action <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={cta.action}
-                      onChange={(e) => handleCTAChange(index, 'action', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Campaign Action</option>
-                      <option value="app-download">App Download</option>
-                      <option value="website-visit">Website Visit</option>
-                      <option value="product-purchase">Product Purchase</option>
-                      <option value="sign-up">Sign Up</option>
-                      <option value="contact-us">Contact Us</option>
-                      <option value="book-appointment">Book Appointment</option>
-                      <option value="watch-video">Watch Video</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Button Text <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={cta.buttonText}
-                      onChange={(e) => handleCTAChange(index, 'buttonText', e.target.value)}
-                      placeholder="Enter button text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Destination URL
-                  </label>
-                  <input
-                    type="url"
-                    value={cta.destinationUrl}
-                    onChange={(e) => handleCTAChange(index, 'destinationUrl', e.target.value)}
-                    placeholder="https://example.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={cta.description}
-                    onChange={(e) => handleCTAChange(index, 'description', e.target.value)}
-                    placeholder="Brief explanation of what happens when users click"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            ))}
-
-            <button
-              onClick={addCTA}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Another CTA
-            </button>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              End Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={campaignData.endDate}
+              onChange={(e) => handleInputChange('endDate', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -2022,7 +1757,7 @@ const InfluencerCampaignManager = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-base font-semibold text-gray-900">Target Influencers</h3>
-              <p className="text-sm text-gray-500">Selected influencers for this campaign</p>
+              <p className="text-sm text-gray-500">Browse and select influencers for your campaign</p>
             </div>
             <Link 
               href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}&step=1`}
@@ -2035,27 +1770,120 @@ const InfluencerCampaignManager = () => {
 
           {/* Selected Influencers List */}
           {campaignData.selectedInfluencers.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {campaignData.selectedInfluencers.map((influencer) => (
                 <div 
                   key={influencer.id} 
-                  className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                  className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
                 >
-                  <div>
-                    <p className="font-medium text-gray-900">{influencer.name}</p>
-                    <p className="text-sm text-gray-600">{influencer.handle} • {influencer.followers} followers</p>
+                  <div className="flex items-center gap-4 flex-1">
+                    {/* Profile Picture/Icon */}
+                    <div className="relative flex-shrink-0">
+                      {influencer.image ? (
+                        <img 
+                          src={influencer.image} 
+                          alt={influencer.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
+                          {influencer.icon || influencer.name.substring(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      {/* Verified Badge */}
+                      <div className="absolute -bottom-0.5 -right-0.5">
+                        <svg 
+                          className="w-4 h-4" 
+                          viewBox="0,0,256,256"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g 
+                            fill="#228be6" 
+                            fillRule="nonzero" 
+                            stroke="none" 
+                            strokeWidth="1" 
+                            strokeLinecap="butt" 
+                            strokeLinejoin="miter" 
+                            strokeMiterlimit="10" 
+                            strokeDasharray="" 
+                            strokeDashoffset="0" 
+                            fontFamily="none" 
+                            fontWeight="none" 
+                            fontSize="none" 
+                            textAnchor="none" 
+                            style={{mixBlendMode: 'normal'}}
+                          >
+                            <g transform="scale(8.53333,8.53333)">
+                              <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                            </g>
+                          </g>
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Influencer Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold text-gray-900">{influencer.name}</h4>
+                        <span className="text-sm text-gray-500">
+                          {influencer.followers?.includes('-') 
+                            ? influencer.followers.split('-')[0].trim() 
+                            : influencer.followers}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {influencer.category && influencer.category.split(',').map((cat, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
+                            {cat.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="hidden md:flex items-center gap-6 text-sm text-gray-500">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-400">Campaign Milestones</div>
+                        <div className="font-medium text-gray-700">0-5</div>
+                      </div>
+                      {influencer.engagement && (
+                        <div className="text-center">
+                          <div className="text-xs text-gray-400">Engagement Rate</div>
+                          <div className="font-medium text-gray-700">{influencer.engagement}</div>
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <div className="text-xs text-gray-400">Performance Score</div>
+                        <div className="font-medium text-gray-700">85%</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-400">Estimate Price</div>
+                        <div className="font-medium text-gray-700">$100 - $200</div>
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      setCampaignData({
-                        ...campaignData,
-                        selectedInfluencers: campaignData.selectedInfluencers.filter(i => i.id !== influencer.id)
-                      });
-                    }}
-                    className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+
+                  {/* View Profile & Remove Buttons */}
+                  <div className="flex gap-2 ml-4">
+                    <Link
+                      href={`/${storeId}/campaign/1/influencers/profile`}
+                      className="px-3 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-2"
+                    >
+                      {/* <Eye className="w-4 h-4" /> */}
+                      Profile
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setCampaignData({
+                          ...campaignData,
+                          selectedInfluencers: campaignData.selectedInfluencers.filter(i => i.id !== influencer.id)
+                        });
+                      }}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -2065,40 +1893,6 @@ const InfluencerCampaignManager = () => {
               <p className="text-xs text-gray-500 mt-1">Click "Add Influencers" to discover and select creators for your campaign.</p>
             </div>
           )}
-        </div>
-
-        <Link 
-          href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}&step=1`}
-          className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-              <Users className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">Discover More Influencers</h3>
-              <p className="text-xs text-gray-500">Browse and select additional influencers for your campaign</p>
-            </div>
-          </div>
-          <ChevronLeft className="w-5 h-5 text-gray-400 rotate-180 group-hover:text-blue-600 transition-colors" />
-        </Link>
-      </div>
-
-      {/* Preferred Content Style */}
-      <div className="border-t border-gray-200 pt-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Preferred Content Style</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {['Casual & Authentic', 'Professional & Polished', 'Fun & Energetic', 'Educational', 'Minimalist'].map(style => (
-            <label key={style} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all group">
-              <input
-                type="checkbox"
-                checked={campaignData.contentStyle === style}
-                onChange={() => handleInputChange('contentStyle', style)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-              />
-              <span className="text-sm text-gray-700 group-hover:text-blue-600 transition-colors">{style}</span>
-            </label>
-          ))}
         </div>
       </div>
     </div>
@@ -2453,10 +2247,9 @@ const InfluencerCampaignManager = () => {
     switch (currentStep) {
       case 0: return renderBasicInfo();
       case 1: return renderTargetsGoals();
-      case 2: return renderCampaignObjective();
-      case 3: return renderMilestones();
-      case 4: return renderDeliverables();
-      case 5: return renderPreview();
+      case 2: return renderMilestones();
+      case 3: return renderDeliverables();
+      case 4: return renderPreview();
       default: return renderBasicInfo();
     }
   };
@@ -2505,12 +2298,12 @@ const InfluencerCampaignManager = () => {
           </div>
           
           {/* Desktop Tab Navigation - Wallet Style */}
-          <div className="hidden sm:flex border-b border-gray-200">
+          <div className="hidden sm:flex border-b border-gray-200 overflow-x-auto">
             {steps.map((step, index) => (
               <button
                 key={step.id}
                 onClick={() => setCurrentStep(index)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3.5 px-4 border-b-2 transition-all relative ${
+                className={`flex items-center justify-center gap-2 py-3.5 px-3 border-b-2 transition-all relative whitespace-nowrap flex-shrink-0 ${
                   currentStep === index
                     ? 'border-blue-600 text-blue-600 bg-white'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -2519,11 +2312,13 @@ const InfluencerCampaignManager = () => {
                 <span className={`${currentStep === index ? 'text-blue-600' : 'text-gray-400'}`}>
                   {step.icon}
                 </span>
-                <span className={`font-medium text-sm ${currentStep === index ? 'text-blue-600' : 'text-gray-600'}`}>
+                <span className={`font-medium text-xs sm:text-sm ${currentStep === index ? 'text-blue-600' : 'text-gray-600'}`}>
                   {step.title}
                 </span>
                 {index < currentStep && (
-                  <CheckCircle className="w-4 h-4 text-green-500 absolute top-2 right-2" />
+                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
                 )}
               </button>
             ))}

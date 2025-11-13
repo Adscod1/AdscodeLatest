@@ -24,14 +24,6 @@ export const discountCampaignDataSchema = z.object({
 // Product campaign data schema
 export const productCampaignDataSchema = z.object({
   productId: z.string().uuid().optional(),
-  productLink: z.string().optional().refine(
-    (val) => !val || val === '' || z.string().url().safeParse(val).success,
-    { message: "Invalid product link URL" }
-  ),
-  shopUrl: z.string().optional().refine(
-    (val) => !val || val === '' || z.string().url().safeParse(val).success,
-    { message: "Invalid shop URL" }
-  ),
   productTitle: z.string().optional(),
   productPrice: z.number().positive().optional(),
   productImage: z.string().url().optional(),
@@ -119,7 +111,6 @@ export const createCampaignSchema = z.object({
     awareness: z.array(z.string()).optional(),
     advocacy: z.array(z.string()).optional(),
     conversions: z.array(z.string()).optional(),
-    contentType: z.array(z.string()).optional(),
   }).optional(), // Made optional since UI may not collect all target data
   type: z.enum(["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"], {
     required_error: "Campaign type is required",
@@ -148,7 +139,6 @@ export const updateCampaignSchema = z.object({
     awareness: z.array(z.string()).optional(),
     advocacy: z.array(z.string()).optional(),
     conversions: z.array(z.string()).optional(),
-    contentType: z.array(z.string()).optional(),
   }).optional(),
   type: z.enum(["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"], {
     invalid_type_error: "Invalid campaign type",
