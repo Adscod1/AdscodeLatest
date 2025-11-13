@@ -828,7 +828,23 @@ const InfluencerCampaignManager = () => {
 
       if (result.success) {
         // Clear localStorage on success
-        localStorage.removeItem(`campaign-draft-${storeId}`);
+        try {
+          // Clear draft campaign data
+          localStorage.removeItem(`draft_campaign_${storeId}`);
+          
+          // Clear selected influencers data
+          if (campaignData.title) {
+            localStorage.removeItem(`campaign_${campaignData.title}`);
+          }
+          
+          // Clear any other campaign-related data
+          const keysToRemove = Object.keys(localStorage).filter(key => 
+            key.includes('draft_campaign') || key.includes('campaign_')
+          );
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+        } catch (error) {
+          console.error('Error clearing localStorage:', error);
+        }
         
         // Success! Redirect to campaigns list
         router.push(`/${storeId}/campaign`);
@@ -1187,13 +1203,15 @@ const InfluencerCampaignManager = () => {
                   </div>
                 </div>
               ) : (
-                <button 
-                  onClick={openProductBrowser}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                >
-                  <Package className="w-5 h-5" />
-                  Browse Shop
-                </button>
+                <div className="flex justify-center">
+                  <button 
+                    onClick={openProductBrowser}
+                    className="w-1/2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    <Package className="w-5 h-5" />
+                    Browse Shop
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -2298,7 +2316,9 @@ const InfluencerCampaignManager = () => {
                   {step.title}
                 </span>
                 {index < currentStep && (
-                  <CheckCircle className="w-4 h-4 text-green-500 absolute top-1 right-1" />
+                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
                 )}
               </button>
             ))}
