@@ -337,17 +337,6 @@ const InfluencerCampaignManager = () => {
     }
   };
 
-  // Handle video caption change
-  const handleVideoCaptionChange = (caption: string) => {
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as VideoCampaignData),
-        caption
-      }
-    }));
-  };
-
   // Fetch products from store
   const fetchProducts = async () => {
     setIsLoadingProducts(true);
@@ -438,85 +427,14 @@ const InfluencerCampaignManager = () => {
     }));
   };
 
-  // Validate profile URL
-  const validateProfileUrl = (url: string): boolean => {
-    if (!url) {
-      setProfileUrlError('Profile URL is required');
-      return false;
-    }
-
-    try {
-      const urlObj = new URL(url);
-      
-      // Check if it's a valid social media profile URL
-      const validDomains = [
-        'instagram.com',
-        'tiktok.com',
-        'youtube.com',
-        'twitter.com',
-        'facebook.com',
-        'linkedin.com',
-        'twitch.tv'
-      ];
-
-      const isValidDomain = validDomains.some(domain => 
-        urlObj.hostname.includes(domain)
-      );
-
-      if (!isValidDomain) {
-        setProfileUrlError('Please enter a valid social media profile URL');
-        return false;
-      }
-
-      setProfileUrlError('');
-      return true;
-    } catch (error) {
-      setProfileUrlError('Please enter a valid URL (e.g., https://instagram.com/username)');
-      return false;
-    }
+  // Profile URL handler (removed - feature disabled)
+  const handleProfileUrlChange = (_url: string) => {
+    // Feature disabled
   };
 
-  // Handle profile URL change
-  const handleProfileUrlChange = (url: string) => {
-    setProfileUrl(url);
-    
-    if (url) {
-      validateProfileUrl(url);
-      
-      const profileData: ProfileCampaignData = {
-        profileUrl: url,
-        targetMetrics: {
-          followers: targetFollowers ? parseInt(targetFollowers) : undefined,
-          engagement: targetEngagement ? parseInt(targetEngagement) : undefined,
-          reach: targetReach ? parseInt(targetReach) : undefined
-        }
-      };
-      
-      setCampaignData(prev => ({
-        ...prev,
-        typeSpecificData: profileData
-      }));
-    }
-  };
-
-  // Handle target metrics change
-  const handleTargetMetricChange = (metric: 'followers' | 'engagement' | 'reach', value: string) => {
-    const numValue = value ? parseInt(value) : undefined;
-    
-    if (metric === 'followers') setTargetFollowers(value);
-    if (metric === 'engagement') setTargetEngagement(value);
-    if (metric === 'reach') setTargetReach(value);
-
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as ProfileCampaignData || { profileUrl }),
-        targetMetrics: {
-          ...((prev.typeSpecificData as ProfileCampaignData)?.targetMetrics || {}),
-          [metric]: numValue
-        }
-      }
-    }));
+  // Target metrics handler (removed - feature disabled)
+  const handleTargetMetricChange = (_metric: 'followers' | 'engagement' | 'reach', _value: string) => {
+    // Feature disabled
   };
 
   const steps = [
@@ -1146,19 +1064,6 @@ const InfluencerCampaignManager = () => {
                   </div>
                 )}
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Video Caption or Campaign Brief <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  value={campaignData.typeSpecificData && 'caption' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as VideoCampaignData).caption : ''}
-                  onChange={(e) => handleVideoCaptionChange(e.target.value)}
-                  placeholder="Add a video caption or campaign brief..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
             </div>
           </div>
         )}
@@ -1229,40 +1134,7 @@ const InfluencerCampaignManager = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Profile Campaign Setup</h3>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Profile URL <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="url"
-                  value={profileUrl}
-                  onChange={(e) => handleProfileUrlChange(e.target.value)}
-                  onBlur={(e) => validateProfileUrl(e.target.value)}
-                  placeholder="https://instagram.com/yourprofile"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
-                    profileUrlError 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300 focus:ring-blue-500'
-                  }`}
-                />
-                {profileUrlError ? (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {profileUrlError}
-                  </p>
-                ) : profileUrl && !profileUrlError ? (
-                  <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
-                    Valid profile URL
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter Instagram, TikTok, YouTube, Twitter, Facebook, LinkedIn, or Twitch profile URL
-                  </p>
-                )}
-              </div>
-
-              {profileUrl && !profileUrlError && (
+              {false && profileUrl && !profileUrlError && (
                 <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
