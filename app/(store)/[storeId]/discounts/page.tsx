@@ -127,7 +127,7 @@ export default function CouponsPage() {
       case 'view':
         // Navigate to coupon details
         console.log('Navigating to:', `/${storeId}/coupons/${coupon.id}`);
-        router.push(`/${storeId}/coupons/${coupon.id}`);
+        router.push(`/${storeId}/discounts/${coupon.id}`);
         break;
       case 'edit':
         // Navigate to edit coupon
@@ -153,7 +153,7 @@ export default function CouponsPage() {
         <div className="flex items-center justify-between">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Coupons & Discounts</h1>
         <Link
-                href={`/${storeId}/coupons/new`}
+                href={`/${storeId}/discounts/new`}
                 className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-gray-100 hover:text-gray-800 transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />

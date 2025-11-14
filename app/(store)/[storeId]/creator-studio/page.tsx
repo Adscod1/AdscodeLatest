@@ -157,7 +157,7 @@ const CreatorStudioDashboard = () => {
     { icon: BarChart3, label: 'Analytics', path: 'Analytics' },
     { icon: Users, label: 'Competitor Analysis', path: 'Competitor Analysis' },
     { icon: MessageCircle, label: 'Sentiment Analysis', path: 'Sentiment Analysis' },
-    { icon: Target, label: 'Coupons', path: 'Coupons' }
+    { icon: Target, label: 'Discounts', path: 'Discounts' }
   ];
 
   const tabs = ['Discovery', 'Calender', 'Applications', 'Content', 'Analytics'];
