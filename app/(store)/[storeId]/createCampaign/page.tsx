@@ -1,9 +1,24 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, X } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, X, ChevronsUpDown, Check, Search, ShoppingBag } from 'lucide-react';
+import { Command as CommandPrimitive } from "cmdk";
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { createCampaign } from '@/actions/campaign';
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 // Campaign type enum matching backend
 type CampaignType = 'PRODUCT' | 'DISCOUNT' | 'VIDEO' | 'PROFILE';
@@ -119,6 +134,8 @@ const InfluencerCampaignManager = () => {
   const [targetReach, setTargetReach] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [currencySearch, setCurrencySearch] = useState("");
   const [campaignData, setCampaignData] = useState<CampaignData>({
     title: '',
     category: '',
@@ -450,6 +467,56 @@ const InfluencerCampaignManager = () => {
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
   const campaignTypes = ['Product Campaign', 'Discount Campaign', 'Video Campaign', 'Profile Campaign'];
   const metricOptions = ['Reach', 'Views', 'Sales', 'Clicks', 'Conversion Rate', 'Engagement Rate', 'Reviews'];
+
+  // African currencies
+  const africanCurrencies = [
+    { value: 'DZD (د.ج)', label: 'Algerian Dinar (DZD)', country: 'Algeria' },
+    { value: 'AOA (Kz)', label: 'Angolan Kwanza (AOA)', country: 'Angola' },
+    { value: 'BWP (P)', label: 'Botswana Pula (BWP)', country: 'Botswana' },
+    { value: 'BIF (Fr)', label: 'Burundian Franc (BIF)', country: 'Burundi' },
+    { value: 'CVE ($)', label: 'Cape Verdean Escudo (CVE)', country: 'Cape Verde' },
+    { value: 'XAF (Fr)', label: 'Central African CFA Franc (XAF)', country: 'Central Africa' },
+    { value: 'XOF (Fr)', label: 'West African CFA Franc (XOF)', country: 'West Africa' },
+    { value: 'KMF (Fr)', label: 'Comorian Franc (KMF)', country: 'Comoros' },
+    { value: 'CDF (Fr)', label: 'Congolese Franc (CDF)', country: 'DR Congo' },
+    { value: 'DJF (Fr)', label: 'Djiboutian Franc (DJF)', country: 'Djibouti' },
+    { value: 'EGP (£)', label: 'Egyptian Pound (EGP)', country: 'Egypt' },
+    { value: 'ERN (Nfk)', label: 'Eritrean Nakfa (ERN)', country: 'Eritrea' },
+    { value: 'SZL (L)', label: 'Eswatini Lilangeni (SZL)', country: 'Eswatini' },
+    { value: 'ETB (Br)', label: 'Ethiopian Birr (ETB)', country: 'Ethiopia' },
+    { value: 'GMD (D)', label: 'Gambian Dalasi (GMD)', country: 'Gambia' },
+    { value: 'GHS (₵)', label: 'Ghanaian Cedi (GHS)', country: 'Ghana' },
+    { value: 'GNF (Fr)', label: 'Guinean Franc (GNF)', country: 'Guinea' },
+    { value: 'KES (KSh)', label: 'Kenyan Shilling (KES)', country: 'Kenya' },
+    { value: 'LSL (L)', label: 'Lesotho Loti (LSL)', country: 'Lesotho' },
+    { value: 'LRD ($)', label: 'Liberian Dollar (LRD)', country: 'Liberia' },
+    { value: 'LYD (ل.د)', label: 'Libyan Dinar (LYD)', country: 'Libya' },
+    { value: 'MGA (Ar)', label: 'Malagasy Ariary (MGA)', country: 'Madagascar' },
+    { value: 'MWK (MK)', label: 'Malawian Kwacha (MWK)', country: 'Malawi' },
+    { value: 'MRU (UM)', label: 'Mauritanian Ouguiya (MRU)', country: 'Mauritania' },
+    { value: 'MUR (₨)', label: 'Mauritian Rupee (MUR)', country: 'Mauritius' },
+    { value: 'MAD (د.م.)', label: 'Moroccan Dirham (MAD)', country: 'Morocco' },
+    { value: 'MZN (MT)', label: 'Mozambican Metical (MZN)', country: 'Mozambique' },
+    { value: 'NAD ($)', label: 'Namibian Dollar (NAD)', country: 'Namibia' },
+    { value: 'NGN (₦)', label: 'Nigerian Naira (NGN)', country: 'Nigeria' },
+    { value: 'RWF (Fr)', label: 'Rwandan Franc (RWF)', country: 'Rwanda' },
+    { value: 'STN (Db)', label: 'São Tomé and Príncipe Dobra (STN)', country: 'São Tomé' },
+    { value: 'SCR (₨)', label: 'Seychellois Rupee (SCR)', country: 'Seychelles' },
+    { value: 'SLL (Le)', label: 'Sierra Leonean Leone (SLL)', country: 'Sierra Leone' },
+    { value: 'SOS (Sh)', label: 'Somali Shilling (SOS)', country: 'Somalia' },
+    { value: 'ZAR (R)', label: 'South African Rand (ZAR)', country: 'South Africa' },
+    { value: 'SSP (£)', label: 'South Sudanese Pound (SSP)', country: 'South Sudan' },
+    { value: 'SDG (ج.س.)', label: 'Sudanese Pound (SDG)', country: 'Sudan' },
+    { value: 'TZS (TSh)', label: 'Tanzanian Shilling (TZS)', country: 'Tanzania' },
+    { value: 'TND (د.ت)', label: 'Tunisian Dinar (TND)', country: 'Tunisia' },
+    { value: 'UGX (USh)', label: 'Ugandan Shilling (UGX)', country: 'Uganda' },
+    { value: 'ZMW (ZK)', label: 'Zambian Kwacha (ZMW)', country: 'Zambia' },
+    { value: 'ZWL ($)', label: 'Zimbabwean Dollar (ZWL)', country: 'Zimbabwe' },
+    // Add common international currencies for reference
+    { value: 'USD ($)', label: 'US Dollar (USD)', country: 'United States' },
+    { value: 'EUR (€)', label: 'Euro (EUR)', country: 'European Union' },
+    { value: 'GBP (£)', label: 'British Pound (GBP)', country: 'United Kingdom' },
+  ];
 
   // Helper function to get appropriate unit based on metric
   const getUnitForMetric = (metric: string): string => {
@@ -1069,17 +1136,8 @@ const InfluencerCampaignManager = () => {
         )}
 
         {campaignData.campaignType === 'Product Campaign' && (
-          <div className="mt-6 border-t-2 border-green-200 pt-6">
+          <div className="mt-6">
             <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Product Campaign Setup</h3>
-              </div>
-
               {selectedProduct ? (
                 <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
                   <div className="flex items-center gap-3">
@@ -1108,15 +1166,13 @@ const InfluencerCampaignManager = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-center">
-                  <button 
-                    onClick={openProductBrowser}
-                    className="w-1/2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                  >
-                    <Package className="w-5 h-5" />
-                    Browse Shop
-                  </button>
-                </div>
+                <button 
+                  onClick={openProductBrowser}
+                  className="w-[50%] bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  Browse Shop
+                </button>
               )}
             </div>
           </div>
@@ -1800,15 +1856,74 @@ const InfluencerCampaignManager = () => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
-            <select
-              value={campaignData.currency}
-              onChange={(e) => handleInputChange('currency', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-            >
-              <option>USD ($)</option>
-              <option>EUR (€)</option>
-              <option>GBP (£)</option>
-            </select>
+            <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={currencyOpen}
+                  className="w-full justify-between px-3 py-2 h-auto border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                >
+                  {campaignData.currency || "Select currency..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start" side="bottom">
+                <Command>
+                  <div className="p-2">
+                    <div className="relative">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <CommandPrimitive.Input
+                        value={currencySearch}
+                        onValueChange={setCurrencySearch}
+                        placeholder="Search currency..."
+                        className="h-10 w-full rounded-md border border-gray-300 bg-white pl-9 pr-9 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      />
+                      {campaignData.currency && (
+                        <button
+                          type="button"
+                          aria-label="Clear selection"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          onClick={() => {
+                            handleInputChange('currency', '');
+                            setCurrencySearch('');
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <CommandList className="max-h-[300px]">
+                    <CommandEmpty>No currency found.</CommandEmpty>
+                    <CommandGroup>
+                      {africanCurrencies.map((currency) => (
+                        <CommandItem
+                          key={currency.value}
+                          value={currency.label}
+                          onSelect={() => {
+                            handleInputChange('currency', currency.value);
+                            setCurrencyOpen(false);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              campaignData.currency === currency.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">{currency.label}</span>
+                            <span className="text-xs text-gray-500">{currency.country}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
