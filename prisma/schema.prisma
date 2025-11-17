@@ -22,6 +22,7 @@ model User {
   sessions      Session[]
   Store         Store[]
   notifications Notification[]
+  comments      Comment[]
 
   @@map("user")
 }
@@ -203,6 +204,7 @@ model Product {
   images               ProductImage[]
   variations           ProductVariation[]
   videos               ProductVideo[]
+  comments             Comment[]
 
   @@index([storeId], map: "product_storeId_fkey")
   @@map("product")
@@ -239,6 +241,21 @@ model ProductVideo {
 
   @@index([productId], map: "product_video_productId_fkey")
   @@map("product_video")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "comment_userId_fkey")
+  @@index([productId], map: "comment_productId_fkey")
+  @@map("comment")
 }
 
 model StoreActivity {

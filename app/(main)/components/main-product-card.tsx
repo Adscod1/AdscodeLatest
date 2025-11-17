@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Heart,
@@ -14,6 +17,7 @@ import Image from "next/image";
 import { Product } from "@prisma/client";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
+import { CommentsModal } from "@/components/CommentsModal";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const SoftStar = ({ filled }: { filled: boolean }) => (
@@ -101,13 +105,19 @@ interface ExtendedProduct extends Product {
     id: string;
     url: string;
   }[];
+  _count?: {
+    comments: number;
+  };
 }
 
 export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
+  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
+  const [commentCount, setCommentCount] = useState(product._count?.comments || 0);
+
   // Mock engagement data - replace with real data from your database
   const engagementData = {
     likes: "8.2M",
-    comments: "3.1M",
+    comments: commentCount > 0 ? commentCount.toString() : "0",
     views: "12.5M",
     shares: "2.8M",
     bookmarks: "6.7M",
@@ -116,7 +126,35 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   // Calculate review count (mock data - replace with actual reviews)
   const reviewCount = 324;
 
+  const handleCommentsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCommentsModalOpen(true);
+  };
+
+  // Update comment count when modal closes and comments were added
+  const handleModalClose = (open: boolean) => {
+    setIsCommentsModalOpen(open);
+    if (!open) {
+      // Refresh comment count when modal closes
+      fetchCommentCount();
+    }
+  };
+
+  const fetchCommentCount = async () => {
+    try {
+      const response = await fetch(`/api/comments/${product.id}`);
+      const data = await response.json();
+      if (data.success) {
+        setCommentCount(data.count);
+      }
+    } catch (error) {
+      console.error('Failed to fetch comment count:', error);
+    }
+  };
+
   return (
+    <>
     <Link href={`/product/${product.id}`} className="block">
       <Card className="w-full border border-gray-200 rounded-lg overflow-hidden bg-white hover:bg-gray-50 transition-shadow duration-300 p-0 cursor-pointer ">
         {/* Header with store info */}
@@ -217,7 +255,10 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
             <Heart className="w-4 h-4" />
             <span className="text-sm ">{engagementData.likes}</span>
           </button>
-          <button className="flex items-center gap-1 hover:text-blue-500 transition-colors">
+          <button 
+            className="flex items-center gap-1 hover:text-blue-500 transition-colors"
+            onClick={handleCommentsClick}
+          >
             <MessageCircle className="w-4 h-4" />
             <span className="text-sm ">{engagementData.comments}</span>
           </button>
@@ -237,5 +278,15 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       </div>
   </Card>
     </Link>
+
+      {/* Comments Modal */}
+      <CommentsModal
+        open={isCommentsModalOpen}
+        onOpenChange={handleModalClose}
+        productId={product.id}
+        productTitle={product.title}
+        onCommentAdded={() => setCommentCount(commentCount + 1)}
+      />
+    </>
   );
 };

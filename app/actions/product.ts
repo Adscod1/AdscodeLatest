@@ -13,6 +13,11 @@ export const getProducts = async (storeId: string) => {
         images: true,
         videos: true,
         store: true,
+        _count: {
+          select: {
+            comments: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
