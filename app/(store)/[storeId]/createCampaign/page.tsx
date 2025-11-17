@@ -98,6 +98,50 @@ interface CampaignData {
   }>;
 }
 
+// Helper function to get objectives based on campaign type
+const getCampaignObjectivesByType = (campaignType: string): Record<string, { label: string; description: string }> => {
+  switch (campaignType) {
+    case 'Product Campaign':
+    case 'PRODUCT':
+      return {
+        'ugc-content': { label: 'UGC Content', description: 'Generate user-generated content and reviews' },
+        'website-traffic': { label: 'Website Traffic', description: 'Drive more visitors to your website or landing page' },
+        'product-reviews': { label: 'Product Reviews', description: 'Generate honest product reviews and feedback' },
+        'product-purchases': { label: 'Product Purchases', description: 'Boost online product sales and conversions' },
+        'app-installs': { label: 'App Installs', description: 'Drive mobile app downloads and installations' },
+        'lead-generation': { label: 'Lead Generation', description: 'Capture potential customer information and contacts' },
+        'bookings': { label: 'Bookings', description: 'Generate service bookings and appointments' },
+        'event-responses': { label: 'Event Responses', description: 'Promote events and increase attendance RSVPs' },
+      };
+    
+    case 'Discount Campaign':
+    case 'DISCOUNT':
+      return {
+        'product-purchases': { label: 'Product Purchases', description: 'Boost online product sales and conversions' },
+        'ugc-content': { label: 'UGC Content', description: 'Generate user-generated content and reviews' },
+        'product-reviews': { label: 'Product Reviews', description: 'Generate honest product reviews and feedback' },
+        'catalog-sales': { label: 'Catalog Sales', description: 'Promote products from your catalog inventory' },
+        'store-visits': { label: 'Store Visits', description: 'Drive foot traffic to physical store locations' },
+      };
+    
+    case 'Profile Campaign':
+    case 'PROFILE':
+      return {
+        'brand-awareness': { label: 'Brand Awareness', description: 'Increase visibility and recognition of your brand' },
+        'engagement': { label: 'Engagement', description: 'Boost likes, comments, shares and interactions' },
+        'website-traffic': { label: 'Website Traffic', description: 'Drive more visitors to your website or landing page' },
+        'messages': { label: 'Messages', description: 'Encourage direct conversations and inquiries' },
+        'store-visits': { label: 'Store Visits', description: 'Drive foot traffic to physical store locations' },
+        'product-reviews': { label: 'Product Reviews', description: 'Generate honest product reviews and feedback' },
+        'bookings': { label: 'Bookings', description: 'Generate service bookings and appointments' },
+        'lead-generation': { label: 'Lead Generation', description: 'Capture potential customer information and contacts' },
+      };
+    
+    default:
+      return {};
+  }
+};
+
 const InfluencerCampaignManager = () => {
   const params = useParams();
   const router = useRouter();
@@ -1197,418 +1241,84 @@ const InfluencerCampaignManager = () => {
       <div>
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6">Campaign Objective</h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Brand Awareness */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'brand-awareness' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('brand-awareness')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'brand-awareness' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'brand-awareness' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Brand Awareness</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Increase visibility and recognition of your brand</p>
-              </div>
-              {campaignData.campaignObjective === 'brand-awareness' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
+        {!campaignData.campaignType ? (
+          <div className="p-6 border border-dashed border-gray-300 rounded-lg bg-gray-50 text-center">
+            <p className="text-sm text-gray-600 font-medium">Please select a campaign type first</p>
+            <p className="text-xs text-gray-500 mt-1">Campaign objectives will be available once you choose a campaign type above</p>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(getCampaignObjectivesByType(campaignData.campaignType)).map(([objectiveKey, { label, description }]) => {
+              const getIconSVG = () => {
+                switch (objectiveKey) {
+                  case 'brand-awareness':
+                    return <><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></>;
+                  case 'lead-generation':
+                    return <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>;
+                  case 'website-traffic':
+                    return <path fillRule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.415l.707-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clipRule="evenodd"/>;
+                  case 'app-installs':
+                    return <path fillRule="evenodd" d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zm3 14a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>;
+                  case 'engagement':
+                    return <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>;
+                  case 'messages':
+                    return <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd"/>;
+                  case 'product-purchases':
+                    return <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>;
+                  case 'catalog-sales':
+                    return <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd"/>;
+                  case 'store-visits':
+                    return <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>;
+                  case 'calls':
+                    return <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>;
+                  case 'bookings':
+                    return <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />;
+                  case 'event-responses':
+                    return <><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="M22 2l-2.24.75a2.9 2.9 0 0 0-1.96 3.12v0c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="M22 13l-.82-.33c-.86-.34-1.82.2-1.98 1.11v0c-.11.7-.72 1.22-1.43 1.22H17"/><path d="M11 2l.33.82c.34.86-.2 1.82-1.11 1.98v0C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/></>;
+                  case 'ugc-content':
+                    return <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />;
+                  case 'product-reviews':
+                    return <path fillRule="evenodd" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" clipRule="evenodd" />;
+                  default:
+                    return <circle cx="10" cy="10" r="1"/>;
+                }
+              };
 
-          {/* Lead Generation */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'lead-generation' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('lead-generation')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'lead-generation' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'lead-generation' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Lead Generation</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Capture potential customer information and contacts</p>
-              </div>
-              {campaignData.campaignObjective === 'lead-generation' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+              return (
+                <div 
+                  key={objectiveKey}
+                  className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+                    campaignData.campaignObjective === objectiveKey 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => handleObjectiveChange(objectiveKey)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      campaignData.campaignObjective === objectiveKey ? 'bg-blue-500' : 'bg-gray-100'
+                    }`}>
+                      <svg className={`w-4 h-4 ${
+                        campaignData.campaignObjective === objectiveKey ? 'text-white' : 'text-gray-600'
+                      }`} fill="currentColor" viewBox="0 0 20 20">
+                        {getIconSVG()}
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base font-semibold text-gray-900 mb-1">{label}</h4>
+                      <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+                    </div>
+                    {campaignData.campaignObjective === objectiveKey && (
+                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
+              );
+            })}
           </div>
-
-          {/* Website Traffic */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'website-traffic' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('website-traffic')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'website-traffic' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'website-traffic' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.415l.707-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clipRule="evenodd"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Website Traffic</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Drive more visitors to your website or landing page</p>
-              </div>
-              {campaignData.campaignObjective === 'website-traffic' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* App Installs */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'app-installs' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('app-installs')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'app-installs' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'app-installs' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zm3 14a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">App Installs</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Drive mobile app downloads and installations</p>
-              </div>
-              {campaignData.campaignObjective === 'app-installs' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Engagement */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'engagement' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('engagement')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'engagement' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'engagement' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Engagement</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Boost likes, comments, shares and interactions</p>
-              </div>
-              {campaignData.campaignObjective === 'engagement' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'messages' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('messages')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'messages' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'messages' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Messages</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Encourage direct conversations and inquiries</p>
-              </div>
-              {campaignData.campaignObjective === 'messages' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Product Purchases */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'product-purchases' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('product-purchases')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'product-purchases' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'product-purchases' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Product Purchases</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Boost online product sales and conversions</p>
-              </div>
-              {campaignData.campaignObjective === 'product-purchases' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Catalog Sales */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'catalog-sales' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('catalog-sales')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'catalog-sales' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'catalog-sales' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Catalog Sales</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Promote products from your catalog inventory</p>
-              </div>
-              {campaignData.campaignObjective === 'catalog-sales' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Store Visits */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'store-visits' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('store-visits')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'store-visits' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'store-visits' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Store Visits</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Drive foot traffic to physical store locations</p>
-              </div>
-              {campaignData.campaignObjective === 'store-visits' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Calls */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'calls' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('calls')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'calls' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'calls' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Calls</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Drive phone calls and direct inquiries</p>
-              </div>
-              {campaignData.campaignObjective === 'calls' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Bookings */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'bookings' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('bookings')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'bookings' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'bookings' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Bookings</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Generate service bookings and appointments</p>
-              </div>
-              {campaignData.campaignObjective === 'bookings' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Event Responses */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'event-responses' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('event-responses')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'event-responses' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'event-responses' ? 'text-white' : 'text-gray-600'
-                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5.8 11.3 2 22l10.7-3.79"/>
-                  <path d="M4 3h.01"/>
-                  <path d="M22 8h.01"/>
-                  <path d="M15 2h.01"/>
-                  <path d="M22 20h.01"/>
-                  <path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12v0c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/>
-                  <path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11v0c-.11.7-.72 1.22-1.43 1.22H17"/>
-                  <path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98v0C9.52 4.9 9 5.52 9 6.23V7"/>
-                  <path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Event Responses</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Promote events and increase attendance RSVPs</p>
-              </div>
-              {campaignData.campaignObjective === 'event-responses' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* UGC Content */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'ugc-content' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('ugc-content')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'ugc-content' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'ugc-content' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">UGC Content</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Generate user-generated content and reviews</p>
-              </div>
-              {campaignData.campaignObjective === 'ugc-content' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       <div>
