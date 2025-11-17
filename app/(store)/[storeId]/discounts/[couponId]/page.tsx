@@ -65,7 +65,7 @@ export default function CouponDetailsPage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <Link
-              href={`/${storeId}/coupons`}
+              href={`/${storeId}/discounts`}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft className="w-4 h-4" />

@@ -54,7 +54,7 @@ export default function CreateCouponModal() {
   };
 
   const handleClose = () => {
-    router.push(`/${storeId}/coupons`);
+    router.push(`/${storeId}/discounts`);
   };
 
   return (

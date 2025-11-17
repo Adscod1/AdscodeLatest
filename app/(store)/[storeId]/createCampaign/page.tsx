@@ -1,12 +1,27 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, X } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, CheckCircle, Clock, AlertCircle, X, ChevronsUpDown, Check, Search, ShoppingBag } from 'lucide-react';
+import { Command as CommandPrimitive } from "cmdk";
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { createCampaign } from '@/actions/campaign';
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 // Campaign type enum matching backend
-type CampaignType = 'PRODUCT' | 'DISCOUNT' | 'VIDEO' | 'PROFILE';
+type CampaignType = 'PRODUCT' | 'DISCOUNT' | 'PROFILE';
 
 // Define types for the campaign data
 interface Target {
@@ -38,13 +53,6 @@ interface ProductCampaignData {
   productId?: string;
 }
 
-interface VideoCampaignData {
-  videoUrl: string;
-  videoSize: number;
-  videoFormat: string;
-  caption: string;
-}
-
 interface ProfileCampaignData {
   profileUrl: string;
   targetMetrics?: {
@@ -54,7 +62,7 @@ interface ProfileCampaignData {
   };
 }
 
-type TypeSpecificData = DiscountCampaignData | ProductCampaignData | VideoCampaignData | ProfileCampaignData | null;
+type TypeSpecificData = DiscountCampaignData | ProductCampaignData | ProfileCampaignData | null;
 
 interface CampaignData {
   title: string;
@@ -101,9 +109,6 @@ const InfluencerCampaignManager = () => {
   const initialStep = returnStep ? parseInt(returnStep) : 0;
 
   const [currentStep, setCurrentStep] = useState(initialStep);
-  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
-  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [showProductBrowser, setShowProductBrowser] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
@@ -119,6 +124,8 @@ const InfluencerCampaignManager = () => {
   const [targetReach, setTargetReach] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [currencySearch, setCurrencySearch] = useState("");
   const [campaignData, setCampaignData] = useState<CampaignData>({
     title: '',
     category: '',
@@ -246,106 +253,11 @@ const InfluencerCampaignManager = () => {
         return 'PRODUCT';
       case 'Discount Campaign':
         return 'DISCOUNT';
-      case 'Video Campaign':
-        return 'VIDEO';
       case 'Profile Campaign':
         return 'PROFILE';
       default:
         return 'PRODUCT';
     }
-  };
-
-  // Handle video file upload
-  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const validTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
-    if (!validTypes.includes(file.type)) {
-      setUploadError('Invalid file type. Please upload MP4, MOV, AVI, or WEBM files.');
-      return;
-    }
-
-    // Validate file size (500MB max)
-    const maxSize = 500 * 1024 * 1024; // 500MB in bytes
-    if (file.size > maxSize) {
-      setUploadError('File size exceeds 500MB limit.');
-      return;
-    }
-
-    setIsUploadingVideo(true);
-    setUploadError(null);
-    setVideoUploadProgress(0);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);  // Changed from 'video' to 'file'
-      formData.append('caption', ''); // Optional caption
-
-      const xhr = new XMLHttpRequest();
-
-      // Track upload progress
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          const progress = Math.round((e.loaded / e.total) * 100);
-          setVideoUploadProgress(progress);
-        }
-      });
-
-      // Handle upload completion
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          const videoData: VideoCampaignData = {
-            videoUrl: response.videoUrl,
-            videoSize: response.videoSize,
-            videoFormat: response.videoFormat,
-            caption: ''
-          };
-          
-          setCampaignData(prev => ({
-            ...prev,
-            typeSpecificData: videoData
-          }));
-          
-          setIsUploadingVideo(false);
-          setVideoUploadProgress(0);
-        } else {
-          const error = JSON.parse(xhr.responseText);
-          setUploadError(error.error || 'Upload failed. Please try again.');
-          setIsUploadingVideo(false);
-          setVideoUploadProgress(0);
-        }
-      });
-
-      // Handle upload error
-      xhr.addEventListener('error', () => {
-        setUploadError('Network error. Please check your connection and try again.');
-        setIsUploadingVideo(false);
-        setVideoUploadProgress(0);
-      });
-
-      xhr.open('POST', '/api/campaigns/upload-video');
-      xhr.send(formData);
-
-    } catch (error) {
-      console.error('Video upload error:', error);
-      setUploadError('An unexpected error occurred. Please try again.');
-      setIsUploadingVideo(false);
-      setVideoUploadProgress(0);
-    }
-  };
-
-  // Handle video caption change
-  const handleVideoCaptionChange = (caption: string) => {
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as VideoCampaignData),
-        caption
-      }
-    }));
   };
 
   // Fetch products from store
@@ -438,85 +350,14 @@ const InfluencerCampaignManager = () => {
     }));
   };
 
-  // Validate profile URL
-  const validateProfileUrl = (url: string): boolean => {
-    if (!url) {
-      setProfileUrlError('Profile URL is required');
-      return false;
-    }
-
-    try {
-      const urlObj = new URL(url);
-      
-      // Check if it's a valid social media profile URL
-      const validDomains = [
-        'instagram.com',
-        'tiktok.com',
-        'youtube.com',
-        'twitter.com',
-        'facebook.com',
-        'linkedin.com',
-        'twitch.tv'
-      ];
-
-      const isValidDomain = validDomains.some(domain => 
-        urlObj.hostname.includes(domain)
-      );
-
-      if (!isValidDomain) {
-        setProfileUrlError('Please enter a valid social media profile URL');
-        return false;
-      }
-
-      setProfileUrlError('');
-      return true;
-    } catch (error) {
-      setProfileUrlError('Please enter a valid URL (e.g., https://instagram.com/username)');
-      return false;
-    }
+  // Profile URL handler (removed - feature disabled)
+  const handleProfileUrlChange = (_url: string) => {
+    // Feature disabled
   };
 
-  // Handle profile URL change
-  const handleProfileUrlChange = (url: string) => {
-    setProfileUrl(url);
-    
-    if (url) {
-      validateProfileUrl(url);
-      
-      const profileData: ProfileCampaignData = {
-        profileUrl: url,
-        targetMetrics: {
-          followers: targetFollowers ? parseInt(targetFollowers) : undefined,
-          engagement: targetEngagement ? parseInt(targetEngagement) : undefined,
-          reach: targetReach ? parseInt(targetReach) : undefined
-        }
-      };
-      
-      setCampaignData(prev => ({
-        ...prev,
-        typeSpecificData: profileData
-      }));
-    }
-  };
-
-  // Handle target metrics change
-  const handleTargetMetricChange = (metric: 'followers' | 'engagement' | 'reach', value: string) => {
-    const numValue = value ? parseInt(value) : undefined;
-    
-    if (metric === 'followers') setTargetFollowers(value);
-    if (metric === 'engagement') setTargetEngagement(value);
-    if (metric === 'reach') setTargetReach(value);
-
-    setCampaignData(prev => ({
-      ...prev,
-      typeSpecificData: {
-        ...(prev.typeSpecificData as ProfileCampaignData || { profileUrl }),
-        targetMetrics: {
-          ...((prev.typeSpecificData as ProfileCampaignData)?.targetMetrics || {}),
-          [metric]: numValue
-        }
-      }
-    }));
+  // Target metrics handler (removed - feature disabled)
+  const handleTargetMetricChange = (_metric: 'followers' | 'engagement' | 'reach', _value: string) => {
+    // Feature disabled
   };
 
   const steps = [
@@ -530,8 +371,58 @@ const InfluencerCampaignManager = () => {
   const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Snapchat', 'Twitch', 'Pinterest', 'Facebook'];
   const deliverableTypes = ['Post', 'Story', 'Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
-  const campaignTypes = ['Product Campaign', 'Discount Campaign', 'Video Campaign', 'Profile Campaign'];
+  const campaignTypes = ['Product Campaign', 'Discount Campaign', 'Profile Campaign'];
   const metricOptions = ['Reach', 'Views', 'Sales', 'Clicks', 'Conversion Rate', 'Engagement Rate', 'Reviews'];
+
+  // African currencies
+  const africanCurrencies = [
+    { value: 'DZD (د.ج)', label: 'Algerian Dinar (DZD)', country: 'Algeria' },
+    { value: 'AOA (Kz)', label: 'Angolan Kwanza (AOA)', country: 'Angola' },
+    { value: 'BWP (P)', label: 'Botswana Pula (BWP)', country: 'Botswana' },
+    { value: 'BIF (Fr)', label: 'Burundian Franc (BIF)', country: 'Burundi' },
+    { value: 'CVE ($)', label: 'Cape Verdean Escudo (CVE)', country: 'Cape Verde' },
+    { value: 'XAF (Fr)', label: 'Central African CFA Franc (XAF)', country: 'Central Africa' },
+    { value: 'XOF (Fr)', label: 'West African CFA Franc (XOF)', country: 'West Africa' },
+    { value: 'KMF (Fr)', label: 'Comorian Franc (KMF)', country: 'Comoros' },
+    { value: 'CDF (Fr)', label: 'Congolese Franc (CDF)', country: 'DR Congo' },
+    { value: 'DJF (Fr)', label: 'Djiboutian Franc (DJF)', country: 'Djibouti' },
+    { value: 'EGP (£)', label: 'Egyptian Pound (EGP)', country: 'Egypt' },
+    { value: 'ERN (Nfk)', label: 'Eritrean Nakfa (ERN)', country: 'Eritrea' },
+    { value: 'SZL (L)', label: 'Eswatini Lilangeni (SZL)', country: 'Eswatini' },
+    { value: 'ETB (Br)', label: 'Ethiopian Birr (ETB)', country: 'Ethiopia' },
+    { value: 'GMD (D)', label: 'Gambian Dalasi (GMD)', country: 'Gambia' },
+    { value: 'GHS (₵)', label: 'Ghanaian Cedi (GHS)', country: 'Ghana' },
+    { value: 'GNF (Fr)', label: 'Guinean Franc (GNF)', country: 'Guinea' },
+    { value: 'KES (KSh)', label: 'Kenyan Shilling (KES)', country: 'Kenya' },
+    { value: 'LSL (L)', label: 'Lesotho Loti (LSL)', country: 'Lesotho' },
+    { value: 'LRD ($)', label: 'Liberian Dollar (LRD)', country: 'Liberia' },
+    { value: 'LYD (ل.د)', label: 'Libyan Dinar (LYD)', country: 'Libya' },
+    { value: 'MGA (Ar)', label: 'Malagasy Ariary (MGA)', country: 'Madagascar' },
+    { value: 'MWK (MK)', label: 'Malawian Kwacha (MWK)', country: 'Malawi' },
+    { value: 'MRU (UM)', label: 'Mauritanian Ouguiya (MRU)', country: 'Mauritania' },
+    { value: 'MUR (₨)', label: 'Mauritian Rupee (MUR)', country: 'Mauritius' },
+    { value: 'MAD (د.م.)', label: 'Moroccan Dirham (MAD)', country: 'Morocco' },
+    { value: 'MZN (MT)', label: 'Mozambican Metical (MZN)', country: 'Mozambique' },
+    { value: 'NAD ($)', label: 'Namibian Dollar (NAD)', country: 'Namibia' },
+    { value: 'NGN (₦)', label: 'Nigerian Naira (NGN)', country: 'Nigeria' },
+    { value: 'RWF (Fr)', label: 'Rwandan Franc (RWF)', country: 'Rwanda' },
+    { value: 'STN (Db)', label: 'São Tomé and Príncipe Dobra (STN)', country: 'São Tomé' },
+    { value: 'SCR (₨)', label: 'Seychellois Rupee (SCR)', country: 'Seychelles' },
+    { value: 'SLL (Le)', label: 'Sierra Leonean Leone (SLL)', country: 'Sierra Leone' },
+    { value: 'SOS (Sh)', label: 'Somali Shilling (SOS)', country: 'Somalia' },
+    { value: 'ZAR (R)', label: 'South African Rand (ZAR)', country: 'South Africa' },
+    { value: 'SSP (£)', label: 'South Sudanese Pound (SSP)', country: 'South Sudan' },
+    { value: 'SDG (ج.س.)', label: 'Sudanese Pound (SDG)', country: 'Sudan' },
+    { value: 'TZS (TSh)', label: 'Tanzanian Shilling (TZS)', country: 'Tanzania' },
+    { value: 'TND (د.ت)', label: 'Tunisian Dinar (TND)', country: 'Tunisia' },
+    { value: 'UGX (USh)', label: 'Ugandan Shilling (UGX)', country: 'Uganda' },
+    { value: 'ZMW (ZK)', label: 'Zambian Kwacha (ZMW)', country: 'Zambia' },
+    { value: 'ZWL ($)', label: 'Zimbabwean Dollar (ZWL)', country: 'Zimbabwe' },
+    // Add common international currencies for reference
+    { value: 'USD ($)', label: 'US Dollar (USD)', country: 'United States' },
+    { value: 'EUR (€)', label: 'Euro (EUR)', country: 'European Union' },
+    { value: 'GBP (£)', label: 'British Pound (GBP)', country: 'United Kingdom' },
+  ];
 
   // Helper function to get appropriate unit based on metric
   const getUnitForMetric = (metric: string): string => {
@@ -677,19 +568,6 @@ const InfluencerCampaignManager = () => {
     }
 
     switch (campaignData.type) {
-      case 'VIDEO':
-        if (!campaignData.typeSpecificData || !('videoUrl' in campaignData.typeSpecificData)) {
-          return { valid: false, error: 'Please upload a video for Video Campaign' };
-        }
-        const videoData = campaignData.typeSpecificData as VideoCampaignData;
-        if (!videoData.caption || videoData.caption.trim() === '') {
-          return { valid: false, error: 'Video caption is required' };
-        }
-        if (videoData.videoSize > 500 * 1024 * 1024) {
-          return { valid: false, error: 'Video size must not exceed 500MB' };
-        }
-        break;
-
       case 'PRODUCT':
         if (!campaignData.typeSpecificData) {
           return { valid: false, error: 'Please select a product' };
@@ -1061,120 +939,10 @@ const InfluencerCampaignManager = () => {
         </div>
 
         {/* Campaign Type Specific Forms - Inline Sections */}
-        {campaignData.campaignType === 'Video Campaign' && (
-          <div className="mt-6 border-t-2 border-blue-200 pt-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Video Campaign Setup</h3>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload Video <span className="text-red-500">*</span>
-                </label>
-                
-                {!campaignData.typeSpecificData && !isUploadingVideo && (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                    <input 
-                      type="file" 
-                      accept="video/mp4,video/quicktime,video/x-msvideo,video/webm" 
-                      className="hidden" 
-                      id="video-upload"
-                      onChange={handleVideoUpload}
-                      disabled={isUploadingVideo}
-                    />
-                    <label htmlFor="video-upload" className="cursor-pointer">
-                      <div className="text-gray-400 mb-2">
-                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">Click to upload video</p>
-                      <p className="text-xs text-gray-500 mt-1">MP4, MOV, AVI, or WEBM (max 500MB)</p>
-                    </label>
-                  </div>
-                )}
-
-                {isUploadingVideo && (
-                  <div className="border-2 border-blue-300 rounded-lg p-8 text-center bg-blue-50">
-                    <div className="text-blue-600 mb-2">
-                      <svg className="w-12 h-12 mx-auto animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                    </div>
-                    <p className="text-sm text-blue-700 font-medium mb-2">Uploading video...</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${videoUploadProgress}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-blue-600">{videoUploadProgress}%</p>
-                  </div>
-                )}
-
-                {campaignData.typeSpecificData && 'videoUrl' in campaignData.typeSpecificData && (
-                  <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
-                        <CheckCircle className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-green-900">Video uploaded successfully</p>
-                        <p className="text-xs text-green-700 mt-1">
-                          {((campaignData.typeSpecificData as VideoCampaignData).videoSize / (1024 * 1024)).toFixed(2)} MB · {(campaignData.typeSpecificData as VideoCampaignData).videoFormat}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setCampaignData(prev => ({ ...prev, typeSpecificData: null }))}
-                        className="text-green-700 hover:text-green-900"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {uploadError && (
-                  <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-700">{uploadError}</p>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Video Caption or Campaign Brief <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  value={campaignData.typeSpecificData && 'caption' in campaignData.typeSpecificData ? (campaignData.typeSpecificData as VideoCampaignData).caption : ''}
-                  onChange={(e) => handleVideoCaptionChange(e.target.value)}
-                  placeholder="Add a video caption or campaign brief..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
         {campaignData.campaignType === 'Product Campaign' && (
-          <div className="mt-6 border-t-2 border-green-200 pt-6">
+          <div className="mt-6">
             <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Product Campaign Setup</h3>
-              </div>
-
               {selectedProduct ? (
                 <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
                   <div className="flex items-center gap-3">
@@ -1203,15 +971,13 @@ const InfluencerCampaignManager = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-center">
-                  <button 
-                    onClick={openProductBrowser}
-                    className="w-1/2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                  >
-                    <Package className="w-5 h-5" />
-                    Browse Shop
-                  </button>
-                </div>
+                <button 
+                  onClick={openProductBrowser}
+                  className="w-[50%] bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  Browse Shop
+                </button>
               )}
             </div>
           </div>
@@ -1229,40 +995,7 @@ const InfluencerCampaignManager = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Profile Campaign Setup</h3>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Profile URL <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="url"
-                  value={profileUrl}
-                  onChange={(e) => handleProfileUrlChange(e.target.value)}
-                  onBlur={(e) => validateProfileUrl(e.target.value)}
-                  placeholder="https://instagram.com/yourprofile"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
-                    profileUrlError 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300 focus:ring-blue-500'
-                  }`}
-                />
-                {profileUrlError ? (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {profileUrlError}
-                  </p>
-                ) : profileUrl && !profileUrlError ? (
-                  <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
-                    Valid profile URL
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter Instagram, TikTok, YouTube, Twitter, Facebook, LinkedIn, or Twitch profile URL
-                  </p>
-                )}
-              </div>
-
-              {profileUrl && !profileUrlError && (
+              {false && profileUrl && !profileUrlError && (
                 <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
@@ -1462,169 +1195,418 @@ const InfluencerCampaignManager = () => {
       </div>
 
       <div>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Campaign Objective</h3>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6">Campaign Objective</h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Brand Awareness */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'brand-awareness' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('brand-awareness')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'brand-awareness' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'brand-awareness' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Brand Awareness</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Increase visibility and recognition of your brand</p>
+              </div>
+              {campaignData.campaignObjective === 'brand-awareness' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Lead Generation */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'lead-generation' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('lead-generation')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'lead-generation' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'lead-generation' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Lead Generation</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Capture potential customer information and contacts</p>
+              </div>
+              {campaignData.campaignObjective === 'lead-generation' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Website Traffic */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'website-traffic' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('website-traffic')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'website-traffic' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'website-traffic' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.415l.707-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Website Traffic</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Drive more visitors to your website or landing page</p>
+              </div>
+              {campaignData.campaignObjective === 'website-traffic' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* App Installs */}
           <div 
-            className={`relative p-4 sm:p-6 border-2 rounded-lg cursor-pointer transition-all ${
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
               campaignData.campaignObjective === 'app-installs' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => handleObjectiveChange('app-installs')}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shrink-0">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                  </svg>
-                </div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">App Installs</h3>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'app-installs' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'app-installs' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zm3 14a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">App Installs</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Drive mobile app downloads and installations</p>
               </div>
               {campaignData.campaignObjective === 'app-installs' && (
-                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                 </div>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-gray-600">Drive mobile app downloads and installations</p>
           </div>
 
-          {/* Video Views */}
+          {/* Engagement */}
           <div 
-            className={`relative p-4 sm:p-6 border-2 rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'video-views' 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'engagement' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
-            onClick={() => handleObjectiveChange('video-views')}
+            onClick={() => handleObjectiveChange('engagement')}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-2 sm:mr-3 shrink-0">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                  </svg>
-                </div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Video Views</h3>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'engagement' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'engagement' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>
+                </svg>
               </div>
-              {campaignData.campaignObjective === 'video-views' && (
-                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Engagement</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Boost likes, comments, shares and interactions</p>
+              </div>
+              {campaignData.campaignObjective === 'engagement' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                 </div>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-gray-600">Increase video content engagement and reach</p>
           </div>
 
-          {/* Bookings */}
+          {/* Messages */}
           <div 
-            className={`relative p-6 border-2 rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'bookings' 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'messages' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
-            onClick={() => handleObjectiveChange('bookings')}
+            onClick={() => handleObjectiveChange('messages')}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Bookings</h3>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'messages' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'messages' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd"/>
+                </svg>
               </div>
-              {campaignData.campaignObjective === 'bookings' && (
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Messages</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Encourage direct conversations and inquiries</p>
+              </div>
+              {campaignData.campaignObjective === 'messages' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-600">Generate service bookings and appointments</p>
-          </div>
-
-          {/* Calls */}
-          <div 
-            className={`relative p-6 border-2 rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'calls' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('calls')}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Calls</h3>
-              </div>
-              {campaignData.campaignObjective === 'calls' && (
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                </div>
-              )}
-            </div>
-            <p className="text-sm text-gray-600">Drive phone calls and direct inquiries</p>
           </div>
 
           {/* Product Purchases */}
           <div 
-            className={`relative p-6 border-2 rounded-lg cursor-pointer transition-all ${
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
               campaignData.campaignObjective === 'product-purchases' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => handleObjectiveChange('product-purchases')}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Product Purchases</h3>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'product-purchases' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'product-purchases' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Product Purchases</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Boost online product sales and conversions</p>
               </div>
               {campaignData.campaignObjective === 'product-purchases' && (
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-600">Boost product sales and conversions</p>
+          </div>
+
+          {/* Catalog Sales */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'catalog-sales' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('catalog-sales')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'catalog-sales' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'catalog-sales' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Catalog Sales</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Promote products from your catalog inventory</p>
+              </div>
+              {campaignData.campaignObjective === 'catalog-sales' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Store Visits */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'store-visits' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('store-visits')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'store-visits' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'store-visits' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Store Visits</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Drive foot traffic to physical store locations</p>
+              </div>
+              {campaignData.campaignObjective === 'store-visits' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Calls */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'calls' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('calls')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'calls' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'calls' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Calls</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Drive phone calls and direct inquiries</p>
+              </div>
+              {campaignData.campaignObjective === 'calls' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bookings */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'bookings' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('bookings')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'bookings' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'bookings' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Bookings</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Generate service bookings and appointments</p>
+              </div>
+              {campaignData.campaignObjective === 'bookings' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Event Responses */}
+          <div 
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+              campaignData.campaignObjective === 'event-responses' 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            onClick={() => handleObjectiveChange('event-responses')}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'event-responses' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'event-responses' ? 'text-white' : 'text-gray-600'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5.8 11.3 2 22l10.7-3.79"/>
+                  <path d="M4 3h.01"/>
+                  <path d="M22 8h.01"/>
+                  <path d="M15 2h.01"/>
+                  <path d="M22 20h.01"/>
+                  <path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12v0c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/>
+                  <path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11v0c-.11.7-.72 1.22-1.43 1.22H17"/>
+                  <path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98v0C9.52 4.9 9 5.52 9 6.23V7"/>
+                  <path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">Event Responses</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Promote events and increase attendance RSVPs</p>
+              </div>
+              {campaignData.campaignObjective === 'event-responses' && (
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* UGC Content */}
           <div 
-            className={`relative p-6 border-2 rounded-lg cursor-pointer transition-all ${
+            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
               campaignData.campaignObjective === 'ugc-content' 
                 ? 'border-blue-500 bg-blue-50' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => handleObjectiveChange('ugc-content')}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">UGC Content</h3>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                campaignData.campaignObjective === 'ugc-content' ? 'bg-blue-500' : 'bg-gray-100'
+              }`}>
+                <svg className={`w-4 h-4 ${
+                  campaignData.campaignObjective === 'ugc-content' ? 'text-white' : 'text-gray-600'
+                }`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-base font-semibold text-gray-900 mb-1">UGC Content</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">Generate user-generated content and reviews</p>
               </div>
               {campaignData.campaignObjective === 'ugc-content' && (
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-600">Generate user-generated content and reviews</p>
           </div>
         </div>
       </div>
@@ -1648,15 +1630,74 @@ const InfluencerCampaignManager = () => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
-            <select
-              value={campaignData.currency}
-              onChange={(e) => handleInputChange('currency', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-            >
-              <option>USD ($)</option>
-              <option>EUR (€)</option>
-              <option>GBP (£)</option>
-            </select>
+            <Popover open={currencyOpen} onOpenChange={setCurrencyOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={currencyOpen}
+                  className="w-full justify-between px-3 py-2 h-auto border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                >
+                  {campaignData.currency || "Select currency..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start" side="bottom">
+                <Command>
+                  <div className="p-2">
+                    <div className="relative">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <CommandPrimitive.Input
+                        value={currencySearch}
+                        onValueChange={setCurrencySearch}
+                        placeholder="Search currency..."
+                        className="h-10 w-full rounded-md border border-gray-300 bg-white pl-9 pr-9 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      />
+                      {campaignData.currency && (
+                        <button
+                          type="button"
+                          aria-label="Clear selection"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          onClick={() => {
+                            handleInputChange('currency', '');
+                            setCurrencySearch('');
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <CommandList className="max-h-[300px]">
+                    <CommandEmpty>No currency found.</CommandEmpty>
+                    <CommandGroup>
+                      {africanCurrencies.map((currency) => (
+                        <CommandItem
+                          key={currency.value}
+                          value={currency.label}
+                          onSelect={() => {
+                            handleInputChange('currency', currency.value);
+                            setCurrencyOpen(false);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              campaignData.currency === currency.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">{currency.label}</span>
+                            <span className="text-xs text-gray-500">{currency.country}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 

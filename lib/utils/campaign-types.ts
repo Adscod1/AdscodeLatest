@@ -3,14 +3,12 @@ import {
   CampaignType,
   DiscountCampaignData,
   ProductCampaignData,
-  VideoCampaignData,
   ProfileCampaignData,
   TypeSpecificData,
 } from "@/types/campaign";
 import {
   discountCampaignDataSchema,
   productCampaignDataSchema,
-  videoCampaignDataSchema,
   profileCampaignDataSchema,
   validateTypeSpecificData,
 } from "@/lib/validations/campaign";
@@ -37,18 +35,6 @@ export function isProductCampaign(
 ): boolean {
   const type = typeof campaign === "string" ? campaign : (campaign as any).type;
   return type === "PRODUCT";
-}
-
-/**
- * Type guard to check if a campaign is a Video campaign
- * @param campaign - Campaign object or campaign type string
- * @returns True if campaign type is VIDEO
- */
-export function isVideoCampaign(
-  campaign: any | string
-): boolean {
-  const type = typeof campaign === "string" ? campaign : (campaign as any).type;
-  return type === "VIDEO";
 }
 
 /**
@@ -102,25 +88,6 @@ export function getProductCampaignData(
 }
 
 /**
- * Safely extracts video campaign data from a campaign
- * @param campaign - Campaign object with typeSpecificData
- * @returns Video campaign data or null if not a video campaign
- */
-export function getVideoCampaignData(
-  campaign: any
-): VideoCampaignData | null {
-  if (!isVideoCampaign(campaign)) return null;
-  if (!campaign.typeSpecificData) return null;
-
-  try {
-    const result = videoCampaignDataSchema.safeParse(campaign.typeSpecificData);
-    return result.success ? result.data : null;
-  } catch {
-    return null;
-  }
-}
-
-/**
  * Safely extracts profile campaign data from a campaign
  * @param campaign - Campaign object with typeSpecificData
  * @returns Profile campaign data or null if not a profile campaign
@@ -150,8 +117,6 @@ export function getSchemaForCampaignType(type: CampaignType) {
       return discountCampaignDataSchema;
     case "PRODUCT":
       return productCampaignDataSchema;
-    case "VIDEO":
-      return videoCampaignDataSchema;
     case "PROFILE":
       return profileCampaignDataSchema;
     default:
@@ -217,8 +182,6 @@ export function getCampaignTypeLabel(type: CampaignType | string): string {
       return "Discount Campaign";
     case "PRODUCT":
       return "Product Campaign";
-    case "VIDEO":
-      return "Video Campaign";
     case "PROFILE":
       return "Profile Campaign";
     default:
@@ -237,8 +200,6 @@ export function getCampaignTypeIcon(type: CampaignType | string): string {
       return "ticket";
     case "PRODUCT":
       return "package";
-    case "VIDEO":
-      return "video";
     case "PROFILE":
       return "user";
     default:
@@ -257,8 +218,6 @@ export function getCampaignTypeDescription(type: CampaignType | string): string 
       return "Promote discount codes and special offers to drive sales";
     case "PRODUCT":
       return "Showcase specific products to increase awareness and conversions";
-    case "VIDEO":
-      return "Create engaging video content campaigns with specific guidelines";
     case "PROFILE":
       return "Boost brand profiles and increase follower engagement";
     default:
@@ -273,7 +232,7 @@ export function getCampaignTypeDescription(type: CampaignType | string): string 
  */
 export function isTypeSpecificDataRequired(type: CampaignType | string): boolean {
   // All campaign types require type-specific data
-  return ["DISCOUNT", "PRODUCT", "VIDEO", "PROFILE"].includes(type);
+  return ["DISCOUNT", "PRODUCT", "PROFILE"].includes(type);
 }
 
 /**
@@ -291,8 +250,6 @@ export function extractTypeSpecificData(
       return getDiscountCampaignData(campaign);
     case "PRODUCT":
       return getProductCampaignData(campaign);
-    case "VIDEO":
-      return getVideoCampaignData(campaign);
     case "PROFILE":
       return getProfileCampaignData(campaign);
     default:

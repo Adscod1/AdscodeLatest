@@ -1,5 +1,5 @@
 "use client";
-import { Plus, Search, LayoutDashboard, Wallet, Package, Megaphone, Star, TrendingUp, Search as SearchIcon, Smile, Ticket, MessageSquare, Bell, Settings, User, Menu, X, MoreHorizontal, UserPlus, Users as UsersIcon, LogOut, ChevronDown, Trash2 } from "lucide-react";
+import { Plus, Search, LayoutDashboard, Wallet, Package, ShoppingBag, Megaphone, Star, TrendingUp, Search as SearchIcon, Smile, Ticket, MessageSquare, Bell, Settings, User, Menu, X, MoreHorizontal, UserPlus, Users as UsersIcon, LogOut, ChevronDown, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
@@ -184,7 +184,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
                 href={`/${storeId}/listings`}
                 className={getLinkClassName("/listings")}
               >
-                <Package className="w-6 h-6 mr-3" />
+                <ShoppingBag className="w-6 h-6 mr-3" />
                 Listings
               </Link>
               <Link href={`/${storeId}/campaign`} className={getLinkClassName("/campaign")}>
@@ -192,7 +192,7 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
                 Campaigns
               </Link>
               <Link href={`/${storeId}/creator-studio`} className={getLinkClassName("/creator-studio")}>
-                <Settings className="w-6 h-6 mr-3" />
+                <UsersIcon className="w-6 h-6 mr-3" />
                 Creator Studio
               </Link>
               <Link href={`/${storeId}/wallet`} className={getLinkClassName("/wallet")}>
