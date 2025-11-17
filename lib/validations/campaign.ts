@@ -30,21 +30,6 @@ export const productCampaignDataSchema = z.object({
   productDescription: z.string().optional(),
 });
 
-// Video campaign data schema
-export const videoCampaignDataSchema = z.object({
-  videoUrl: z.string().url("Video URL is required and must be valid"),
-  videoFileName: z.string().min(1, "Video file name is required"),
-  videoSize: z.number().positive().max(500 * 1024 * 1024, "Video size must not exceed 500MB"),
-  videoDuration: z.number().int().positive().optional(),
-  videoFormat: z.enum(["mp4", "mov", "avi", "webm"], {
-    required_error: "Video format is required",
-  }),
-  videoCaption: z.string().min(10, "Video caption must be at least 10 characters"),
-  campaignBrief: z.string().min(50, "Campaign brief must be at least 50 characters"),
-  contentGuidelines: z.string().optional(),
-  hashtagRequirements: z.array(z.string()).optional(),
-});
-
 // Profile campaign data schema
 export const profileCampaignDataSchema = z.object({
   profileUrl: z.string().url("Profile URL is required and must be valid"),
@@ -70,14 +55,12 @@ export const profileCampaignDataSchema = z.object({
 });
 
 // Helper function to get the appropriate schema based on campaign type
-export function getTypeSpecificSchema(type: "PRODUCT" | "DISCOUNT" | "VIDEO" | "PROFILE") {
+export function getTypeSpecificSchema(type: "PRODUCT" | "DISCOUNT" | "PROFILE") {
   switch (type) {
     case "DISCOUNT":
       return discountCampaignDataSchema;
     case "PRODUCT":
       return productCampaignDataSchema;
-    case "VIDEO":
-      return videoCampaignDataSchema;
     case "PROFILE":
       return profileCampaignDataSchema;
     default:
@@ -87,7 +70,7 @@ export function getTypeSpecificSchema(type: "PRODUCT" | "DISCOUNT" | "VIDEO" | "
 
 // Helper function to validate type-specific data
 export function validateTypeSpecificData(
-  type: "PRODUCT" | "DISCOUNT" | "VIDEO" | "PROFILE",
+  type: "PRODUCT" | "DISCOUNT" | "PROFILE",
   data: any
 ) {
   const schema = getTypeSpecificSchema(type);
@@ -112,13 +95,12 @@ export const createCampaignSchema = z.object({
     advocacy: z.array(z.string()).optional(),
     conversions: z.array(z.string()).optional(),
   }).optional(), // Made optional since UI may not collect all target data
-  type: z.enum(["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"], {
+  type: z.enum(["PRODUCT", "DISCOUNT", "PROFILE"], {
     required_error: "Campaign type is required",
   }).default("PRODUCT"), // Default to PRODUCT for backward compatibility
   typeSpecificData: z.union([
     discountCampaignDataSchema,
     productCampaignDataSchema,
-    videoCampaignDataSchema,
     profileCampaignDataSchema,
   ]).optional(),
 });
@@ -140,13 +122,12 @@ export const updateCampaignSchema = z.object({
     advocacy: z.array(z.string()).optional(),
     conversions: z.array(z.string()).optional(),
   }).optional(),
-  type: z.enum(["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"], {
+  type: z.enum(["PRODUCT", "DISCOUNT", "PROFILE"], {
     invalid_type_error: "Invalid campaign type",
   }).optional(),
   typeSpecificData: z.union([
     discountCampaignDataSchema,
     productCampaignDataSchema,
-    videoCampaignDataSchema,
     profileCampaignDataSchema,
   ]).optional(),
 });
@@ -164,5 +145,4 @@ export type PublishCampaignInput = z.infer<typeof publishCampaignSchema>;
 // Type-specific data type exports
 export type DiscountCampaignDataInput = z.infer<typeof discountCampaignDataSchema>;
 export type ProductCampaignDataInput = z.infer<typeof productCampaignDataSchema>;
-export type VideoCampaignDataInput = z.infer<typeof videoCampaignDataSchema>;
 export type ProfileCampaignDataInput = z.infer<typeof profileCampaignDataSchema>;

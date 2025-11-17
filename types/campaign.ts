@@ -1,7 +1,7 @@
 import { Campaign, CampaignInfluencer, CampaignStatus, CampaignApplicationStatus } from "@prisma/client";
 
 // Campaign Type enum
-export type CampaignType = "PRODUCT" | "DISCOUNT" | "VIDEO" | "PROFILE";
+export type CampaignType = "PRODUCT" | "DISCOUNT" | "PROFILE";
 
 // Type-specific data interfaces
 
@@ -25,19 +25,6 @@ export interface ProductCampaignData {
   productDescription?: string;
 }
 
-// Video campaign data
-export interface VideoCampaignData {
-  videoUrl: string;
-  videoFileName: string;
-  videoSize: number;
-  videoDuration?: number;
-  videoFormat: "mp4" | "mov" | "avi" | "webm";
-  videoCaption: string;
-  campaignBrief: string;
-  contentGuidelines?: string;
-  hashtagRequirements?: string[];
-}
-
 // Profile campaign data
 export interface ProfileCampaignData {
   profileUrl: string;
@@ -58,7 +45,6 @@ export interface ProfileCampaignData {
 export type TypeSpecificData = 
   | DiscountCampaignData 
   | ProductCampaignData 
-  | VideoCampaignData 
   | ProfileCampaignData;
 
 // Campaign with relations

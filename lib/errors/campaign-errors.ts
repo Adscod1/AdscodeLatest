@@ -93,45 +93,15 @@ export class InvalidCouponReferenceError extends CampaignTypeError {
 }
 
 /**
- * Error thrown when video upload fails
- */
-export class VideoUploadError extends CampaignTypeError {
-  constructor(reason: string, details?: any) {
-    super(
-      `Video upload failed: ${reason}`,
-      "VIDEO_UPLOAD_FAILED",
-      500,
-      details
-    );
-    this.name = "VideoUploadError";
-  }
-}
-
-/**
- * Error thrown when video file is invalid
- */
-export class InvalidVideoFileError extends CampaignTypeError {
-  constructor(reason: string, details?: any) {
-    super(
-      `Invalid video file: ${reason}`,
-      "INVALID_VIDEO_FILE",
-      400,
-      details
-    );
-    this.name = "InvalidVideoFileError";
-  }
-}
-
-/**
  * Error thrown when campaign type is invalid or unsupported
  */
 export class InvalidCampaignTypeError extends CampaignTypeError {
   constructor(type: string) {
     super(
-      `Invalid campaign type: ${type}. Supported types: PRODUCT, COUPON, VIDEO, PROFILE`,
+      `Invalid campaign type: ${type}. Supported types: PRODUCT, DISCOUNT, PROFILE`,
       "INVALID_CAMPAIGN_TYPE",
       400,
-      { providedType: type, supportedTypes: ["PRODUCT", "DISCOUNT", "VIDEO", "PROFILE"] }
+      { providedType: type, supportedTypes: ["PRODUCT", "DISCOUNT", "PROFILE"] }
     );
     this.name = "InvalidCampaignTypeError";
   }
@@ -343,19 +313,6 @@ export function validateTypeSpecificDataExists(
       if (!typeSpecificData.productId) {
         throw new InvalidTypeSpecificDataError(campaignType, [
           { message: "productId is required for PRODUCT campaigns" },
-        ]);
-      }
-      break;
-
-    case "VIDEO":
-      if (!typeSpecificData.videoUrl) {
-        throw new InvalidTypeSpecificDataError(campaignType, [
-          { message: "videoUrl is required for VIDEO campaigns" },
-        ]);
-      }
-      if (!typeSpecificData.videoCaption) {
-        throw new InvalidTypeSpecificDataError(campaignType, [
-          { message: "videoCaption is required for VIDEO campaigns" },
         ]);
       }
       break;

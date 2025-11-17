@@ -21,7 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 
 // Campaign type enum matching backend
-type CampaignType = 'PRODUCT' | 'DISCOUNT' | 'VIDEO' | 'PROFILE';
+type CampaignType = 'PRODUCT' | 'DISCOUNT' | 'PROFILE';
 
 // Define types for the campaign data
 interface Target {
@@ -53,13 +53,6 @@ interface ProductCampaignData {
   productId?: string;
 }
 
-interface VideoCampaignData {
-  videoUrl: string;
-  videoSize: number;
-  videoFormat: string;
-  caption: string;
-}
-
 interface ProfileCampaignData {
   profileUrl: string;
   targetMetrics?: {
@@ -69,7 +62,7 @@ interface ProfileCampaignData {
   };
 }
 
-type TypeSpecificData = DiscountCampaignData | ProductCampaignData | VideoCampaignData | ProfileCampaignData | null;
+type TypeSpecificData = DiscountCampaignData | ProductCampaignData | ProfileCampaignData | null;
 
 interface CampaignData {
   title: string;
@@ -116,9 +109,6 @@ const InfluencerCampaignManager = () => {
   const initialStep = returnStep ? parseInt(returnStep) : 0;
 
   const [currentStep, setCurrentStep] = useState(initialStep);
-  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
-  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [showProductBrowser, setShowProductBrowser] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
@@ -263,94 +253,10 @@ const InfluencerCampaignManager = () => {
         return 'PRODUCT';
       case 'Discount Campaign':
         return 'DISCOUNT';
-      case 'Video Campaign':
-        return 'VIDEO';
       case 'Profile Campaign':
         return 'PROFILE';
       default:
         return 'PRODUCT';
-    }
-  };
-
-  // Handle video file upload
-  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const validTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
-    if (!validTypes.includes(file.type)) {
-      setUploadError('Invalid file type. Please upload MP4, MOV, AVI, or WEBM files.');
-      return;
-    }
-
-    // Validate file size (500MB max)
-    const maxSize = 500 * 1024 * 1024; // 500MB in bytes
-    if (file.size > maxSize) {
-      setUploadError('File size exceeds 500MB limit.');
-      return;
-    }
-
-    setIsUploadingVideo(true);
-    setUploadError(null);
-    setVideoUploadProgress(0);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);  // Changed from 'video' to 'file'
-      formData.append('caption', ''); // Optional caption
-
-      const xhr = new XMLHttpRequest();
-
-      // Track upload progress
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          const progress = Math.round((e.loaded / e.total) * 100);
-          setVideoUploadProgress(progress);
-        }
-      });
-
-      // Handle upload completion
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          const videoData: VideoCampaignData = {
-            videoUrl: response.videoUrl,
-            videoSize: response.videoSize,
-            videoFormat: response.videoFormat,
-            caption: ''
-          };
-          
-          setCampaignData(prev => ({
-            ...prev,
-            typeSpecificData: videoData
-          }));
-          
-          setIsUploadingVideo(false);
-          setVideoUploadProgress(0);
-        } else {
-          const error = JSON.parse(xhr.responseText);
-          setUploadError(error.error || 'Upload failed. Please try again.');
-          setIsUploadingVideo(false);
-          setVideoUploadProgress(0);
-        }
-      });
-
-      // Handle upload error
-      xhr.addEventListener('error', () => {
-        setUploadError('Network error. Please check your connection and try again.');
-        setIsUploadingVideo(false);
-        setVideoUploadProgress(0);
-      });
-
-      xhr.open('POST', '/api/campaigns/upload-video');
-      xhr.send(formData);
-
-    } catch (error) {
-      console.error('Video upload error:', error);
-      setUploadError('An unexpected error occurred. Please try again.');
-      setIsUploadingVideo(false);
-      setVideoUploadProgress(0);
     }
   };
 
@@ -465,7 +371,7 @@ const InfluencerCampaignManager = () => {
   const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Snapchat', 'Twitch', 'Pinterest', 'Facebook'];
   const deliverableTypes = ['Post', 'Story', 'Reel', 'TikTok Video', 'YouTube Video', 'Blog Post', 'Product Review', 'Unboxing Video'];
   const categories = ['Fashion & Beauty', 'Technology', 'Food & Beverage', 'Travel', 'Fitness & Health', 'Lifestyle', 'Gaming', 'Education'];
-  const campaignTypes = ['Product Campaign', 'Discount Campaign', 'Video Campaign', 'Profile Campaign'];
+  const campaignTypes = ['Product Campaign', 'Discount Campaign', 'Profile Campaign'];
   const metricOptions = ['Reach', 'Views', 'Sales', 'Clicks', 'Conversion Rate', 'Engagement Rate', 'Reviews'];
 
   // African currencies
@@ -662,19 +568,6 @@ const InfluencerCampaignManager = () => {
     }
 
     switch (campaignData.type) {
-      case 'VIDEO':
-        if (!campaignData.typeSpecificData || !('videoUrl' in campaignData.typeSpecificData)) {
-          return { valid: false, error: 'Please upload a video for Video Campaign' };
-        }
-        const videoData = campaignData.typeSpecificData as VideoCampaignData;
-        if (!videoData.caption || videoData.caption.trim() === '') {
-          return { valid: false, error: 'Video caption is required' };
-        }
-        if (videoData.videoSize > 500 * 1024 * 1024) {
-          return { valid: false, error: 'Video size must not exceed 500MB' };
-        }
-        break;
-
       case 'PRODUCT':
         if (!campaignData.typeSpecificData) {
           return { valid: false, error: 'Please select a product' };
@@ -1046,94 +939,6 @@ const InfluencerCampaignManager = () => {
         </div>
 
         {/* Campaign Type Specific Forms - Inline Sections */}
-        {campaignData.campaignType === 'Video Campaign' && (
-          <div className="mt-6 border-t-2 border-blue-200 pt-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 6a2 2 0 012-2h6l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Video Campaign Setup</h3>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload Video <span className="text-red-500">*</span>
-                </label>
-                
-                {!campaignData.typeSpecificData && !isUploadingVideo && (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                    <input 
-                      type="file" 
-                      accept="video/mp4,video/quicktime,video/x-msvideo,video/webm" 
-                      className="hidden" 
-                      id="video-upload"
-                      onChange={handleVideoUpload}
-                      disabled={isUploadingVideo}
-                    />
-                    <label htmlFor="video-upload" className="cursor-pointer">
-                      <div className="text-gray-400 mb-2">
-                        <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">Click to upload video</p>
-                      <p className="text-xs text-gray-500 mt-1">MP4, MOV, AVI, or WEBM (max 500MB)</p>
-                    </label>
-                  </div>
-                )}
-
-                {isUploadingVideo && (
-                  <div className="border-2 border-blue-300 rounded-lg p-8 text-center bg-blue-50">
-                    <div className="text-blue-600 mb-2">
-                      <svg className="w-12 h-12 mx-auto animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                    </div>
-                    <p className="text-sm text-blue-700 font-medium mb-2">Uploading video...</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${videoUploadProgress}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-blue-600">{videoUploadProgress}%</p>
-                  </div>
-                )}
-
-                {campaignData.typeSpecificData && 'videoUrl' in campaignData.typeSpecificData && (
-                  <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center shrink-0">
-                        <CheckCircle className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-green-900">Video uploaded successfully</p>
-                        <p className="text-xs text-green-700 mt-1">
-                          {((campaignData.typeSpecificData as VideoCampaignData).videoSize / (1024 * 1024)).toFixed(2)} MB · {(campaignData.typeSpecificData as VideoCampaignData).videoFormat}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setCampaignData(prev => ({ ...prev, typeSpecificData: null }))}
-                        className="text-green-700 hover:text-green-900"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {uploadError && (
-                  <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-700">{uploadError}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {campaignData.campaignType === 'Product Campaign' && (
           <div className="mt-6">
@@ -1479,37 +1284,6 @@ const InfluencerCampaignManager = () => {
                 <p className="text-sm text-gray-500 leading-relaxed">Drive more visitors to your website or landing page</p>
               </div>
               {campaignData.campaignObjective === 'website-traffic' && (
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Video Views */}
-          <div 
-            className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-              campaignData.campaignObjective === 'video-views' 
-                ? 'border-blue-500 bg-blue-50' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => handleObjectiveChange('video-views')}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                campaignData.campaignObjective === 'video-views' ? 'bg-blue-500' : 'bg-gray-100'
-              }`}>
-                <svg className={`w-4 h-4 ${
-                  campaignData.campaignObjective === 'video-views' ? 'text-white' : 'text-gray-600'
-                }`} fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 mb-1">Video Views</h4>
-                <p className="text-sm text-gray-500 leading-relaxed">Increase video content engagement and reach</p>
-              </div>
-              {campaignData.campaignObjective === 'video-views' && (
                 <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
                   <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                 </div>
