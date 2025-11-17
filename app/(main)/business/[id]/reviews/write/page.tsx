@@ -8,14 +8,18 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import dynamic from "next/dynamic";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Star, 
   ArrowLeft, 
-  Camera, 
+  Camera,
+  Video,
+  X,
   CheckCircle2,
   LogIn,
-  UserPlus
+  UserPlus,
+  Upload,
+  ImageIcon
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,12 +27,6 @@ import { getStoreById } from "@/app/actions/store";
 import { createStoreReview, getStoreReviews } from "@/actions/reviews";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-
-// Dynamically import the markdown editor to avoid SSR issues
-const MDEditor = dynamic(
-  () => import('@uiw/react-md-editor').then(mod => mod.default),
-  { ssr: false }
-);
 
 const WriteReviewPage = () => {
   const params = useParams();
@@ -39,16 +37,166 @@ const WriteReviewPage = () => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState("");
   const [comment, setComment] = useState("");
+  const [attachedImages, setAttachedImages] = useState<File[]>([]);
+  const [attachedVideos, setAttachedVideos] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [videoPreviewUrls, setVideoPreviewUrls] = useState<string[]>([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
+  const [uploadedVideoUrls, setUploadedVideoUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isReviewSubmitted, setIsReviewSubmitted] = useState(false);
 
-  // Check authentication status
-  const { data: session } = useQuery({
+  // Upload file to server
+  const uploadFile = async (file: File): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
+
+      const response = await fetch('/api/upload/media', {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log('Upload response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Upload failed:', errorData);
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
+      const data = await response.json();
+      console.log('Upload successful:', data);
+      return data.url;
+    } catch (error) {
+      console.error('File upload error:', error);
+      toast.error(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Network error'}`);
+      return null;
+    }
+  };
+
+  // Handle image upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (attachedImages.length + files.length > 5) {
+      toast.error("You can only upload up to 5 images");
+      return;
+    }
+
+    const validImages = files.filter(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} is too large. Max size is 5MB`);
+        return false;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not a valid image file`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validImages.length > 0) {
+      const newPreviewUrls: string[] = [];
+      validImages.forEach(file => {
+        const url = URL.createObjectURL(file);
+        newPreviewUrls.push(url);
+      });
+      
+      setAttachedImages(prev => [...prev, ...validImages]);
+      setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
+
+      toast.promise(
+        Promise.all(validImages.map(file => uploadFile(file))),
+        {
+          loading: 'Uploading images...',
+          success: (urls) => {
+            const validUrls = urls.filter((url): url is string => url !== null);
+            setUploadedImageUrls(prev => [...prev, ...validUrls]);
+            return `${validUrls.length} image(s) uploaded successfully`;
+          },
+          error: 'Failed to upload some images',
+        }
+      );
+    }
+  };
+
+  // Handle video upload
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (attachedVideos.length + files.length > 2) {
+      toast.error("You can only upload up to 2 videos");
+      return;
+    }
+
+    const validVideos = files.filter(file => {
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error(`${file.name} is too large. Max size is 50MB`);
+        return false;
+      }
+      if (!file.type.startsWith('video/')) {
+        toast.error(`${file.name} is not a valid video file`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validVideos.length > 0) {
+      const newPreviewUrls: string[] = [];
+      validVideos.forEach(file => {
+        const url = URL.createObjectURL(file);
+        newPreviewUrls.push(url);
+      });
+      
+      setAttachedVideos(prev => [...prev, ...validVideos]);
+      setVideoPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+
+      toast.promise(
+        Promise.all(validVideos.map(file => uploadFile(file))),
+        {
+          loading: 'Uploading videos...',
+          success: (urls) => {
+            const validUrls = urls.filter((url): url is string => url !== null);
+            setUploadedVideoUrls(prev => [...prev, ...validUrls]);
+            return `${validUrls.length} video(s) uploaded successfully`;
+          },
+          error: 'Failed to upload some videos',
+        }
+      );
+    }
+  };
+
+  // Remove image
+  const removeImage = (index: number) => {
+    URL.revokeObjectURL(imagePreviewUrls[index]);
+    setAttachedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
+    setUploadedImageUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Remove video
+  const removeVideo = (index: number) => {
+    URL.revokeObjectURL(videoPreviewUrls[index]);
+    setAttachedVideos(prev => prev.filter((_, i) => i !== index));
+    setVideoPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    setUploadedVideoUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const { data: user, isLoading: isLoadingSession } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
-      const { data } = await authClient.getSession();
-      return data;
+      try {
+        const session = await authClient.getSession();
+        console.log('Full session response:', session);
+        console.log('Session data:', session?.data);
+        console.log('Session user:', session?.data?.user);
+        return session?.data?.user ?? null;
+      } catch (error) {
+        console.error('Session error:', error);
+        return null;
+      }
     },
   });
 
@@ -65,11 +213,15 @@ const WriteReviewPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if user is logged in
-    if (!session?.user) {
+    console.log('Submit attempt - User:', user);
+    
+    if (!user) {
+      console.log('No valid user found, showing login dialog');
       setShowLoginDialog(true);
       return;
     }
+
+    console.log('User is authenticated:', user);
 
     if (rating === 0) {
       toast.error("Please select a rating");
@@ -82,35 +234,54 @@ const WriteReviewPage = () => {
     }
 
     if (!comment.trim()) {
-      toast.error("Please write a comment");
+      toast.error("Please write your review content");
+      return;
+    }
+
+    if (comment.trim().length < 85) {
+      toast.error("Your review must be at least 85 characters long");
       return;
     }
 
     try {
-      setIsSubmitting(true);
+      console.log('Submitting review:', { storeId, rating, reviewTitle, comment: comment.substring(0, 50) + '...' });
       
-      await createStoreReview({
+      const reviewData = {
         storeId,
         rating,
         comment: `**${reviewTitle.trim()}**\n\n${comment.trim()}`,
-      });
+        images: uploadedImageUrls.length > 0 ? JSON.stringify(uploadedImageUrls) : undefined,
+        videos: uploadedVideoUrls.length > 0 ? JSON.stringify(uploadedVideoUrls) : undefined,
+      };
+      
+      console.log('Review data with media:', reviewData);
+      
+      await createStoreReview(reviewData);
 
       toast.success("Review submitted successfully!");
       setIsReviewSubmitted(true);
       refetchReviews();
       
-      // Reset form but stay on page
+      imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      videoPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      
       setRating(0);
       setReviewTitle("");
       setComment("");
+      setAttachedImages([]);
+      setAttachedVideos([]);
+      setImagePreviewUrls([]);
+      setVideoPreviewUrls([]);
+      setUploadedImageUrls([]);
+      setUploadedVideoUrls([]);
 
-      // Hide success message after 5 seconds
       setTimeout(() => {
         setIsReviewSubmitted(false);
       }, 5000);
       
     } catch (error) {
-      toast.error("Failed to submit review. Please try again.");
+      console.error("Error submitting review:", error);
+      toast.error(`Failed to submit review: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -126,10 +297,10 @@ const WriteReviewPage = () => {
 
   if (!store) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Store Not Found</h2>
-          <p className="text-gray-600">The store you're trying to review doesn't exist.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Store Not Found</h2>
+          <p className="text-sm sm:text-base text-gray-600">The store you're trying to review doesn't exist.</p>
         </div>
       </div>
     );
@@ -139,7 +310,7 @@ const WriteReviewPage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Login Required Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md mx-4">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <LogIn className="w-5 h-5" />
@@ -150,78 +321,100 @@ const WriteReviewPage = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
-            <Link href="/auth/login" className="w-full">
+            <Link href="/auth/login" className="w-full" onClick={() => setShowLoginDialog(false)}>
               <Button className="w-full bg-blue-600 hover:bg-blue-700">
                 <LogIn className="w-4 h-4 mr-2" />
                 Sign In
               </Button>
             </Link>
-            <Link href="/auth/register" className="w-full">
+            <Link href="/auth/register" className="w-full" onClick={() => setShowLoginDialog(false)}>
               <Button variant="outline" className="w-full">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Create Account
               </Button>
             </Link>
+            <Button variant="ghost" onClick={() => setShowLoginDialog(false)} className="w-full">
+              Cancel
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Success Message */}
       {isReviewSubmitted && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5" />
-            <span>Review submitted successfully! Thank you for your feedback.</span>
+        <div className="fixed top-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:transform sm:-translate-x-1/2 z-50 max-w-md mx-auto">
+          <div className="bg-green-500 text-white px-4 sm:px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm sm:text-base">Review submitted successfully! Thank you for your feedback.</span>
           </div>
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Link href={`/business/${storeId}`}>
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
-                {store.logo ? (
-                  <Image
-                    src={store.logo}
-                    alt={store.name}
-                    width={48}
-                    height={48}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                ) : (
-                  <span className="text-xl font-bold text-white">
-                    {store.name.charAt(0)}
-                  </span>
-                )}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{store.name}</h1>
-                <p className="text-gray-600">Write a review</p>
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+              <Link href={`/business/${storeId}`}>
+                <Button variant="outline" size="sm" className="flex items-center gap-2 flex-shrink-0">
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Back</span>
+                </Button>
+              </Link>
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  {store.logo ? (
+                    <Image
+                      src={store.logo}
+                      alt={store.name}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <span className="text-lg sm:text-xl font-bold text-white">
+                      {store.name.charAt(0)}
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{store.name}</h1>
+                  <p className="text-sm sm:text-base text-gray-600">Write a review</p>
+                  {isLoadingSession && (
+                    <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1 mt-1">
+                      Checking login status...
+                    </p>
+                  )}
+                  {!isLoadingSession && user && (
+                    <p className="text-xs sm:text-sm text-green-600 flex items-center gap-1 mt-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span className="truncate">Logged in as {user.name || user.email}</span>
+                    </p>
+                  )}
+                  {!isLoadingSession && !user && (
+                    <p className="text-xs sm:text-sm text-amber-600 flex items-center gap-1 mt-1">
+                      <LogIn className="w-3 h-3" />
+                      Please login to submit a review
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
+            <Link href="/review-guidelines" className="text-blue-600 text-xs sm:text-sm hover:underline self-start sm:self-auto">
+              Read review guidelines →
+            </Link>
           </div>
-          <Link href="/review-guidelines" className="text-blue-600 text-sm hover:underline">
-            Read about our review guidelines →
-          </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Main Review Form */}
           <div className="lg:col-span-2">
-            <Card className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-8">
+            <Card className="p-4 sm:p-6 lg:p-8">
+              <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
                 {/* Rating Section */}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Select your rating</h2>
-                  <div className="flex items-center gap-2 mb-2">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Select your rating</h2>
+                  <div className="flex items-center gap-1 sm:gap-2 mb-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
@@ -232,7 +425,7 @@ const WriteReviewPage = () => {
                         className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                       >
                         <Star
-                          className={`w-8 h-8 ${
+                          className={`w-6 h-6 sm:w-8 sm:h-8 ${
                             star <= (hoveredRating || rating)
                               ? 'text-yellow-400 fill-yellow-400'
                               : 'text-gray-300'
@@ -241,85 +434,179 @@ const WriteReviewPage = () => {
                       </button>
                     ))}
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Some keywords to include in your review
                   </p>
-                  <div className="flex gap-2 mt-2">
-                    <Badge variant="outline">Service Quality</Badge>
-                    <Badge variant="outline">Product Prices</Badge>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <Badge variant="outline" className="text-xs">Service Quality</Badge>
+                    <Badge variant="outline" className="text-xs">Product Prices</Badge>
                   </div>
                 </div>
 
                 {/* Review Title */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Review Title</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Review Title</h3>
                   <Input
                     placeholder="Give your review a title..."
                     value={reviewTitle}
                     onChange={(e) => setReviewTitle(e.target.value)}
-                    className="text-lg"
+                    className="text-base sm:text-lg"
                     maxLength={100}
                   />
                 </div>
 
-                {/* Comment Section with Markdown Editor */}
+                {/* Review Content */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Review</h3>
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <MDEditor
-                      value={comment}
-                      onChange={(val) => setComment(val || "")}
-                      preview="edit"
-                      hideToolbar={false}
-                      height={300}
-                      data-color-mode="light"
-                      style={{
-                        backgroundColor: "white",
-                      }}
-                    />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Your Review</h3>
+                  
+                  {/* Media Upload Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
+                    <div className="w-full sm:w-auto">
+                      <input
+                        type="file"
+                        id="image-upload"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <label htmlFor="image-upload" className="block">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer text-sm"
+                          asChild
+                        >
+                          <span>
+                            <Camera className="w-4 h-4" />
+                            <span className="truncate">Images ({attachedImages.length}/5)</span>
+                          </span>
+                        </Button>
+                      </label>
+                    </div>
+                    
+                    <div className="w-full sm:w-auto">
+                      <input
+                        type="file"
+                        id="video-upload"
+                        multiple
+                        accept="video/*"
+                        onChange={handleVideoUpload}
+                        className="hidden"
+                      />
+                      <label htmlFor="video-upload" className="block">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer text-sm"
+                          asChild
+                        >
+                          <span>
+                            <Video className="w-4 h-4" />
+                            <span className="truncate">Videos ({attachedVideos.length}/2)</span>
+                          </span>
+                        </Button>
+                      </label>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mt-3">
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span>Your review needs to have at least 85 characters +</span>
-                      <div className="flex items-center gap-2">
-                        <Camera className="w-4 h-4" />
-                        <span>Add photos</span>
+
+                  {/* Image Previews */}
+                  {imagePreviewUrls.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Attached Images:</h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                        {imagePreviewUrls.map((url, index) => (
+                          <div key={index} className="relative">
+                            <Image
+                              src={url}
+                              alt={`Preview ${index + 1}`}
+                              width={120}
+                              height={120}
+                              className="w-full h-20 sm:h-24 object-cover rounded-lg border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    <span className="text-sm text-gray-500">
+                  )}
+
+                  {/* Video Previews */}
+                  {videoPreviewUrls.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Attached Videos:</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                        {videoPreviewUrls.map((url, index) => (
+                          <div key={index} className="relative">
+                            <video
+                              src={url}
+                              controls
+                              className="w-full h-32 object-cover rounded-lg border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeVideo(index)}
+                              className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Text Area */}
+                  <Textarea
+                    placeholder="Share details about your experience with this business. What did you like or dislike? What should others know before visiting?"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="min-h-[120px] sm:min-h-[150px] resize-none text-sm sm:text-base"
+                    maxLength={2000}
+                  />
+                  
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mt-3">
+                    <span className="text-xs sm:text-sm text-gray-600">
+                      Min 85 characters required
+                    </span>
+                    <span className="text-xs sm:text-sm text-gray-500">
                       {comment.length}/2000
                     </span>
                   </div>
                 </div>
 
                 {/* Submit Button */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" type="button">
-                      Cancel
-                    </Button>
-                  </div>
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
+                  <Button variant="outline" size="sm" type="button" className="w-full sm:w-auto">
+                    Cancel
+                  </Button>
                   <Button 
                     type="submit" 
-                    disabled={!rating || !reviewTitle.trim() || !comment.trim() || isSubmitting}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={!rating || !reviewTitle.trim() || !comment.trim() || comment.length < 85 || isSubmitting}
+                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
                   >
-                    {isSubmitting ? "Posting..." : !session?.user ? "Login to Post Review" : "Post review"}
+                    {isSubmitting ? "Posting..." : "Post review"}
                   </Button>
                 </div>
               </form>
             </Card>
 
             {/* Reviews Section */}
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Reviews</h2>
+            <div className="mt-6 sm:mt-8">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Reviews</h2>
               
               {/* Review Summary */}
-              <Card className="p-6 mb-6">
+              <Card className="p-4 sm:p-6 mb-4 sm:mb-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl font-bold">
+                      <span className="text-2xl sm:text-3xl font-bold">
                         {reviews && reviews.length > 0 
                           ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
                           : "0.0"
@@ -333,7 +620,7 @@ const WriteReviewPage = () => {
                           return (
                             <Star
                               key={star}
-                              className={`w-5 h-5 ${
+                              className={`w-4 h-4 sm:w-5 sm:h-5 ${
                                 star <= avgRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
                               }`}
                             />
@@ -341,7 +628,7 @@ const WriteReviewPage = () => {
                         })}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       ({reviews?.length || 0} reviews)
                     </p>
                   </div>
@@ -353,15 +640,15 @@ const WriteReviewPage = () => {
                     const count = reviews?.filter(r => r.rating === ratingValue).length || 0;
                     const percentage = reviews && reviews.length > 0 ? (count / reviews.length) * 100 : 0;
                     return (
-                      <div key={ratingValue} className="flex items-center gap-3">
-                        <span className="text-sm w-8">{ratingValue}</span>
+                      <div key={ratingValue} className="flex items-center gap-2 sm:gap-3">
+                        <span className="text-xs sm:text-sm w-6 sm:w-8">{ratingValue}</span>
                         <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-yellow-400 rounded-full transition-all"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
-                        <span className="text-sm text-gray-500 w-12">
+                        <span className="text-xs sm:text-sm text-gray-500 w-10 sm:w-12">
                           {percentage.toFixed(0)}%
                         </span>
                       </div>
@@ -373,9 +660,9 @@ const WriteReviewPage = () => {
               {/* Individual Reviews */}
               <div className="space-y-4">
                 {reviews?.slice(0, 3).map((review) => (
-                  <Card key={review.id} className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                  <Card key={review.id} className="p-4 sm:p-6 overflow-hidden">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                         {review.user.image ? (
                           <Image
                             src={review.user.image}
@@ -385,20 +672,20 @@ const WriteReviewPage = () => {
                             className="w-full h-full object-cover rounded-full"
                           />
                         ) : (
-                          <span className="text-sm font-bold text-white">
+                          <span className="text-xs sm:text-sm font-bold text-white">
                             {(review.user.name || "U").charAt(0)}
                           </span>
                         )}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium text-gray-900">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <span className="text-sm sm:text-base font-medium text-gray-900 break-words">
                             {review.user.name || "Anonymous User"}
                           </span>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs flex-shrink-0">
                             Verified
                           </Badge>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0">
                             {new Date(review.createdAt).toLocaleDateString()}
                           </span>
                         </div>
@@ -406,7 +693,7 @@ const WriteReviewPage = () => {
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
-                              className={`w-4 h-4 ${
+                              className={`w-3 h-3 sm:w-4 sm:h-4 ${
                                 star <= review.rating
                                   ? 'text-yellow-400 fill-yellow-400'
                                   : 'text-gray-300'
@@ -414,21 +701,71 @@ const WriteReviewPage = () => {
                             />
                           ))}
                         </div>
-                        <div className="text-gray-700 prose prose-sm max-w-none">
+                        <div className="text-sm sm:text-base text-gray-700 prose prose-sm max-w-none break-words">
                           {review.comment?.split('\n').map((paragraph, idx) => (
-                            <p key={idx} className="mb-2 last:mb-0">{paragraph}</p>
+                            <p key={idx} className="mb-2 last:mb-0 break-words">{paragraph}</p>
                           ))}
                         </div>
+                      
+                        {/* Display Review Media */}
+                        {(review as any).images && (() => {
+                          try {
+                            const imageUrls = JSON.parse((review as any).images);
+                            if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+                              return (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4 max-w-full">
+                                  {imageUrls.map((url: string, idx: number) => (
+                                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+                                      <Image
+                                        src={url}
+                                        alt={`Review image ${idx + 1}`}
+                                        fill
+                                        className="object-cover hover:scale-105 transition-transform"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            }
+                          } catch (e) {
+                            console.error('Error parsing review images:', e);
+                          }
+                          return null;
+                        })()}
+                      
+                        {(review as any).videos && (() => {
+                          try {
+                            const videoUrls = JSON.parse((review as any).videos);
+                            if (Array.isArray(videoUrls) && videoUrls.length > 0) {
+                              return (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 max-w-full">
+                                  {videoUrls.map((url: string, idx: number) => (
+                                    <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
+                                      <video
+                                        src={url}
+                                        controls
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            }
+                          } catch (e) {
+                            console.error('Error parsing review videos:', e);
+                          }
+                          return null;
+                        })()}
                       </div>
                     </div>
                   </Card>
                 ))}
 
                 {reviews?.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="text-6xl mb-4">💬</div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
-                    <p className="text-gray-600">Be the first to review this business!</p>
+                  <div className="text-center py-8 sm:py-12">
+                    <div className="text-4xl sm:text-6xl mb-4">💬</div>
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
+                    <p className="text-sm sm:text-base text-gray-600">Be the first to review this business!</p>
                   </div>
                 )}
               </div>
@@ -437,11 +774,11 @@ const WriteReviewPage = () => {
 
           {/* Latest Reviews Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="p-6 sticky top-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Latest Reviews</h3>
+            <Card className="p-4 sm:p-6 lg:sticky lg:top-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Latest Reviews</h3>
               <div className="space-y-4">
                 {reviews?.slice(0, 5).map((review) => (
-                  <div key={review.id} className="flex items-start gap-3">
+                  <div key={review.id} className="flex items-start gap-2 sm:gap-3">
                     <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                       {review.user.image ? (
                         <Image
@@ -458,40 +795,73 @@ const WriteReviewPage = () => {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 mb-1">
-                        <span className="font-medium text-sm text-gray-900 truncate">
+                      <div className="flex items-center gap-1 mb-1 flex-wrap">
+                        <span className="font-medium text-xs sm:text-sm text-gray-900 truncate">
                           {review.user.name || "Anonymous"}
                         </span>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs flex-shrink-0">
                           Verified
                         </Badge>
-                        <span className="text-xs text-gray-500 ml-auto">
+                      </div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${
+                                star <= review.rating
+                                  ? 'text-yellow-400 fill-yellow-400'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-gray-500 flex-shrink-0">
                           {new Date(review.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 mb-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`w-3 h-3 ${
-                              star <= review.rating
-                                ? 'text-yellow-400 fill-yellow-400'
-                                : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-xs text-gray-600 line-clamp-2">
+                      <p className="text-xs text-gray-600 line-clamp-2 break-words">
                         {review.comment}
                       </p>
+                      {/* Display review images if available */}
+                      {(review as any).images && (() => {
+                        try {
+                          const imageUrls = JSON.parse((review as any).images);
+                          if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+                            return (
+                              <div className="mt-2 flex gap-1 overflow-x-auto">
+                                {imageUrls.slice(0, 3).map((url: string, idx: number) => (
+                                  <div key={idx} className="w-10 h-10 sm:w-12 sm:h-12 rounded overflow-hidden border border-gray-200 flex-shrink-0">
+                                    <Image
+                                      src={url}
+                                      alt={`Review image ${idx + 1}`}
+                                      width={48}
+                                      height={48}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                ))}
+                                {imageUrls.length > 3 && (
+                                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                                    <span className="text-xs text-gray-600">+{imageUrls.length - 3}</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                        } catch (e) {
+                          console.error('Error parsing review images:', e);
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
                 ))}
 
                 {reviews?.length === 0 && (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-2">💭</div>
-                    <p className="text-sm text-gray-500">No reviews yet</p>
+                  <div className="text-center py-6 sm:py-8">
+                    <div className="text-3xl sm:text-4xl mb-2">💭</div>
+                    <p className="text-xs sm:text-sm text-gray-500">No reviews yet</p>
                   </div>
                 )}
               </div>
@@ -499,7 +869,7 @@ const WriteReviewPage = () => {
               {reviews && reviews.length > 5 && (
                 <Link 
                   href={`/business/${storeId}/reviews`}
-                  className="text-blue-600 text-sm hover:underline mt-4 block"
+                  className="text-blue-600 text-xs sm:text-sm hover:underline mt-4 block text-center"
                 >
                   Show more discussion ({reviews.length - 5})
                 </Link>

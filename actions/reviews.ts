@@ -5,7 +5,7 @@ import { auth } from "@/utils/auth";
 import { Prisma, StoreReview } from "@prisma/client";
 import { headers } from "next/headers";
 
-export const createStoreReview = async (review: Partial<StoreReview>) => {
+export const createStoreReview = async (review: Partial<StoreReview> & { images?: string; videos?: string }) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -17,9 +17,11 @@ export const createStoreReview = async (review: Partial<StoreReview>) => {
 
     const userId = session.user.id;
 
-    const reviewData: Omit<Prisma.StoreReviewCreateInput, "id"> = {
+    const reviewData: any = {
       rating: review.rating ?? 0,
       comment: review.comment,
+      images: review.images,
+      videos: review.videos,
       user: {
         connect: {
           id: userId,

@@ -260,6 +260,8 @@ model StoreReview {
   storeId   String
   rating    Int
   comment   String?
+  images    String?  @db.Text // JSON array of image URLs
+  videos    String?  @db.Text // JSON array of video URLs
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   store     Store    @relation(fields: [storeId], references: [id])

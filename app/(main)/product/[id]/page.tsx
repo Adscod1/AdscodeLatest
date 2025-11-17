@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { 
   Heart, 
   Share2, 
@@ -64,6 +64,7 @@ interface Review {
 
 export default function ProductDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const productId = params.id as string;
   
   const [product, setProduct] = useState<Product | null>(null);
@@ -75,6 +76,9 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState('L');
   const [activeTab, setActiveTab] = useState('details');
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
+
+  // Check if the current item is a service
+  const isService = product?.tags?.includes('SERVICE') || false;
 
   // Mock reviews data - replace with actual data from database
   const mockReviews: Review[] = [
@@ -269,10 +273,13 @@ export default function ProductDetailPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
-                  {calculateDiscount() > 0 && (
+                  {!isService && calculateDiscount() > 0 && (
                     <span className="inline-block bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                       Best seller
                     </span>
+                  )}
+                  {isService && product.vendor && (
+                    <p className="text-gray-600 mt-1">{product.vendor}</p>
                   )}
                 </div>
                 <div className="flex space-x-2">
@@ -292,7 +299,7 @@ export default function ProductDetailPage() {
                 </div>
                 <span className="text-sm font-medium">4.5</span>
                 <span className="text-sm text-gray-600">368 reviews</span>
-                <span className="text-sm text-gray-600">823 sold</span>
+                {!isService && <span className="text-sm text-gray-600">823 sold</span>}
               </div>
 
               {/* Price */}
@@ -300,98 +307,205 @@ export default function ProductDetailPage() {
                 <span className="text-4xl font-bold text-gray-900">
                   ${product.price}
                 </span>
-                {product.comparePrice && product.comparePrice > product.price && (
+                {!isService && product.comparePrice && product.comparePrice > product.price && (
                   <span className="text-xl text-gray-500 line-through">
                     ${product.comparePrice}
                   </span>
                 )}
               </div>
 
-              {/* Color Selection */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Color</h3>
-                <div className="flex space-x-2">
-                  {['blue', 'gray', 'white'].map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`w-8 h-8 rounded-full border-2 transition-colors ${
-                        selectedColor === color ? 'border-gray-900' : 'border-gray-300'
-                      } ${
-                        color === 'blue' ? 'bg-blue-500' :
-                        color === 'gray' ? 'bg-gray-400' : 'bg-white'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
+              {isService ? (
+                /* Service-specific UI */
+                <div className="space-y-6 border-t pt-6">
+                  {/* Service Duration - if available in variations */}
+                  {product.variations?.some(v => v.name === 'duration') && (
+                    <div className="flex items-center space-x-2 text-gray-700">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>
+                        Flexible duration: {product.variations.find(v => v.name === 'duration')?.value}
+                      </span>
+                    </div>
+                  )}
 
-              {/* Size Selection */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Size</h3>
-                <div className="flex space-x-2">
-                  {['L', 'M', 'S'].map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`px-4 py-2 border rounded-lg transition-colors ${
-                        selectedSize === size
-                          ? 'border-blue-500 bg-blue-50 text-blue-600'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      {size}
+                  {/* Remote or On-site availability */}
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Remote & On-site available</span>
+                  </div>
+
+                  {/* Team size */}
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>Team of 10+ consultants</span>
+                  </div>
+
+                  {/* Satisfaction guarantee */}
+                  <div className="flex items-center space-x-2 text-gray-700">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>100% satisfaction guarantee</span>
+                  </div>
+
+                  {/* Availability */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-900 mb-2">Availability</h3>
+                    <p className="text-gray-700">
+                      Weekdays - Available in 2 weeks
+                    </p>
+                  </div>
+
+                  {/* Early Bird Special - if discount exists */}
+                  {product.comparePrice && product.comparePrice > product.price && (
+                    <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-blue-900 font-medium">
+                          Early Bird Special - {calculateDiscount()}% OFF
+                        </p>
+                        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                          {calculateDiscount()}% OFF
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        Book now and get 1 month free cancellation
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Number of Sessions */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Number of Sessions</h3>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-12 text-center font-medium">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                      <span className="text-sm text-gray-600 ml-2">sessions</span>
+                    </div>
+                  </div>
+
+                  {/* Service Action Buttons */}
+                  <div className="flex space-x-4">
+                    <button className="flex-1 bg-gray-100 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                      Add to cart
                     </button>
-                  ))}
+                    <button 
+                      onClick={() => router.push(`/checkout?type=service&itemId=${product.id}&quantity=${quantity}`)}
+                      className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Book Now
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* Product-specific UI */
+                <>
+                  {/* Color Selection */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Color</h3>
+                    <div className="flex space-x-2">
+                      {['blue', 'gray', 'white'].map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setSelectedColor(color)}
+                          className={`w-8 h-8 rounded-full border-2 transition-colors ${
+                            selectedColor === color ? 'border-gray-900' : 'border-gray-300'
+                          } ${
+                            color === 'blue' ? 'bg-blue-500' :
+                            color === 'gray' ? 'bg-gray-400' : 'bg-white'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Delivery */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Delivery</h3>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                  <option>AAA Standard delivery - Est. arrival: £6HMM</option>
-                </select>
-              </div>
+                  {/* Size Selection */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Size</h3>
+                    <div className="flex space-x-2">
+                      {['L', 'M', 'S'].map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-4 py-2 border rounded-lg transition-colors ${
+                            selectedSize === size
+                              ? 'border-blue-500 bg-blue-50 text-blue-600'
+                              : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Promotion */}
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <span className="text-blue-600 font-medium">Mastermind - 10% OFF</span>
-                  <span className="text-blue-600">Buy 3 get 1</span>
-                </div>
-              </div>
+                  {/* Delivery */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Delivery</h3>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                      <option>AAA Standard delivery - Est. arrival: £6HMM</option>
+                    </select>
+                  </div>
 
-              {/* Quantity */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Quantity</h3>
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="w-12 text-center font-medium">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                  {/* Promotion */}
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-blue-600 font-medium">Mastermind - 10% OFF</span>
+                      <span className="text-blue-600">Buy 3 get 1</span>
+                    </div>
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="flex space-x-4">
-                <button className="flex-1 bg-gray-100 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2">
-                  <ShoppingCart className="w-5 h-5" />
-                  <span>Add to cart</span>
-                </button>
-                <button className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                  Check out
-                </button>
-              </div>
+                  {/* Quantity */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Quantity</h3>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-12 text-center font-medium">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex space-x-4">
+                    <button className="flex-1 bg-gray-100 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2">
+                      <ShoppingCart className="w-5 h-5" />
+                      <span>Add to cart</span>
+                    </button>
+                    <button 
+                      onClick={() => router.push(`/checkout?type=product&itemId=${product.id}&quantity=${quantity}`)}
+                      className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Check out
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

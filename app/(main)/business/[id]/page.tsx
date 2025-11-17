@@ -158,13 +158,13 @@ const BusinessPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+      <div className="mx-auto w-full">
         {/* Hero Carousel Section with Three Images - Full Width */}
-        <div className="relative h-96 overflow-hidden">
-          <div className="absolute inset-0 grid grid-cols-3 gap-0">
+        <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden w-full">
+          <div className="absolute inset-0 grid grid-cols-1 sm:grid-cols-3 gap-0">
             {/* Left Image */}
-            <div className="relative bg-gray-200 overflow-hidden">
+            <div className="relative bg-gray-200 overflow-hidden hidden sm:block">
               <Image
                 src={carouselImages[0]}
                 alt="Business Image 1"
@@ -174,7 +174,7 @@ const BusinessPage = () => {
             </div>
             
             {/* Center Image (Main) */}
-            <div className="relative bg-gray-100 overflow-hidden border-l-2 border-white/30">
+            <div className="relative bg-gray-100 overflow-hidden sm:border-l-2 border-white/30">
               <Image
                 src={carouselImages[1]}
                 alt="Business Image 2"
@@ -184,7 +184,7 @@ const BusinessPage = () => {
             </div>
             
             {/* Right Image */}
-            <div className="relative bg-gray-300 overflow-hidden border-l-2 border-white/30">
+            <div className="relative bg-gray-300 overflow-hidden border-l-2 border-white/30 hidden sm:block">
               <Image
                 src={carouselImages[2]}
                 alt="Business Image 3"
@@ -200,28 +200,27 @@ const BusinessPage = () => {
           {/* Navigation Arrows */}
           <button 
             onClick={() => setCurrentImageIndex(prev => prev === 0 ? carouselImages.length - 1 : prev - 1)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all z-10"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-1.5 sm:p-2 shadow-lg hover:shadow-xl transition-all z-10"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
           </button>
           <button 
             onClick={() => setCurrentImageIndex(prev => prev === carouselImages.length - 1 ? 0 : prev + 1)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all z-10"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-1.5 sm:p-2 shadow-lg hover:shadow-xl transition-all z-10"
           >
-            <ChevronRight className="w-5 h-5 text-gray-700" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
           </button>
         </div>
 
         
-
         {/* Top Section: Business Profile + Action Buttons */}
-        <div className="bg-white shadow-sm px-6 sm:px-12 py-8 ">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-white shadow-sm px-4 sm:px-6 lg:px-12 py-6 sm:py-8 w-full">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-full">
             {/* Left Side: Business Profile - Adjusted for overlapping avatar */}
             {/* Business Avatar - Positioned outside carousel to ensure proper z-index */}
-        <div className="absolute top-[460px] left-12 z-50">
-          <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-xl flex items-center justify-center shadow-xl border-4 border-white">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 shadow-md">
+        <div className="absolute top-[240px] sm:top-[320px] lg:top-[384px] left-4 sm:left-8 lg:left-12 z-50">
+          <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-white rounded-xl flex items-center justify-center shadow-xl border-4 border-white">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 shadow-md">
               {store.logo ? (
                 <Image
                   src={store.logo}
@@ -232,7 +231,7 @@ const BusinessPage = () => {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-xl sm:text-2xl font-bold text-white">
+                  <span className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                     {store.name.charAt(0)}
                   </span>
                 </div>
@@ -240,32 +239,32 @@ const BusinessPage = () => {
             </div>
           </div>
         </div>
-            <div className="flex items-center gap-6 ml-0 sm:ml-40 mt-4 sm:mt-0">
+            <div className="flex items-center gap-3 sm:gap-6 ml-0 sm:ml-28 lg:ml-40 mt-12 sm:mt-4 overflow-hidden">
               {/* Business Info */}
-              <div>
-                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">{store.name}</h1>
-                <p className="text-gray-600 text-lg sm:text-xl">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2 truncate">{store.name}</h1>
+                <p className="text-gray-600 text-sm sm:text-lg lg:text-xl truncate">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
                 </p>
               </div>
             </div>
             
             {/* Right Side: Action Buttons */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <Button className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-4 sm:px-6 py-2.5 flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto max-w-full">
+              <Button className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 flex items-center gap-2 text-sm sm:text-base">
                 <Heart className="w-4 h-4" />
                 <span className="hidden sm:inline">Favourite</span>
               </Button>
-              <Button variant="outline" className="rounded-lg px-4 sm:px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+              <Button variant="outline" className="rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
                 <MessageCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">Inbox</span>
               </Button>
-              <Button variant="outline" className="rounded-lg px-4 sm:px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+              <Button variant="outline" className="rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Share</span>
               </Button>
               <Link href={`/business/${store.id}/reviews/write`}>
-                <Button variant="outline" className="rounded-lg px-4 sm:px-6 py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2">
+                <Button variant="outline" className="rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
@@ -277,21 +276,21 @@ const BusinessPage = () => {
         </div>
 
         {/* Main Content - Responsive padding */}
-        <div className="px-4 sm:px-8 lg:px-20 flex flex-col lg:flex-row gap-8 bg-blue-50 pt-5">
+        <div className="px-4 sm:px-6 lg:px-12 flex flex-col lg:flex-row gap-6 lg:gap-8 bg-blue-50 pt-5 w-full max-w-full overflow-hidden">
           {/* Left Column - Main Content */}
-          <div className="flex-1 space-y-8">
+          <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
             {/* Business Header - Full Width */}
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden w-full">
              
 
               {/* Description Section */}
-              <div className="p-8">
-                <h3 className="font-semibold text-gray-900 mb-4 border-b flex items-center">
-                  <MessageCircle className="w-5 h-5 mr-2" />
+              <div className="p-4 sm:p-6 lg:p-8 w-full">
+                <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 border-b flex items-center text-base sm:text-lg break-words">
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Description
                 </h3>
-                <div className="relative">
-                  <p className={`text-gray-700 leading-relaxed ${
+                <div className="relative w-full overflow-hidden">
+                  <p className={`text-gray-700 leading-relaxed break-words ${
                     !isDescriptionExpanded ? "line-clamp-3" : ""
                   }`}>
                     {store.description || "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsa incidunt commodi ab totam illo quidem quas porro doloribus consequuntur adipisci placeat numquam vero hic perspiciatis minus facere aperiam dolor alias accusamus omnis reiciendis, nisl pariatur ad molestias? Voluptas assumenda porro tempora ipsum animi libero incidunt iure ut facilis, soluta consequuntur totam beatae voluptate qui quasi, tenetur perferendis? Laboriosam ipsum ad libero numquam obcaecati consectetur dolores ratione earum? Soluta placeat ipsum nesciunt sequi. Impedit sapiente fugit labore delectus minus, vitae maxime ab ea velit distinctio neque alias? Error, iure! Rem nihil id dolorum repellendus tempora quis dolor sapiente cumque tempore?"}
@@ -307,18 +306,19 @@ const BusinessPage = () => {
             </div>
 
             {/* Campaigns */}
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <MessageCircle className="w-6 h-6 mr-3" />
+            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                   Campaigns
                 </h2>
-                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
-                  See all campaigns
+                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
+                  <span className="hidden sm:inline">See all campaigns</span>
+                  <span className="sm:hidden">See all</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 {campaigns.map((campaign, index) => (
                   <div key={index} className="aspect-square rounded-xl overflow-hidden bg-gray-100">
                     <Image
@@ -334,20 +334,21 @@ const BusinessPage = () => {
             </div>
 
             {/* Services */}
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <MessageCircle className="w-6 h-6 mr-3" />
-                  Listing main Products and Services
+            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                  <span className="hidden sm:inline">Listing main Products and Services</span>
+                  <span className="sm:hidden">Products & Services</span>
                 </h2>
-                <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
+                <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
                   See all
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
               
               {isLoadingProducts || isLoadingServices ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {[...Array(4)].map((_, index) => (
                     <div key={index} className="animate-pulse">
                       <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
@@ -357,7 +358,7 @@ const BusinessPage = () => {
                   ))}
                 </div>
               ) : allItems.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
                       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
@@ -376,15 +377,15 @@ const BusinessPage = () => {
                             </div>
                           )}
                         </div>
-                        <div className="p-4">
-                          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{item.title}</h3>
-                          <p className="text-gray-600 text-sm line-clamp-2 mb-2">
+                        <div className="p-3 sm:p-4">
+                          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 text-sm sm:text-base">{item.title}</h3>
+                          <p className="text-gray-600 text-xs sm:text-sm line-clamp-2 mb-2">
                             {item.description || "No description available"}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold text-gray-900">${item.price}</span>
+                            <span className="text-base sm:text-lg font-bold text-gray-900">${item.price}</span>
                             {item.comparePrice && item.comparePrice > item.price && (
-                              <span className="text-sm text-gray-400 line-through">${item.comparePrice}</span>
+                              <span className="text-xs sm:text-sm text-gray-400 line-through">${item.comparePrice}</span>
                             )}
                           </div>
                         </div>
@@ -402,26 +403,27 @@ const BusinessPage = () => {
             </div>
 
             {/* Highlights */}
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Highlights from the Business</h2>
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
+            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Highlights from the Business</h2>
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
                 {highlights.map((highlight, index) => (
                   <div key={index} className="text-center">
-                    <div className={`w-16 h-16 ${highlight.color} rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg`}>
-                      <highlight.icon className="w-8 h-8 text-white" />
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 ${highlight.color} rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 shadow-lg`}>
+                      <highlight.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                     </div>
-                    <p className="font-medium text-gray-900">{highlight.name}</p>
+                    <p className="font-medium text-gray-900 text-xs sm:text-sm">{highlight.name}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Reviews */}
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Recommended Reviews</h2>
-                <Link href={`/business/${store.id}/reviews`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
-                  See all reviews
+            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Recommended Reviews</h2>
+                <Link href={`/business/${store.id}/reviews`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
+                  <span className="hidden sm:inline">See all reviews</span>
+                  <span className="sm:hidden">See all</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
@@ -490,8 +492,8 @@ const BusinessPage = () => {
                     <h3 className="text-lg font-semibold text-gray-900">Recent Reviews</h3>
                     {reviews.slice(0, 3).map((review) => (
                       <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                             {review.user.image ? (
                               <Image
                                 src={review.user.image}
@@ -501,26 +503,26 @@ const BusinessPage = () => {
                                 className="w-full h-full object-cover rounded-full"
                               />
                             ) : (
-                              <span className="text-lg font-bold text-white">
+                              <span className="text-base sm:text-lg font-bold text-white">
                                 {(review.user.name || "U").charAt(0)}
                               </span>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="font-medium text-gray-900">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span className="font-medium text-gray-900 text-sm sm:text-base">
                                 {review.user.name || "Anonymous User"}
                               </span>
                               <Badge variant="outline" className="text-xs">Verified</Badge>
-                              <span className="text-sm text-gray-500">
+                              <span className="text-xs sm:text-sm text-gray-500">
                                 {new Date(review.createdAt).toLocaleDateString()}
                               </span>
                             </div>
-                            <div className="flex items-center mb-3">
+                            <div className="flex items-center mb-2 sm:mb-3">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <Star
                                   key={star}
-                                  className={`w-4 h-4 ${
+                                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                                     star <= review.rating
                                       ? 'text-orange-400 fill-orange-400'
                                       : 'text-gray-300'
@@ -528,7 +530,7 @@ const BusinessPage = () => {
                                 />
                               ))}
                             </div>
-                            <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                            <p className="text-gray-700 leading-relaxed text-sm sm:text-base break-words">{review.comment}</p>
                           </div>
                         </div>
                       </div>
@@ -561,84 +563,84 @@ const BusinessPage = () => {
           </div>
 
           {/* Right Column - About Section (Sticky) */}
-          <div className="w-80 sticky top-6 self-start">
-            <div className="bg-white rounded-2xl shadow-sm p-8">
-              <h3 className="font-semibold text-gray-900 mb-6">About</h3>
-              <div className="space-y-4">
+          <div className="w-full lg:w-80 lg:sticky lg:top-6 lg:self-start flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+              <h3 className="font-semibold text-gray-900 mb-4 sm:mb-6 text-base sm:text-lg">About</h3>
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-center text-gray-700">
-                  <Globe className="w-5 h-5 mr-3 text-gray-500" />
-                  <span className="text-sm">www.adscod.com</span>
+                  <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-gray-500 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm break-all">www.adscod.com</span>
                 </div>
                 <div className="flex items-center text-gray-700">
-                  <Phone className="w-5 h-5 mr-3 text-gray-500" />
-                  <span className="text-sm">{store.phone || "+256 700 000 000"}</span>
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-gray-500 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm">{store.phone || "+256 700 000 000"}</span>
                 </div>
                 <div className="flex items-center text-gray-700">
-                  <MapPin className="w-5 h-5 mr-3 text-gray-500" />
-                  <span className="text-sm">Kansanga, Kampala</span>
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-gray-500 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm">Kansanga, Kampala</span>
                 </div>
                 {store.email && (
                   <div className="flex items-center text-gray-700">
-                    <Mail className="w-5 h-5 mr-3 text-gray-500" />
-                    <span className="text-sm">{store.email}</span>
+                    <Mail className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 text-gray-500 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm break-all">{store.email}</span>
                   </div>
                 )}
               </div>
 
               {/* Social Links */}
-              <div className="flex items-center gap-3 mt-6 pt-6 border-t border-blue-200">
+              <div className="flex items-center gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-blue-200 flex-wrap">
                 {/* Facebook */}
-                <button className="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors">
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <button className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
                 </button>
                 
                 {/* X (Twitter) */}
-                <button className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors">
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <button className="w-7 h-7 sm:w-8 sm:h-8 bg-black text-white rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                 </button>
                 
                 {/* YouTube */}
-                <button className="w-8 h-8 bg-red-600 text-white rounded-lg flex items-center justify-center hover:bg-red-700 transition-colors">
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <button className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 text-white rounded-lg flex items-center justify-center hover:bg-red-700 transition-colors">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                   </svg>
                 </button>
                 
                 {/* Instagram */}
-                <button className="w-8 h-8 bg-pink-600 text-white rounded-lg flex items-center justify-center hover:bg-pink-700 transition-colors">
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <button className="w-7 h-7 sm:w-8 sm:h-8 bg-pink-600 text-white rounded-lg flex items-center justify-center hover:bg-pink-700 transition-colors">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                   </svg>
                 </button>
                 
                 {/* LinkedIn */}
-                <button className="w-8 h-8 bg-blue-700 text-white rounded-lg flex items-center justify-center hover:bg-blue-800 transition-colors">
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <button className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-700 text-white rounded-lg flex items-center justify-center hover:bg-blue-800 transition-colors">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                 </button>
               </div>
 
-              <Button className="w-full mt-6 hover:bg-gray-900 text-white rounded-lg">
+              <Button className="w-full mt-4 sm:mt-6 hover:bg-gray-900 text-white rounded-lg text-sm sm:text-base">
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Send message
               </Button>
 
               {/* Business Hours */}
-              <div className="mt-6 pt-6 border-t border-blue-200">
-                <div className="bg-green-500 text-white rounded-lg px-4 py-2 mb-4 flex items-center">
-                  <Clock className="w-4 h-4 mr-2" />
+              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-blue-200">
+                <div className="bg-green-500 text-white rounded-lg px-3 sm:px-4 py-2 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
+                  <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
                   <span className="font-medium">OPEN NOW</span>
-                  <span className="ml-auto text-sm">08:30 AM to 05:00 PM</span>
+                  <span className="ml-auto text-xs sm:text-sm">08:30 AM to 05:00 PM</span>
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   {businessHours.map((schedule, index) => (
-                    <div key={index} className="flex justify-between text-sm">
+                    <div key={index} className="flex justify-between text-xs sm:text-sm">
                       <span className={schedule.isOpen ? "text-green-600 font-medium" : "text-gray-700"}>
                         {schedule.day}
                       </span>
