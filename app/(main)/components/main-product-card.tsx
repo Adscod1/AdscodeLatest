@@ -12,12 +12,26 @@ import {
   MoreHorizontal,
   Star,
   CheckCircle,
+  UserPlus,
+  UserMinus,
+  ThumbsUp,
+  ThumbsDown,
+  Flag,
+  Copy,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@prisma/client";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { CommentsModal } from "@/components/CommentsModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const SoftStar = ({ filled }: { filled: boolean }) => (
@@ -113,6 +127,9 @@ interface ExtendedProduct extends Product {
 export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
   const [commentCount, setCommentCount] = useState(product._count?.comments || 0);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isInterested, setIsInterested] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   // Mock engagement data - replace with real data from your database
   const engagementData = {
@@ -153,6 +170,43 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
     }
   };
 
+  const handleCopyLink = () => {
+    const productUrl = `${window.location.origin}/product/${product.id}`;
+    navigator.clipboard.writeText(productUrl);
+    alert('Link copied to clipboard!');
+  };
+
+  const handleFollow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsFollowing(!isFollowing);
+  };
+
+  const handleInterested = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsInterested(!isInterested);
+  };
+
+  const handleNotInterested = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Handle not interested logic
+    alert('Marked as not interested');
+  };
+
+  const handleReport = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    alert('Report functionality will be implemented');
+  };
+
+  const handleAddToFavorites = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsFavorite(!isFavorite);
+  };
+
   return (
     <>
     <Link href={`/product/${product.id}`} className="block">
@@ -187,9 +241,75 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
             </p>
           </div>
         </div>
-        <button className="text-gray-500 hover:text-gray-700">
-          <MoreHorizontal className="w-5 h-5" />
-        </button>
+        
+        {/* Dropdown Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button 
+              className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <MoreHorizontal className="w-5 h-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={handleFollow}>
+              {isFollowing ? (
+                <>
+                  <UserMinus className="w-4 h-4 mr-2" />
+                  Unfollow
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Follow
+                </>
+              )}
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={handleInterested}>
+              <ThumbsUp className="w-4 h-4 mr-2" />
+              {isInterested ? 'Interested' : 'Mark as Interested'}
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={handleNotInterested}>
+              <ThumbsDown className="w-4 h-4 mr-2" />
+              Not Interested
+            </DropdownMenuItem>
+            
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuItem onClick={handleReport}>
+              <Flag className="w-4 h-4 mr-2" />
+              Report
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={handleAddToFavorites}>
+              <Bookmark className={`w-4 h-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
+              {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+            </DropdownMenuItem>
+            
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuItem onClick={handleCopyLink}>
+              <Copy className="w-4 h-4 mr-2" />
+              Copy Link
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Product Image */}
