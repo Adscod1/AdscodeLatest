@@ -219,7 +219,7 @@ const BusinessPage = () => {
             {/* Left Side: Business Profile - Adjusted for overlapping avatar */}
             {/* Business Avatar - Positioned outside carousel to ensure proper z-index */}
         <div className="absolute top-[240px] sm:top-[320px] lg:top-[384px] left-4 sm:left-8 lg:left-12 z-50">
-          <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-white rounded-xl flex items-center justify-center shadow-xl border-4 border-white">
+          <div className="w-22 h-22 sm:w-32 sm:h-32 lg:w-36 lg:h-36 bg-white rounded-xl flex items-center justify-center shadow-xl border-4 border-white">
             <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 shadow-md">
               {store.logo ? (
                 <Image
@@ -251,20 +251,20 @@ const BusinessPage = () => {
             
             {/* Right Side: Action Buttons */}
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto max-w-full">
-              <Button className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 flex items-center gap-2 text-sm sm:text-base">
+              <Button className="bg-pink-500 hover:bg-pink-600 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 flex items-center gap-2 text-sm sm:text-base">
                 <Heart className="w-4 h-4" />
-                <span className="hidden sm:inline">Favourite</span>
+                <span className="hidden sm:inline">Follow</span>
               </Button>
-              <Button variant="outline" className="rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
+              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-0 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
                 <MessageCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">Inbox</span>
               </Button>
-              <Button variant="outline" className="rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
+              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-0 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Share</span>
               </Button>
               <Link href={`/business/${store.id}/reviews/write`}>
-                <Button variant="outline" className="rounded-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-gray-200 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
+                <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border-0 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
@@ -280,13 +280,13 @@ const BusinessPage = () => {
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
             {/* Business Header - Full Width */}
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden w-full">
+            <div className="bg-white shadow-sm overflow-hidden w-full">
              
 
               {/* Description Section */}
               <div className="p-4 sm:p-6 lg:p-8 w-full">
                 <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 border-b flex items-center text-base sm:text-lg break-words">
-                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  {/* <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /> */}
                   Description
                 </h3>
                 <div className="relative w-full overflow-hidden">
@@ -306,10 +306,10 @@ const BusinessPage = () => {
             </div>
 
             {/* Campaigns */}
-            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
-                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                  {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
                   Campaigns
                 </h2>
                 <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
@@ -320,7 +320,7 @@ const BusinessPage = () => {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 {campaigns.map((campaign, index) => (
-                  <div key={index} className="aspect-square rounded-xl overflow-hidden bg-gray-100">
+                  <div key={index} className="aspect-square overflow-hidden bg-gray-100">
                     <Image
                       src={campaign.image}
                       alt={`Campaign ${index + 1}`}
@@ -334,10 +334,10 @@ const BusinessPage = () => {
             </div>
 
             {/* Services */}
-            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
-                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                  {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
                   <span className="hidden sm:inline">Listing main Products and Services</span>
                   <span className="sm:hidden">Products & Services</span>
                 </h2>
@@ -351,9 +351,9 @@ const BusinessPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {[...Array(4)].map((_, index) => (
                     <div key={index} className="animate-pulse">
-                      <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
-                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                      <div className="aspect-square bg-gray-200 mb-4"></div>
+                      <div className="h-4 bg-gray-200 mb-2"></div>
+                      <div className="h-3 bg-gray-200 w-3/4"></div>
                     </div>
                   ))}
                 </div>
@@ -361,7 +361,7 @@ const BusinessPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
-                      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer border-0 shadow-none">
                         <div className="aspect-square bg-gray-100">
                           {item.images && item.images.length > 0 ? (
                             <Image
@@ -403,7 +403,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Highlights */}
-            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Highlights from the Business</h2>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
                 {highlights.map((highlight, index) => (
@@ -418,7 +418,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Reviews */}
-            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Recommended Reviews</h2>
                 <Link href={`/business/${store.id}/reviews`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
@@ -432,13 +432,13 @@ const BusinessPage = () => {
                 <div className="animate-pulse">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div>
-                      <div className="h-6 bg-gray-200 rounded mb-4 w-32"></div>
-                      <div className="h-8 bg-gray-200 rounded mb-2 w-48"></div>
-                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      <div className="h-6 bg-gray-200 mb-4 w-32"></div>
+                      <div className="h-8 bg-gray-200 mb-2 w-48"></div>
+                      <div className="h-4 bg-gray-200 w-24"></div>
                     </div>
                     <div className="space-y-2">
                       {[...Array(5)].map((_, i) => (
-                        <div key={i} className="h-3 bg-gray-200 rounded"></div>
+                        <div key={i} className="h-3 bg-gray-200"></div>
                       ))}
                     </div>
                   </div>
@@ -564,7 +564,7 @@ const BusinessPage = () => {
 
           {/* Right Column - About Section (Sticky) */}
           <div className="w-full lg:w-80 lg:sticky lg:top-6 lg:self-start flex-shrink-0">
-            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <h3 className="font-semibold text-gray-900 mb-4 sm:mb-6 text-base sm:text-lg">About</h3>
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-center text-gray-700">
