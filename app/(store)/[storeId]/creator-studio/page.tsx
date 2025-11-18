@@ -928,57 +928,78 @@ const CreatorStudioDashboard = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {creators.map((creator) => (
-            <div key={creator.id} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-              <div className="flex items-center gap-3 mb-4">
+            <div key={creator.id} className="bg-white rounded-lg border border-gray-200 p-5 sm:p-6">
+              {/* Profile Header */}
+              <div className="flex flex-col items-center text-center mb-5">
                 {creator.image ? (
                   <img
                     src={creator.image}
                     alt={creator.name}
-                    className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full object-cover shrink-0"
+                    className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full object-cover mb-3"
                   />
                 ) : (
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center text-lg sm:text-xl shrink-0">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center text-2xl mb-3">
                     {creator.icon || '⭐'}
                   </div>
                 )}
-                <div className="min-w-0">
-                  <h4 className="font-semibold text-sm sm:text-base truncate">{creator.name}</h4>
-                  <p className="text-gray-600 text-xs sm:text-sm truncate">{creator.handle}</p>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900">{creator.name}</h3>
+                <p className="text-gray-600 text-xs sm:text-sm">@{creator.handle}</p>
+              </div>
+
+              {/* Stats Grid - 2x2 */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-5 pb-5 border-b border-gray-200">
+                <div className="text-center">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1">👥 Followers</p>
+                  <p className="font-bold text-sm sm:text-base text-gray-900">{creator.followers}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1">📊 Engagement</p>
+                  <p className="font-bold text-sm sm:text-base text-gray-900">{creator.engagement}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1">📈 Conversion</p>
+                  <p className="font-bold text-sm sm:text-base text-gray-900">{creator.rate}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1">👁️ Response</p>
+                  <p className="font-bold text-sm sm:text-base text-gray-900">92%</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
-                <div>
-                  <p className="text-gray-600 text-xs sm:text-sm">Followers</p>
-                  <p className="font-semibold text-sm sm:text-base">{creator.followers}</p>
+              {/* Category & Rating */}
+              <div className="mb-5">
+                <p className="text-gray-600 text-xs sm:text-sm mb-2 font-medium">Content Niches</p>
+                <div className="flex flex-wrap gap-2 justify-center mb-3">
+                  <span className="text-xs sm:text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded">{creator.category}</span>
+                  {creator.category !== 'Business' && (
+                    <span className="text-xs sm:text-sm bg-yellow-50 text-yellow-700 px-2 py-1 rounded">Business</span>
+                  )}
                 </div>
-                <div>
-                  <p className="text-gray-600 text-xs sm:text-sm">Engagement</p>
-                  <p className="font-semibold text-sm sm:text-base">{creator.engagement}</p>
+                <div className="flex items-center justify-center gap-1 mb-2">
+                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                  <span className="text-xs sm:text-sm font-semibold text-gray-900">{creator.rating}</span>
+                  <span className="text-xs text-gray-500">47 collabs</span>
                 </div>
               </div>
 
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs sm:text-sm bg-gray-100 px-2 py-1 rounded">{creator.category}</span>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 fill-current" />
-                    <span className="text-xs sm:text-sm font-medium">{creator.rating}</span>
-                  </div>
-                </div>
-                <p className="text-xs sm:text-sm text-gray-600">Rate: {creator.rate}</p>
-                <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
+              {/* Location & Rate */}
+              <div className="mb-5 pb-5 border-b border-gray-200">
+                <p className="text-xs sm:text-sm text-gray-600 mb-2">
+                  <span className="font-medium">Estimate cost:</span> <span className="text-gray-900 font-semibold">${creator.rate}</span>
+                </p>
+                <div className="flex items-center justify-center gap-1 text-xs sm:text-sm text-gray-600">
                   <MapPin className="w-3 h-3" />
-                  <span className="truncate">{creator.location}</span>
+                  <span>{creator.location}</span>
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex gap-2">
                 <Link
                   href={`/${storeId}/campaign/1/influencers/profile`}
-                  className="flex-1 bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-blue-700 flex items-center justify-center gap-2"
+                  className="flex-1 bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm hover:bg-blue-700 flex items-center justify-center gap-2 font-medium transition-colors"
                 >
-                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Eye className="w-4 h-4" />
                   <span>View Profile</span>
                 </Link>
                 <button 
@@ -1024,13 +1045,13 @@ const CreatorStudioDashboard = () => {
                       setTimeout(() => setAddedToastMessage(null), 3000);
                     }
                   }}
-                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-xs sm:text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs sm:text-sm font-medium transition-colors ${
                     campaignMode && selectedInfluencers.includes(creator.id)
-                      ? 'bg-green-100 border border-green-300 text-green-700 hover:bg-green-200'
+                      ? 'bg-gray-100 border border-gray-300 text-gray-700 hover:bg-gray-200'
                       : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <UserPlus className="w-4 h-4" />
                   <span>{campaignMode && selectedInfluencers.includes(creator.id) ? 'Added' : 'Invite'}</span>
                 </button>
               </div>
