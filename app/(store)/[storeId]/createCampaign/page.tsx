@@ -82,7 +82,7 @@ interface CampaignData {
   ageRange: string;
   gender: string;
   location: string;
-  campaignObjective: string;
+  campaignObjectives: string[];
   milestones: Milestone[];
   deliverables: Deliverable[];
   selectedInfluencers: Array<{
@@ -189,7 +189,7 @@ const InfluencerCampaignManager = () => {
     ageRange: '',
     gender: '',
     location: '',
-    campaignObjective: '',
+    campaignObjectives: [],
     milestones: [
       { title: 'Campaign Kickoff', description: '', dueDate: '' }
     ],
@@ -597,7 +597,14 @@ const InfluencerCampaignManager = () => {
   };
 
   const handleObjectiveChange = (objective: string) => {
-    setCampaignData(prev => ({ ...prev, campaignObjective: objective }));
+    setCampaignData(prev => {
+      const objectives = prev.campaignObjectives || [];
+      if (objectives.includes(objective)) {
+        return { ...prev, campaignObjectives: objectives.filter(o => o !== objective) };
+      } else {
+        return { ...prev, campaignObjectives: [...objectives, objective] };
+      }
+    });
   };
 
 
@@ -1284,35 +1291,31 @@ const InfluencerCampaignManager = () => {
                 }
               };
 
+              const isSelected = (campaignData.campaignObjectives || []).includes(objectiveKey);
               return (
                 <div 
                   key={objectiveKey}
                   className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
-                    campaignData.campaignObjective === objectiveKey 
+                    isSelected
                       ? 'border-blue-500 bg-blue-50' 
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                   onClick={() => handleObjectiveChange(objectiveKey)}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                      campaignData.campaignObjective === objectiveKey ? 'bg-blue-500' : 'bg-gray-100'
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border-2 ${
+                      isSelected ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
                     }`}>
-                      <svg className={`w-4 h-4 ${
-                        campaignData.campaignObjective === objectiveKey ? 'text-white' : 'text-gray-600'
-                      }`} fill="currentColor" viewBox="0 0 20 20">
-                        {getIconSVG()}
-                      </svg>
+                      {isSelected && (
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-base font-semibold text-gray-900 mb-1">{label}</h4>
                       <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
                     </div>
-                    {campaignData.campaignObjective === objectiveKey && (
-                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                      </div>
-                    )}
                   </div>
                 </div>
               );
@@ -1845,6 +1848,103 @@ const InfluencerCampaignManager = () => {
           </div>
         ) : (
           <>
+            {/* Campaign Targets, Milestones, Deliverables summary (from form data) */}
+            {(campaignData.targets?.length > 0 || campaignData.milestones?.length > 0 || campaignData.deliverables?.length > 0) && (
+              <div className="max-w-4xl mx-auto space-y-6">
+                {/* Campaign Targets */}
+                {campaignData.targets?.some(t => t.metric && t.value) && (
+                  <div className="bg-white border border-gray-200 rounded-xl p-5">
+                    <h3 className="text-base font-semibold text-gray-900 mb-4">Campaign Targets</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {campaignData.targets.filter(t => t.metric && t.value).map((t, idx) => {
+                        const raw = (t.value || '').toString().replace(/,/g, '');
+                        const targetNum = isNaN(parseFloat(raw)) ? 0 : parseFloat(raw);
+                        const achieved = 0; // no achievements yet – real-time later
+                        const percent = targetNum > 0 ? Math.min(100, Math.max(0, Math.round((achieved / targetNum) * 100))) : 0;
+                        const displayValue = t.unit?.toLowerCase().includes('percentage') ? `${targetNum}%` : `${targetNum.toLocaleString()} ${t.unit || ''}`.trim();
+                        return (
+                          <div key={idx} className="border border-gray-200 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-900">{t.metric}</span>
+                              <span className="text-xs text-gray-500">Target: {displayValue}</span>
+                            </div>
+                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-2 bg-blue-600" style={{ width: `${percent}%` }} />
+                            </div>
+                            <div className="mt-1 text-xs text-gray-500">{percent}% achieved</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Campaign Milestones */}
+                {campaignData.milestones?.length > 0 && (
+                  <div className="bg-white border border-gray-200 rounded-xl p-5">
+                    <h3 className="text-base font-semibold text-gray-900 mb-4">Campaign Milestones</h3>
+                    <div className="space-y-3">
+                      {campaignData.milestones.map((m, idx) => {
+                        const hasDate = !!m.dueDate;
+                        const today = new Date();
+                        const due = hasDate ? new Date(m.dueDate) : null;
+                        let status: 'overdue' | 'today' | 'upcoming' | 'unscheduled' = 'unscheduled';
+                        if (!due) status = 'unscheduled';
+                        else {
+                          const d = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+                          const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                          if (d.getTime() < t.getTime()) status = 'overdue';
+                          else if (d.getTime() === t.getTime()) status = 'today';
+                          else status = 'upcoming';
+                        }
+                        const badge =
+                          status === 'overdue' ? 'bg-red-100 text-red-800' :
+                          status === 'today' ? 'bg-yellow-100 text-yellow-800' :
+                          status === 'upcoming' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700';
+                        return (
+                          <div key={idx} className="flex items-start justify-between border border-gray-200 rounded-lg p-4">
+                            <div className="mr-4">
+                              <div className="text-sm font-medium text-gray-900">{m.title || `Milestone ${idx + 1}`}</div>
+                              {m.description && (
+                                <div className="text-xs text-gray-600 mt-1">{m.description}</div>
+                              )}
+                              {m.dueDate && (
+                                <div className="text-xs text-gray-500 mt-1">Due {new Date(m.dueDate).toLocaleDateString('en-GB')}</div>
+                              )}
+                            </div>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${badge}`}>
+                              {status === 'unscheduled' ? 'unscheduled' : status === 'today' ? 'due today' : status}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Deliverables Tracker */}
+                {campaignData.deliverables?.length > 0 && (
+                  <div className="bg-white border border-gray-200 rounded-xl p-5">
+                    <h3 className="text-base font-semibold text-gray-900 mb-4">Campaign Deliverables</h3>
+                    <div className="space-y-3">
+                      {campaignData.deliverables.map((d, idx) => (
+                        <div key={idx} className="flex items-start justify-between border border-gray-200 rounded-lg p-4">
+                          <div className="mr-4">
+                            <div className="text-sm font-medium text-gray-900">{d.type}</div>
+                            {d.description && (
+                              <div className="text-xs text-gray-600 mt-1">{d.description}</div>
+                            )}
+                            <div className="text-xs text-gray-500 mt-1">Qty: {d.quantity}</div>
+                          </div>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 shrink-0">pending</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Campaign Card Preview */}
             <div className="max-w-2xl mx-auto">
               <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
@@ -1974,6 +2074,25 @@ const InfluencerCampaignManager = () => {
                                     )}
                                   </div>
                                 ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Campaign Objectives */}
+                        {(campaignData.campaignObjectives || []).length > 0 && (
+                          <div>
+                            <h5 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Campaign Objectives</h5>
+                            <div className="space-y-1.5">
+                              {(campaignData.campaignObjectives || []).map((objective, index) => {
+                                const objectives = getCampaignObjectivesByType(campaignData.campaignType);
+                                const objectiveData = objectives[objective];
+                                return (
+                                  <div key={index} className="flex items-center gap-2 text-sm">
+                                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+                                    <span className="text-gray-600">{objectiveData?.label || objective}</span>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
