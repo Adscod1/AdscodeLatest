@@ -1888,19 +1888,19 @@ const InfluencerCampaignManager = () => {
                         const hasDate = !!m.dueDate;
                         const today = new Date();
                         const due = hasDate ? new Date(m.dueDate) : null;
-                        let status: 'overdue' | 'today' | 'upcoming' | 'unscheduled' = 'unscheduled';
+                        let status: 'overdue' | 'today' | 'pending' | 'unscheduled' = 'unscheduled';
                         if (!due) status = 'unscheduled';
                         else {
                           const d = new Date(due.getFullYear(), due.getMonth(), due.getDate());
                           const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                           if (d.getTime() < t.getTime()) status = 'overdue';
                           else if (d.getTime() === t.getTime()) status = 'today';
-                          else status = 'upcoming';
+                          else status = 'pending';
                         }
                         const badge =
                           status === 'overdue' ? 'bg-red-100 text-red-800' :
                           status === 'today' ? 'bg-yellow-100 text-yellow-800' :
-                          status === 'upcoming' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700';
+                          status === 'pending' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700';
                         return (
                           <div key={idx} className="flex items-start justify-between border border-gray-200 rounded-lg p-4">
                             <div className="mr-4">
