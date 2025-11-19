@@ -1621,10 +1621,9 @@ const InfluencerCampaignManager = () => {
                   {/* View Profile & Remove Buttons */}
                   <div className="flex gap-2 ml-4">
                     <Link
-                      href={`/${storeId}/campaign/1/influencers/profile`}
-                      className="px-3 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-2"
+                      href={`/${storeId}/creator-studio/influencer/${influencer.id}`}
+                      className="text-blue-600 hover:underline text-sm font-medium"
                     >
-                      {/* <Eye className="w-4 h-4" /> */}
                       Profile
                     </Link>
                     <button
