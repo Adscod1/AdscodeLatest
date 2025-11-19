@@ -2333,7 +2333,13 @@ const InfluencerCampaignManager = () => {
 
                     {/* CTA Button */}
                     <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors shadow-sm">
-                      Redeem Now
+                      {campaignData.campaignType === 'Product Campaign' || campaignData.type === 'PRODUCT'
+                        ? 'Shop Now'
+                        : campaignData.campaignType === 'Discount Campaign' || campaignData.type === 'DISCOUNT'
+                        ? 'Redeem Now'
+                        : campaignData.campaignType === 'Profile Campaign' || campaignData.type === 'PROFILE'
+                        ? 'Visit Now'
+                        : 'Learn More'}
                     </button>
                   </div>
                 </div>
