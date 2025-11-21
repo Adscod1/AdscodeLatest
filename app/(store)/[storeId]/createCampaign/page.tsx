@@ -1621,10 +1621,9 @@ const InfluencerCampaignManager = () => {
                   {/* View Profile & Remove Buttons */}
                   <div className="flex gap-2 ml-4">
                     <Link
-                      href={`/${storeId}/campaign/1/influencers/profile`}
-                      className="px-3 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-2"
+                      href={`/${storeId}/creator-studio/influencer/${influencer.id}`}
+                      className="text-blue-600 hover:underline text-sm font-medium"
                     >
-                      {/* <Eye className="w-4 h-4" /> */}
                       Profile
                     </Link>
                     <button
@@ -1848,7 +1847,7 @@ const InfluencerCampaignManager = () => {
             </div>
           </div>
         ) : (
-          <>
+          <div>
             {/* Campaign Targets, Milestones, Deliverables summary (from form data) */}
             {(campaignData.targets?.length > 0 || campaignData.milestones?.length > 0 || campaignData.deliverables?.length > 0) && (
               <div className="max-w-4xl mx-auto space-y-6">
@@ -1889,19 +1888,19 @@ const InfluencerCampaignManager = () => {
                         const hasDate = !!m.dueDate;
                         const today = new Date();
                         const due = hasDate ? new Date(m.dueDate) : null;
-                        let status: 'overdue' | 'today' | 'upcoming' | 'unscheduled' = 'unscheduled';
+                        let status: 'overdue' | 'today' | 'pending' | 'unscheduled' = 'unscheduled';
                         if (!due) status = 'unscheduled';
                         else {
                           const d = new Date(due.getFullYear(), due.getMonth(), due.getDate());
                           const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                           if (d.getTime() < t.getTime()) status = 'overdue';
                           else if (d.getTime() === t.getTime()) status = 'today';
-                          else status = 'upcoming';
+                          else status = 'pending';
                         }
                         const badge =
                           status === 'overdue' ? 'bg-red-100 text-red-800' :
                           status === 'today' ? 'bg-yellow-100 text-yellow-800' :
-                          status === 'upcoming' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700';
+                          status === 'pending' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700';
                         return (
                           <div key={idx} className="flex items-start justify-between border border-gray-200 rounded-lg p-4">
                             <div className="mr-4">
@@ -2071,10 +2070,12 @@ const InfluencerCampaignManager = () => {
             )}
 
             {/* Campaign Card Preview */}
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-                {/* Campaign Header Image */}
-                <div className="h-48 sm:h-64 bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 relative">
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Existing Campaign Card */}
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                  {/* Campaign Header Image */}
+                  <div className="h-48 sm:h-64 bg-gradient-to-br from-orange-100 via-pink-100 to-purple-100 relative">
                   <div className="absolute inset-0 bg-black bg-opacity-5 flex items-center justify-center">
                     <div className="w-20 h-20 bg-white bg-opacity-30 rounded-full flex items-center justify-center backdrop-blur-sm">
                       <div className="w-12 h-12 bg-white rounded-full"></div>
@@ -2230,9 +2231,121 @@ const InfluencerCampaignManager = () => {
                     View Details & Apply Now
                   </button>
                 </div>
+                {/* Close existing campaign card container */}
+                </div>
+
+                {/* Social Post Card (TechHub Lagos) */}
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                  {/* Post Header */}
+                  <div className="p-4 pb-0">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                          <img
+                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces"
+                            alt="TechHub Lagos"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <h4 className="text-sm font-semibold text-gray-900">TechHub Lagos</h4>
+                            <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                              Brand
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500">@techhublagos · 4h</p>
+                        </div>
+                      </div>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Badges Row */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                        Sponsored
+                      </span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                        Offer
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Media Image */}
+                  <div className="w-full aspect-[16/10] bg-gray-100 relative">
+                    <img
+                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop"
+                      alt="TechHub Lagos - Coding Bootcamp"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Post Content */}
+                  <div className="p-4">
+                    {/* Engagement Stats */}
+                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1.5">
+                          <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                          </svg>
+                          <span className="font-medium text-gray-700">1,234</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
+                          </svg>
+                          <span className="font-medium text-gray-700">78</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M15 8a3 3 0 010 6 3 3 0 000-6zM6 8a3 3 0 100 6 3 3 0 000-6z" />
+                            <path d="M1.5 13.25A2.25 2.25 0 013.75 11h.5a.75.75 0 000-1.5h-.5a3.75 3.75 0 00-3.75 3.75v.75h1.5v-.75zM13.5 13.25a2.25 2.25 0 012.25-2.25h.5a.75.75 0 000-1.5h-.5a3.75 3.75 0 00-3.75 3.75v.75h1.5v-.75z" />
+                          </svg>
+                          <span className="font-medium text-gray-700">234</span>
+                        </div>
+                      </div>
+                      <button className="shrink-0 text-orange-500 hover:text-orange-600">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Post Text */}
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-900 leading-relaxed mb-2">
+                        🚀 Exciting news! Our new coding bootcamp starts next month. Join 1000+ developers who've transformed their careers with us!
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        <span className="text-sm text-orange-500 font-normal">#TechEducation</span>
+                        <span className="text-sm text-orange-500 font-normal">#Coding</span>
+                        <span className="text-sm text-orange-500 font-normal">#Nigeria</span>
+                      </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors shadow-sm">
+                      {campaignData.campaignType === 'Product Campaign' || campaignData.type === 'PRODUCT'
+                        ? 'Shop Now'
+                        : campaignData.campaignType === 'Discount Campaign' || campaignData.type === 'DISCOUNT'
+                        ? 'Redeem Now'
+                        : campaignData.campaignType === 'Profile Campaign' || campaignData.type === 'PROFILE'
+                        ? 'Visit Now'
+                        : 'Learn More'}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     );
