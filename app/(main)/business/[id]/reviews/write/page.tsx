@@ -19,7 +19,8 @@ import {
   LogIn,
   UserPlus,
   Upload,
-  ImageIcon
+  ImageIcon,
+  MessageCircle
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -46,6 +47,38 @@ const WriteReviewPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [isReviewSubmitted, setIsReviewSubmitted] = useState(false);
+  
+  // Reply functionality state
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, date: Date}>}>({});
+
+  // Reply handlers
+  const handleReplyClick = (reviewId: string) => {
+    setReplyingTo(reviewId);
+    setReplyText("");
+  };
+
+  const handleReplySubmit = async (reviewId: string) => {
+    if (!replyText.trim()) return;
+
+    // TODO: Add API call to save reply
+    const newReply = {
+      id: Date.now().toString(),
+      text: replyText,
+      user: user?.name || "Current User",
+      date: new Date()
+    };
+
+    setReplies(prev => ({
+      ...prev,
+      [reviewId]: [...(prev[reviewId] || []), newReply]
+    }));
+
+    setReplyText("");
+    setReplyingTo(null);
+    toast.success("Reply posted successfully!");
+  };
 
   // Upload file to server
   const uploadFile = async (file: File): Promise<string | null> => {
@@ -314,7 +347,7 @@ const WriteReviewPage = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <LogIn className="w-5 h-5" />
-              Login Required
+              Login Required please
             </DialogTitle>
             <DialogDescription>
               You need to be logged in to submit a review. Please sign in or create an account to continue.
@@ -775,86 +808,208 @@ const WriteReviewPage = () => {
           {/* Latest Reviews Sidebar */}
           <div className="lg:col-span-1">
             <Card className="p-4 sm:p-6 lg:sticky lg:top-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Latest Reviews</h3>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-lg">▶</span>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900">Latest Reviews</h3>
+              </div>
+              
               <div className="space-y-4">
-                {reviews?.slice(0, 5).map((review) => (
-                  <div key={review.id} className="flex items-start gap-2 sm:gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                      {review.user.image ? (
-                        <Image
-                          src={review.user.image}
-                          alt={review.user.name || "User"}
-                          width={32}
-                          height={32}
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <span className="text-xs font-bold text-white">
-                          {(review.user.name || "U").charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 mb-1 flex-wrap">
-                        <span className="font-medium text-xs sm:text-sm text-gray-900 truncate">
-                          {review.user.name || "Anonymous"}
-                        </span>
-                        <Badge variant="outline" className="text-xs flex-shrink-0">
-                          Verified
-                        </Badge>
+                {reviews?.slice(0, 10).map((review) => (
+                  <div key={review.id} className="border-b border-gray-100 pb-4 last:border-b-0">
+                    {/* Review Header */}
+                    <div className="flex items-start gap-2 sm:gap-3 mb-2">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        {review.user.image ? (
+                          <Image
+                            src={review.user.image}
+                            alt={review.user.name || "User"}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        ) : (
+                          <span className="text-xs sm:text-sm font-bold text-white">
+                            {(review.user.name || "U").charAt(0)}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-0.5">
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-xs sm:text-sm text-gray-900">
+                            {review.user.name || "Anonymous"}
+                          </span>
+                          <Badge variant="outline" className="text-xs px-1.5 py-0">✓</Badge>
+                          <span className="text-xs text-gray-500">
+                            {new Date(review.createdAt).toLocaleTimeString('en-US', { 
+                              hour: '2-digit', 
+                              minute: '2-digit',
+                              hour12: false 
+                            })}
+                          </span>
+                        </div>
+                        
+                        {/* Star Rating */}
+                        <div className="flex items-center gap-0.5 mb-2">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
-                              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${
+                              className={`w-3 h-3 ${
                                 star <= review.rating
-                                  ? 'text-yellow-400 fill-yellow-400'
+                                  ? 'text-orange-400 fill-orange-400'
                                   : 'text-gray-300'
                               }`}
                             />
                           ))}
                         </div>
-                        <span className="text-xs text-gray-500 flex-shrink-0">
-                          {new Date(review.createdAt).toLocaleDateString()}
-                        </span>
                       </div>
-                      <p className="text-xs text-gray-600 line-clamp-2 break-words">
-                        {review.comment}
-                      </p>
-                      {/* Display review images if available */}
-                      {(review as any).images && (() => {
-                        try {
-                          const imageUrls = JSON.parse((review as any).images);
-                          if (Array.isArray(imageUrls) && imageUrls.length > 0) {
-                            return (
-                              <div className="mt-2 flex gap-1 overflow-x-auto">
-                                {imageUrls.slice(0, 3).map((url: string, idx: number) => (
-                                  <div key={idx} className="w-10 h-10 sm:w-12 sm:h-12 rounded overflow-hidden border border-gray-200 flex-shrink-0">
-                                    <Image
-                                      src={url}
-                                      alt={`Review image ${idx + 1}`}
-                                      width={48}
-                                      height={48}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                ))}
-                                {imageUrls.length > 3 && (
-                                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs text-gray-600">+{imageUrls.length - 3}</span>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          }
-                        } catch (e) {
-                          console.error('Error parsing review images:', e);
-                        }
-                        return null;
-                      })()}
                     </div>
+
+                    {/* Review Text */}
+                    <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-2 break-words">
+                      {review.comment}
+                    </p>
+
+                    {/* Review Images - Larger Size */}
+                    {(review as any).images && (() => {
+                      try {
+                        const imageUrls = JSON.parse((review as any).images);
+                        if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+                          return (
+                            <div className="mb-3 grid grid-cols-2 gap-2">
+                              {imageUrls.slice(0, 4).map((url: string, idx: number) => (
+                                <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
+                                  <Image
+                                    src={url}
+                                    alt={`Review image ${idx + 1}`}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                              ))}
+                              {imageUrls.length > 4 && (
+                                <div className="relative aspect-video rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
+                                  <span className="text-sm font-semibold text-gray-600">+{imageUrls.length - 4}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+                      } catch (e) {
+                        console.error('Error parsing review images:', e);
+                      }
+                      return null;
+                    })()}
+
+                    {/* Reply Button and Count */}
+                    <div className="flex items-center gap-4 mt-2">
+                      <button
+                        onClick={() => handleReplyClick(review.id)}
+                        className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors text-xs"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Reply</span>
+                      </button>
+                      
+                      {replies[review.id] && replies[review.id].length > 0 && (
+                        <span className="flex items-center gap-1 text-blue-600 text-xs">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>Reply ({replies[review.id].length})</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Reply Form */}
+                    {replyingTo === review.id && (
+                      <div className="mt-3 pl-3 border-l-2 border-blue-400">
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write a reply..."
+                            className="w-full p-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            rows={3}
+                          />
+                          {/* Emoji Toolbar */}
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-1 text-base">
+                              <button type="button" className="hover:scale-110 transition-transform">👍</button>
+                              <button type="button" className="hover:scale-110 transition-transform">❤️</button>
+                              <button type="button" className="hover:scale-110 transition-transform">👏</button>
+                              <button type="button" className="hover:scale-110 transition-transform">😂</button>
+                              <button type="button" className="hover:scale-110 transition-transform">😍</button>
+                              <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setReplyingTo(null);
+                                  setReplyText("");
+                                }}
+                                className="text-gray-600 h-7 text-xs px-2"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => handleReplySubmit(review.id)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white h-7 text-xs px-3"
+                              >
+                                Post
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Display Replies */}
+                    {replies[review.id] && replies[review.id].length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {replies[review.id].map((reply) => (
+                          <div key={reply.id} className="pl-4 border-l-2 border-gray-200">
+                            <div className="flex items-start gap-2">
+                              <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                                <span className="text-xs font-bold text-white">
+                                  {reply.user.charAt(0)}
+                                </span>
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-gray-900 text-xs">
+                                    {reply.user}
+                                  </span>
+                                  {reply.user === store?.name && (
+                                    <Badge className="bg-blue-500 text-white text-xs px-2 py-0 h-4">Author</Badge>
+                                  )}
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(reply.date).toLocaleTimeString('en-US', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit',
+                                      hour12: false 
+                                    })}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-700">{reply.text}</p>
+                                
+                                {/* Reply to reply button */}
+                                <button 
+                                  type="button"
+                                  className="flex items-center gap-1 text-gray-500 hover:text-blue-600 mt-1 text-xs"
+                                >
+                                  <MessageCircle className="w-3 h-3" />
+                                  <span>Reply</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
 
