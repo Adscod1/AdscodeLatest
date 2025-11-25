@@ -6,6 +6,7 @@ import { LoadingState } from "@/app/components/skeletons/stores-skeleton-loader"
 import { ErrorState } from "@/app/components/errors/error-state";
 import { Store } from "@prisma/client";
 import { MoreVertical, UserPlus, Users, LogOut, X, Trash2 } from "lucide-react";
+import api from "@/lib/api-client";
 
 const AllStoresCards = () => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -30,11 +31,8 @@ const AllStoresCards = () => {
   } = useQuery<Store[]>({
     queryKey: ["stores"],
     queryFn: async () => {
-      const response = await fetch("/api/stores");
-      if (!response.ok) {
-        throw new Error("Failed to fetch stores");
-      }
-      return response.json();
+      const result = await api.stores.getUserStores();
+      return result.stores;
     },
   });
 

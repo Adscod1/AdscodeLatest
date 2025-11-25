@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getStoreApplications } from '@/actions/campaign';
+import api from '@/lib/api-client';
 import { 
   BarChart3, 
   Users, 
@@ -168,13 +168,8 @@ const CreatorStudioDashboard = () => {
       try {
         setCreatorsLoading(true);
         setCreatorsError(null);
-        const response = await fetch('/api/influencer/list');
+        const data = await api.influencers.list();
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch creators');
-        }
-        
-        const data = await response.json();
         if (data.success && Array.isArray(data.data)) {
           setCreators(data.data);
         } else {
@@ -198,7 +193,7 @@ const CreatorStudioDashboard = () => {
       
       try {
         setApplicationsLoading(true);
-        const result = await getStoreApplications();
+        const result = await api.campaigns.getAll({ storeId: params?.storeId as string });
         
         if (result.success && result.applications) {
           // Transform database applications to UI format

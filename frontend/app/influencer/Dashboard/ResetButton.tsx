@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api-client';
 
 export default function ResetButton() {
   const [isResetting, setIsResetting] = useState(false);
@@ -15,21 +16,12 @@ export default function ResetButton() {
     setIsResetting(true);
     
     try {
-      const response = await fetch('/api/influencer/reset', {
-        method: 'DELETE',
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        alert('Your influencer account has been reset. You will be redirected to the landing page.');
-        router.push('/influencer/landingpage');
-      } else {
-        alert(data.error || 'Failed to reset account');
-      }
+      await api.influencers.reset();
+      alert('Your influencer account has been reset. You will be redirected to the landing page.');
+      router.push('/influencer/landingpage');
     } catch (error) {
       console.error('Error resetting account:', error);
-      alert('An error occurred. Please try again.');
+      alert(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     } finally {
       setIsResetting(false);
     }

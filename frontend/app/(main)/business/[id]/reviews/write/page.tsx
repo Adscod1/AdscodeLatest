@@ -28,6 +28,7 @@ import { getStoreById } from "@/app/actions/store";
 import { createStoreReview, getStoreReviews } from "@/actions/reviews";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import api from "@/lib/api-client";
 
 const WriteReviewPage = () => {
   const params = useParams();
@@ -83,25 +84,10 @@ const WriteReviewPage = () => {
   // Upload file to server
   const uploadFile = async (file: File): Promise<string | null> => {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
       console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
 
-      const response = await fetch('/api/upload/media', {
-        method: 'POST',
-        body: formData,
-      });
+      const data = await api.upload.uploadMedia(file);
 
-      console.log('Upload response status:', response.status);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Upload failed:', errorData);
-        throw new Error(errorData.error || 'Upload failed');
-      }
-
-      const data = await response.json();
       console.log('Upload successful:', data);
       return data.url;
     } catch (error) {

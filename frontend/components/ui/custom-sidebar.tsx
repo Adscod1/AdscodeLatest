@@ -5,6 +5,7 @@ import { Profile } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import api from "@/lib/api-client";
 import { 
   Bell,
   Settings,
@@ -52,8 +53,7 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
           return;
         }
         
-        const response = await fetch('/api/check-influencer-status');
-        const data = await response.json();
+        const data = await api.influencers.checkStatus();
         
         setHasInfluencerAccount(!!data.isInfluencer);
         localStorage.setItem('hasInfluencerAccount', data.isInfluencer ? 'true' : 'false');

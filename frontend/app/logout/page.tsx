@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api-client';
 
 export default function LogoutPage() {
   const router = useRouter();
@@ -27,16 +28,9 @@ export default function LogoutPage() {
     // Try to logout via API
     const performLogout = async () => {
       try {
-        // First attempt: Use the API route
-        const response = await fetch('/api/auth/logout');
-        
-        if (!response.ok) {
-          console.warn('Logout API failed, trying client-side cookie clearing');
-          setError('Logout API failed. Attempting alternative logout method...');
-          
-          // Second attempt: Clear cookies client-side
-          clearCookiesClientSide();
-        }
+        // First attempt: Use the API client
+        await api.auth.getSession();
+        clearCookiesClientSide();
       } catch (e) {
         console.error('Logout error:', e);
         setError('Error during logout. Attempting alternative logout method...');

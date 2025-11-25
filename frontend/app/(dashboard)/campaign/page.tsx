@@ -17,23 +17,11 @@ import { Plus, Eye, Edit, Trash2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import api, { Campaign } from "@/lib/api-client";
 
 type CampaignStatus = "DRAFT" | "PUBLISHED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELLED";
 
-interface Campaign {
-  id: string;
-  title: string;
-  description: string | null;
-  budget: number;
-  currency: string;
-  status: CampaignStatus;
-  createdAt: string;
-  _count: {
-    applicants: number;
-  };
-}
-
-const statusColors: Record<CampaignStatus, string> = {
+const statusColors: Record<string, string> = {
   DRAFT: "bg-gray-100 text-gray-800",
   PUBLISHED: "bg-blue-100 text-blue-800",
   ACTIVE: "bg-green-100 text-green-800",
@@ -58,17 +46,8 @@ const CampaignDashboard = () => {
   const fetchCampaigns = async () => {
     setIsLoading(true);
     try {
-      const url = filter === "ALL" 
-        ? "/api/campaigns" 
-        : `/api/campaigns?status=${filter}`;
-      
-      const response = await fetch(url);
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch campaigns");
-      }
-
+      const params = filter === "ALL" ? undefined : { status: filter };
+      const result = await api.campaigns.getAll(params);
       setCampaigns(result.campaigns || []);
     } catch (error) {
       console.error("Error fetching campaigns:", error);
@@ -83,8 +62,7 @@ const CampaignDashboard = () => {
   const handleCreateCampaign = async () => {
     try {
       // Fetch user's store
-      const response = await fetch('/api/stores');
-      const result = await response.json();
+      const result = await api.stores.getUserStores();
       
       if (result.stores && result.stores.length > 0) {
         const storeId = result.stores[0].id;
@@ -108,8 +86,7 @@ const CampaignDashboard = () => {
     // Route to store-scoped edit page; derive storeId like in handleCreateCampaign
     (async () => {
       try {
-        const response = await fetch('/api/stores');
-        const result = await response.json();
+        const result = await api.stores.getUserStores();
 
         if (result.stores && result.stores.length > 0) {
           const storeId = result.stores[0].id;
@@ -136,15 +113,7 @@ const CampaignDashboard = () => {
 
     setIsPublishing(true);
     try {
-      const response = await fetch(`/api/campaigns/${campaignToPublish.id}/publish`, {
-        method: "POST",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to publish campaign");
-      }
+      await api.campaigns.publish(campaignToPublish.id);
 
       toast.success("Campaign published!", {
         description: "Your campaign is now live and visible to influencers.",

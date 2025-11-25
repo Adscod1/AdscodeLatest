@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Check, CheckCheck, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import api from "@/lib/api-client";
 
 interface Notification {
   id: string;
@@ -25,13 +26,7 @@ const NotificationBell = () => {
   // Fetch notifications
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('/api/notifications?limit=10');
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to fetch notifications');
-      }
-
+      const result = await api.notifications.getAll(10);
       setNotifications(result.notifications || []);
       setUnreadCount(result.notifications.filter((n: Notification) => !n.read).length);
     } catch (error) {
@@ -42,15 +37,7 @@ const NotificationBell = () => {
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH',
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to mark notification as read');
-      }
+      await api.notifications.markAsRead(notificationId);
 
       // Update local state
       setNotifications(prev =>
@@ -66,15 +53,7 @@ const NotificationBell = () => {
   const markAllAsRead = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/notifications', {
-        method: 'POST',
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to mark all notifications as read');
-      }
+      await api.notifications.markAllAsRead();
 
       // Update local state
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));

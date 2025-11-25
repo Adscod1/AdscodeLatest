@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { X, Instagram, Youtube, Music, Twitter } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import api from "@/lib/api-client"
 
 interface FormData {
   // Personal Information
@@ -207,12 +208,7 @@ const CreatorNetworkForm: React.FC = () => {
         })
       }
 
-      const response = await fetch('/api/influencer/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const result = await api.influencers.register({
           firstName: formData.firstName,
           lastName: formData.lastName,
           phone: formData.phone,
@@ -225,19 +221,12 @@ const CreatorNetworkForm: React.FC = () => {
           ratePerPost: formData.ratePerPost,
           brandCollaborations: formData.brandCollaborations,
           socialAccounts
-        }),
-      })
+        })
 
-      const result = await response.json()
-
-      if (response.ok) {
-        alert('Application submitted successfully! Redirecting to dashboard...')
-        setIsOpen(false)
-        // Redirect to influencer dashboard
-        router.push('/influencer/Dashboard')
-      } else {
-        alert(result.error || 'Failed to submit application')
-      }
+      alert('Application submitted successfully! Redirecting to dashboard...')
+      setIsOpen(false)
+      // Redirect to influencer dashboard
+      router.push('/influencer/Dashboard')
     } catch (error) {
       console.error('Error submitting form:', error)
       alert('An error occurred. Please try again.')

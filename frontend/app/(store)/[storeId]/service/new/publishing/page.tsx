@@ -18,6 +18,7 @@ import { useServiceStore, CreateServiceInput } from "@/store/use-service-store";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
+import api from "@/lib/api-client";
 
 const NewServicePublishingPage = () => {
   const router = useRouter();
@@ -51,22 +52,18 @@ const NewServicePublishingPage = () => {
         media: service.media || [],
       };
 
-      const response = await fetch('/api/service', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(finalData),
-      });
+      const response = await api.services.create({
+          ...finalData,
+          images: finalData.media?.filter((m: any) => m.type === 'image').map((m: any) => ({ url: m.url })) || [],
+          videos: finalData.media?.filter((m: any) => m.type === 'video').map((m: any) => ({ url: m.url })) || [],
+        });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (response.success) {
         toast.success("Service published successfully!");
         reset();
         router.push(`/${storeId}/products?tab=services`);
       } else {
-        toast.error(result.error || 'Failed to publish service');
+        toast.error('Failed to publish service');
       }
     } catch (error) {
       console.error('Error publishing service:', error);
