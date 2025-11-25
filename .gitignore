@@ -54,7 +54,8 @@ next-env.d.ts
 
 /campaign-videos
 
-# uploads (large files)
-/public/uploads/**/*.mp4
-/public/uploads/**/*.mov
-/public/uploads/**/*.avi
+# uploads (large files and user-generated content)
+/frontend/public/uploads/
+/public/uploads/
+frontend/public/uploads/
+public/uploads/
