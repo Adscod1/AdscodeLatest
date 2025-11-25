@@ -8,6 +8,7 @@ import { ProductsModule } from './products/products.module';
 import { ServicesModule } from './services/services.module';
 import { InfluencersModule } from './influencers/influencers.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { StoresModule } from './stores/stores.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     // Feature modules
     HealthModule,
     AuthModule,
+    StoresModule,
     CampaignsModule,
     ProductsModule,
     ServicesModule,
