@@ -56,6 +56,8 @@ next-env.d.ts
 
 # uploads (large files and user-generated content)
 /frontend/public/uploads/
+/backend/public/uploads/
 /public/uploads/
 frontend/public/uploads/
+backend/public/uploads/
 public/uploads/
