@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Share2, Heart, Clock, MapPin, Users, Star } from "lucide-react";
+import { Share2, Heart, Clock, MapPin, Users } from "lucide-react";
 
 // Mock deals data
 const dealsData = [

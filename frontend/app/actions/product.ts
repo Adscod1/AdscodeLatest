@@ -25,8 +25,7 @@ export const getProducts = async (storeId: string) => {
     });
 
     return products;
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
+  } catch (_error) {
     throw new Error("Failed to fetch products");
   }
 };

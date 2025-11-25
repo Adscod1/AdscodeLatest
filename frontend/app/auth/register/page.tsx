@@ -1,6 +1,5 @@
 "use client";
 
-import { createProfile } from "@/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RegisterFormValues } from "@/types";
@@ -54,7 +53,21 @@ const RegisterPage = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: createProfile,
+    mutationFn: async (data: RegisterFormValues) => {
+      // Use Better-Auth to create the user account
+      // Better-Auth handles both user creation and profile creation
+      const result = await authClient.signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+      });
+      
+      if (result.error) {
+        throw new Error(result.error.message || "Registration failed");
+      }
+      
+      return result;
+    },
     onSuccess: () => {
       toast.success("Account created successfully");
       router.push("/profile");

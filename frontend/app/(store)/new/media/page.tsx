@@ -8,7 +8,7 @@ import { useStoreForm } from "@/store/use-store-form";
 import { StoreFormLayout } from "../components/store-form-layout";
 import { StorePreview } from "../components/store-preview";
 import { useMutation } from "@tanstack/react-query";
-import { createStore as createStoreAction } from "../../../../actions/store";
+import { createStore as createStoreAction, CreateStoreInput } from "@/lib/api-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Store } from "@prisma/client";
@@ -91,25 +91,25 @@ const StoreMediaPage = () => {
         {}
       );
 
-      const storeData: Partial<Store> = {
+      const storeData: CreateStoreInput = {
         name: data.name,
-        tagline: cleanData.tagline || null,
-        description: cleanData.description || null,
-        category: cleanData.category || null,
-        regNumber: cleanData.regNumber || null,
+        tagline: cleanData.tagline as string | undefined,
+        description: cleanData.description as string | undefined,
+        category: cleanData.category as string | undefined,
+        regNumber: cleanData.regNumber as string | undefined,
         yearEstablished: cleanData.yearEstablished
-          ? new Date(cleanData.yearEstablished).getFullYear()
-          : null,
-        phone: cleanData.phone || null,
-        email: cleanData.email || null,
-        address: cleanData.address || null,
-        city: cleanData.city || null,
-        state: cleanData.state || null,
-        country: cleanData.country || null,
-        zip: cleanData.zip || null,
-        website: cleanData.website || null,
-        logo: cleanData.logo || null,
-        banner: cleanData.banner || null,
+          ? new Date(cleanData.yearEstablished as number).getFullYear()
+          : undefined,
+        phone: cleanData.phone as string | undefined,
+        email: cleanData.email as string | undefined,
+        address: cleanData.address as string | undefined,
+        city: cleanData.city as string | undefined,
+        state: cleanData.state as string | undefined,
+        country: cleanData.country as string | undefined,
+        zip: cleanData.zip as string | undefined,
+        website: cleanData.website as string | undefined,
+        logo: cleanData.logo as string | undefined,
+        banner: cleanData.banner as string | undefined,
       };
 
       return createStoreAction(storeData);

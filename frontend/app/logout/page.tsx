@@ -32,7 +32,6 @@ export default function LogoutPage() {
         await api.auth.getSession();
         clearCookiesClientSide();
       } catch (e) {
-        console.error('Logout error:', e);
         setError('Error during logout. Attempting alternative logout method...');
         
         // Fallback: Clear cookies client-side
@@ -62,8 +61,8 @@ export default function LogoutPage() {
     try {
       localStorage.clear();
       sessionStorage.clear();
-    } catch (e) {
-      console.error('Error clearing storage:', e);
+    } catch (_e) {
+      // Error clearing storage - continue anyway
     }
     
     // Navigate to login

@@ -45,8 +45,7 @@ export const createStoreReview = async (review: Partial<StoreReview>) => {
     });
 
     return newReview;
-  } catch (error) {
-    console.error("Error creating store review:", error);
+  } catch (_error) {
     throw new Error("Failed to create store review");
   }
 };
@@ -71,8 +70,7 @@ export const getStoreReviews = async (storeId: string) => {
     });
 
     return reviews;
-  } catch (error) {
-    console.error("Error getting store reviews:", error);
+  } catch (_error) {
     throw new Error("Failed to get store reviews");
   }
 };

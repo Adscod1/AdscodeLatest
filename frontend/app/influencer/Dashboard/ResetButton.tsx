@@ -20,7 +20,6 @@ export default function ResetButton() {
       alert('Your influencer account has been reset. You will be redirected to the landing page.');
       router.push('/influencer/landingpage');
     } catch (error) {
-      console.error('Error resetting account:', error);
       alert(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     } finally {
       setIsResetting(false);

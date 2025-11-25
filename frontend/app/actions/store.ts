@@ -24,8 +24,7 @@ export const getStores = async () => {
       },
     });
     return stores;
-  } catch (error) {
-    console.error("Failed to fetch stores:", error);
+  } catch (_error) {
     throw new Error("Failed to fetch stores");
   }
 };
@@ -72,8 +71,7 @@ export const getStoreById = async (storeId: string) => {
     }
 
     return store;
-  } catch (error) {
-    console.error("Failed to fetch store:", error);
+  } catch (_error) {
     throw new Error("Failed to fetch store");
   }
 };

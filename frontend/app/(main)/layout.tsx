@@ -1,6 +1,5 @@
 import React from "react";
 import { FeedNavbar } from "./components/navbar";
-import { Footer } from "./components/footer";
 import { SearchProvider } from "@/contexts/SearchContext";
 
 const FeedLayout = ({ children }: { children: React.ReactNode }) => {
