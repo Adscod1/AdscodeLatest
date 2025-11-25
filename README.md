@@ -11,9 +11,6 @@ AdscodeLatest/
 ├── prisma/            # Database schema
 ├── package.json       # Root workspace configuration
 ├── README.md          # Documentation
-├── QUICK_START.md     # Quick start guide
-├── MIGRATION_STATUS.md           # Migration progress
-└── MONOREPO_MIGRATION_PLAN.md    # Detailed migration plan
 ```
 
 ## Tech Stack
@@ -94,25 +91,6 @@ npx prisma studio
 | Health Check | http://localhost:4000/health | Backend status |
 | API Docs | http://localhost:4000/api/docs | Swagger documentation |
 
-## Migration Status
-
-Currently migrating from Next.js API Routes to NestJS:
-
-- [x] Monorepo structure setup
-- [x] NestJS backend initialized
-- [x] Prisma database connection
-- [x] Health check endpoint
-- [ ] Authentication module
-- [ ] Campaigns module (8 endpoints)
-- [ ] Products module (2 endpoints)
-- [ ] Services module (3 endpoints)
-- [ ] Influencers module (3 endpoints)
-- [ ] Notifications module (2 endpoints)
-- [ ] Other endpoints (5 endpoints)
-- [ ] Frontend API client integration
-
-See `MIGRATION_STATUS.md` for detailed progress.
-
 ## Troubleshooting
 
 | Issue | Solution |
@@ -129,11 +107,5 @@ See `MIGRATION_STATUS.md` for detailed progress.
 - Frontend should not access DB directly after migration
 - Keep .env files in sync during migration
 - Test each module after migration before moving to next
+- Use `npx prisma studio` to inspect the database visually
 
-## Next Steps
-
-1. ✅ Monorepo setup complete
-2. 🔄 Implement Authentication module in backend
-3. 🔄 Migrate API endpoints to NestJS
-4. 🔄 Update frontend to use backend API
-5. 🚀 Deploy separately
