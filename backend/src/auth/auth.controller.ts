@@ -1,10 +1,14 @@
 import { Controller, All, Req, Res } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { auth } from './auth.config';
+import { toNodeHandler } from 'better-auth/node';
+
+// Create the Node.js handler for Better-Auth
+const authHandler = toNodeHandler(auth);
 
 @ApiTags('auth')
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   /**
    * Handle all Better-Auth routes
@@ -13,14 +17,7 @@ export class AuthController {
   @All('*')
   @ApiExcludeEndpoint() // Exclude from Swagger since Better-Auth has many dynamic routes
   async handleAuth(@Req() req: Request, @Res() res: Response) {
-    // Better-Auth handler expects the raw request object with additional properties
-    const request = Object.assign(req, {
-      method: req.method,
-      url: req.url,
-      headers: req.headers,
-      body: req.body,
-    });
-    
-    return auth.handler(request as any);
+    // Use Better-Auth's Node.js handler
+    return authHandler(req, res);
   }
 }

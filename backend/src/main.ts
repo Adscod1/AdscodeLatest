@@ -2,9 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as express from 'express';
+import * as path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Serve static files from the public directory
+  app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 
   // Global validation pipe
   app.useGlobalPipes(

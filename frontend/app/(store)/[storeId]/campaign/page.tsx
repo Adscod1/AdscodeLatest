@@ -36,7 +36,7 @@ const MarketingCampaigns: React.FC = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const result = await api.campaigns.getAll({ storeId });
+        const result = await api.campaigns.getAll();
         if (result.success && result.campaigns) {
           // Deduplicate campaigns by ID
           const uniqueCampaigns = Array.from(

@@ -82,7 +82,7 @@ const RegisterPage = () => {
       setIsGoogleLoading(true);
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/profile",
+        callbackURL: "http://localhost:3000/profile",
       });
     } catch {
       toast.error("Failed to sign up with Google. Please try again.");

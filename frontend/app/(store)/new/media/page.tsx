@@ -176,6 +176,7 @@ const StoreMediaPage = () => {
                       accept="image/*"
                       maxSize={5}
                       className="h-full"
+                      endpoint="/new/media"
                     />
                   </div>
                 </div>
@@ -193,6 +194,7 @@ const StoreMediaPage = () => {
                       accept="image/*"
                       maxSize={5}
                       className="h-full"
+                      endpoint="/new/media"
                     />
                   </div>
                 </div>
@@ -238,6 +240,7 @@ const StoreMediaPage = () => {
                           accept="image/*"
                           maxSize={5}
                           className="h-full"
+                          endpoint="/new/media"
                         >
                           <div className="flex flex-col items-center justify-center h-full">
                             <Plus className="w-8 h-8 text-gray-400 mb-2" />
@@ -291,6 +294,7 @@ const StoreMediaPage = () => {
                           accept="video/*"
                           maxSize={10}
                           className="h-full"
+                          endpoint="/new/media"
                         >
                           <div className="flex flex-col items-center justify-center h-full">
                             <Play className="w-8 h-8 text-gray-400 mb-2" />

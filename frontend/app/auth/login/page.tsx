@@ -48,7 +48,7 @@ const LoginPage = () => {
       setError(null);
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/profile",
+        callbackURL: "http://localhost:3000/profile",
       });
     } catch {
       setError("Failed to sign in with Google. Please try again.");
@@ -66,7 +66,7 @@ const LoginPage = () => {
           email: data.email,
           password: data.password,
           rememberMe: data.rememberMe,
-          callbackURL: "/profile",
+          callbackURL: "http://localhost:3000/profile",
         },
         {
           onRequest: () => {

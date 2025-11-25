@@ -309,7 +309,7 @@ const InfluencerCampaignManager = () => {
   const fetchProducts = async () => {
     setIsLoadingProducts(true);
     try {
-      const data = await api.campaigns.getProducts(storeId);
+      const data = await api.campaigns.getProducts();
       setProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);

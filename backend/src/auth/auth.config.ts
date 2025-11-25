@@ -6,10 +6,17 @@ import { PrismaClient } from '@prisma/client';
 // This is separate from the NestJS Prisma service to avoid circular dependencies
 const prisma = new PrismaClient();
 
+// Log the configuration for debugging
+console.log('Better-Auth Configuration:', {
+  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:4000',
+  frontendURL: process.env.FRONTEND_URL || 'http://localhost:3000',
+});
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'mysql',
   }),
+  basePath: '/api/auth',
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
@@ -18,6 +25,7 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      redirectURI: `${process.env.BETTER_AUTH_URL || 'http://localhost:4000'}/api/auth/callback/google`,
     },
   },
   trustedOrigins: [
@@ -34,6 +42,12 @@ export const auth = betterAuth({
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
     },
+  },
+  // Redirect to frontend after successful authentication
+  redirects: {
+    afterSignIn: process.env.FRONTEND_URL || 'http://localhost:3000',
+    afterSignUp: process.env.FRONTEND_URL || 'http://localhost:3000',
+    afterSignOut: process.env.FRONTEND_URL || 'http://localhost:3000',
   },
 });
 

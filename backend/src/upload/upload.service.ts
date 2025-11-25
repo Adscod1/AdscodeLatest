@@ -59,8 +59,9 @@ export class UploadService {
     const filePath = path.join(uploadsDir, filename);
     fs.writeFileSync(filePath, file.buffer);
 
-    // Return the public URL
-    const fileUrl = `/uploads/${filename}`;
+    // Return the public URL with full backend URL
+    const backendUrl = process.env.BETTER_AUTH_URL || 'http://localhost:4000';
+    const fileUrl = `${backendUrl}/uploads/${filename}`;
 
     return {
       success: true,
@@ -122,8 +123,9 @@ export class UploadService {
     const filePath = path.join(uploadDir, filename);
     fs.writeFileSync(filePath, file.buffer);
 
-    // Return public URL
-    const publicUrl = `/uploads/reviews/${filename}`;
+    // Return public URL with full backend URL
+    const backendUrl = process.env.BETTER_AUTH_URL || 'http://localhost:4000';
+    const publicUrl = `${backendUrl}/uploads/reviews/${filename}`;
 
     return {
       success: true,
@@ -185,8 +187,9 @@ export class UploadService {
     const filePath = path.join(uploadDir, filename);
     fs.writeFileSync(filePath, file.buffer);
 
-    // Return public URL
-    const publicUrl = `/uploads/services/${filename}`;
+    // Return public URL with full backend URL
+    const backendUrl = process.env.BETTER_AUTH_URL || 'http://localhost:4000';
+    const publicUrl = `${backendUrl}/uploads/services/${filename}`;
 
     return {
       success: true,
@@ -251,8 +254,9 @@ export class UploadService {
     const filePath = path.join(uploadDir, filename);
     fs.writeFileSync(filePath, file.buffer);
 
-    // Return public URL
-    const publicUrl = `/uploads/products/${filename}`;
+    // Return public URL with full backend URL
+    const backendUrl = process.env.BETTER_AUTH_URL || 'http://localhost:4000';
+    const publicUrl = `${backendUrl}/uploads/products/${filename}`;
 
     return {
       success: true,

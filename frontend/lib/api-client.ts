@@ -535,7 +535,6 @@ export interface CreateCampaignInput {
 }
 
 export interface CampaignQueryParams {
-  storeId?: string;
   status?: string;
   page?: number;
   limit?: number;
@@ -552,7 +551,6 @@ export const campaignsApi = {
   // Get campaigns
   getAll: (params?: CampaignQueryParams) => {
     const searchParams = new URLSearchParams();
-    if (params?.storeId) searchParams.set('storeId', params.storeId);
     if (params?.status) searchParams.set('status', params.status);
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.limit) searchParams.set('limit', params.limit.toString());
@@ -608,8 +606,8 @@ export const campaignsApi = {
     apiRequest<{ success: boolean; applications: unknown[] }>('/campaigns/my-applications'),
   
   // Get campaign products
-  getProducts: (storeId?: string) => {
-    const query = storeId ? `?storeId=${storeId}` : '';
+  getProducts: (search?: string) => {
+    const query = search ? `?search=${encodeURIComponent(search)}` : '';
     return apiRequest<{ success: boolean; products: Product[] }>(`/campaigns/products${query}`);
   },
 };
@@ -1057,8 +1055,8 @@ export const createCampaign = async (data: CreateCampaignInput) => {
   return response.campaign;
 };
 
-export const getCampaigns = async (storeId?: string) => {
-  const response = await campaignsApi.getAll(storeId ? { storeId } : undefined);
+export const getCampaigns = async () => {
+  const response = await campaignsApi.getAll();
   return response.campaigns;
 };
 
