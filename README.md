@@ -1,6 +1,6 @@
 # AdscodeLatest Monorepo
 
-This is a monorepo containing the frontend and backend applications for AdscodeLatest.
+Monorepo containing the frontend and backend applications for AdscodeLatest.
 
 ## Project Structure
 
@@ -8,54 +8,39 @@ This is a monorepo containing the frontend and backend applications for AdscodeL
 AdscodeLatest/
 ├── frontend/          # Next.js 15 frontend application
 ├── backend/           # NestJS backend API
-├── prisma/            # Database schema (legacy, will be removed)
+├── prisma/            # Database schema
 ├── package.json       # Root workspace configuration
-└── README.md          # This file
+├── README.md          # Documentation
+├── QUICK_START.md     # Quick start guide
+├── MIGRATION_STATUS.md           # Migration progress
+└── MONOREPO_MIGRATION_PLAN.md    # Detailed migration plan
 ```
 
 ## Tech Stack
 
-### Frontend
-- **Framework**: Next.js 15.3.1
-- **UI**: React 19, Tailwind CSS, Radix UI
-- **State Management**: React Query, Zustand
-- **API Client**: Fetch API calling backend
+| Layer | Tech |
+|-------|------|
+| **Frontend** | Next.js 15.3.1, React 19, Tailwind CSS, Radix UI, React Query, Zustand |
+| **Backend** | NestJS, MySQL, Prisma ORM 6.18.0, Better-Auth |
+| **Validation** | Zod, class-validator |
 
-### Backend
-- **Framework**: NestJS
-- **Database**: MySQL + Prisma ORM 6.18.0
-- **Authentication**: Better-Auth
-- **Validation**: Zod + class-validator
-- **API Style**: RESTful JSON
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- MySQL database running on localhost:3306
+- Node.js >= 18.0.0, npm >= 9.0.0
+- MySQL running on localhost:3306
 
 ### Installation
 
-1. Install root dependencies:
 ```bash
+# Install all dependencies
 npm install
-```
 
-2. Install workspace dependencies:
-```bash
-npm install --workspaces
-```
-
-3. Setup environment variables:
-
-**Frontend** (`frontend/.env.local`):
-```env
+# Setup environment variables
+# Frontend: frontend/.env.local
 NEXT_PUBLIC_API_URL=http://localhost:4000
-```
 
-**Backend** (`backend/.env`):
-```env
+# Backend: backend/.env
 DATABASE_URL=mysql://root@127.0.0.1:3306/adscode_dev
 BETTER_AUTH_SECRET=your-secret-key
 BETTER_AUTH_URL=http://localhost:4000
@@ -63,66 +48,55 @@ GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 PORT=4000
 FRONTEND_URL=http://localhost:3000
-```
 
-4. Generate Prisma client:
-```bash
+# Generate Prisma client
 cd backend && npx prisma generate
 ```
 
-5. Run database migrations (if needed):
-```bash
-cd backend && npx prisma migrate deploy
-```
+## Commands
 
-### Development
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Run both frontend & backend |
+| `npm run dev:frontend` | Run frontend only (port 3000) |
+| `npm run dev:backend` | Run backend only (port 4000) |
+| `npm run build` | Build both apps |
+| `npm run build:frontend` | Build frontend only |
+| `npm run build:backend` | Build backend only |
+| `npm run start:frontend` | Start frontend production |
+| `npm run start:backend` | Start backend production |
+| `npm run clean` | Remove node_modules & build artifacts |
+| `npm run test` | Run tests |
+| `npm install <pkg> --workspace=frontend` | Install in frontend |
+| `npm install <pkg> --workspace=backend` | Install in backend |
 
-Run both frontend and backend in development mode:
-```bash
-npm run dev
-```
-
-Or run them separately:
-```bash
-# Terminal 1 - Frontend (runs on port 3000)
-npm run dev:frontend
-
-# Terminal 2 - Backend (runs on port 4000)
-npm run dev:backend
-```
-
-### Building for Production
-
-Build both applications:
-```bash
-npm run build
-```
-
-Or build individually:
-```bash
-npm run build:frontend
-npm run build:backend
-```
-
-### Running in Production
+### Backend Database
 
 ```bash
-# Frontend
-npm run start:frontend
+cd backend
 
-# Backend
-npm run start:backend
+# Generate Prisma client
+npx prisma generate
+
+# Run migrations
+npx prisma migrate dev
+
+# Open Prisma Studio
+npx prisma studio
 ```
 
-## API Documentation
+## Services & URLs
 
-Once the backend is running, visit:
-- Swagger UI: http://localhost:4000/api/docs
-- Health check: http://localhost:4000/health
+| Service | URL | Purpose |
+|---------|-----|---------|
+| Frontend | http://localhost:3000 | Next.js app |
+| Backend API | http://localhost:4000 | NestJS API |
+| Health Check | http://localhost:4000/health | Backend status |
+| API Docs | http://localhost:4000/api/docs | Swagger documentation |
 
 ## Migration Status
 
-Currently migrating from Next.js API Routes to NestJS backend:
+Currently migrating from Next.js API Routes to NestJS:
 
 - [x] Monorepo structure setup
 - [x] NestJS backend initialized
@@ -137,41 +111,29 @@ Currently migrating from Next.js API Routes to NestJS backend:
 - [ ] Other endpoints (5 endpoints)
 - [ ] Frontend API client integration
 
-See `MONOREPO_MIGRATION_PLAN.md` for detailed migration plan.
-
-## Available Scripts
-
-### Root Level
-- `npm run dev` - Run both apps in development mode
-- `npm run build` - Build both apps
-- `npm run clean` - Clean all node_modules and build folders
-
-### Frontend Workspace
-- `npm run dev --workspace=frontend` - Run Next.js dev server
-- `npm run build --workspace=frontend` - Build Next.js app
-- `npm run start --workspace=frontend` - Start Next.js production server
-
-### Backend Workspace
-- `npm run dev --workspace=backend` - Run NestJS in watch mode
-- `npm run build --workspace=backend` - Build NestJS app
-- `npm run start:prod --workspace=backend` - Start NestJS production server
-- `npm run prisma:generate --workspace=backend` - Generate Prisma client
-- `npm run prisma:migrate --workspace=backend` - Run database migrations
+See `MIGRATION_STATUS.md` for detailed progress.
 
 ## Troubleshooting
 
-### Database Connection Issues
-Make sure MySQL is running and the connection string in `backend/.env` is correct.
+| Issue | Solution |
+|-------|----------|
+| **Database connection fails** | Ensure MySQL is running: `mysql -u root -p` |
+| **Port 3000/4000 already in use** | Kill process: `lsof -i :3000` then `kill -9 <PID>` |
+| **Prisma Client not found** | Run: `cd backend && npx prisma generate` |
+| **Workspace not found** | Run from root: `cd /Users/kiwana/projects/AdscodeLatest && npm run dev` |
 
-### Port Already in Use
-- Frontend uses port 3000
-- Backend uses port 4000
+## Tips
 
-Change the PORT environment variable if needed.
+- Always run `npm install` from root for all workspaces
+- Use `--workspace=` flag for workspace-specific commands
+- Frontend should not access DB directly after migration
+- Keep .env files in sync during migration
+- Test each module after migration before moving to next
 
-### Prisma Client Not Found
-Run `npx prisma generate` in the backend folder.
+## Next Steps
 
-## License
-
-ISC
+1. ✅ Monorepo setup complete
+2. 🔄 Implement Authentication module in backend
+3. 🔄 Migrate API endpoints to NestJS
+4. 🔄 Update frontend to use backend API
+5. 🚀 Deploy separately
