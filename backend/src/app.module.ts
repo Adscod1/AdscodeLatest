@@ -10,6 +10,8 @@ import { InfluencersModule } from './influencers/influencers.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { StoresModule } from './stores/stores.module';
 import { UploadModule } from './upload/upload.module';
+import { ProfilesModule } from './profiles/profiles.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { UploadModule } from './upload/upload.module';
     InfluencersModule,
     NotificationsModule,
     UploadModule,
+    ProfilesModule,
+    ReviewsModule,
   ],
 })
 export class AppModule {}

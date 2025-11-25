@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterInfluencerDto } from './dto/register-influencer.dto';
 import { SocialPlatform } from '@prisma/client';
@@ -167,5 +167,171 @@ export class InfluencersService {
       isInfluencer: influencer !== null,
       status: influencer?.status || null,
     };
+  }
+
+  /**
+   * Get current influencer profile with all details
+   */
+  async getCurrentInfluencer(userId: string) {
+    const influencer = await this.prisma.influencer.findUnique({
+      where: { userId },
+      include: {
+        socialAccounts: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    if (!influencer) {
+      return null;
+    }
+
+    // Parse secondary niches from JSON string
+    return {
+      ...influencer,
+      secondaryNiches: influencer.secondaryNiches
+        ? JSON.parse(influencer.secondaryNiches)
+        : [],
+    };
+  }
+
+  /**
+   * Get influencer stats
+   */
+  async getInfluencerStats(userId: string) {
+    const influencer = await this.prisma.influencer.findUnique({
+      where: { userId },
+      include: {
+        socialAccounts: true,
+      },
+    });
+
+    if (!influencer) {
+      return null;
+    }
+
+    // Calculate total followers across platforms
+    const totalFollowers = influencer.socialAccounts.reduce(
+      (total: number, account) => {
+        if (!account.followers) return total;
+
+        // Parse follower count (assuming format like "10K - 50K")
+        const followerRange = account.followers;
+        const numbers = followerRange.match(/\d+/g);
+        if (numbers && numbers.length > 0) {
+          const multiplier = followerRange.includes('K')
+            ? 1000
+            : followerRange.includes('M')
+              ? 1000000
+              : 1;
+          return total + parseInt(numbers[0]) * multiplier;
+        }
+        return total;
+      },
+      0,
+    );
+
+    return {
+      totalFollowers,
+      socialPlatforms: influencer.socialAccounts.length,
+      status: influencer.status,
+      joinDate: influencer.createdAt,
+      primaryNiche: influencer.primaryNiche,
+    };
+  }
+
+  /**
+   * Apply for a campaign as an influencer
+   */
+  async applyCampaign(userId: string, campaignId: string) {
+    // Get influencer profile
+    const influencer = await this.prisma.influencer.findUnique({
+      where: { userId },
+    });
+
+    if (!influencer) {
+      throw new BadRequestException(
+        'You must complete your influencer profile to apply for campaigns',
+      );
+    }
+
+    // Check if influencer is approved
+    if (influencer.status !== 'APPROVED') {
+      throw new BadRequestException(
+        'Your influencer profile must be approved before applying to campaigns',
+      );
+    }
+
+    // Check if campaign exists and is published
+    const campaign = await this.prisma.campaign.findUnique({
+      where: { id: campaignId },
+    });
+
+    if (!campaign) {
+      throw new NotFoundException('Campaign not found');
+    }
+
+    if (campaign.status !== 'PUBLISHED') {
+      throw new BadRequestException('This campaign is not accepting applications');
+    }
+
+    // Check if already applied
+    const existingApplication = await this.prisma.campaignInfluencer.findUnique({
+      where: {
+        campaignId_influencerId: {
+          campaignId,
+          influencerId: influencer.id,
+        },
+      },
+    });
+
+    if (existingApplication) {
+      throw new BadRequestException('You have already applied to this campaign');
+    }
+
+    // Create application
+    const application = await this.prisma.campaignInfluencer.create({
+      data: {
+        campaignId,
+        influencerId: influencer.id,
+        applicationStatus: 'APPLIED',
+      },
+    });
+
+    return {
+      success: true,
+      application,
+      message: 'Successfully applied to campaign',
+    };
+  }
+
+  /**
+   * Check if influencer has applied to a campaign
+   */
+  async hasAppliedToCampaign(userId: string, campaignId: string) {
+    const influencer = await this.prisma.influencer.findUnique({
+      where: { userId },
+    });
+
+    if (!influencer) {
+      return false;
+    }
+
+    const application = await this.prisma.campaignInfluencer.findUnique({
+      where: {
+        campaignId_influencerId: {
+          campaignId,
+          influencerId: influencer.id,
+        },
+      },
+    });
+
+    return !!application;
   }
 }
