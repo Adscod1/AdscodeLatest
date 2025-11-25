@@ -1,6 +1,6 @@
 "use client";
 
-import { getProducts } from "@/actions/product";
+import api from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useSearch } from "@/contexts/SearchContext";
@@ -16,7 +16,10 @@ const FeedPage = () => {
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products", storeId],
-    queryFn: () => getProducts(storeId as string),
+    queryFn: async () => {
+      const response = await api.products.getByStore({ storeId: storeId as string });
+      return response.products;
+    },
   });
 
   // Filter products based on search term and category

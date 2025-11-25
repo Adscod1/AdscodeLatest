@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { UserAuthButton } from "../(main)/components/UserAuthButton";
 import { useQuery } from "@tanstack/react-query";
-import { getStoreById } from "@/actions/store";
+import api from "@/lib/api-client";
 
 const StoreLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
@@ -25,7 +25,10 @@ const StoreLayout = ({ children }: { children: React.ReactNode }) => {
     isLoading: isLoadingStore,
   } = useQuery({
     queryKey: ["store", storeId],
-    queryFn: () => getStoreById(storeId as string),
+    queryFn: async () => {
+      const response = await api.stores.getById(storeId as string);
+      return response.store;
+    },
     enabled: !!storeId,
   });
 

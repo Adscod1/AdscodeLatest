@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, Play, Share2, Edit, Trash2, DollarSign, Users, Eye, MousePointer, Clock, TrendingUp, Zap, Star, X, Loader } from 'lucide-react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from "@/components/ui/card";
-import { getCampaignById, getCampaignInfluencers } from "@/actions/campaign";
+import api from "@/lib/api-client";
 
 // Star Rating Component
 interface StarRatingProps {
@@ -291,14 +291,14 @@ export default function CampaignDetailPage() {
     const fetchCampaignData = async () => {
       try {
         setIsLoading(true);
-        const campaignResult = await getCampaignById(campaignId);
+        const campaignResult = await api.campaigns.getById(campaignId);
         if (campaignResult.success && campaignResult.campaign) {
           setCampaign(campaignResult.campaign);
           
           // Fetch influencers for this campaign
-          const influencersResult = await getCampaignInfluencers(campaignId);
-          if (influencersResult.success && influencersResult.influencers) {
-            setCampaignInfluencers(influencersResult.influencers);
+          const influencersResult = await api.campaigns.getApplicants(campaignId);
+          if (influencersResult.success && influencersResult.applicants) {
+            setCampaignInfluencers(influencersResult.applicants);
           }
         }
       } catch (error) {

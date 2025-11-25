@@ -24,8 +24,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getStoreById } from "@/app/actions/store";
-import { createStoreReview, getStoreReviews } from "@/actions/reviews";
+import api from "@/lib/api-client";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import api from "@/lib/api-client";
@@ -221,12 +220,18 @@ const WriteReviewPage = () => {
 
   const { data: store, isLoading: isLoadingStore } = useQuery({
     queryKey: ["store", storeId],
-    queryFn: () => getStoreById(storeId),
+    queryFn: async () => {
+      const response = await api.stores.getById(storeId);
+      return response.store;
+    },
   });
 
   const { data: reviews, refetch: refetchReviews } = useQuery({
     queryKey: ["reviews", storeId],
-    queryFn: () => getStoreReviews(storeId),
+    queryFn: async () => {
+      const response = await api.reviews.getByStore(storeId);
+      return response.reviews;
+    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -275,7 +280,7 @@ const WriteReviewPage = () => {
       
       console.log('Review data with media:', reviewData);
       
-      await createStoreReview(reviewData);
+      await api.reviews.create(reviewData);
 
       toast.success("Review submitted successfully!");
       setIsReviewSubmitted(true);

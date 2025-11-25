@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, Download, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { getProductById } from '@/actions/product';
+import api from '@/lib/api-client';
 
 interface Product {
   id: string;
@@ -52,8 +52,8 @@ export default function CheckoutPage() {
       }
       
       try {
-        const productData = await getProductById(itemId);
-        setProduct(productData);
+        const response = await api.products.getById(itemId);
+        setProduct(response.product as unknown as Product);
       } catch (error) {
         console.error('Error fetching product:', error);
       } finally {

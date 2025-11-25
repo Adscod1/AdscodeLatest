@@ -13,7 +13,7 @@ import {
   Play,
   ChevronDown
 } from 'lucide-react';
-import { getProductById, getProducts } from '@/actions/product';
+import api from '@/lib/api-client';
 import Link from 'next/link';
 
 interface Product {
@@ -150,18 +150,18 @@ export default function ProductDetailPage() {
         setLoading(true);
         
         // Fetch the specific product
-        const productData = await getProductById(productId);
-        if (productData) {
-          setProduct(productData);
+        const response = await api.products.getById(productId);
+        if (response.product) {
+          setProduct(response.product as unknown as Product);
           
           // Fetch related products from the same store
-          if (productData.storeId) {
-            const storeProducts = await getProducts(productData.storeId);
+          if (response.product.storeId) {
+            const storeProductsResponse = await api.products.getByStore({ storeId: response.product.storeId });
             // Filter out current product and get first 4 related products
-            const related = storeProducts
+            const related = storeProductsResponse.products
               ?.filter(p => p.id !== productId)
               .slice(0, 4) || [];
-            setRelatedProducts(related);
+            setRelatedProducts(related as unknown as Product[]);
           }
         }
       } catch (error) {

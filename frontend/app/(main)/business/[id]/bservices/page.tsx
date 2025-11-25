@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getProducts } from '@/actions/product';
-import { getServicesByStore } from '@/actions/service';
+import api from '@/lib/api-client';
 import Link from 'next/link';
 
 interface Product {
@@ -120,12 +119,12 @@ export default function EcommercePage() {
       try {
         setLoading(true);
         // Fetch products for this business
-        const productsData = await getProducts(businessId);
+        const productsResponse = await api.products.getByStore({ storeId: businessId });
         // Fetch services for this business
-        const servicesData = await getServicesByStore(businessId);
+        const servicesResponse = await api.services.getByStore(businessId);
         
-        setProducts(productsData || []);
-        setServices(servicesData || []);
+        setProducts(productsResponse.products as unknown as Product[] || []);
+        setServices(servicesResponse.services as unknown as Service[] || []);
       } catch (error) {
         console.error('Error fetching products and services:', error);
         setProducts([]);

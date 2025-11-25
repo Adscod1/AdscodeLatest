@@ -1,6 +1,6 @@
 "use client";
 
-import { getPopularProducts } from "@/actions/product";
+import api from "@/lib/api-client";
 import { LoadingState } from "@/app/components/skeletons/stores-skeleton-loader";
 import { ErrorState } from "@/app/components/errors/error-state";
 import { useQuery } from "@tanstack/react-query";
@@ -18,7 +18,10 @@ const PopularProducts = () => {
     isError,
   } = useQuery<Product[]>({
     queryKey: ["popular-products"],
-    queryFn: () => getPopularProducts(storeId as string),
+    queryFn: async () => {
+      const response = await api.products.getPopularProducts(storeId as string);
+      return response.products as unknown as Product[];
+    },
   });
 
   if (isLoading) return <LoadingState />;

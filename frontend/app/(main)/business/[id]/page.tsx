@@ -1,9 +1,6 @@
 "use client";
 
-import { getStoreById } from "@/app/actions/store";
-import { getProducts } from "@/app/actions/product";
-import { getServicesByStore } from "@/actions/service";
-import { getStoreReviews } from "@/actions/reviews";
+import api from "@/lib/api-client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -87,24 +84,36 @@ const BusinessPage = () => {
 
   const { data: store, isLoading: isLoadingStore } = useQuery({
     queryKey: ["store", businessId],
-    queryFn: () => getStoreById(businessId),
+    queryFn: async () => {
+      const response = await api.stores.getById(businessId);
+      return response.store;
+    },
   });
 
   const { data: products, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["products", businessId],
-    queryFn: () => getProducts(businessId),
+    queryFn: async () => {
+      const response = await api.products.getByStore({ storeId: businessId });
+      return response.products;
+    },
     enabled: !!businessId,
   });
 
   const { data: services, isLoading: isLoadingServices } = useQuery({
     queryKey: ["services", businessId],
-    queryFn: () => getServicesByStore(businessId),
+    queryFn: async () => {
+      const response = await api.services.getByStore(businessId);
+      return response.services;
+    },
     enabled: !!businessId,
   });
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ["reviews", businessId],
-    queryFn: () => getStoreReviews(businessId),
+    queryFn: async () => {
+      const response = await api.reviews.getByStore(businessId);
+      return response.reviews;
+    },
     enabled: !!businessId,
   });
 

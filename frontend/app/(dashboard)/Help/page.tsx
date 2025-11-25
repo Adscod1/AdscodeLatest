@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
-import { getCurrentProfile } from "@/actions/profile";
+import api from "@/lib/api-client";
 import HelpCenter from "./Help";
 
 const Help = async () => {
@@ -14,7 +14,8 @@ const Help = async () => {
   }
 
   // Get the user profile
-  const profile = await getCurrentProfile();
+  const response = await api.profiles.getMe();
+  const profile = response.profile;
 
   if (!profile) {
     redirect("/auth/login");

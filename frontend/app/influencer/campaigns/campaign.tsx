@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, MapPin, Users, Calendar, DollarSign, ArrowLeft, Check, Video, Image, Package, Film, Camera, MessageSquare, LucideIcon, UserCheck, Briefcase, Laptop, Loader } from 'lucide-react';
 import InfluencerSidebar from '@/components/ui/influencersidebar';
-import { getPublishedCampaigns } from '@/actions/campaign';
+import api from '@/lib/api-client';
 
 interface ActiveCampaign {
   id: string;
@@ -52,7 +52,7 @@ const CampaignsPage = () => {
     const fetchCampaigns = async () => {
       try {
         setIsLoading(true);
-        const result = await getPublishedCampaigns({ limit: 100 });
+        const result = await api.campaigns.getAvailable();
         if (result.success && result.campaigns) {
           // Transform campaigns to match the UI expectations
           const transformedCampaigns = result.campaigns.map((campaign: any) => ({

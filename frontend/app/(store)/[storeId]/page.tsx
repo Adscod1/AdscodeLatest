@@ -3,7 +3,7 @@
 import React from "react";
 import { ArrowUpRight, ChevronDown, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getStoreById } from "@/actions/store";
+import api from "@/lib/api-client";
 import { useParams } from "next/navigation";
 import { LoadingState } from "@/app/components/skeletons/stores-skeleton-loader";
 import { ErrorState } from "@/app/components/errors/error-state";
@@ -18,7 +18,10 @@ const DashboardPage = () => {
     isError,
   } = useQuery({
     queryKey: ["store", storeId],
-    queryFn: () => getStoreById(storeId as string),
+    queryFn: async () => {
+      const response = await api.stores.getById(storeId as string);
+      return response.store;
+    },
   });
 
   if (isLoading) return <LoadingState />;

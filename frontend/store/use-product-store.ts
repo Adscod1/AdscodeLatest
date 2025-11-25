@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CreateProductInput } from "@/actions/product";
+import { CreateProductInput } from "@/lib/api-client";
 
 interface ProductStore {
   product: Partial<CreateProductInput>;

@@ -21,7 +21,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import Link from 'next/link';
-import { getCampaigns } from '@/actions/campaign';
+import api from '@/lib/api-client';
 
 interface Campaign {
   id: string;
@@ -49,7 +49,7 @@ const MarketingCampaigns: React.FC = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const result = await getCampaigns();
+        const result = await api.campaigns.getAll({ storeId });
         if (result.success && result.campaigns) {
           // Deduplicate campaigns by ID
           const uniqueCampaigns = Array.from(
@@ -65,7 +65,7 @@ const MarketingCampaigns: React.FC = () => {
     };
 
     fetchCampaigns();
-  }, []);
+  }, [storeId]);
 
   // Calculate stats from real campaigns
   const stats = {

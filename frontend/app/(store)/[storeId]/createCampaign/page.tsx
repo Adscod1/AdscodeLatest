@@ -4,7 +4,7 @@ import { ChevronLeft, Plus, Trash2, Calendar, Users, Target, Package, Eye, Check
 import { Command as CommandPrimitive } from "cmdk";
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { createCampaign } from '@/actions/campaign';
+import api from '@/lib/api-client';
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -753,8 +753,8 @@ const InfluencerCampaignManager = () => {
         typeSpecificData: campaignData.typeSpecificData || undefined,
       };
 
-      // Call server action with publish flag to publish immediately
-      const result = await createCampaign({ ...submissionData, publish: true });
+      // Call API with publish flag to publish immediately
+      const result = await api.campaigns.create({ ...submissionData, publish: true });
 
       if (result.success) {
         // Clear localStorage on success

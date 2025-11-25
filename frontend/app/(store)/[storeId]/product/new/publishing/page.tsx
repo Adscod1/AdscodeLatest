@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm } from "react-hook-form";
-import { CreateProductInput, createProduct } from "@/actions/product";
+import api, { CreateProductInput } from "@/lib/api-client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +41,7 @@ const NewProductPublishingPage = () => {
   });
 
   const createProductMutation = useMutation({
-    mutationFn: createProduct,
+    mutationFn: (data: CreateProductInput) => api.products.create(data),
     onSuccess: () => {
       toast.success("Product published successfully!");
       reset();

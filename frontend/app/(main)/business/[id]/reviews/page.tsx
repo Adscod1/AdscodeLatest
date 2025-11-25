@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getStoreById } from "@/app/actions/store";
-import { getStoreReviews } from "@/actions/reviews";
+import api from "@/lib/api-client";
 import { useState } from "react";
 
 interface ReviewWithUser {
@@ -38,12 +37,18 @@ const ReviewsPage = () => {
 
   const { data: store, isLoading: isLoadingStore } = useQuery({
     queryKey: ["store", storeId],
-    queryFn: () => getStoreById(storeId),
+    queryFn: async () => {
+      const response = await api.stores.getById(storeId);
+      return response.store;
+    },
   });
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ["reviews", storeId],
-    queryFn: () => getStoreReviews(storeId),
+    queryFn: async () => {
+      const response = await api.reviews.getByStore(storeId);
+      return response.reviews;
+    },
   });
 
   // Filter and sort reviews

@@ -1,6 +1,6 @@
 "use client";
 
-import { getStores } from "@/app/actions/store";
+import api from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -234,7 +234,10 @@ const BusinessesPageContent = () => {
   
   const { data: stores, isLoading } = useQuery({
     queryKey: ["stores"],
-    queryFn: getStores,
+    queryFn: async () => {
+      const response = await api.stores.getAll();
+      return response.stores;
+    },
   });
 
   // Filter stores based on search query

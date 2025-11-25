@@ -1,6 +1,6 @@
 "use client";
 
-import { getStoreActivity } from "@/actions/product";
+import api from "@/lib/api-client";
 import { StoreActivity } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -12,7 +12,10 @@ const ActivityCard = () => {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["store-activity", storeId],
-    queryFn: () => getStoreActivity(storeId as string),
+    queryFn: async () => {
+      const response = await api.products.getStoreActivity(storeId as string);
+      return response.activities as StoreActivity[];
+    },
   });
 
   const renderEmoji = (activity: StoreActivity) => {

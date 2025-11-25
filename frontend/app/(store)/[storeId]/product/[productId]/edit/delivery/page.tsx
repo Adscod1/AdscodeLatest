@@ -3,7 +3,7 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProductById, updateProduct } from "@/actions/product";
+import api from "@/lib/api-client";
 import { useForm } from "react-hook-form";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -71,9 +71,9 @@ const EditDeliveryPage = () => {
   const { data: product, isLoading } = useQuery<Product | null, Error>({
     queryKey: ["product", productId],
     queryFn: async () => {
-      const data = await getProductById(productId as string);
-      if (!data) return null;
-      return data as unknown as Product;
+      const response = await api.products.getById(productId as string);
+      if (!response.product) return null;
+      return response.product as unknown as Product;
     },
   });
 
@@ -102,8 +102,8 @@ const EditDeliveryPage = () => {
   const updateProductMutation = useMutation<Product, Error, UpdateProductInput>(
     {
       mutationFn: async (data) => {
-        const result = await updateProduct(productId as string, data);
-        return result as unknown as Product;
+        const result = await api.products.update(productId as string, data);
+        return result.product as unknown as Product;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["product", productId] });

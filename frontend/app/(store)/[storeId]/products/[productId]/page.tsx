@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { getProductById } from '@/actions/product';
+import api from '@/lib/api-client';
 import { 
   ArrowLeft, 
   Share, 
@@ -83,10 +83,10 @@ const ProductDetailsPage = () => {
       try {
         if (!productId) return;
         
-        const productData = await getProductById(productId as string);
+        const response = await api.products.getById(productId as string);
         
-        if (productData) {
-          setProduct(productData as Product);
+        if (response.product) {
+          setProduct(response.product as unknown as Product);
         } else {
           console.error('Product not found');
         }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ProductTabs } from "../components/product-tabs";
 import { useForm } from "react-hook-form";
 import { useParams, useRouter } from "next/navigation";
-import { CreateProductInput } from "@/actions/product";
+import { CreateProductInput } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

@@ -4,7 +4,7 @@ import { ChevronLeft, Info, X } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm, useFieldArray } from "react-hook-form";
-import { CreateProductInput } from "@/actions/product";
+import { CreateProductInput } from "@/lib/api-client";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

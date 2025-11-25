@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AddCatalogDialog from "@/components/AddCatalogDialog";
-import { deleteProduct, getProducts } from "@/actions/product";
+import api from "@/lib/api-client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -88,12 +88,15 @@ const StoreListings = () => {
   // Fetch products
   const { data: products, isLoading } = useQuery({
     queryKey: ["products", storeId],
-    queryFn: () => getProducts(storeId),
+    queryFn: async () => {
+      const response = await api.products.getByStore({ storeId });
+      return response.products;
+    },
   });
 
   // Delete product mutation
   const deleteProductMutation = useMutation({
-    mutationFn: deleteProduct,
+    mutationFn: (productId: string) => api.products.delete(productId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Product deleted successfully");
