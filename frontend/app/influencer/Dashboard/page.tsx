@@ -1,8 +1,7 @@
 import { headers } from "next/headers";
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
-import { getCurrentProfile } from "@/actions/profile";
-import { getCurrentInfluencer } from "@/actions/influencer";
+import api from "@/lib/api-client";
 import Dashboard from "./Dashboard";
 
 const DashboardPage = async () => {
@@ -15,8 +14,35 @@ const DashboardPage = async () => {
   }
 
   // Get the user profile and influencer data
-  const profile = await getCurrentProfile();
-  const influencer = await getCurrentInfluencer();
+  const profileResponse = await api.profiles.getMe();
+  const profile = profileResponse.profile;
+  
+  let influencer = null;
+  try {
+    const influencerResponse = await api.influencers.getMe();
+    if (influencerResponse.influencer) {
+      // Transform Influencer to InfluencerData
+      const inf = influencerResponse.influencer;
+      influencer = {
+        id: inf.id,
+        firstName: inf.firstName,
+        lastName: inf.lastName,
+        primaryNiche: inf.primaryNiche || '',
+        secondaryNiches: [],
+        bio: inf.bio || null,
+        status: inf.status,
+        socialAccounts: inf.socialAccounts || [],
+        user: {
+          id: inf.userId,
+          email: '',
+          name: `${inf.firstName} ${inf.lastName}`,
+          image: inf.profilePicture || null,
+        },
+      };
+    }
+  } catch {
+    // Not an influencer
+  }
 
   if (!profile) {
     redirect("/auth/login");

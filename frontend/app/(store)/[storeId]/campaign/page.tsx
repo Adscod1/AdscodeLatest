@@ -21,20 +21,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import Link from 'next/link';
-import api from '@/lib/api-client';
-
-interface Campaign {
-  id: string;
-  title: string;
-  type: string;
-  budget: number;
-  duration?: number | null;
-  status: string;
-  createdAt: Date;
-  _count?: {
-    applicants: number;
-  };
-}
+import api, { Campaign } from '@/lib/api-client';
 
 const MarketingCampaigns: React.FC = () => {
   const params = useParams();

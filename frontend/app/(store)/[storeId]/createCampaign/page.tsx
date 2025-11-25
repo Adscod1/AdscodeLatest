@@ -309,26 +309,10 @@ const InfluencerCampaignManager = () => {
   const fetchProducts = async () => {
     setIsLoadingProducts(true);
     try {
-      const params = new URLSearchParams({
-        storeId,
-        limit: '50'
-      });
-      
-      if (productSearchQuery) {
-        params.append('search', productSearchQuery);
-      }
-
-      const response = await fetch(`/api/campaigns/products?${params}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-
-      const data = await response.json();
+      const data = await api.campaigns.getProducts(storeId);
       setProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      setUploadError('Failed to load products. Please try again.');
     } finally {
       setIsLoadingProducts(false);
     }
@@ -780,13 +764,14 @@ const InfluencerCampaignManager = () => {
         router.push(`/${storeId}/campaign`);
       } else {
         // Log validation details if available
-        if (result.details) {
-          console.error('Validation errors:', result.details);
+        const resultWithDetails = result as unknown as { details?: Array<{ path: string[]; message: string }>; error?: string };
+        if (resultWithDetails.details) {
+          console.error('Validation errors:', resultWithDetails.details);
           // Show detailed validation errors
-          const errorMessages = result.details.map((err: any) => `${err.path.join('.')}: ${err.message}`).join(', ');
+          const errorMessages = resultWithDetails.details.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ');
           setSubmitError(`Validation failed: ${errorMessages}`);
         } else {
-          setSubmitError(result.error || 'Failed to create campaign');
+          setSubmitError(resultWithDetails.error || 'Failed to create campaign');
         }
       }
     } catch (error) {
@@ -1563,9 +1548,9 @@ const InfluencerCampaignManager = () => {
                             strokeDasharray="" 
                             strokeDashoffset="0" 
                             fontFamily="none" 
-                            fontWeight="none" 
+                            fontWeight="normal" 
                             fontSize="none" 
-                            textAnchor="none" 
+                            textAnchor="inherit" 
                             style={{mixBlendMode: 'normal'}}
                           >
                             <g transform="scale(8.53333,8.53333)">

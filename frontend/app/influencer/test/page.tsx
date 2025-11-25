@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { auth } from "@/utils/auth";
-import { getCurrentInfluencer } from "@/actions/influencer";
-import { getCurrentProfile } from "@/actions/profile";
+import api from "@/lib/api-client";
 
 export default async function TestPage() {
   const session = await auth.api.getSession({
@@ -12,8 +11,16 @@ export default async function TestPage() {
     return <div>Not logged in</div>;
   }
 
-  const profile = await getCurrentProfile();
-  const influencer = await getCurrentInfluencer();
+  const profileResponse = await api.profiles.getMe();
+  const profile = profileResponse.profile;
+  
+  let influencer = null;
+  try {
+    const influencerResponse = await api.influencers.getMe();
+    influencer = influencerResponse.influencer;
+  } catch {
+    // Not an influencer
+  }
 
   return (
     <div className="p-8">

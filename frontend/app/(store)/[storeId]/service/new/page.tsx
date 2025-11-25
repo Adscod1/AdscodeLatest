@@ -382,7 +382,7 @@ const CreateNewService = () => {
                         onUpload={handleMediaUpload}
                         accept="image/*,video/*"
                         maxSize={10}
-                        endpoint="/api/service/media"
+                        endpoint="/service/media"
                       >
                         <div>
                           <p className="text-sm font-medium text-gray-900 mb-1">
@@ -430,7 +430,7 @@ const CreateNewService = () => {
                           onUpload={handleMediaUpload}
                           accept="image/*,video/*"
                           maxSize={10}
-                          endpoint="/api/service/media"
+                          endpoint="/service/media"
                           className="h-full"
                         >
                           <div className="flex items-center justify-center h-full border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors cursor-pointer">

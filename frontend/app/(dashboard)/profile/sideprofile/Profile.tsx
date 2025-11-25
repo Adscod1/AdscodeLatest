@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { getCurrentProfile } from "@/actions/profile";
+import { getCurrentProfile } from "@/lib/api-client";
 import { Profile } from "@prisma/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CustomSidebar from "@/components/ui/custom-sidebar";

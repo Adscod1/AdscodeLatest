@@ -21,12 +21,16 @@
     "clean": "rm -rf frontend/node_modules backend/node_modules node_modules frontend/.next backend/dist"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "prisma": "^6.18.0"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.18.0"
+  }
 }

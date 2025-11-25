@@ -235,7 +235,7 @@ const BusinessesPageContent = () => {
   const { data: stores, isLoading } = useQuery({
     queryKey: ["stores"],
     queryFn: async () => {
-      const response = await api.stores.getAll();
+      const response = await api.stores.getAllStores();
       return response.stores;
     },
   });

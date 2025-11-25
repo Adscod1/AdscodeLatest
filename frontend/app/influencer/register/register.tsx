@@ -161,8 +161,8 @@ const CreatorNetworkForm: React.FC = () => {
         socialAccounts.push({
           platform: 'INSTAGRAM',
           handle: formData.instagramHandle,
-          followers: formData.instagramFollowers,
-          url: `https://instagram.com/${formData.instagramHandle.replace('@', '')}`
+          followerCount: parseInt(formData.instagramFollowers),
+          profileUrl: `https://instagram.com/${formData.instagramHandle.replace('@', '')}`
         })
       }
       
@@ -175,8 +175,8 @@ const CreatorNetworkForm: React.FC = () => {
         socialAccounts.push({
           platform: 'YOUTUBE',
           handle: formData.youtubeChannel,
-          followers: formData.youtubeSubscribers,
-          url: formData.youtubeChannel.startsWith('http') ? formData.youtubeChannel : `https://youtube.com/c/${formData.youtubeChannel}`
+          followerCount: parseInt(formData.youtubeSubscribers),
+          profileUrl: formData.youtubeChannel.startsWith('http') ? formData.youtubeChannel : `https://youtube.com/c/${formData.youtubeChannel}`
         })
       }
       
@@ -189,8 +189,8 @@ const CreatorNetworkForm: React.FC = () => {
         socialAccounts.push({
           platform: 'TIKTOK',
           handle: formData.tiktokHandle,
-          followers: formData.tiktokFollowers,
-          url: `https://tiktok.com/@${formData.tiktokHandle.replace('@', '')}`
+          followerCount: parseInt(formData.tiktokFollowers),
+          profileUrl: `https://tiktok.com/@${formData.tiktokHandle.replace('@', '')}`
         })
       }
       
@@ -203,23 +203,16 @@ const CreatorNetworkForm: React.FC = () => {
         socialAccounts.push({
           platform: 'TWITTER',
           handle: formData.twitterHandle,
-          followers: formData.twitterFollowers,
-          url: `https://twitter.com/${formData.twitterHandle.replace('@', '')}`
+          followerCount: parseInt(formData.twitterFollowers),
+          profileUrl: `https://twitter.com/${formData.twitterHandle.replace('@', '')}`
         })
       }
-
       const result = await api.influencers.register({
           firstName: formData.firstName,
           lastName: formData.lastName,
-          phone: formData.phone,
-          country: formData.country,
-          city: formData.city,
           primaryNiche: formData.primaryNiche,
-          secondaryNiches: formData.secondaryNiches,
+          location: formData.country ? `${formData.city}, ${formData.country}` : undefined,
           bio: formData.bio,
-          websiteUrl: formData.websiteUrl,
-          ratePerPost: formData.ratePerPost,
-          brandCollaborations: formData.brandCollaborations,
           socialAccounts
         })
 

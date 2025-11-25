@@ -421,7 +421,7 @@ const BusinessPage = () => {
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-base sm:text-lg font-bold text-gray-900">${item.price}</span>
-                            {item.comparePrice && item.comparePrice > item.price && (
+                            {item.comparePrice && item.price && item.comparePrice > item.price && (
                               <span className="text-xs sm:text-sm text-gray-400 line-through">${item.comparePrice}</span>
                             )}
                           </div>

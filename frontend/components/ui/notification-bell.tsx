@@ -4,16 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Check, CheckCheck, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import api from "@/lib/api-client";
-
-interface Notification {
-  id: string;
-  type: string;
-  message: string;
-  link: string | null;
-  read: boolean;
-  createdAt: string;
-}
+import api, { Notification } from "@/lib/api-client";
 
 const NotificationBell = () => {
   const router = useRouter();
@@ -26,7 +17,7 @@ const NotificationBell = () => {
   // Fetch notifications
   const fetchNotifications = async () => {
     try {
-      const result = await api.notifications.getAll(10);
+      const result = await api.notifications.getAll({ limit: 10 });
       setNotifications(result.notifications || []);
       setUnreadCount(result.notifications.filter((n: Notification) => !n.read).length);
     } catch (error) {

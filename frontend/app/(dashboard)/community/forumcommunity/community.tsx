@@ -1,5 +1,5 @@
 "use client";
-import { getCurrentProfile } from "@/actions/profile";
+import { getCurrentProfile } from "@/lib/api-client";
 import { Profile } from "@prisma/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardLayout } from "@/components/ui/dashboard-layout";

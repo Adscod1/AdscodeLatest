@@ -2,7 +2,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/ui/dashboard-layout';
-import { getCurrentProfile } from '@/actions/profile';
+import { getCurrentProfile } from '@/lib/api-client';
 import { Profile } from '@prisma/client';
 import { auth } from '@/utils/auth';
 import { useIsMobile } from '@/hooks/use-mobile';

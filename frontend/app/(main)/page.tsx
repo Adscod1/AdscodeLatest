@@ -34,7 +34,6 @@ const FeedPage = () => {
       filtered = filtered.filter((product) => 
         product.title.toLowerCase().includes(term) ||
         product.description?.toLowerCase().includes(term) ||
-        product.store?.name?.toLowerCase().includes(term) ||
         product.category?.toLowerCase().includes(term)
       );
     }

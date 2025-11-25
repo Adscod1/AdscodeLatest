@@ -80,9 +80,8 @@ const CampaignsPage = () => {
           const appliedSet = new Set<string>();
           for (const campaign of transformedCampaigns) {
             try {
-              const response = await fetch(`/api/campaigns/${campaign.id}/apply`);
-              const data = await response.json();
-              if (data.hasApplied) {
+              const hasApplied = await api.influencers.hasAppliedToCampaign(campaign.id);
+              if (hasApplied) {
                 appliedSet.add(campaign.id);
               }
             } catch (error) {
@@ -150,21 +149,14 @@ const CampaignsPage = () => {
   const handleApplyCampaign = async (campaignId: string) => {
     try {
       setApplyingCampaignId(campaignId);
-      const response = await fetch(`/api/campaigns/${campaignId}/apply`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      const result = await response.json();
+      const result = await api.campaigns.apply(campaignId);
       
       if (result.success) {
         // Add to applied campaigns
         setAppliedCampaigns(prev => new Set(prev).add(campaignId));
         alert('Successfully applied to campaign!');
       } else {
-        alert(result.error || 'Failed to apply to campaign');
+        alert('Failed to apply to campaign');
       }
     } catch (error) {
       console.error('Error applying to campaign:', error);

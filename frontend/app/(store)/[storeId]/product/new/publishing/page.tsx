@@ -279,8 +279,8 @@ const NewProductPublishingPage = () => {
                       {product.variations?.map((variation, index) => (
                         <TableRow key={index}>
                           <TableCell>{variation.value}</TableCell>
-                          <TableCell>$ {variation.price.toFixed(2)}</TableCell>
-                          <TableCell>{variation.stock}</TableCell>
+                          <TableCell>$ {(variation.price ?? 0).toFixed(2)}</TableCell>
+                          <TableCell>{variation.stock ?? 0}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

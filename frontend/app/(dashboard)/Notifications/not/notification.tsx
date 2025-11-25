@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/ui/dashboard-layout';
 import { Profile } from '@prisma/client';
 import { auth } from '@/utils/auth';
-import { getCurrentProfile } from '@/actions/profile';
+import { getCurrentProfile } from '@/lib/api-client';
 import { 
   Bell, 
   CheckCircle, 

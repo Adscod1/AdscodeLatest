@@ -147,23 +147,23 @@ export interface Store {
   id: string;
   userId: string;
   name: string;
-  tagline?: string;
-  description?: string;
-  category?: string;
-  regNumber?: string;
-  yearEstablished?: number;
-  phone?: string;
-  email?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  zip?: string;
-  website?: string;
-  logo?: string;
-  banner?: string;
-  createdAt: string;
-  updatedAt: string;
+  tagline: string | null;
+  description: string | null;
+  category: string | null;
+  regNumber: string | null;
+  yearEstablished: number | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  zip: string | null;
+  website: string | null;
+  logo: string | null;
+  banner: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateStoreInput {
@@ -242,6 +242,7 @@ export const storesApi = {
 // ============================================================================
 
 export interface ProductVariation {
+  id?: string;
   name: string;
   value: string;
   price?: number;
@@ -249,10 +250,12 @@ export interface ProductVariation {
 }
 
 export interface ProductImage {
+  id?: string;
   url: string;
 }
 
 export interface ProductVideo {
+  id?: string;
   url: string;
 }
 
@@ -262,12 +265,34 @@ export interface Product {
   title: string;
   description?: string;
   category?: string;
-  price: number;
+  vendor?: string;
+  tags?: string;
+  price?: number;
   comparePrice?: number;
+  costPerItem?: number;
+  weight?: number;
+  weightUnit?: string;
+  length?: number;
+  width?: number;
+  height?: number;
+  sizeUnit?: string;
+  countryOfOrigin?: string;
+  harmonizedSystemCode?: string;
   status: string;
   variations: ProductVariation[];
   images: ProductImage[];
   videos: ProductVideo[];
+  store?: {
+    id: string;
+    name: string;
+    category: string | null;
+    logo: string | null;
+    avatarUrl: string | null;
+    verified?: boolean;
+  };
+  _count?: {
+    comments: number;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -290,6 +315,10 @@ export interface CreateProductInput {
   requiresShipping?: boolean;
   weight?: number;
   weightUnit?: string;
+  length?: number;
+  width?: number;
+  height?: number;
+  sizeUnit?: string;
   countryOfOrigin?: string;
   harmonizedSystemCode?: string;
   status?: string;
@@ -460,14 +489,22 @@ export interface Campaign {
   title: string;
   description?: string | null;
   objective?: string;
+  type?: string;
   startDate?: string;
   endDate?: string;
   budget: number;
   currency: string;
+  duration?: number;
   status: string;
   requirements?: string;
   deliverables?: string;
   targetAudience?: string;
+  platforms?: string[];
+  targets?: string[];
+  influencerLocation?: {
+    country?: string;
+    stateCity?: string;
+  };
   createdAt: string;
   updatedAt: string;
   _count: {
@@ -476,17 +513,25 @@ export interface Campaign {
 }
 
 export interface CreateCampaignInput {
-  storeId: string;
+  storeId?: string;
   title: string;
   description?: string;
   objective?: string;
   startDate?: string;
   endDate?: string;
   budget?: number;
+  currency?: string;
+  duration?: number;
   requirements?: string;
   deliverables?: string;
   targetAudience?: string;
   productIds?: string[];
+  platforms?: string[];
+  targets?: string[];
+  influencerLocation?: {
+    country?: string;
+    stateCity?: string;
+  };
 }
 
 export interface CampaignQueryParams {
@@ -615,6 +660,10 @@ export const influencersApi = {
   getAll: () => 
     apiRequest<Influencer[]>('/influencer/list'),
   
+  // Get all influencers with success wrapper
+  list: () => 
+    apiRequest<{ success: boolean; data: Influencer[] }>('/influencer/list'),
+  
   // Get current influencer profile
   getMe: () => 
     apiRequest<{ success: boolean; influencer: Influencer | null }>('/influencer/me'),
@@ -703,16 +752,21 @@ export const notificationsApi = {
 // PROFILES API
 // ============================================================================
 
+// Note: Role enum matches Prisma schema
+export type Role = 'ADMIN' | 'USER' | 'INFLUENCER';
+
 export interface Profile {
   id: string;
   userId: string;
-  name: string;
-  image?: string;
-  bio?: string;
-  location?: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
+  name: string | null;
+  image: string | null;
+  bio: string | null;
+  location: string | null;
+  website: string | null;
+  socials: string | null;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface UpdateProfileInput {
@@ -751,16 +805,16 @@ export interface Review {
   storeId: string;
   userId: string;
   rating: number;
-  comment?: string;
-  images?: string;
-  videos?: string;
+  comment: string | null;
+  images: string | null;
+  videos: string | null;
   user: {
     id: string;
-    name: string;
-    image?: string;
+    name: string | null;
+    image: string | null;
   };
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateReviewInput {
@@ -802,6 +856,41 @@ export const reviewsApi = {
 };
 
 // ============================================================================
+// COMMENTS API
+// ============================================================================
+
+export interface Comment {
+  id: string;
+  content: string;
+  productId: string;
+  userId: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+  };
+}
+
+export interface CreateCommentInput {
+  content: string;
+}
+
+export const commentsApi = {
+  // Get comments for a product
+  getByProduct: (productId: string) => 
+    apiRequest<{ success: boolean; comments: Comment[]; count: number }>(`/comments/${productId}`),
+  
+  // Create a comment on a product
+  create: (productId: string, data: CreateCommentInput) => 
+    apiRequest<{ success: boolean; comment: Comment }>(`/comments/${productId}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
+// ============================================================================
 // UPLOAD API
 // ============================================================================
 
@@ -823,48 +912,72 @@ export const uploadApi = {
 // to minimize changes in existing components
 
 // Profile actions
-export const getCurrentProfile = async () => {
+export const getCurrentProfile = async (): Promise<Profile | null> => {
   const response = await profilesApi.getMe();
-  return response.profile;
+  if (!response.profile) return null;
+  // Transform date strings to Date objects for Prisma compatibility
+  return {
+    ...response.profile,
+    createdAt: new Date(response.profile.createdAt),
+    updatedAt: new Date(response.profile.updatedAt),
+  };
 };
 
-export const updateProfile = async (data: UpdateProfileInput) => {
+export const updateProfile = async (data: UpdateProfileInput): Promise<Profile> => {
   const response = await profilesApi.update(data);
-  return response.profile;
+  return {
+    ...response.profile,
+    createdAt: new Date(response.profile.createdAt),
+    updatedAt: new Date(response.profile.updatedAt),
+  };
 };
 
-export const updateProfileFields = async (data: UpdateProfileInput) => {
+export const updateProfileFields = async (data: UpdateProfileInput): Promise<Profile> => {
   const response = await profilesApi.patch(data);
-  return response.profile;
+  return {
+    ...response.profile,
+    createdAt: new Date(response.profile.createdAt),
+    updatedAt: new Date(response.profile.updatedAt),
+  };
 };
 
 // Store actions
+const transformStore = (store: Store): Store => ({
+  ...store,
+  createdAt: new Date(store.createdAt),
+  updatedAt: new Date(store.updatedAt),
+});
+
 export const createStore = async (store: CreateStoreInput) => {
   const response = await storesApi.create(store);
-  return response.store;
+  return transformStore(response.store);
 };
 
 export const getAllUserStores = async () => {
   const response = await storesApi.getUserStores();
-  return response.stores;
+  return response.stores.map(transformStore);
 };
 
 export const getStoreById = async (storeId: string) => {
   try {
     const response = await storesApi.getById(storeId);
-    return response.store;
+    return transformStore(response.store);
   } catch {
     return null;
   }
 };
 
 export const getStores = async (params?: GetStoresParams) => {
-  return storesApi.getAllStores(params);
+  const response = await storesApi.getAllStores(params);
+  return {
+    ...response,
+    stores: response.stores.map(transformStore),
+  };
 };
 
 export const appendStoreDetails = async (storeId: string, storeDetails: Partial<CreateStoreInput>) => {
   const response = await storesApi.update(storeId, storeDetails);
-  return response.store;
+  return transformStore(response.store);
 };
 
 // Product actions
@@ -1035,5 +1148,6 @@ export default {
   notifications: notificationsApi,
   profiles: profilesApi,
   reviews: reviewsApi,
+  comments: commentsApi,
   upload: uploadApi,
 };

@@ -51,20 +51,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-
-interface ProductVariation {
-  id: string;
-  name: string;
-  value: string;
-  price: number;
-  stock: number;
-}
+import { ProductVariation, Product as ApiProduct } from "@/lib/api-client";
 
 interface Product {
   id: string;
   title: string;
   description?: string | null;
-  price: number;
+  price?: number;
   category?: string | null;
   status: string;
   images?: { url: string }[];
@@ -123,7 +116,7 @@ const StoreListings = () => {
 
   // Calculate total stock for a product from its variations
   const getTotalStock = (variations: ProductVariation[]) => {
-    return variations.reduce((total, variation) => total + variation.stock, 0);
+    return variations.reduce((total, variation) => total + (variation.stock ?? 0), 0);
   };
 
   return (
@@ -217,7 +210,7 @@ const StoreListings = () => {
                         <div className="min-w-0 flex-1">
                           <span className="font-medium text-sm sm:text-base truncate block">{product.title}</span>
                           <div className="sm:hidden text-xs text-gray-500 mt-1">
-                            {product.category || "Uncategorized"} • UGX {product.price.toLocaleString()}
+                            {product.category || "Uncategorized"} • UGX {(product.price ?? 0).toLocaleString()}
                           </div>
                           <div className="md:hidden mt-1 flex gap-2">
                             <Badge variant="outline" className="text-xs">
@@ -236,7 +229,7 @@ const StoreListings = () => {
                     <TableCell className="text-gray-600 hidden sm:table-cell">
                       {product.category || "Uncategorized"}
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">UGX {product.price.toLocaleString()}</TableCell>
+                    <TableCell className="hidden sm:table-cell">UGX {(product.price ?? 0).toLocaleString()}</TableCell>
                     <TableCell className="hidden md:table-cell">
                       <Badge variant="outline">
                         {getTotalStock(product.variations)} in stock

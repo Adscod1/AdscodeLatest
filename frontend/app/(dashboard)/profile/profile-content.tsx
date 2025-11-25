@@ -32,7 +32,7 @@ import UserEngagement from "./components/user-engagement";
 import UserLocation from "./components/user-location";
 import { useState, useEffect } from "react";
 import { ProfileEditForm } from "./components/profile-edit-form";
-import { getCurrentProfile } from "@/actions/profile";
+import { getCurrentProfile } from "@/lib/api-client";
 import AllStoresCards from "./components/all-stores-cards";
 import { DashboardLayout } from "@/components/ui/dashboard-layout";
 

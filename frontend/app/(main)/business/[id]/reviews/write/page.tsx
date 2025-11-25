@@ -27,7 +27,6 @@ import Link from "next/link";
 import api from "@/lib/api-client";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import api from "@/lib/api-client";
 
 const WriteReviewPage = () => {
   const params = useParams();

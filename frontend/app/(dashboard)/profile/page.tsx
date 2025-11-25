@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import ProfileContent from "./profile-content";
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
-import { getCurrentProfile } from "@/actions/profile";
+import api from "@/lib/api-client";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
@@ -15,7 +15,8 @@ const ProfilePage = async () => {
     redirect("/auth/login");
   }
 
-  let profile = await getCurrentProfile();
+  const response = await api.profiles.getMe();
+  let profile = response.profile;
 
   // If profile doesn't exist (e.g., OAuth user), create one automatically
   if (!profile) {

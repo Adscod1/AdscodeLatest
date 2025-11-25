@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Profile } from "@prisma/client";
 import { ProfileUpdateValues, profileUpdateSchema } from "@/types";
-import { updateProfileFields } from "@/actions/profile";
+import { updateProfileFields } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import {
   Form,

@@ -171,7 +171,29 @@ const CreatorStudioDashboard = () => {
         const data = await api.influencers.list();
         
         if (data.success && Array.isArray(data.data)) {
-          setCreators(data.data);
+          // Transform Influencer data to Creator format
+          const transformedCreators: Creator[] = data.data.map((influencer: any) => ({
+            id: influencer.id,
+            name: `${influencer.firstName || ''} ${influencer.lastName || ''}`.trim() || 'Unknown',
+            handle: influencer.socialAccounts?.[0]?.handle || `@${influencer.firstName?.toLowerCase() || 'user'}`,
+            followers: influencer.totalFollowers ? `${(influencer.totalFollowers / 1000).toFixed(1)}K` : '0',
+            engagement: influencer.engagementRate ? `${influencer.engagementRate.toFixed(1)}%` : '0%',
+            category: influencer.primaryNiche || 'General',
+            rating: '4.5',
+            rate: '$500',
+            location: influencer.location || 'Unknown',
+            icon: influencer.profilePicture,
+            email: '',
+            bio: influencer.bio,
+            platforms: {
+              instagram: influencer.socialAccounts?.find((a: any) => a.platform === 'Instagram')?.handle || '',
+              youtube: influencer.socialAccounts?.find((a: any) => a.platform === 'YouTube')?.handle || '',
+              tiktok: influencer.socialAccounts?.find((a: any) => a.platform === 'TikTok')?.handle || '',
+            },
+            userId: influencer.userId,
+            image: influencer.profilePicture,
+          }));
+          setCreators(transformedCreators);
         } else {
           throw new Error('Invalid response format');
         }
@@ -195,77 +217,86 @@ const CreatorStudioDashboard = () => {
         setApplicationsLoading(true);
         const result = await api.campaigns.getAll({ storeId: params?.storeId as string });
         
-        if (result.success && result.applications) {
-          // Transform database applications to UI format
-          const transformedApplications: Application[] = result.applications.map((app: any, index: number) => {
-            const influencer = app.influencer;
-            const instagramAccount = influencer.socialAccounts?.find((acc: any) => acc.platform === 'INSTAGRAM');
-            const tiktokAccount = influencer.socialAccounts?.find((acc: any) => acc.platform === 'TIKTOK');
-            const youtubeAccount = influencer.socialAccounts?.find((acc: any) => acc.platform === 'YOUTUBE');
-            
-            // Default engagement rate (can be calculated from actual metrics later)
-            const avgEngagement = 3.5;
-            
-            // Get total followers
-            const totalFollowers = influencer.socialAccounts
-              ?.reduce((sum: number, acc: any) => sum + (acc.followers || 0), 0) || 0;
-            
-            const formatFollowers = (count: number) => {
-              if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-              if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
-              return count.toString();
-            };
-
-            return {
-              id: index + 1,
-              influencer: {
-                name: `${influencer.firstName} ${influencer.lastName}`,
-                username: instagramAccount?.handle || tiktokAccount?.handle || youtubeAccount?.handle || 'N/A',
-                avatar: '👤',
-                category: influencer.primaryNiche || 'General',
-                followers: formatFollowers(totalFollowers),
-                engagement: `${avgEngagement?.toFixed(1) || '0.0'}%`,
-                rating: 4.5,
-                location: 'N/A',
-                joinedDate: new Date(app.appliedAt).toLocaleDateString(),
-                bio: influencer.bio || 'No bio available',
-                platforms: {
-                  instagram: instagramAccount ? formatFollowers(instagramAccount.followers) : '0',
-                  tiktok: tiktokAccount ? formatFollowers(tiktokAccount.followers) : '0',
-                  youtube: youtubeAccount ? formatFollowers(youtubeAccount.followers) : '0',
-                },
-                demographics: {
-                  '18-24': 0,
-                  '25-34': 0,
-                  '35-44': 0,
-                  '45+': 0,
-                },
-                audienceGender: { female: 0, male: 0 },
-                topLocations: [],
-                performance: {
-                  totalCampaigns: 0,
-                  avgEngagement: avgEngagement || 0,
-                  successRate: 0,
-                },
-                avgLikes: '0',
-                avgComments: 0,
-                avgReach: '0',
-              },
-              campaign: app.campaign.title,
-              appliedDate: new Date(app.appliedAt).toLocaleDateString(),
-              proposedRate: `${app.campaign.currency} ${app.campaign.budget}`,
-              status: app.applicationStatus === 'APPLIED' ? 'pending' : 
-                      app.applicationStatus === 'SELECTED' ? 'approved' : 'rejected',
-              message: 'Application submitted',
-              deliverables: {
-                instagramPosts: 0,
-                stories: 0,
-                reels: 0,
-              },
-            };
-          });
+        if (result.success && result.campaigns) {
+          // Fetch applicants for each campaign and combine them
+          const allApplications: Application[] = [];
           
-          setApplications(transformedApplications);
+          for (const campaign of result.campaigns) {
+            try {
+              const applicantsResult = await api.campaigns.getApplicants(campaign.id);
+              if (applicantsResult.success && applicantsResult.applicants) {
+                const campaignApps = applicantsResult.applicants.map((app: any, index: number) => {
+                  const influencer = app.influencer;
+                  const instagramAccount = influencer?.socialAccounts?.find((acc: any) => acc.platform === 'INSTAGRAM');
+                  const tiktokAccount = influencer?.socialAccounts?.find((acc: any) => acc.platform === 'TIKTOK');
+                  const youtubeAccount = influencer?.socialAccounts?.find((acc: any) => acc.platform === 'YOUTUBE');
+                  
+                  const avgEngagement = 3.5;
+                  const totalFollowers = influencer?.socialAccounts
+                    ?.reduce((sum: number, acc: any) => sum + (acc.followers || 0), 0) || 0;
+                  
+                  const formatFollowers = (count: number) => {
+                    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+                    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+                    return count.toString();
+                  };
+
+                  return {
+                    id: allApplications.length + index + 1,
+                    influencer: {
+                      name: influencer ? `${influencer.firstName || ''} ${influencer.lastName || ''}`.trim() : 'Unknown',
+                      username: instagramAccount?.handle || tiktokAccount?.handle || youtubeAccount?.handle || 'N/A',
+                      avatar: '👤',
+                      category: influencer?.primaryNiche || 'General',
+                      followers: formatFollowers(totalFollowers),
+                      engagement: `${avgEngagement?.toFixed(1) || '0.0'}%`,
+                      rating: 4.5,
+                      location: 'N/A',
+                      joinedDate: app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A',
+                      bio: influencer?.bio || 'No bio available',
+                      platforms: {
+                        instagram: instagramAccount ? formatFollowers(instagramAccount.followers) : '0',
+                        tiktok: tiktokAccount ? formatFollowers(tiktokAccount.followers) : '0',
+                        youtube: youtubeAccount ? formatFollowers(youtubeAccount.followers) : '0',
+                      },
+                      demographics: {
+                        '18-24': 0,
+                        '25-34': 0,
+                        '35-44': 0,
+                        '45+': 0,
+                      },
+                      audienceGender: { female: 0, male: 0 },
+                      topLocations: [],
+                      performance: {
+                        totalCampaigns: 0,
+                        avgEngagement: avgEngagement || 0,
+                        successRate: 0,
+                      },
+                      avgLikes: '0',
+                      avgComments: 0,
+                      avgReach: '0',
+                    },
+                    campaign: campaign.title,
+                    appliedDate: app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A',
+                    proposedRate: `${campaign.currency} ${campaign.budget}`,
+                    status: (app.applicationStatus === 'APPLIED' ? 'pending' : 
+                            app.applicationStatus === 'SELECTED' ? 'approved' : 'rejected') as 'pending' | 'approved' | 'rejected',
+                    message: 'Application submitted',
+                    deliverables: {
+                      instagramPosts: 0,
+                      stories: 0,
+                      reels: 0,
+                    },
+                  };
+                });
+                allApplications.push(...campaignApps);
+              }
+            } catch {
+              // Continue if one campaign fails
+            }
+          }
+          
+          setApplications(allApplications);
         }
       } catch (error) {
         console.error('Error fetching applications:', error);

@@ -84,7 +84,7 @@ const EditProductPage = () => {
       setValue("category", product.category || "");
       setValue("vendor", product.vendor || "");
       setValue("tags", product.tags || "");
-      setValue("price", product.price);
+      setValue("price", product.price || 0);
       setValue("comparePrice", product.comparePrice || 0);
       setValue("costPerItem", product.costPerItem || 0);
       setValue("status", product.status);
@@ -108,6 +108,14 @@ const EditProductPage = () => {
   });
 
   const onSubmit = (data: FormData) => {
+    // Transform variations to ensure price and stock are defined
+    const transformedVariations = product?.variations?.map(v => ({
+      name: v.name,
+      value: v.value,
+      price: v.price ?? 0,
+      stock: v.stock ?? 0,
+    }));
+
     updateProductMutation.mutate({
       ...data,
       storeId: storeId as string,
@@ -116,7 +124,7 @@ const EditProductPage = () => {
       comparePrice: data.comparePrice ? Number(data.comparePrice) : undefined,
       costPerItem: data.costPerItem ? Number(data.costPerItem) : undefined,
       // Keep existing relations if not modified
-      variations: product?.variations,
+      variations: transformedVariations,
       images: product?.images,
       videos: product?.videos,
     });

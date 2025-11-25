@@ -8,6 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import React, { useState, useEffect, Suspense } from "react";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
+import { campaignsApi } from "@/lib/api-client";
 
 const CreateNewCampaignPageContent = () => {
   const [activeStep] = useState(0);
@@ -86,11 +87,10 @@ const CreateNewCampaignPageContent = () => {
   const loadCampaignData = async (id: string) => {
     setIsLoadingCampaign(true);
     try {
-      const response = await fetch(`/api/campaigns/${id}`);
-      const result = await response.json();
+      const result = await campaignsApi.getById(id);
 
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to load campaign");
+      if (!result.success) {
+        throw new Error("Failed to load campaign");
       }
 
       const campaign = result.campaign;
@@ -267,22 +267,13 @@ const CreateNewCampaignPageContent = () => {
         targets: allTargets.length > 0 ? allTargets : undefined,
       };
 
-      // Determine API endpoint and method based on edit mode
-      const url = isEditMode ? `/api/campaigns/${campaignId}` : "/api/campaigns";
-      const method = isEditMode ? "PATCH" : "POST";
+      // Call API using the appropriate method based on edit mode
+      const result = isEditMode 
+        ? await campaignsApi.update(campaignId!, campaignData)
+        : await campaignsApi.create(campaignData);
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(campaignData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || `Failed to ${isEditMode ? "update" : "create"} campaign`);
+      if (!result.success) {
+        throw new Error(`Failed to ${isEditMode ? "update" : "create"} campaign`);
       }
 
       // Success! Clear localStorage for draft

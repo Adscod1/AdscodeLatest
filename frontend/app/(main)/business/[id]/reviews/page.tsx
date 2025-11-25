@@ -14,20 +14,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import api from "@/lib/api-client";
+import api, { Review } from "@/lib/api-client";
 import { useState } from "react";
-
-interface ReviewWithUser {
-  id: string;
-  rating: number;
-  comment: string | null;
-  createdAt: Date;
-  user: {
-    id: string;
-    name: string | null;
-    image: string | null;
-  };
-}
 
 const ReviewsPage = () => {
   const params = useParams();
@@ -228,7 +216,7 @@ const ReviewsPage = () => {
         {/* Reviews List */}
         <div className="space-y-6">
           {filteredAndSortedReviews.length > 0 ? (
-            filteredAndSortedReviews.map((review: ReviewWithUser) => (
+            filteredAndSortedReviews.map((review: Review) => (
               <Card key={review.id} className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">

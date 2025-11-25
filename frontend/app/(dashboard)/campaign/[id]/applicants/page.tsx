@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ArrowLeft, User, Calendar, Users, CheckCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { campaignsApi } from "@/lib/api-client";
 
 interface Social {
   platform: string;
@@ -78,11 +79,10 @@ const CampaignApplicantsPage = () => {
   const fetchApplicants = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}/applicants`);
-      const result = await response.json();
+      const result = await campaignsApi.getApplicants(campaignId) as { success: boolean; campaign: Campaign; applicants: Applicant[] };
 
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch applicants");
+      if (!result.success) {
+        throw new Error("Failed to fetch applicants");
       }
 
       setCampaign(result.campaign);
@@ -107,17 +107,13 @@ const CampaignApplicantsPage = () => {
 
     setIsSelecting(true);
     try {
-      const response = await fetch(
-        `/api/campaigns/${campaignId}/applicants/${applicantToSelect.influencer.id}/select`,
-        {
-          method: "POST",
-        }
+      const result = await campaignsApi.selectInfluencer(
+        campaignId,
+        applicantToSelect.influencer.id
       );
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to select influencer");
+      if (!result.success) {
+        throw new Error("Failed to select influencer");
       }
 
       toast.success("Influencer selected!", {

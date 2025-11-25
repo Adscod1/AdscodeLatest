@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import api from "@/lib/api-client";
 
 interface ServicePricingInput {
   price: number;
@@ -59,17 +60,14 @@ const ServiceSalePage = () => {
   useEffect(() => {
     const loadService = async () => {
       try {
-        const response = await fetch(`/api/service/${serviceId}`);
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            setService(result.service);
-            // Pre-fill form with existing data
-            if (result.service.price) setValue('price', result.service.price);
-            if (result.service.comparePrice) setValue('comparePrice', result.service.comparePrice);
-            if (result.service.costPerItem) setValue('costPerService', result.service.costPerItem);
-            setValue('status', result.service.status);
-          }
+        const response = await api.services.getById(serviceId as string);
+        if (response.service) {
+          setService(response.service as Service);
+          // Pre-fill form with existing data
+          if (response.service.price) setValue('price', response.service.price);
+          if (response.service.comparePrice) setValue('comparePrice', response.service.comparePrice);
+          if (response.service.costPerItem) setValue('costPerService', response.service.costPerItem);
+          if (response.service.status) setValue('status', response.service.status);
         }
       } catch (error) {
         console.error('Error loading service:', error);
@@ -98,22 +96,14 @@ const ServiceSalePage = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/service/${serviceId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          price: Number(data.price),
-          comparePrice: data.comparePrice ? Number(data.comparePrice) : undefined,
-          costPerService: data.costPerService ? Number(data.costPerService) : undefined,
-          status: data.status,
-        }),
+      const response = await api.services.patch(serviceId as string, {
+        price: Number(data.price),
+        comparePrice: data.comparePrice ? Number(data.comparePrice) : undefined,
+        costPerService: data.costPerService ? Number(data.costPerService) : undefined,
+        status: data.status,
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (response.success) {
         toast.success('Service pricing updated successfully!');
         
         if (data.status === 'PUBLISHED') {
@@ -122,7 +112,7 @@ const ServiceSalePage = () => {
           router.push(`/${storeId}/products?tab=services&status=draft`);
         }
       } else {
-        toast.error(result.error || 'Failed to update service pricing');
+        toast.error('Failed to update service pricing');
       }
     } catch (error) {
       console.error('Error updating service:', error);

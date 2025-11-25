@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+
 interface UploadResult {
   success: boolean;
   url?: string;
@@ -16,7 +18,7 @@ export const useFileUpload = () => {
   const uploadFile = async (
     file: File, 
     type: string = 'image',
-    endpoint: string = '/api/new/media'
+    endpoint: string = '/upload/media'
   ): Promise<UploadResult> => {
     setUploading(true);
     
@@ -25,9 +27,15 @@ export const useFileUpload = () => {
       formData.append('file', file);
       formData.append('type', type);
 
-      const response = await fetch(endpoint, {
+      // Use backend URL for upload
+      const uploadUrl = endpoint.startsWith('/api/') 
+        ? `${API_BASE_URL}${endpoint.replace('/api/', '/')}`
+        : `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
+      const response = await fetch(uploadUrl, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
 
       const result = await response.json();

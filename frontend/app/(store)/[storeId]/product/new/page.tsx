@@ -324,7 +324,7 @@ const CreateNewProduct = () => {
                             onUpload={handleImageUpload}
                             accept="image/*"
                             maxSize={5}
-                            endpoint="/api/product/media"
+                            endpoint="/product/media"
                           >
                             <div>
                               <p className="text-sm text-gray-600 mb-2">
@@ -391,7 +391,7 @@ const CreateNewProduct = () => {
                               onUpload={handleImageUpload}
                               accept="image/*"
                               maxSize={5}
-                              endpoint="/api/product/media"
+                              endpoint="/product/media"
                               className="h-full"
                             >
                               <div className="flex items-center justify-center h-full border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
@@ -411,7 +411,7 @@ const CreateNewProduct = () => {
                               onUpload={handleVideoUpload}
                               accept="video/*"
                               maxSize={10}
-                              endpoint="/api/product/media"
+                              endpoint="/product/media"
                               className="h-full"
                             >
                               <div className="flex flex-col items-center justify-center h-full border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import CustomSidebar from '@/components/ui/custom-sidebar';
 import { Profile } from '@prisma/client';
-import { getCurrentProfile } from '@/actions/profile';
+import { getCurrentProfile } from '@/lib/api-client';
 import { auth } from '@/utils/auth';
 import { useIsMobile } from '@/hooks/use-mobile';
 

@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { getCurrentProfile } from "@/actions/profile";
+import { getCurrentProfile } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import CustomSidebar from "@/components/ui/custom-sidebar";
 import { Profile, Role } from "@prisma/client";

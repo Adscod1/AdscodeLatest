@@ -1,8 +1,7 @@
 import { headers } from "next/headers";
 import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
-import { getCurrentProfile } from "@/actions/profile";
-import { getCurrentInfluencer } from "@/actions/influencer";
+import api from "@/lib/api-client";
 import CreatorNetworkForm from "./register";
 
 const registerform = async () => {
@@ -15,8 +14,16 @@ const registerform = async () => {
   }
 
   // Get the user profile and check if already an influencer
-  const profile = await getCurrentProfile();
-  const influencer = await getCurrentInfluencer();
+  const profileResponse = await api.profiles.getMe();
+  const profile = profileResponse.profile;
+  
+  let influencer = null;
+  try {
+    const influencerResponse = await api.influencers.getMe();
+    influencer = influencerResponse.influencer;
+  } catch {
+    // Not an influencer yet, that's expected
+  }
 
   if (!profile) {
     redirect("/auth/login");

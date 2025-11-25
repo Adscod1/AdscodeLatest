@@ -24,18 +24,7 @@ import {
   ArrowDown
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: string;
-  user: {
-    id: string;
-    name: string | null;
-    email: string;
-    image: string | null;
-  };
-}
+import { commentsApi, type Comment } from "@/lib/api-client";
 
 interface CommentsModalProps {
   open: boolean;
@@ -69,8 +58,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/comments/${productId}`);
-      const data = await response.json();
+      const data = await commentsApi.getByProduct(productId);
 
       if (data.success) {
         setComments(data.comments);
@@ -94,22 +82,9 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
     setError(null);
 
     try {
-      console.log('Posting comment to:', `/api/comments/${productId}`);
-      console.log('Comment content:', newComment.trim());
-      
-      const response = await fetch(`/api/comments/${productId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: newComment.trim(),
-        }),
+      const data = await commentsApi.create(productId, {
+        content: newComment.trim(),
       });
-
-      console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response data:', data);
 
       if (data.success) {
         // Add new comment to the top of the list
@@ -120,8 +95,8 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({
           onCommentAdded();
         }
       } else {
-        setError(data.error || "Failed to post comment");
-        alert(`Error: ${data.error || "Failed to post comment"}`);
+        setError("Failed to post comment");
+        alert("Error: Failed to post comment");
       }
     } catch (error) {
       console.error("Error posting comment:", error);

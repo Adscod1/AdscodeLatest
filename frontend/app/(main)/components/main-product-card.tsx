@@ -21,7 +21,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { Product } from "@prisma/client";
+import { Product, commentsApi } from "@/lib/api-client";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { CommentsModal } from "@/components/CommentsModal";
@@ -87,9 +87,9 @@ const VerifiedBadge = () => (
       strokeDasharray="" 
       strokeDashoffset="0" 
       fontFamily="none" 
-      fontWeight="none" 
+      fontWeight="normal" 
       fontSize="none" 
-      textAnchor="none" 
+      textAnchor="inherit" 
       style={{mixBlendMode: 'normal'}}
     >
       <g transform="scale(8.53333,8.53333)">
@@ -99,32 +99,7 @@ const VerifiedBadge = () => (
   </svg>
 );
 
-interface ExtendedProduct extends Product {
-  store: {
-    id: string;
-    name: string;
-    category: string | null;
-    logo?: string | null;
-    avatarUrl?: string | null;
-    verified?: boolean;
-  };
-  variations: {
-    id: string;
-    name: string;
-    value: string;
-    price: number;
-    stock: number;
-  }[];
-  images: {
-    id: string;
-    url: string;
-  }[];
-  _count?: {
-    comments: number;
-  };
-}
-
-export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
+export const MainProductCard = ({ product }: { product: Product }) => {
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
   const [commentCount, setCommentCount] = useState(product._count?.comments || 0);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -160,8 +135,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
 
   const fetchCommentCount = async () => {
     try {
-      const response = await fetch(`/api/comments/${product.id}`);
-      const data = await response.json();
+      const data = await commentsApi.getByProduct(product.id);
       if (data.success) {
         setCommentCount(data.count);
       }
@@ -215,29 +189,29 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
       <div className="flex items-center justify-between p-3 pb-1">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded overflow-hidden flex items-center justify-center bg-gray-200">
-            {product.store.logo || product.store.avatarUrl ? (
+            {product.store?.logo || product.store?.avatarUrl ? (
               <Image
                 src={product.store.logo || product.store.avatarUrl || ''}
-                alt={product.store.name}
+                alt={product.store?.name || 'Store'}
                 width={40}
                 height={40}
                 className="w-full h-full object-cover"
               />
             ) : (
               <span className="text-gray-600 font-bold text-sm">
-                {product.store.name.charAt(0).toUpperCase()}
+                {(product.store?.name || 'S').charAt(0).toUpperCase()}
               </span>
             )}
           </div>
           <div>
             <div className="flex items-center gap-1">
               <h3 className="font-semibold text-sm text-gray-900">
-                {product.store.name}
+                {product.store?.name || 'Unknown Store'}
               </h3>
               <VerifiedBadge />
             </div>
             <p className="text-xs text-gray-500">
-              {product.store.category || "Other"} • Just now
+              {product.store?.category || "Other"} • Just now
             </p>
           </div>
         </div>
@@ -330,7 +304,7 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         )}
         
         {/* Discount Badge */}
-        {product.comparePrice && product.comparePrice > product.price && (
+        {product.comparePrice && product.price && product.comparePrice > product.price && (
           <div className="absolute top-3 right-3 bg-pink-500 text-white px-3 text-sm w-auto rounded-full ">
             {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
           </div>
@@ -360,9 +334,9 @@ export const MainProductCard = ({ product }: { product: ExtendedProduct }) => {
         {/* Price */}
         <div className="flex items-baseline gap-2">
           <p className="text-xl font-bold text-blue-600">
-            {formatCurrency(product.price)}
+            {formatCurrency(product.price ?? 0)}
           </p>
-          {product.comparePrice && product.comparePrice > product.price && (
+          {product.comparePrice && product.price && product.comparePrice > product.price && (
             <p className="text-base text-gray-400 line-through">
               {formatCurrency(product.comparePrice)}
             </p>
