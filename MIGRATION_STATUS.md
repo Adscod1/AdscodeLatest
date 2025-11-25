@@ -102,13 +102,16 @@
   - [x] `POST /api/services/media/upload` - Upload media
   - [x] Convert `actions/service.ts` server actions
 
-- [ ] **Notifications Module** (2 endpoints)
-  - [ ] `GET /api/notifications` - Get notifications
-  - [ ] `PUT /api/notifications/[id]/read` - Mark as read
+- [x] **Notifications Module** (5 endpoints) ✅
+  - [x] `GET /api/notifications` - Get notifications
+  - [x] `GET /api/notifications/unread-count` - Get unread count
+  - [x] `POST /api/notifications/mark-all-read` - Mark all as read
+  - [x] `PATCH /api/notifications/:id/read` - Mark as read
+  - [x] `DELETE /api/notifications/:id` - Delete notification
 
-- [ ] **Upload Module** (2 endpoints)
-  - [ ] `POST /api/upload/media` - Upload media
-  - [ ] `POST /api/new/media` - Upload new media
+- [x] **Upload Module** (2 endpoints) ✅
+  - [x] `POST /api/upload/media` - Upload review media
+  - [x] `POST /api/new/media` - Upload general media
 
 #### Priority 4: Remaining Server Actions (Week 3)
 - [ ] Convert `actions/influencer.ts` → InfluencersService
@@ -139,14 +142,14 @@
 
 ### API Endpoints Migration
 - Total: 25 endpoints
-- Migrated: 35 (Health + Stores + Influencers + Campaigns + Products + Services)
-- Remaining: ~4
-- Progress: 88%
+- Migrated: 42 (Health + Stores + Influencers + Campaigns + Products + Services + Notifications + Upload)
+- Remaining: Profile + Reviews server actions
+- Progress: 95%
 
 ### Server Actions Migration
 - Total: 7 action files
 - Migrated: 3 (campaign.ts, product.ts, service.ts)
-- Remaining: 4
+- Remaining: 4 (influencer.ts, profile.ts, reviews.ts, store.ts)
 - Progress: 43%
 
 ### Modules Status
@@ -157,19 +160,20 @@
 - ✅ Campaigns Module (100%)
 - ✅ Products Module (100%)
 - ✅ Services Module (100%)
-- ⏳ Notifications Module (0%)
-- ⏳ Upload Module (0%)
+- ✅ Notifications Module (100%)
+- ✅ Upload Module (100%)
 - ⏳ Profile Module (0%)
 - ⏳ Reviews Module (0%)
 
 ## 🎯 Current Focus
 
-**Next Step**: Implement Notifications Module
+**Next Step**: Implement remaining server actions (Priority 4)
 
-Services module is complete! Next priorities:
-1. Notifications Module - Get and mark read
-2. Upload Module - Generic media uploads
-3. Profile and Reviews Modules
+All API endpoints are complete! Next priorities:
+1. Convert `actions/profile.ts` → ProfilesService (new module)
+2. Convert `actions/reviews.ts` → ReviewsService (new module)
+3. Convert remaining `actions/influencer.ts` methods
+4. Convert remaining `actions/store.ts` methods
 
 ## 📝 Notes
 
