@@ -46,6 +46,7 @@
     "@swc/cli": "^0.7.9",
     "@swc/core": "^1.15.3",
     "@types/express": "^5.0.5",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.10.1",
     "prisma": "^6.18.0",
     "ts-loader": "^9.5.4",
