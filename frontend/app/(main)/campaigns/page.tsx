@@ -198,7 +198,7 @@ const CampaignsPage = () => {
           {filteredCampaigns.map((campaign) => (
             <Card key={campaign.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               {/* Campaign Image */}
-              <div className="relative h-48 bg-gray-100">
+              <div className="relative h-80 bg-gray-100">
                 <Image
                   src={campaign.image}
                   alt={campaign.title}
@@ -233,18 +233,14 @@ const CampaignsPage = () => {
                     <Users className="w-3.5 h-3.5" />
                     <span>{campaign.publications} Publications</span>
                   </div>
-                </div>
-
-                {/* Campaign Type */}
-                <div className="flex items-center gap-1 text-xs text-gray-600">
-                  <Building2 className="w-3.5 h-3.5" />
-                  <span>{campaign.type}</span>
-                </div>
-
-                {/* Date Range */}
-                <div className="flex items-center gap-1 text-xs text-gray-600">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{campaign.startDate} - {campaign.endDate}</span>
+                  <div className="flex items-center gap-1">
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>{campaign.type}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{campaign.startDate} - {campaign.endDate}</span>
+                  </div>
                 </div>
 
                 {/* Status Badge and Rating */}

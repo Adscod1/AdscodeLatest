@@ -161,7 +161,7 @@ const DealsPage = () => {
               </div>
 
               {/* Deal Image */}
-              <div className="relative h-48 bg-gray-100">
+              <div className="relative aspect-[4/3] bg-gray-100">
                 <Image
                   src={deal.image}
                   alt={deal.title}
