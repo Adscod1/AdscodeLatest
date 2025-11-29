@@ -34,11 +34,17 @@ interface ExtendedCreateProductInput extends CreateProductInput {
 const CreateNewProduct = () => {
   const { storeId } = useParams();
   const router = useRouter();
-  const { product, updateProduct, reset } = useProductStore();
+  const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
+  const hasSyncedRef = React.useRef(false);
+  
+  // State for sale channels
+  const [saleChannels, setSaleChannels] = React.useState({
+    onlineStore: true,
+    buyButton: true,
+  });
 
-  const { register, handleSubmit, setValue, watch } = useForm<ExtendedCreateProductInput>({
+  const { register, handleSubmit, setValue, watch, reset: resetForm } = useForm<ExtendedCreateProductInput>({
     defaultValues: {
-      ...product,
       storeId: storeId as string,
       brand: "",
       model: "",
@@ -48,13 +54,57 @@ const CreateNewProduct = () => {
     },
   });
 
-  // State for product images and videos
-  const [productImages, setProductImages] = React.useState<string[]>(
-    product.images?.map(img => img.url) || []
-  );
-  const [productVideos, setProductVideos] = React.useState<string[]>(
-    product.videos?.map(vid => vid.url) || []
-  );
+  // Sync form with store data ONCE after hydration
+  React.useEffect(() => {
+    if (_hasHydrated && !hasSyncedRef.current) {
+      hasSyncedRef.current = true;
+      resetForm({
+        ...product,
+        storeId: storeId as string,
+        brand: (product as ExtendedCreateProductInput).brand || "",
+        model: (product as ExtendedCreateProductInput).model || "",
+        condition: (product as ExtendedCreateProductInput).condition || "",
+        warranty: (product as ExtendedCreateProductInput).warranty || "",
+        specifications: (product as ExtendedCreateProductInput).specifications || "",
+      });
+    }
+  }, [_hasHydrated]);
+
+  // State for product images and videos - initialized lazily after hydration
+  const [productImages, setProductImages] = React.useState<string[]>([]);
+  const [productVideos, setProductVideos] = React.useState<string[]>([]);
+  const hasMediaSyncedRef = React.useRef(false);
+
+  // Handle sale channel checkbox changes
+  const handleChannelChange = (channel: 'onlineStore' | 'buyButton', checked: boolean) => {
+    setSaleChannels(prev => ({
+      ...prev,
+      [channel]: checked,
+    }));
+  };
+
+  // Handle Select All checkbox
+  const handleSelectAll = (checked: boolean) => {
+    setSaleChannels({
+      onlineStore: checked,
+      buyButton: checked,
+    });
+  };
+
+  // Check if all channels are selected
+  const allChannelsSelected = saleChannels.onlineStore && saleChannels.buyButton;
+  const someChannelsSelected = saleChannels.onlineStore || saleChannels.buyButton;
+
+  // Sync images/videos state ONCE after hydration
+  React.useEffect(() => {
+    if (_hasHydrated && !hasMediaSyncedRef.current) {
+      hasMediaSyncedRef.current = true;
+      const storedImages = product.images?.map(img => img.url) || [];
+      const storedVideos = product.videos?.map(vid => vid.url) || [];
+      setProductImages(storedImages);
+      setProductVideos(storedVideos);
+    }
+  }, [_hasHydrated, product.images, product.videos]);
 
   // Handle image upload
   const handleImageUpload = (url: string) => {
@@ -96,14 +146,52 @@ const CreateNewProduct = () => {
     updateProduct({
       ...data,
       storeId: storeId as string,
+      images: productImages.map(url => ({ url })),
+      videos: productVideos.map(url => ({ url })),
     });
     router.push(`/${storeId}/product/new/sale`);
   };
 
   const handleCancel = () => {
-    reset();
+    resetStore();
     router.push(`/${storeId}/products`);
   };
+
+  // Keep refs for current media state to avoid stale closures in auto-save
+  const productImagesRef = React.useRef(productImages);
+  const productVideosRef = React.useRef(productVideos);
+  React.useEffect(() => {
+    productImagesRef.current = productImages;
+  }, [productImages]);
+  React.useEffect(() => {
+    productVideosRef.current = productVideos;
+  }, [productVideos]);
+
+  // Auto-save form data to store on change
+  React.useEffect(() => {
+    const subscription = watch((data) => {
+      // Only save if we have fully hydrated and synced to avoid overwriting with empty defaults
+      if (hasSyncedRef.current && hasMediaSyncedRef.current) {
+        updateProduct({
+          ...data,
+          storeId: storeId as string,
+        } as Partial<ExtendedCreateProductInput>);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, updateProduct, storeId]);
+
+  // Show loading state until hydration completes
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -176,18 +264,97 @@ const CreateNewProduct = () => {
                       Product Category <span className="text-red-500">*</span>
                     </Label>
                     <Select
-                      value={watch("category")}
-                      onValueChange={(value) => setValue("category", value)}
+                      value={watch("category") || ""}
+                      onValueChange={(value) => {
+                        setValue("category", value);
+                        updateProduct({ category: value });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="electronics">Electronics</SelectItem>
-                        <SelectItem value="clothing">Clothing</SelectItem>
-                        <SelectItem value="accessories">Accessories</SelectItem>
-                        <SelectItem value="home">Home & Garden</SelectItem>
-                        <SelectItem value="sports">Sports & Outdoors</SelectItem>
+                      <SelectContent className="max-h-[300px]">
+                        {/* Electronics */}
+                        <SelectItem value="smartphone">Smartphones</SelectItem>
+                        <SelectItem value="laptop">Laptops</SelectItem>
+                        <SelectItem value="tablet">Tablets</SelectItem>
+                        <SelectItem value="desktop">Desktop Computers</SelectItem>
+                        <SelectItem value="accessory">Electronics Accessories</SelectItem>
+                        <SelectItem value="camera">Cameras</SelectItem>
+                        <SelectItem value="headphones">Headphones & Audio</SelectItem>
+                        
+                        {/* Fashion & Clothing */}
+                        <SelectItem value="mens_clothing">Men's Clothing</SelectItem>
+                        <SelectItem value="womens_clothing">Women's Clothing</SelectItem>
+                        <SelectItem value="shoes">Shoes</SelectItem>
+                        <SelectItem value="bags">Bags & Luggage</SelectItem>
+                        <SelectItem value="accessories_fashion">Fashion Accessories</SelectItem>
+                        <SelectItem value="jewelry">Jewelry</SelectItem>
+                        <SelectItem value="watches">Watches</SelectItem>
+                        
+                        {/* Home & Furniture */}
+                        <SelectItem value="furniture">Furniture</SelectItem>
+                        <SelectItem value="home_decor">Home Decor</SelectItem>
+                        <SelectItem value="bedding">Bedding</SelectItem>
+                        <SelectItem value="kitchen">Kitchen Appliances</SelectItem>
+                        <SelectItem value="lighting">Lighting</SelectItem>
+                        
+                        {/* Health & Beauty */}
+                        <SelectItem value="skincare">Skincare</SelectItem>
+                        <SelectItem value="cosmetics">Cosmetics</SelectItem>
+                        <SelectItem value="haircare">Hair Care</SelectItem>
+                        <SelectItem value="health_supplements">Health Supplements</SelectItem>
+                        <SelectItem value="fitness">Fitness Equipment</SelectItem>
+                        
+                        {/* Food & Beverages */}
+                        <SelectItem value="beverages">Beverages</SelectItem>
+                        <SelectItem value="snacks">Snacks</SelectItem>
+                        <SelectItem value="groceries">Groceries</SelectItem>
+                        <SelectItem value="bakery">Bakery Products</SelectItem>
+                        <SelectItem value="organic_food">Organic Food</SelectItem>
+                        
+                        {/* Sports & Outdoors */}
+                        <SelectItem value="sports_equipment">Sports Equipment</SelectItem>
+                        <SelectItem value="outdoor_gear">Outdoor Gear</SelectItem>
+                        <SelectItem value="bikes">Bikes</SelectItem>
+                        <SelectItem value="camping">Camping Gear</SelectItem>
+                        
+                        {/* Books & Media */}
+                        <SelectItem value="books">Books</SelectItem>
+                        <SelectItem value="ebooks">E-Books</SelectItem>
+                        <SelectItem value="magazines">Magazines</SelectItem>
+                        <SelectItem value="music">Music & CDs</SelectItem>
+                        
+                        {/* Toys & Games */}
+                        <SelectItem value="toys">Toys</SelectItem>
+                        <SelectItem value="games">Games</SelectItem>
+                        <SelectItem value="hobbies">Hobbies & Crafts</SelectItem>
+                        
+                        {/* Automotive */}
+                        <SelectItem value="car_parts">Car Parts</SelectItem>
+                        <SelectItem value="car_accessories">Car Accessories</SelectItem>
+                        <SelectItem value="motorcycle">Motorcycle Parts</SelectItem>
+                        
+                        {/* Pet Supplies */}
+                        <SelectItem value="pet_food">Pet Food</SelectItem>
+                        <SelectItem value="pet_accessories">Pet Accessories</SelectItem>
+                        <SelectItem value="pet_toys">Pet Toys</SelectItem>
+                        
+                        {/* Office & Stationery */}
+                        <SelectItem value="stationery">Stationery</SelectItem>
+                        <SelectItem value="office_supplies">Office Supplies</SelectItem>
+                        <SelectItem value="furniture_office">Office Furniture</SelectItem>
+                        
+                        {/* Services */}
+                        <SelectItem value="service_repair">Repair Services</SelectItem>
+                        <SelectItem value="service_cleaning">Cleaning Services</SelectItem>
+                        <SelectItem value="service_consulting">Consulting Services</SelectItem>
+                        <SelectItem value="service_tutoring">Tutoring Services</SelectItem>
+                        <SelectItem value="service_photography">Photography Services</SelectItem>
+                        <SelectItem value="service_personal_training">Personal Training</SelectItem>
+                        
+                        {/* Other */}
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -258,8 +425,11 @@ const CreateNewProduct = () => {
                         Condition <span className="text-red-500">*</span>
                       </Label>
                       <Select
-                        value={watch("condition")}
-                        onValueChange={(value) => setValue("condition", value)}
+                        value={watch("condition") || ""}
+                        onValueChange={(value) => {
+                          setValue("condition", value);
+                          updateProduct({ condition: value });
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select condition" />
@@ -444,8 +614,11 @@ const CreateNewProduct = () => {
                   <div>
                     <Label htmlFor="status">Status</Label>
                     <Select
-                      value={watch("status")}
-                      onValueChange={(value) => setValue("status", value)}
+                      value={watch("status") || "DRAFT"}
+                      onValueChange={(value) => {
+                        setValue("status", value);
+                        updateProduct({ status: value });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
@@ -467,15 +640,32 @@ const CreateNewProduct = () => {
                     </h3>
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <Checkbox id="all" />
+                        <Checkbox 
+                          id="all"
+                          checked={allChannelsSelected}
+                          ref={el => {
+                            if (el && someChannelsSelected && !allChannelsSelected) {
+                              el.indeterminate = true;
+                            }
+                          }}
+                          onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                        />
                         <Label htmlFor="all">Select all</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Checkbox id="online-store" />
+                        <Checkbox 
+                          id="online-store"
+                          checked={saleChannels.onlineStore}
+                          onCheckedChange={(checked) => handleChannelChange('onlineStore', checked as boolean)}
+                        />
                         <Label htmlFor="online-store">Online Store</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Checkbox id="buy-button" />
+                        <Checkbox 
+                          id="buy-button"
+                          checked={saleChannels.buyButton}
+                          onCheckedChange={(checked) => handleChannelChange('buyButton', checked as boolean)}
+                        />
                         <Label htmlFor="buy-button">Buy Button</Label>
                       </div>
                     </div>

@@ -60,29 +60,51 @@ const generateProductId = (): string => {
 const NewProductSaleInformation = () => {
   const { storeId } = useParams();
   const router = useRouter();
-  const { product, updateProduct, reset } = useProductStore();
+  const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
   const [copied, setCopied] = React.useState(false);
   const [expandedVariants, setExpandedVariants] = React.useState<Record<string, boolean>>({
     Size: true, // Size expanded by default
   });
+  const [selectedVariants, setSelectedVariants] = React.useState<Set<number>>(new Set());
+  const [selectedVariantGroups, setSelectedVariantGroups] = React.useState<Set<string>>(new Set());
   const [showAddVariantDialog, setShowAddVariantDialog] = React.useState(false);
   const [newVariantName, setNewVariantName] = React.useState("");
+  const hasSyncedRef = React.useRef(false);
   
-  // Generate Product ID on component mount
-  const [productId] = React.useState(() => generateProductId());
+  // Generate Product ID on component mount (or use existing from store)
+  const productIdRef = React.useRef<string | null>(null);
+  if (!productIdRef.current) {
+    productIdRef.current = generateProductId();
+  }
 
-  const { register, control, watch, handleSubmit, setValue } =
+  const { register, control, watch, handleSubmit, setValue, reset: resetForm } =
     useForm<ExtendedProductInput>({
       defaultValues: {
-        ...product,
         storeId: storeId as string,
-        productId: productId,
+        productId: productIdRef.current,
         stockQuantity: 0,
         lowStockAlert: 5,
         currency: "UGX - Ugandan Shilling",
-        taxRate: 0,
+        taxRate: 1.8,
       },
     });
+
+  // Sync form with store data ONCE after hydration
+  React.useEffect(() => {
+    if (_hasHydrated && !hasSyncedRef.current) {
+      hasSyncedRef.current = true;
+      const storedProductId = (product as ExtendedProductInput).productId || productIdRef.current;
+      resetForm({
+        ...product,
+        storeId: storeId as string,
+        productId: storedProductId,
+        stockQuantity: (product as ExtendedProductInput).stockQuantity || 0,
+        lowStockAlert: (product as ExtendedProductInput).lowStockAlert || 5,
+        currency: (product as ExtendedProductInput).currency || "UGX - Ugandan Shilling",
+        taxRate: (product as ExtendedProductInput).taxRate || 0,
+      });
+    }
+  }, [_hasHydrated]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -138,11 +160,65 @@ const NewProductSaleInformation = () => {
     setNewVariantName("");
   };
 
+  // Handle parent checkbox to select/deselect all variants in a group
+  const handleGroupCheckboxChange = (variantName: string, items: typeof groupedVariations[string], checked: boolean) => {
+    const newSelected = new Set(selectedVariants);
+    if (checked) {
+      // Select all items in this group
+      items.forEach(({ index }) => {
+        newSelected.add(index);
+      });
+      setSelectedVariantGroups(prev => new Set(prev).add(variantName));
+    } else {
+      // Deselect all items in this group
+      items.forEach(({ index }) => {
+        newSelected.delete(index);
+      });
+      setSelectedVariantGroups(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(variantName);
+        return newSet;
+      });
+    }
+    setSelectedVariants(newSelected);
+  };
+
+  // Handle individual variant checkbox
+  const handleVariantCheckboxChange = (index: number, checked: boolean) => {
+    const newSelected = new Set(selectedVariants);
+    if (checked) {
+      newSelected.add(index);
+    } else {
+      newSelected.delete(index);
+    }
+    setSelectedVariants(newSelected);
+  };
+
+  // Check if all variants in a group are selected
+  const isGroupFullySelected = (items: typeof groupedVariations[string]): boolean => {
+    return items.every(({ index }) => selectedVariants.has(index));
+  };
+
+  // Check if any variants in a group are selected
+  const isGroupPartiallySelected = (items: typeof groupedVariations[string]): boolean => {
+    return items.some(({ index }) => selectedVariants.has(index)) && !isGroupFullySelected(items);
+  };
+
   const price = watch("price");
-  const costPerItem = watch("costPerItem");
-  const profit = price && costPerItem ? price - costPerItem : 0;
-  const margin =
-    price && costPerItem ? ((price - costPerItem) / price) * 100 : 0;
+  const selectedCurrency = watch("currency") || "UGX - Ugandan Shilling";
+
+  // Get currency symbol based on selected currency
+  const getCurrencySymbol = (currency: string): string => {
+    const currencyMap: Record<string, string> = {
+      "UGX - Ugandan Shilling": "UGX",
+      "USD - US Dollar": "$",
+      "EUR - Euro": "€",
+      "GBP - British Pound": "£",
+    };
+    return currencyMap[currency] || "UGX";
+  };
+
+  const currencySymbol = getCurrencySymbol(selectedCurrency);
 
   const onSubmit = (data: ExtendedProductInput) => {
     updateProduct({
@@ -153,9 +229,35 @@ const NewProductSaleInformation = () => {
   };
 
   const handleCancel = () => {
-    reset();
+    resetStore();
     router.push(`/${storeId}/products`);
   };
+
+  // Auto-save form data to store on change
+  React.useEffect(() => {
+    const subscription = watch((data) => {
+      // Only save if we have hydrated to avoid overwriting with empty defaults
+      if (hasSyncedRef.current) {
+        updateProduct({
+          ...data,
+          storeId: storeId as string,
+        } as Partial<ExtendedProductInput>);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, updateProduct, storeId]);
+
+  // Show loading state until hydration completes
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -208,7 +310,7 @@ const NewProductSaleInformation = () => {
                     </Label>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                        $
+                        {currencySymbol}
                       </span>
                       <Input
                         id="price"
@@ -216,7 +318,7 @@ const NewProductSaleInformation = () => {
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="pl-7"
+                        className="pl-12"
                       />
                     </div>
                   </div>
@@ -224,7 +326,7 @@ const NewProductSaleInformation = () => {
                     <Label htmlFor="comparePrice">Compare at Price</Label>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                        $
+                        {currencySymbol}
                       </span>
                       <Input
                         id="comparePrice"
@@ -232,7 +334,7 @@ const NewProductSaleInformation = () => {
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="pl-7"
+                        className="pl-12"
                       />
                     </div>
                     <p className="text-xs text-gray-500">
@@ -248,7 +350,7 @@ const NewProductSaleInformation = () => {
                     <div className="flex gap-2">
                       <Input
                         id="productId"
-                        value={productId}
+                        value={productIdRef.current}
                         disabled
                         className="bg-gray-100"
                       />
@@ -257,7 +359,7 @@ const NewProductSaleInformation = () => {
                         variant="outline"
                         size="icon"
                         onClick={() => {
-                          navigator.clipboard.writeText(productId);
+                          navigator.clipboard.writeText(productIdRef.current);
                           setCopied(true);
                           setTimeout(() => setCopied(false), 2000);
                         }}
@@ -314,8 +416,11 @@ const NewProductSaleInformation = () => {
                       Currency <span className="text-red-500">*</span>
                     </Label>
                     <Select
-                      value={watch("currency")}
-                      onValueChange={(value) => setValue("currency", value)}
+                      value={watch("currency") || "UGX - Ugandan Shilling"}
+                      onValueChange={(value) => {
+                        setValue("currency", value);
+                        updateProduct({ currency: value });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select currency" />
@@ -341,56 +446,8 @@ const NewProductSaleInformation = () => {
                       {...register("taxRate", { valueAsNumber: true })}
                       type="number"
                       step="0.01"
-                      placeholder="0"
+                      placeholder="1.8"
                     />
-                  </div>
-                </div>
-
-                {/* Cost and Profit Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-1">
-                      <Label htmlFor="costPerItem">Cost per item</Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-3.5 h-3.5 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Cost to acquire or produce one unit</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                        $
-                      </span>
-                      <Input
-                        id="costPerItem"
-                        {...register("costPerItem", { valueAsNumber: true })}
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="pl-7"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Profit</Label>
-                    <div className="bg-muted px-3 py-2.5 rounded-md">
-                      <span className="text-sm text-muted-foreground">
-                        ${profit.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Margin</Label>
-                    <div className="bg-muted px-3 py-2.5 rounded-md">
-                      <span className="text-sm text-muted-foreground">
-                        {margin.toFixed(1)}%
-                      </span>
-                    </div>
                   </div>
                 </div>
 
@@ -430,7 +487,16 @@ const NewProductSaleInformation = () => {
                                 <ChevronRight className="w-4 h-4 text-gray-500" />
                               )}
                               <Checkbox 
+                                checked={isGroupFullySelected(items)}
+                                ref={el => {
+                                  if (el && isGroupPartiallySelected(items)) {
+                                    el.indeterminate = true;
+                                  }
+                                }}
                                 onClick={(e) => e.stopPropagation()}
+                                onCheckedChange={(checked) => {
+                                  handleGroupCheckboxChange(variantName, items, checked as boolean);
+                                }}
                               />
                               <span className="font-medium">{variantName}</span>
                               <span className="text-sm text-muted-foreground">
@@ -474,7 +540,12 @@ const NewProductSaleInformation = () => {
                                 >
                                   <div className="col-span-5">
                                     <div className="flex items-center space-x-2 pl-8">
-                                      <Checkbox />
+                                      <Checkbox 
+                                        checked={selectedVariants.has(index)}
+                                        onCheckedChange={(checked) => {
+                                          handleVariantCheckboxChange(index, checked as boolean);
+                                        }}
+                                      />
                                       <Input
                                         {...register(`variations.${index}.value`)}
                                         className="max-w-[180px]"
@@ -485,7 +556,7 @@ const NewProductSaleInformation = () => {
                                   <div className="col-span-3">
                                     <div className="relative w-28">
                                       <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                                        $
+                                        {currencySymbol}
                                       </span>
                                       <Input
                                         {...register(`variations.${index}.price`, {
@@ -493,7 +564,7 @@ const NewProductSaleInformation = () => {
                                         })}
                                         type="number"
                                         step="0.01"
-                                        className="pl-7"
+                                        className="pl-12"
                                       />
                                     </div>
                                   </div>

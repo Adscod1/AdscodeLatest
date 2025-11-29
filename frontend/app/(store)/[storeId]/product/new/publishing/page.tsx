@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -28,17 +29,103 @@ import {
 import { useProductStore } from "@/store/use-product-store";
 import { useParams } from "next/navigation";
 
+const getCategoryLabel = (categoryValue: string): string => {
+  const categoryMap: Record<string, string> = {
+    smartphone: "Smartphones",
+    laptop: "Laptops",
+    tablet: "Tablets",
+    desktop: "Desktop Computers",
+    accessory: "Electronics Accessories",
+    camera: "Cameras",
+    headphones: "Headphones & Audio",
+    mens_clothing: "Men's Clothing",
+    womens_clothing: "Women's Clothing",
+    shoes: "Shoes",
+    bags: "Bags & Luggage",
+    accessories_fashion: "Fashion Accessories",
+    jewelry: "Jewelry",
+    watches: "Watches",
+    furniture: "Furniture",
+    home_decor: "Home Decor",
+    bedding: "Bedding",
+    kitchen: "Kitchen Appliances",
+    lighting: "Lighting",
+    skincare: "Skincare",
+    cosmetics: "Cosmetics",
+    haircare: "Hair Care",
+    health_supplements: "Health Supplements",
+    fitness: "Fitness Equipment",
+    beverages: "Beverages",
+    snacks: "Snacks",
+    groceries: "Groceries",
+    bakery: "Bakery Products",
+    organic_food: "Organic Food",
+    sports_equipment: "Sports Equipment",
+    outdoor_gear: "Outdoor Gear",
+    bikes: "Bikes",
+    camping: "Camping Gear",
+    books: "Books",
+    ebooks: "E-Books",
+    magazines: "Magazines",
+    music: "Music & CDs",
+    toys: "Toys",
+    games: "Games",
+    hobbies: "Hobbies & Crafts",
+    car_parts: "Car Parts",
+    car_accessories: "Car Accessories",
+    motorcycle: "Motorcycle Parts",
+    pet_food: "Pet Food",
+    pet_accessories: "Pet Accessories",
+    pet_toys: "Pet Toys",
+    stationery: "Stationery",
+    office_supplies: "Office Supplies",
+    furniture_office: "Office Furniture",
+    service_repair: "Repair Services",
+    service_cleaning: "Cleaning Services",
+    service_consulting: "Consulting Services",
+    service_tutoring: "Tutoring Services",
+    service_photography: "Photography Services",
+    service_personal_training: "Personal Training",
+    other: "Other",
+  };
+  return categoryMap[categoryValue] || categoryValue;
+};
+
 const NewProductPublishingPage = () => {
   const router = useRouter();
   const { storeId } = useParams();
-  const { product, reset } = useProductStore();
+  const { product, reset, _hasHydrated } = useProductStore();
 
-  const { register, handleSubmit } = useForm<CreateProductInput>({
+  // Get currency symbol based on selected currency
+  const getCurrencySymbol = (currency?: string): string => {
+    const currencyMap: Record<string, string> = {
+      "UGX - Ugandan Shilling": "UGX",
+      "USD - US Dollar": "$",
+      "EUR - Euro": "€",
+      "GBP - British Pound": "£",
+    };
+    const selectedCurrency = currency || (product as any).currency || "UGX - Ugandan Shilling";
+    return currencyMap[selectedCurrency] || "UGX";
+  };
+
+  const currencySymbol = getCurrencySymbol((product as any).currency);
+
+  const { register, handleSubmit, reset: resetForm } = useForm<CreateProductInput>({
     defaultValues: {
       ...product,
       storeId: storeId as string,
     },
   });
+
+  // Sync form with store data after hydration
+  React.useEffect(() => {
+    if (_hasHydrated) {
+      resetForm({
+        ...product,
+        storeId: storeId as string,
+      });
+    }
+  }, [_hasHydrated, product, resetForm, storeId]);
 
   const createProductMutation = useMutation({
     mutationFn: (data: CreateProductInput) => api.products.create(data),
@@ -55,47 +142,89 @@ const NewProductPublishingPage = () => {
   });
 
   const onSubmit = (data: CreateProductInput) => {
+    // Validate required fields
+    if (!product.title || !product.title.trim()) {
+      toast.error("Product title is required");
+      return;
+    }
+
+    if (!product.price || Number(product.price) === 0) {
+      toast.error("Product price is required and must be greater than 0");
+      return;
+    }
+
+    if (!product.storeId) {
+      toast.error("Store ID is missing");
+      return;
+    }
+
     // Ensure all required fields are present and properly typed
     const finalData = {
-      ...product,
-      ...data,
+      title: product.title?.trim() || data.title,
       storeId: storeId as string,
       status: "ACTIVE",
       // Ensure all numeric fields are properly converted
-      price: Number(product.price) || 0,
-      comparePrice: product.comparePrice
-        ? Number(product.comparePrice)
+      price: Number(product.price) || Number(data.price) || 0,
+      comparePrice: product.comparePrice || data.comparePrice
+        ? Number(product.comparePrice || data.comparePrice)
         : undefined,
-      costPerItem: product.costPerItem
-        ? Number(product.costPerItem)
+      costPerItem: product.costPerItem || data.costPerItem
+        ? Number(product.costPerItem || data.costPerItem)
         : undefined,
-      weight: product.weight ? Number(product.weight) : undefined,
-      length: product.length ? Number(product.length) : undefined,
-      width: product.width ? Number(product.width) : undefined,
-      height: product.height ? Number(product.height) : undefined,
-      // Ensure arrays are properly initialized
+      weight: product.weight || data.weight ? Number(product.weight || data.weight) : undefined,
+      length: product.length || data.length ? Number(product.length || data.length) : undefined,
+      width: product.width || data.width ? Number(product.width || data.width) : undefined,
+      height: product.height || data.height ? Number(product.height || data.height) : undefined,
+      // String fields
+      description: product.description || data.description || undefined,
+      category: product.category || data.category || undefined,
+      vendor: product.vendor || data.vendor || undefined,
+      tags: product.tags || data.tags || undefined,
+      countryOfOrigin: product.countryOfOrigin || data.countryOfOrigin || undefined,
+      harmonizedSystemCode: product.harmonizedSystemCode || data.harmonizedSystemCode || undefined,
+      weightUnit: product.weightUnit || data.weightUnit || undefined,
+      sizeUnit: product.sizeUnit || data.sizeUnit || undefined,
+      // Sanitize variations to only include allowed fields (name, value, price, stock)
       variations:
         product.variations?.map((v) => ({
-          ...v,
+          name: v.name,
+          value: v.value,
           price: Number(v.price),
           stock: Number(v.stock),
         })) || [],
-      images: product.images || [],
-      videos: product.videos || [],
-      // Ensure other fields are properly typed
-      countryOfOrigin: product.countryOfOrigin || undefined,
-      harmonizedSystemCode: product.harmonizedSystemCode || undefined,
-      weightUnit: product.weightUnit || undefined,
-      sizeUnit: product.sizeUnit || undefined,
+      // Sanitize images to only include url field
+      images: product.images?.map((img) => ({ url: img.url })) || [],
+      // Sanitize videos to only include url field
+      videos: product.videos?.map((vid) => ({ url: vid.url })) || [],
     };
 
-    createProductMutation.mutate(finalData);
+    // Remove undefined fields to avoid validation errors
+    Object.keys(finalData).forEach(key => {
+      if (finalData[key as keyof typeof finalData] === undefined) {
+        delete finalData[key as keyof typeof finalData];
+      }
+    });
+
+    console.log("Final data being sent:", finalData);
+    createProductMutation.mutate(finalData as CreateProductInput);
   };
 
   const handleCancel = () => {
     reset();
     router.push(`/${storeId}/listings`);
   };
+
+  // Show loading state until hydration completes
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading product data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -147,14 +276,14 @@ const NewProductPublishingPage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <Label>Product title</Label>
-                      <div className="px-3 py-2 bg-muted rounded-md">
+                      <div className={`px-3 py-2 rounded-md ${product.title ? 'bg-muted text-foreground' : 'bg-red-50 text-red-600'}`}>
                         {product.title || "No title provided"}
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label>Product category</Label>
-                      <div className="px-3 py-2 bg-muted rounded-md">
-                        {product.category || "No category provided"}
+                      <div className={`px-3 py-2 rounded-md ${product.category ? 'bg-muted text-foreground' : 'bg-red-50 text-red-600'}`}>
+                        {product.category ? getCategoryLabel(product.category) : "No category provided"}
                       </div>
                     </div>
                   </div>
@@ -162,13 +291,13 @@ const NewProductPublishingPage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <Label>Vendor</Label>
-                      <div className="px-3 py-2 bg-muted rounded-md">
+                      <div className={`px-3 py-2 rounded-md ${product.vendor ? 'bg-muted text-foreground' : 'bg-red-50 text-red-600'}`}>
                         {product.vendor || "No vendor provided"}
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label>Tags</Label>
-                      <div className="px-3 py-2 bg-muted rounded-md">
+                      <div className={`px-3 py-2 rounded-md ${product.tags ? 'bg-muted text-foreground' : 'bg-red-50 text-red-600'}`}>
                         {product.tags || "No tags provided"}
                       </div>
                     </div>
@@ -176,7 +305,7 @@ const NewProductPublishingPage = () => {
 
                   <div className="space-y-2">
                     <Label>Description</Label>
-                    <div className="px-3 py-2 bg-muted rounded-md whitespace-pre-wrap">
+                    <div className={`px-3 py-2 rounded-md whitespace-pre-wrap ${product.description ? 'bg-muted text-foreground' : 'bg-red-50 text-red-600'}`}>
                       {product.description || "No description provided"}
                     </div>
                   </div>
@@ -220,23 +349,17 @@ const NewProductPublishingPage = () => {
                         <div>
                           <Label>Price</Label>
                           <div className="text-lg font-medium">
-                            $ {product.price?.toFixed(2) || "0.00"}
+                            {currencySymbol} {product.price?.toFixed(2) || "0.00"}
                           </div>
                         </div>
                         <div>
                           <Label>Compare-at price</Label>
                           <div className="text-lg font-medium">
-                            $ {product.comparePrice?.toFixed(2) || "0.00"}
+                            {currencySymbol} {product.comparePrice?.toFixed(2) || "0.00"}
                           </div>
                         </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                        <div>
-                          <Label>Cost per item</Label>
-                          <div className="text-lg font-medium">
-                            $ {product.costPerItem?.toFixed(2) || "0.00"}
-                          </div>
-                        </div>
                         <div>
                           <Label>Profit</Label>
                           <div className="text-lg font-medium">
@@ -279,7 +402,7 @@ const NewProductPublishingPage = () => {
                       {product.variations?.map((variation, index) => (
                         <TableRow key={index}>
                           <TableCell>{variation.value}</TableCell>
-                          <TableCell>$ {(variation.price ?? 0).toFixed(2)}</TableCell>
+                          <TableCell>{currencySymbol} {(variation.price ?? 0).toFixed(2)}</TableCell>
                           <TableCell>{variation.stock ?? 0}</TableCell>
                         </TableRow>
                       ))}
@@ -293,15 +416,18 @@ const NewProductPublishingPage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <Label>Weight</Label>
-                      <div className="text-lg font-medium">
-                        {product.weight} {product.weightUnit}
+                      <div className={`text-lg font-medium ${product.weight ? '' : 'text-red-600'}`}>
+                        {product.weight && product.weightUnit
+                          ? `${product.weight} ${product.weightUnit}`
+                          : "Not specified"}
                       </div>
                     </div>
                     <div>
                       <Label>Parcel size</Label>
-                      <div className="text-lg font-medium">
-                        {product.length} × {product.width} × {product.height}{" "}
-                        {product.sizeUnit}
+                      <div className={`text-lg font-medium ${product.length && product.width && product.height ? '' : 'text-red-600'}`}>
+                        {product.length && product.width && product.height && product.sizeUnit
+                          ? `${product.length} × ${product.width} × ${product.height} ${product.sizeUnit}`
+                          : "Not specified"}
                       </div>
                     </div>
                   </div>
@@ -313,7 +439,7 @@ const NewProductPublishingPage = () => {
                   </div>
                   <div className="space-y-2">
                     <Label>Country/Region of origin</Label>
-                    <div className="px-3 py-2 bg-muted rounded-md">
+                    <div className={`px-3 py-2 rounded-md ${product.countryOfOrigin ? 'bg-muted text-foreground' : 'bg-red-50 text-red-600'}`}>
                       {product.countryOfOrigin || "Not specified"}
                     </div>
                   </div>

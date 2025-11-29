@@ -109,3 +109,6 @@ npx prisma studio
 - Test each module after migration before moving to next
 - Use `npx prisma studio` to inspect the database visually
 
+
+npx prisma db push
+
