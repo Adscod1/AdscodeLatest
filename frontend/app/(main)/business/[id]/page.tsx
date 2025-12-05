@@ -322,6 +322,9 @@ const BusinessPage = () => {
                 <p className="text-gray-600 text-sm sm:text-base lg:text-lg truncate">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
                 </p>
+                <p className="text-gray-500 text-[11px] sm:text-xs truncate">
+                  {store.tagline || "Lorem ipsum dolor sit amet"}
+                </p>
                 {store.category && (
                   <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs sm:text-sm rounded-full">
                     {store.category}
@@ -363,11 +366,11 @@ const BusinessPage = () => {
         {/* Main Content - Responsive padding */}
         <div className="px-4 sm:px-6 lg:px-12 bg-blue-50 pt-5 w-full max-w-full overflow-hidden">
           {/* Top Row: Description + About side by side */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-6 lg:mb-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-0 lg:mb-0">
             {/* Description Section */}
-            <div className="flex-1 bg-white shadow-sm overflow-hidden w-full">
-              <div className="p-4 sm:p-6 lg:p-8 w-full">
-                <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4 border-b flex items-center text-base sm:text-lg break-words">
+            <div className="flex-1 bg-white shadow-sm overflow-hidden w-full max-h-80">
+              <div className="p-3 sm:p-4 lg:p-5 w-full">
+                <h3 className="font-semibold text-gray-900 mb-1.5 sm:mb-2 border-b flex items-center text-base sm:text-lg break-words">
                   Description
                 </h3>
                 <div className="relative w-full overflow-hidden">
@@ -421,7 +424,7 @@ const BusinessPage = () => {
                 </div>
 
                 {/* Social Links */}
-                <div className="flex items-center gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-400 flex-wrap">
+                <div className="flex items-center gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 flex-wrap">
                   {/* Facebook */}
                   <button className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-200 text-gray-500 rounded flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
                     <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" viewBox="0 0 320 512">
@@ -458,16 +461,16 @@ const BusinessPage = () => {
                   </button>
                 </div>
 
-                <Button className="w-full mt-4 sm:mt-6 hover:bg-gray-900 text-white rounded-lg text-sm sm:text-base">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Send message
+                <Button className="w-full mt-4 sm:mt-6 hover:bg-gray-200 hover:text-blue-600 text-white rounded text-sm sm:text-base">
+                  <Phone className="w-4 h-4 mr-2" />
+                  Call Now
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Rest of Content */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt-20 lg:-mt-24">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
 
@@ -480,6 +483,33 @@ const BusinessPage = () => {
                 </h2>
                 <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
                   <span className="hidden sm:inline">See all campaigns</span>
+                  <span className="sm:hidden">See all</span>
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                {campaigns.map((campaign, index) => (
+                  <div key={index} className="aspect-square overflow-hidden bg-gray-100">
+                    <Image
+                      src={campaign.image}
+                      alt={`Campaign ${index + 1}`}
+                      width={200}
+                      height={200}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Media */}
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+                  {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
+                Media
+                </h2>
+                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
+                  <span className="hidden sm:inline">See all Media</span>
                   <span className="sm:hidden">See all</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
@@ -859,9 +889,10 @@ const BusinessPage = () => {
             </div>
           </div>
 
-          {/* Right Column - Business Hours & Reviews (Sticky) */}
-          <div className="w-full lg:w-80 lg:sticky lg:top-6 lg:self-start flex-shrink-0">
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+          {/* Right Column - Sidebars Container */}
+          <div className="w-full lg:w-80 flex flex-col gap-6 lg:gap-8 mt-32  flex-shrink-0">
+            {/* Business Hours Sidebar */}
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden rounded-lg lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
               <div>
                 <div className="bg-green-500 text-white rounded-lg px-3 sm:px-4 py-2 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
@@ -881,182 +912,182 @@ const BusinessPage = () => {
                   ))}
                 </div>
               </div>
+            </div>
 
-              {/* Latest Reviews Section */}
-              <div className="mt-6 pt-6 border-t border-blue-200">
-                <div className="flex items-center gap-2 mb-4">
-                  <ChevronRight className="w-5 h-5 text-gray-700" />
-                  <h3 className="text-base font-bold text-gray-900">Latest Reviews</h3>
-                </div>
-                
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                  {reviews && reviews.length > 0 ? (
-                    reviews.slice(0, 10).map((review) => (
-                      <div key={review.id} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                        {/* Review Header */}
-                        <div className="flex items-start gap-2 mb-2">
-                          <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                            {review.user.image ? (
-                              <Image
-                                src={review.user.image}
-                                alt={review.user.name || "User"}
-                                width={32}
-                                height={32}
-                                className="w-full h-full object-cover rounded-full"
-                              />
-                            ) : (
-                              <span className="text-xs font-bold text-white">
-                                {(review.user.name || "U").charAt(0)}
-                              </span>
-                            )}
+            {/* Latest Reviews Sidebar */}
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden rounded-lg">
+              <div className="flex items-center gap-2 mb-4">
+                <ChevronRight className="w-5 h-5 text-gray-700" />
+                <h3 className="text-base font-bold text-gray-900">Latest Reviews</h3>
+              </div>
+              
+              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                {reviews && reviews.length > 0 ? (
+                  reviews.slice(0, 10).map((review) => (
+                    <div key={review.id} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                      {/* Review Header */}
+                      <div className="flex items-start gap-2 mb-2">
+                        <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                          {review.user.image ? (
+                            <Image
+                              src={review.user.image}
+                              alt={review.user.name || "User"}
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ) : (
+                            <span className="text-xs font-bold text-white">
+                              {(review.user.name || "U").charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-gray-900 text-xs truncate">
+                              {review.user.name || "Anonymous User"}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(review.createdAt).toLocaleTimeString('en-US', { 
+                                hour: '2-digit', 
+                                minute: '2-digit',
+                                hour12: false 
+                              })}
+                            </span>
                           </div>
                           
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-semibold text-gray-900 text-xs truncate">
-                                {review.user.name || "Anonymous User"}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {new Date(review.createdAt).toLocaleTimeString('en-US', { 
-                                  hour: '2-digit', 
-                                  minute: '2-digit',
-                                  hour12: false 
-                                })}
-                              </span>
-                            </div>
+                          {/* Star Rating */}
+                          <div className="flex items-center mb-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-3 h-3 ${
+                                  star <= review.rating
+                                    ? 'text-orange-400 fill-orange-400'
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          
+                          {/* Review Text */}
+                          <p className="text-gray-700 text-xs leading-relaxed mb-2 line-clamp-3">
+                            {review.comment}
+                          </p>
+                          
+                          {/* Reply Button with Icon */}
+                          <div className="flex items-center gap-3 mt-2">
+                            <button
+                              onClick={() => handleReplyClick(review.id)}
+                              className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                              <span className="text-xs">Reply</span>
+                            </button>
                             
-                            {/* Star Rating */}
-                            <div className="flex items-center mb-2">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                  key={star}
-                                  className={`w-3 h-3 ${
-                                    star <= review.rating
-                                      ? 'text-orange-400 fill-orange-400'
-                                      : 'text-gray-300'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            
-                            {/* Review Text */}
-                            <p className="text-gray-700 text-xs leading-relaxed mb-2 line-clamp-3">
-                              {review.comment}
-                            </p>
-                            
-                            {/* Reply Button with Icon */}
-                            <div className="flex items-center gap-3 mt-2">
-                              <button
-                                onClick={() => handleReplyClick(review.id)}
-                                className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
-                              >
-                                <MessageCircle className="w-3.5 h-3.5" />
-                                <span className="text-xs">Reply</span>
-                              </button>
-                              
-                              {/* Show reply count if there are replies */}
-                              {replies[review.id] && replies[review.id].length > 0 && (
-                                <span className="flex items-center gap-1 text-blue-600 text-xs">
-                                  <MessageCircle className="w-3.5 h-3.5" />
-                                  <span>Reply ({replies[review.id].length})</span>
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Reply Form */}
-                            {replyingTo === review.id && (
-                              <div className="mt-3 bg-white p-3 rounded-lg border border-gray-200">
-                                <textarea
-                                  value={replyText}
-                                  onChange={(e) => setReplyText(e.target.value)}
-                                  placeholder="Write a reply..."
-                                  className="w-full p-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                  rows={3}
-                                />
-                                {/* Emoji Toolbar */}
-                                <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center gap-1 text-sm">
-                                    <button className="hover:scale-110 transition-transform">👍</button>
-                                    <button className="hover:scale-110 transition-transform">❤️</button>
-                                    <button className="hover:scale-110 transition-transform">👏</button>
-                                    <button className="hover:scale-110 transition-transform">😂</button>
-                                    <button className="hover:scale-110 transition-transform">😍</button>
-                                    <button className="hover:scale-110 transition-transform">🔥</button>
-                                  </div>
-                                  <div className="flex gap-1">
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => {
-                                        setReplyingTo(null);
-                                        setReplyText("");
-                                      }}
-                                      className="text-gray-600 text-xs h-7 px-2"
-                                    >
-                                      Cancel
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      onClick={() => handleReplySubmit(review.id)}
-                                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-7 px-2"
-                                    >
-                                      Post
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Display Replies */}
+                            {/* Show reply count if there are replies */}
                             {replies[review.id] && replies[review.id].length > 0 && (
-                              <div className="mt-3 space-y-2">
-                                {replies[review.id].map((reply) => (
-                                  <div key={reply.id} className="pl-3 border-l-2 border-blue-400 bg-white p-2 rounded">
-                                    <div className="flex items-start gap-2">
-                                      <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                                        <span className="text-xs font-bold text-white">
-                                          {reply.user.charAt(0)}
-                                        </span>
-                                      </div>
-                                      <div className="flex-1">
-                                        <div className="flex items-center gap-1 mb-1">
-                                          <span className="font-semibold text-gray-900 text-xs">
-                                            {reply.user}
-                                          </span>
-                                          {reply.user === store.name && (
-                                            <Badge className="bg-blue-500 text-white text-xs px-1 py-0">Author</Badge>
-                                          )}
-                                          <span className="text-xs text-gray-500">
-                                            {new Date(reply.date).toLocaleTimeString('en-US', { 
-                                              hour: '2-digit', 
-                                              minute: '2-digit',
-                                              hour12: false 
-                                            })}
-                                          </span>
-                                        </div>
-                                        <p className="text-xs text-gray-700">{reply.text}</p>
-                                        
-                                        {/* Reply to reply button */}
-                                        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 mt-1">
-                                          <MessageCircle className="w-3 h-3" />
-                                          <span className="text-xs">Reply</span>
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
+                              <span className="flex items-center gap-1 text-blue-600 text-xs">
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                <span>Reply ({replies[review.id].length})</span>
+                              </span>
                             )}
                           </div>
+
+                          {/* Reply Form */}
+                          {replyingTo === review.id && (
+                            <div className="mt-3 bg-white p-3 rounded-lg border border-gray-200">
+                              <textarea
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                placeholder="Write a reply..."
+                                className="w-full p-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                rows={3}
+                              />
+                              {/* Emoji Toolbar */}
+                              <div className="flex items-center justify-between mt-2">
+                                <div className="flex items-center gap-1 text-sm">
+                                  <button className="hover:scale-110 transition-transform">👍</button>
+                                  <button className="hover:scale-110 transition-transform">❤️</button>
+                                  <button className="hover:scale-110 transition-transform">👏</button>
+                                  <button className="hover:scale-110 transition-transform">😂</button>
+                                  <button className="hover:scale-110 transition-transform">😍</button>
+                                  <button className="hover:scale-110 transition-transform">🔥</button>
+                                </div>
+                                <div className="flex gap-1">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => {
+                                      setReplyingTo(null);
+                                      setReplyText("");
+                                    }}
+                                    className="text-gray-600 text-xs h-7 px-2"
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleReplySubmit(review.id)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-7 px-2"
+                                  >
+                                    Post
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Display Replies */}
+                          {replies[review.id] && replies[review.id].length > 0 && (
+                            <div className="mt-3 space-y-2">
+                              {replies[review.id].map((reply) => (
+                                <div key={reply.id} className="pl-3 border-l-2 border-blue-400 bg-white p-2 rounded">
+                                  <div className="flex items-start gap-2">
+                                    <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                                      <span className="text-xs font-bold text-white">
+                                        {reply.user.charAt(0)}
+                                      </span>
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-1 mb-1">
+                                        <span className="font-semibold text-gray-900 text-xs">
+                                          {reply.user}
+                                        </span>
+                                        {reply.user === store.name && (
+                                          <Badge className="bg-blue-500 text-white text-xs px-1 py-0">Author</Badge>
+                                        )}
+                                        <span className="text-xs text-gray-500">
+                                          {new Date(reply.date).toLocaleTimeString('en-US', { 
+                                            hour: '2-digit', 
+                                            minute: '2-digit',
+                                            hour12: false 
+                                          })}
+                                        </span>
+                                      </div>
+                                      <p className="text-xs text-gray-700">{reply.text}</p>
+                                      
+                                      {/* Reply to reply button */}
+                                      <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 mt-1">
+                                        <MessageCircle className="w-3 h-3" />
+                                        <span className="text-xs">Reply</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-6 text-gray-500">
-                      <p className="text-xs">No reviews yet</p>
                     </div>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center py-6 text-gray-500">
+                    <p className="text-xs">No reviews yet</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
