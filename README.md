@@ -65,7 +65,7 @@ cd backend && npx prisma generate
 | `npm run clean` | Remove node_modules & build artifacts |
 | `npm run test` | Run tests |
 | `npm install <pkg> --workspace=frontend` | Install in frontend |
-| `npm install <pkg> --workspace=backend` | Install in backend |
+| `npm install <pkg> --workspace=backend` | Install in backend 
 
 ### Backend Database
 

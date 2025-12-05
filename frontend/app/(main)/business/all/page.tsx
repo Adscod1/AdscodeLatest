@@ -195,7 +195,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
 };
 
 const FilterSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <div className="mb-6">
+  <div className="mb-6 pb-6 border-b border-gray-300">
     <h3 className="font-semibold text-gray-900 mb-3">{title}</h3>
     <div className="space-y-2">
       {children}
