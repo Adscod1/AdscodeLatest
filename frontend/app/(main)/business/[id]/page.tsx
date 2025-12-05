@@ -470,7 +470,7 @@ const BusinessPage = () => {
           </div>
 
           {/* Rest of Content */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt-20 lg:-mt-22">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt-20 lg:-mt-18">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
 
