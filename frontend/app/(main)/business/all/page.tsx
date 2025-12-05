@@ -364,6 +364,7 @@ const BusinessesPageContent = () => {
             ) : filteredStores.length > 0 ? (
               filteredStores.map((store) => (
                 <div key={store.id}>
+                  <hr className="border-gray-300 mb-4 lg:mb-6" />
                   <BusinessCard store={store} />
                   <hr className="border-gray-300 mt-6 lg:mt-6" />
                 </div>
