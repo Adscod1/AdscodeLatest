@@ -370,10 +370,10 @@ const BusinessPage = () => {
             {/* Description Section */}
             <div className="flex-1 bg-white shadow-sm overflow-hidden w-full max-h-80">
               <div className="p-3 sm:p-4 lg:p-5 w-full">
-                <h3 className="font-semibold text-gray-900 mb-1.5 sm:mb-2 border-b flex items-center text-base sm:text-lg break-words">
+                <h3 className="font-semibold text-gray-900 mb-1.5 sm:mb-2 pb-2 border-b border-gray-200 flex items-center text-base sm:text-lg break-words">
                   Description
                 </h3>
-                <div className="relative w-full overflow-hidden">
+                <div className="relative w-full overflow-hidden mt-3">
                   <p className={`text-gray-700 leading-relaxed break-words ${
                     !isDescriptionExpanded ? "line-clamp-3" : ""
                   }`}>
@@ -470,7 +470,7 @@ const BusinessPage = () => {
           </div>
 
           {/* Rest of Content */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt-20 lg:-mt-24">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt-20 lg:-mt-22">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
 
