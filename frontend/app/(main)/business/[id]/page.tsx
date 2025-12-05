@@ -345,25 +345,25 @@ const BusinessPage = () => {
             
             {/* Right Side: Action Buttons */}
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto max-w-full">
-              <Button className="bg-blue-600 rounded-full hover:bg-blue-700 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 flex items-center gap-2 text-sm sm:text-base">
+              <Button className="bg-white rounded-full border border-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-600 text-gray-800 px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 flex items-center gap-2 text-sm sm:text-base">
                 <svg className="w-4 h-4" viewBox="0 0 640 512" fill="currentColor">
                   <path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
                 </svg>
                 <span className="hidden sm:inline">Follow</span>
               </Button>
               <Link href={`/business/${store.id}/reviews/write`}>
-                <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base rounded-full">
+                <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-2 text-sm sm:text-base rounded-full">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   <span className="hidden sm:inline">Write Review</span>
                 </Button>
               </Link>
-              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base rounded-full">
+              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-2 text-sm sm:text-base rounded-full">
                 <Mail className="w-4 h-4" />
                 <span className="hidden sm:inline">Inbox</span>
               </Button>
-              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base rounded-full">
+              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-2 text-sm sm:text-base rounded-full">
                 <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor">
                   <path d="M 35.478516 5.9804688 A 2.0002 2.0002 0 0 0 34.085938 9.4140625 L 35.179688 10.507812 C 23.476587 10.680668 14 20.256715 14 32 A 2.0002 2.0002 0 1 0 18 32 C 18 22.427546 25.627423 14.702715 35.154297 14.517578 L 34.085938 15.585938 A 2.0002 2.0002 0 1 0 36.914062 18.414062 L 41.236328 14.091797 A 2.0002 2.0002 0 0 0 41.228516 10.900391 L 36.914062 6.5859375 A 2.0002 2.0002 0 0 0 35.478516 5.9804688 z M 12.5 6 C 8.9338464 6 6 8.9338464 6 12.5 L 6 35.5 C 6 39.066154 8.9338464 42 12.5 42 L 35.5 42 C 39.066154 42 42 39.066154 42 35.5 L 42 28 A 2.0002 2.0002 0 1 0 38 28 L 38 35.5 C 38 36.903846 36.903846 38 35.5 38 L 12.5 38 C 11.096154 38 10 36.903846 10 35.5 L 10 12.5 C 10 11.096154 11.096154 10 12.5 10 L 20 10 A 2.0002 2.0002 0 1 0 20 6 L 12.5 6 z"></path>
                 </svg>
@@ -481,7 +481,7 @@ const BusinessPage = () => {
           </div>
 
           {/* Rest of Content */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt- lg:-mt-18">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt- lg:-mt-10">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
 
@@ -903,7 +903,7 @@ const BusinessPage = () => {
           </div>
 
           {/* Right Column - Sidebars Container */}
-          <div className="w-full lg:w-80 flex flex-col gap-6 lg:gap-8 mt-32  flex-shrink-0">
+          <div className="w-full lg:w-80 flex flex-col gap-6 lg:gap-8 mt-8  flex-shrink-0">
             {/* Business Hours Sidebar */}
             <div className="bg-white shadow-sm w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
