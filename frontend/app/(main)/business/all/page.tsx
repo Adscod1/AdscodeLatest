@@ -69,7 +69,7 @@ interface Store {
 
 const BusinessCard = ({ store }: { store: Store }) => {
   return (
-    <div className="flex flex-col lg:flex-row bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className="flex flex-col lg:flex-row bg-white  rounded-lg overflow-hidden  hover:bg-gray-100 transition-shadow">
       {/* Image Gallery */}
       <div className="w-full lg:w-1/2 xl:w-[500px] h-64 lg:h-[340px] relative flex-shrink-0">
         <div className="flex h-full gap-1">
@@ -83,7 +83,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
             />
           </div>
           {/* 4 smaller images in a 2x2 grid */}
-          <div className="w-16 lg:w-20 grid grid-cols-1 gap-1">
+          <div className="w-24 lg:w-32 grid grid-cols-1 gap-1">
             <div className="relative h-full">
               <Image
                 src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400"
@@ -183,7 +183,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 mt-auto sm:justify-end sm:ml-auto">
           <Button variant="outline" size="default" className="w-full sm:w-auto px-4 lg:px-6">
-            Directions
+           Get Directions
           </Button>
           <Button variant="outline" size="default" className="w-full sm:w-auto px-4 lg:px-6">
             Visit Website
@@ -296,8 +296,8 @@ const BusinessesPageContent = () => {
               <FilterCheckbox label="Allows Booking" />
             </FilterSection>
 
-            <FilterSection title="Category">
-              <div className="space-y-3">
+            <FilterSection title="Tags">
+              <div className="space-y-3 space-x-2">
                 <CategoryButton label="Restaurants" active />
                 <CategoryButton label="Cuiesnness" />
               </div>
@@ -363,7 +363,10 @@ const BusinessesPageContent = () => {
               </div>
             ) : filteredStores.length > 0 ? (
               filteredStores.map((store) => (
-                <BusinessCard key={store.id} store={store} />
+                <div key={store.id}>
+                  <BusinessCard store={store} />
+                  <hr className="border-gray-300 mt-6 lg:mt-6" />
+                </div>
               ))
             ) : (
               <div className="text-center py-12">
