@@ -319,9 +319,7 @@ const BusinessPage = () => {
                     <span className="font-semibold text-green-600">92%</span> Performance Score
                   </span>
                 </h1>
-                <p className="text-gray-600 text-sm sm:text-base lg:text-lg truncate">
-                  {store.tagline || "Lorem ipsum dolor sit amet"}
-                </p>
+                
                 <p className="text-gray-500 text-[11px] sm:text-xs truncate">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
                 </p>
@@ -470,7 +468,7 @@ const BusinessPage = () => {
           </div>
 
           {/* Rest of Content */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt-20 lg:-mt-18">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt- lg:-mt-18">
           {/* Left Column - Main Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
 
@@ -892,19 +890,19 @@ const BusinessPage = () => {
           {/* Right Column - Sidebars Container */}
           <div className="w-full lg:w-80 flex flex-col gap-6 lg:gap-8 mt-32  flex-shrink-0">
             {/* Business Hours Sidebar */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden rounded-lg lg:sticky lg:top-6 lg:self-start">
+            <div className="bg-white shadow-sm w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
               <div>
-                <div className="bg-green-500 text-white rounded-lg px-3 sm:px-4 py-2 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
+                <div className="bg-green-400 text-white  sm:px-4 py-2 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
                   <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
                   <span className="font-medium">OPEN NOW</span>
                   <span className="ml-auto text-xs sm:text-sm">08:30 AM to 05:00 PM</span>
                 </div>
                 
-                <div className="space-y-1.5 sm:space-y-2">
+                <div className="space-y-6 sm:space-y-4 p-3">
                   {businessHours.map((schedule, index) => (
-                    <div key={index} className="flex justify-between text-xs sm:text-sm">
-                      <span className={schedule.isOpen ? "text-green-600 font-medium" : "text-gray-700"}>
+                    <div key={index} className="flex justify-between text-xs sm:text-xs">
+                      <span className={schedule.isOpen ? "text-green-400 font-medium" : "text-gray-500"}>
                         {schedule.day}
                       </span>
                       <span className="text-gray-600">{schedule.hours}</span>
