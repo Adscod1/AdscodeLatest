@@ -117,6 +117,16 @@ const BusinessPage = () => {
     enabled: !!businessId,
   });
 
+  const { data: similarStores, isLoading: isLoadingSimilarStores } = useQuery({
+    queryKey: ["similarStores", store?.category],
+    queryFn: async () => {
+      if (!store?.category) return { stores: [] };
+      const response = await api.stores.getAllStores({ category: store.category, limit: 10 });
+      return { stores: response.stores || [] };
+    },
+    enabled: !!store?.category,
+  });
+
   // Combine products and services for the main listing
   const allItems = [...(products || []), ...(services || [])].slice(0, 4); // Show only first 4 items
 
@@ -256,7 +266,7 @@ const BusinessPage = () => {
             {/* Left Side: Business Profile with Logo and Name inline */}
             <div className="flex items-center gap-4 sm:gap-6">
               {/* Business Avatar - Larger size with negative margin to overlap hero */}
-              <div className="flex-shrink-0 bg-white rounded-lg flex items-center justify-center  border-2 border-white -mt-12 sm:-mt-14 lg:-mt-16 z-10">
+              <div className="flex-shrink-0 bg-white rounded-lg flex items-center justify-center  border-2 border-white -mt-4 sm:-mt-6 lg:-mt-8 z-10">
                 <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 shadow-md border-2 border-white">
                   {store.logo ? (
                     <Image
@@ -305,29 +315,31 @@ const BusinessPage = () => {
                       </g>
                     </g>
                   </svg>
-                  <span className="text-gray-300 mx-1">|</span>
+
+                  {store.category && (
+                  <span className=" mt-1 font-normal px-2 py-0.5 bg-gray-100 text-gray-700 text-xs sm:text-xs rounded-full">
+                    {store.category}
+                  </span>
+                )}
+                  <span className="text-gray-300 mx-1 text-sm">|</span>
                   <span className="text-sm font-normal text-gray-600 flex items-center gap-1">
                     <span className="font-semibold text-gray-900">1.2K</span> Followers
                   </span>
-                  <span className="text-gray-300 mx-1">|</span>
+                  <span className="text-gray-300 mx-1 text-sm">|</span>
                   <span className="text-sm font-normal text-gray-600 flex items-center gap-1">
                     <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
                     <span className="font-semibold text-gray-900">{averageRating.toFixed(1)}</span><span>Rating</span>
                   </span>
-                  <span className="text-gray-300 mx-1">|</span>
+                  <span className="text-gray-300 mx-1 text-sm">|</span>
                   <span className="text-sm font-normal text-gray-600 flex items-center gap-1">
                     <span className="font-semibold text-green-600">92%</span> Performance Score
                   </span>
                 </h1>
                 
-                <p className="text-gray-500 text-[11px] sm:text-xs truncate">
+                <p className="text-gray-500 text-xl sm:text-[14px] truncate -mt-1">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
                 </p>
-                {store.category && (
-                  <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs sm:text-sm rounded-full">
-                    {store.category}
-                  </span>
-                )}
+                
               </div>
             </div>
             
@@ -339,6 +351,14 @@ const BusinessPage = () => {
                 </svg>
                 <span className="hidden sm:inline">Follow</span>
               </Button>
+              <Link href={`/business/${store.id}/reviews/write`}>
+                <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base rounded-full">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span className="hidden sm:inline">Write Review</span>
+                </Button>
+              </Link>
               <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base rounded-full">
                 <Mail className="w-4 h-4" />
                 <span className="hidden sm:inline">Inbox</span>
@@ -349,14 +369,7 @@ const BusinessPage = () => {
                 </svg>
                 <span className="hidden sm:inline">Share</span>
               </Button>
-              <Link href={`/business/${store.id}/reviews/write`}>
-                <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-gray-50 flex items-center gap-2 text-sm sm:text-base rounded-full">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <span className="hidden sm:inline">Write Review</span>
-                </Button>
-              </Link>
+              
             </div>
           </div>
         </div>
@@ -475,11 +488,11 @@ const BusinessPage = () => {
             {/* Campaigns */}
             <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+                <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
                   Campaigns
                 </h2>
-                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
+                <Link href="#" className="text-blue-600 hover:text-blue-700 flex items-center text-sm sm:text-base">
                   <span className="hidden sm:inline">See all campaigns</span>
                   <span className="sm:hidden">See all</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
@@ -499,40 +512,13 @@ const BusinessPage = () => {
                 ))}
               </div>
             </div>
-            {/* Media */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
-              <div className="flex justify-between items-center mb-4 sm:mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
-                  {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
-                Media
-                </h2>
-                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
-                  <span className="hidden sm:inline">See all Media</span>
-                  <span className="sm:hidden">See all</span>
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                {campaigns.map((campaign, index) => (
-                  <div key={index} className="aspect-square overflow-hidden bg-gray-100">
-                    <Image
-                      src={campaign.image}
-                      alt={`Campaign ${index + 1}`}
-                      width={200}
-                      height={200}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
+            
             {/* Services */}
             <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
+                <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
-                  <span className="hidden sm:inline">Listing main Products and Services</span>
+                  <span className="hidden sm:inline">Products/Services</span>
                   <span className="sm:hidden">Products & Services</span>
                 </h2>
                 <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
@@ -555,14 +541,14 @@ const BusinessPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
-                      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer border-0 shadow-none">
+                      <Card className="overflow-hidden border border-gray-300 hover:shadow-lg transition-shadow cursor-pointer border-0 shadow-none">
                         <div className="aspect-square bg-gray-100">
                           {item.images && item.images.length > 0 ? (
                             <Image
                               src={item.images[0].url}
                               alt={item.title}
                               width={300}
-                              height={300}
+                              height={200}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -596,9 +582,38 @@ const BusinessPage = () => {
               )}
             </div>
 
+            {/* Media */}
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
+                  {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
+                Media
+                </h2>
+                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
+                  <span className="hidden sm:inline">See all Media</span>
+                  <span className="sm:hidden">See all</span>
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                {campaigns.map((campaign, index) => (
+                  <div key={index} className="aspect-square overflow-hidden bg-gray-100">
+                    <Image
+                      src={campaign.image}
+                      alt={`Campaign ${index + 1}`}
+                      width={200}
+                      height={200}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+
             {/* Highlights */}
             <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Highlights from the Business</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Business Highlights</h2>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
                 {highlights.map((highlight, index) => (
                   <div key={index} className="text-center">
@@ -901,8 +916,8 @@ const BusinessPage = () => {
                 
                 <div className="space-y-6 sm:space-y-4 p-3">
                   {businessHours.map((schedule, index) => (
-                    <div key={index} className="flex justify-between text-xs sm:text-xs">
-                      <span className={schedule.isOpen ? "text-green-400 font-medium" : "text-gray-500"}>
+                    <div key={index} className="flex justify-between text-sm sm:text-sm">
+                      <span className={schedule.isOpen ? "text-green-400" : "text-gray-500"}>
                         {schedule.day}
                       </span>
                       <span className="text-gray-600">{schedule.hours}</span>
@@ -912,178 +927,57 @@ const BusinessPage = () => {
               </div>
             </div>
 
-            {/* Latest Reviews Sidebar */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden rounded-lg">
+            {/* Similar Businesses Sidebar */}
+            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex items-center gap-2 mb-4">
                 <ChevronRight className="w-5 h-5 text-gray-700" />
-                <h3 className="text-base font-bold text-gray-900">Latest Reviews</h3>
+                <h3 className="text-base font-bold text-gray-900">Similar Businesses</h3>
               </div>
               
               <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                {reviews && reviews.length > 0 ? (
-                  reviews.slice(0, 10).map((review) => (
-                    <div key={review.id} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                      {/* Review Header */}
-                      <div className="flex items-start gap-2 mb-2">
-                        <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                          {review.user.image ? (
-                            <Image
-                              src={review.user.image}
-                              alt={review.user.name || "User"}
-                              width={32}
-                              height={32}
-                              className="w-full h-full object-cover rounded-full"
-                            />
-                          ) : (
-                            <span className="text-xs font-bold text-white">
-                              {(review.user.name || "U").charAt(0)}
-                            </span>
-                          )}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-gray-900 text-xs truncate">
-                              {review.user.name || "Anonymous User"}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {new Date(review.createdAt).toLocaleTimeString('en-US', { 
-                                hour: '2-digit', 
-                                minute: '2-digit',
-                                hour12: false 
-                              })}
-                            </span>
-                          </div>
-                          
-                          {/* Star Rating */}
-                          <div className="flex items-center mb-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`w-3 h-3 ${
-                                  star <= review.rating
-                                    ? 'text-orange-400 fill-orange-400'
-                                    : 'text-gray-300'
-                                }`}
+                {isLoadingSimilarStores ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 text-sm">Loading similar businesses...</p>
+                  </div>
+                ) : similarStores && similarStores.stores.length > 0 ? (
+                  similarStores.stores
+                    .filter((s: any) => s.id !== store?.id) // Exclude current store
+                    .slice(0, 5)
+                    .map((similarStore: any) => (
+                      <Link key={similarStore.id} href={`/business/${similarStore.id}`}>
+                        <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer border border-gray-100">
+                          <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                            {similarStore.logo ? (
+                              <Image
+                                src={similarStore.logo}
+                                alt={similarStore.name}
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover"
                               />
-                            ))}
-                          </div>
-                          
-                          {/* Review Text */}
-                          <p className="text-gray-700 text-xs leading-relaxed mb-2 line-clamp-3">
-                            {review.comment}
-                          </p>
-                          
-                          {/* Reply Button with Icon */}
-                          <div className="flex items-center gap-3 mt-2">
-                            <button
-                              onClick={() => handleReplyClick(review.id)}
-                              className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
-                            >
-                              <MessageCircle className="w-3.5 h-3.5" />
-                              <span className="text-xs">Reply</span>
-                            </button>
-                            
-                            {/* Show reply count if there are replies */}
-                            {replies[review.id] && replies[review.id].length > 0 && (
-                              <span className="flex items-center gap-1 text-blue-600 text-xs">
-                                <MessageCircle className="w-3.5 h-3.5" />
-                                <span>Reply ({replies[review.id].length})</span>
+                            ) : (
+                              <span className="text-sm font-bold text-white">
+                                {similarStore.name.charAt(0)}
                               </span>
                             )}
                           </div>
-
-                          {/* Reply Form */}
-                          {replyingTo === review.id && (
-                            <div className="mt-3 bg-white p-3 rounded-lg border border-gray-200">
-                              <textarea
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                placeholder="Write a reply..."
-                                className="w-full p-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                rows={3}
-                              />
-                              {/* Emoji Toolbar */}
-                              <div className="flex items-center justify-between mt-2">
-                                <div className="flex items-center gap-1 text-sm">
-                                  <button className="hover:scale-110 transition-transform">👍</button>
-                                  <button className="hover:scale-110 transition-transform">❤️</button>
-                                  <button className="hover:scale-110 transition-transform">👏</button>
-                                  <button className="hover:scale-110 transition-transform">😂</button>
-                                  <button className="hover:scale-110 transition-transform">😍</button>
-                                  <button className="hover:scale-110 transition-transform">🔥</button>
-                                </div>
-                                <div className="flex gap-1">
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => {
-                                      setReplyingTo(null);
-                                      setReplyText("");
-                                    }}
-                                    className="text-gray-600 text-xs h-7 px-2"
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleReplySubmit(review.id)}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-7 px-2"
-                                  >
-                                    Post
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Display Replies */}
-                          {replies[review.id] && replies[review.id].length > 0 && (
-                            <div className="mt-3 space-y-2">
-                              {replies[review.id].map((reply) => (
-                                <div key={reply.id} className="pl-3 border-l-2 border-blue-400 bg-white p-2 rounded">
-                                  <div className="flex items-start gap-2">
-                                    <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                                      <span className="text-xs font-bold text-white">
-                                        {reply.user.charAt(0)}
-                                      </span>
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-1 mb-1">
-                                        <span className="font-semibold text-gray-900 text-xs">
-                                          {reply.user}
-                                        </span>
-                                        {reply.user === store.name && (
-                                          <Badge className="bg-blue-500 text-white text-xs px-1 py-0">Author</Badge>
-                                        )}
-                                        <span className="text-xs text-gray-500">
-                                          {new Date(reply.date).toLocaleTimeString('en-US', { 
-                                            hour: '2-digit', 
-                                            minute: '2-digit',
-                                            hour12: false 
-                                          })}
-                                        </span>
-                                      </div>
-                                      <p className="text-xs text-gray-700">{reply.text}</p>
-                                      
-                                      {/* Reply to reply button */}
-                                      <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 mt-1">
-                                        <MessageCircle className="w-3 h-3" />
-                                        <span className="text-xs">Reply</span>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 text-sm truncate">
+                              {similarStore.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 truncate">
+                              {similarStore.category || "Business"}
+                            </p>
+                            {similarStore.verified && (
+                              <span className="inline-block mt-1 text-xs text-blue-600">✓ Verified</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ))
+                      </Link>
+                    ))
                 ) : (
-                  <div className="text-center py-6 text-gray-500">
-                    <p className="text-xs">No reviews yet</p>
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 text-sm">No similar businesses found</p>
                   </div>
                 )}
               </div>
