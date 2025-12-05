@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ChevronLeft, Info, X } from "lucide-react";
+import { ChevronLeft, Info, X, Copy, Check, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -33,51 +33,192 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useProductStore } from "@/store/use-product-store";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface ExtendedProductInput extends CreateProductInput {
-  sku?: string;
+  productId?: string;
   stockQuantity?: number;
   lowStockAlert?: number;
-  weight?: number;
-  length?: number;
-  width?: number;
-  height?: number;
   currency?: string;
   taxRate?: number;
 }
 
+// Generate a secure, unique Product ID
+const generateProductId = (): string => {
+  // Use timestamp + random string for uniqueness and security
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substring(2, 8);
+  return `PRD-${timestamp}-${randomStr}`.toUpperCase();
+};
+
 const NewProductSaleInformation = () => {
   const { storeId } = useParams();
   const router = useRouter();
-  const { product, updateProduct, reset } = useProductStore();
+  const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
+  const [copied, setCopied] = React.useState(false);
+  const [expandedVariants, setExpandedVariants] = React.useState<Record<string, boolean>>({
+    Size: true, // Size expanded by default
+  });
+  const [selectedVariants, setSelectedVariants] = React.useState<Set<number>>(new Set());
+  const [selectedVariantGroups, setSelectedVariantGroups] = React.useState<Set<string>>(new Set());
+  const [showAddVariantDialog, setShowAddVariantDialog] = React.useState(false);
+  const [newVariantName, setNewVariantName] = React.useState("");
+  const hasSyncedRef = React.useRef(false);
+  
+  // Generate Product ID on component mount (or use existing from store)
+  const productIdRef = React.useRef<string | null>(null);
+  if (!productIdRef.current) {
+    productIdRef.current = generateProductId();
+  }
 
-  const { register, control, watch, handleSubmit, setValue } =
+  const { register, control, watch, handleSubmit, setValue, reset: resetForm } =
     useForm<ExtendedProductInput>({
       defaultValues: {
-        ...product,
         storeId: storeId as string,
-        sku: "SKU-001",
+        productId: productIdRef.current,
         stockQuantity: 0,
         lowStockAlert: 5,
-        weight: 0,
-        length: 0,
-        width: 0,
-        height: 0,
         currency: "UGX - Ugandan Shilling",
-        taxRate: 0,
+        taxRate: 1.8,
       },
     });
+
+  // Sync form with store data ONCE after hydration
+  React.useEffect(() => {
+    if (_hasHydrated && !hasSyncedRef.current) {
+      hasSyncedRef.current = true;
+      const storedProductId = (product as ExtendedProductInput).productId || productIdRef.current;
+      resetForm({
+        ...product,
+        storeId: storeId as string,
+        productId: storedProductId,
+        stockQuantity: (product as ExtendedProductInput).stockQuantity || 0,
+        lowStockAlert: (product as ExtendedProductInput).lowStockAlert || 5,
+        currency: (product as ExtendedProductInput).currency || "UGX - Ugandan Shilling",
+        taxRate: (product as ExtendedProductInput).taxRate || 0,
+      });
+    }
+  }, [_hasHydrated]);
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variations",
   });
 
+  // Group variations by their name (e.g., "Size", "Color")
+  const groupedVariations = React.useMemo(() => {
+    const groups: Record<string, { index: number; field: typeof fields[0] }[]> = {};
+    fields.forEach((field, index) => {
+      const name = field.name || "Size";
+      if (!groups[name]) {
+        groups[name] = [];
+      }
+      groups[name].push({ index, field });
+    });
+    return groups;
+  }, [fields]);
+
+  const toggleVariantGroup = (name: string) => {
+    setExpandedVariants((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
+
+  const handleAddVariantType = () => {
+    setShowAddVariantDialog(true);
+    setNewVariantName("");
+  };
+
+  const handleConfirmVariantType = () => {
+    if (!newVariantName.trim()) return;
+
+    const variantName = newVariantName.trim();
+
+    // Add first item of new variant type
+    append({
+      name: variantName,
+      value: `New ${variantName}`,
+      price: price || 20,
+      stock: 0,
+    });
+
+    // Auto-expand the new variant group
+    setExpandedVariants((prev) => ({
+      ...prev,
+      [variantName]: true,
+    }));
+
+    // Close dialog and reset
+    setShowAddVariantDialog(false);
+    setNewVariantName("");
+  };
+
+  // Handle parent checkbox to select/deselect all variants in a group
+  const handleGroupCheckboxChange = (variantName: string, items: typeof groupedVariations[string], checked: boolean) => {
+    const newSelected = new Set(selectedVariants);
+    if (checked) {
+      // Select all items in this group
+      items.forEach(({ index }) => {
+        newSelected.add(index);
+      });
+      setSelectedVariantGroups(prev => new Set(prev).add(variantName));
+    } else {
+      // Deselect all items in this group
+      items.forEach(({ index }) => {
+        newSelected.delete(index);
+      });
+      setSelectedVariantGroups(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(variantName);
+        return newSet;
+      });
+    }
+    setSelectedVariants(newSelected);
+  };
+
+  // Handle individual variant checkbox
+  const handleVariantCheckboxChange = (index: number, checked: boolean) => {
+    const newSelected = new Set(selectedVariants);
+    if (checked) {
+      newSelected.add(index);
+    } else {
+      newSelected.delete(index);
+    }
+    setSelectedVariants(newSelected);
+  };
+
+  // Check if all variants in a group are selected
+  const isGroupFullySelected = (items: typeof groupedVariations[string]): boolean => {
+    return items.every(({ index }) => selectedVariants.has(index));
+  };
+
+  // Check if any variants in a group are selected
+  const isGroupPartiallySelected = (items: typeof groupedVariations[string]): boolean => {
+    return items.some(({ index }) => selectedVariants.has(index)) && !isGroupFullySelected(items);
+  };
+
   const price = watch("price");
-  const costPerItem = watch("costPerItem");
-  const profit = price && costPerItem ? price - costPerItem : 0;
-  const margin =
-    price && costPerItem ? ((price - costPerItem) / price) * 100 : 0;
+  const selectedCurrency = watch("currency") || "UGX - Ugandan Shilling";
+
+  // Get currency symbol based on selected currency
+  const getCurrencySymbol = (currency: string): string => {
+    const currencyMap: Record<string, string> = {
+      "UGX - Ugandan Shilling": "UGX",
+      "USD - US Dollar": "$",
+      "EUR - Euro": "€",
+      "GBP - British Pound": "£",
+    };
+    return currencyMap[currency] || "UGX";
+  };
+
+  const currencySymbol = getCurrencySymbol(selectedCurrency);
 
   const onSubmit = (data: ExtendedProductInput) => {
     updateProduct({
@@ -88,9 +229,35 @@ const NewProductSaleInformation = () => {
   };
 
   const handleCancel = () => {
-    reset();
+    resetStore();
     router.push(`/${storeId}/products`);
   };
+
+  // Auto-save form data to store on change
+  React.useEffect(() => {
+    const subscription = watch((data) => {
+      // Only save if we have hydrated to avoid overwriting with empty defaults
+      if (hasSyncedRef.current) {
+        updateProduct({
+          ...data,
+          storeId: storeId as string,
+        } as Partial<ExtendedProductInput>);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, updateProduct, storeId]);
+
+  // Show loading state until hydration completes
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -143,7 +310,7 @@ const NewProductSaleInformation = () => {
                     </Label>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                        $
+                        {currencySymbol}
                       </span>
                       <Input
                         id="price"
@@ -151,7 +318,7 @@ const NewProductSaleInformation = () => {
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="pl-7"
+                        className="pl-12"
                       />
                     </div>
                   </div>
@@ -159,7 +326,7 @@ const NewProductSaleInformation = () => {
                     <Label htmlFor="comparePrice">Compare at Price</Label>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                        $
+                        {currencySymbol}
                       </span>
                       <Input
                         id="comparePrice"
@@ -167,7 +334,7 @@ const NewProductSaleInformation = () => {
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="pl-7"
+                        className="pl-12"
                       />
                     </div>
                     <p className="text-xs text-gray-500">
@@ -176,15 +343,37 @@ const NewProductSaleInformation = () => {
                   </div>
                 </div>
 
-                {/* SKU, Stock Quantity, Low Stock Alert */}
+                {/* Product ID, Stock Quantity, Low Stock Alert */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="sku">SKU</Label>
-                    <Input
-                      id="sku"
-                      {...register("sku")}
-                      placeholder="SKU-001"
-                    />
+                    <Label htmlFor="productId">Product ID</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="productId"
+                        value={productIdRef.current}
+                        disabled
+                        className="bg-gray-100"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(productIdRef.current);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        }}
+                      >
+                        {copied ? (
+                          <Check className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Auto-generated unique identifier
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="stockQuantity">
@@ -220,47 +409,6 @@ const NewProductSaleInformation = () => {
                   </div>
                 </div>
 
-                {/* Dimensions */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="weight">Weight (kg)</Label>
-                    <Input
-                      id="weight"
-                      {...register("weight", { valueAsNumber: true })}
-                      type="number"
-                      step="0.01"
-                      placeholder="0.0"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="length">Length (cm)</Label>
-                    <Input
-                      id="length"
-                      {...register("length", { valueAsNumber: true })}
-                      type="number"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="width">Width (cm)</Label>
-                    <Input
-                      id="width"
-                      {...register("width", { valueAsNumber: true })}
-                      type="number"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="height">Height (cm)</Label>
-                    <Input
-                      id="height"
-                      {...register("height", { valueAsNumber: true })}
-                      type="number"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-
                 {/* Currency and Tax Rate */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
@@ -268,8 +416,11 @@ const NewProductSaleInformation = () => {
                       Currency <span className="text-red-500">*</span>
                     </Label>
                     <Select
-                      value={watch("currency")}
-                      onValueChange={(value) => setValue("currency", value)}
+                      value={watch("currency") || "UGX - Ugandan Shilling"}
+                      onValueChange={(value) => {
+                        setValue("currency", value);
+                        updateProduct({ currency: value });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select currency" />
@@ -295,56 +446,8 @@ const NewProductSaleInformation = () => {
                       {...register("taxRate", { valueAsNumber: true })}
                       type="number"
                       step="0.01"
-                      placeholder="0"
+                      placeholder="1.8"
                     />
-                  </div>
-                </div>
-
-                {/* Cost and Profit Section */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-1">
-                      <Label htmlFor="costPerItem">Cost per item</Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-3.5 h-3.5 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Cost to acquire or produce one unit</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                        $
-                      </span>
-                      <Input
-                        id="costPerItem"
-                        {...register("costPerItem", { valueAsNumber: true })}
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="pl-7"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Profit</Label>
-                    <div className="bg-muted px-3 py-2.5 rounded-md">
-                      <span className="text-sm text-muted-foreground">
-                        ${profit.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Margin</Label>
-                    <div className="bg-muted px-3 py-2.5 rounded-md">
-                      <span className="text-sm text-muted-foreground">
-                        {margin.toFixed(1)}%
-                      </span>
-                    </div>
                   </div>
                 </div>
 
@@ -357,90 +460,163 @@ const NewProductSaleInformation = () => {
                         (Sizes or colors)
                       </span>
                     </h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddVariantType}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add Variant Type
+                    </Button>
                   </div>
 
-                  {/* Variations Table */}
-                  {fields.length > 0 && (
-                    <div className="overflow-x-auto">
-                      <Table className="min-w-[600px]">
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-[250px] sm:w-[300px]">
-                              <div className="flex items-center space-x-2">
-                                <Checkbox />
-                                <span>Size</span>
-                              </div>
-                            </TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead>Available</TableHead>
-                            <TableHead className="w-[50px]"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                      <TableBody>
-                        {fields.map((field, index) => (
-                          <TableRow key={field.id}>
-                            <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox />
-                                <Input
-                                  {...register(`variations.${index}.value`)}
-                                  className="max-w-[150px] sm:max-w-[200px]"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="relative w-24 sm:w-32">
-                                <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                                  $
-                                </span>
-                                <Input
-                                  {...register(`variations.${index}.price`, {
-                                    valueAsNumber: true,
-                                  })}
-                                  type="number"
-                                  step="0.01"
-                                  className="pl-7"
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                {...register(`variations.${index}.stock`, {
-                                  valueAsNumber: true,
-                                })}
-                                type="number"
-                                className="w-16 sm:w-20"
+                  {/* Hierarchical Variations */}
+                  {Object.keys(groupedVariations).length > 0 && (
+                    <div className="border rounded-lg overflow-hidden">
+                      {Object.entries(groupedVariations).map(([variantName, items]) => (
+                        <div key={variantName} className="border-b last:border-b-0">
+                          {/* Parent Variant Header (e.g., Size) */}
+                          <div
+                            className="flex items-center justify-between px-4 py-3 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                            onClick={() => toggleVariantGroup(variantName)}
+                          >
+                            <div className="flex items-center space-x-3">
+                              {expandedVariants[variantName] ? (
+                                <ChevronDown className="w-4 h-4 text-gray-500" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4 text-gray-500" />
+                              )}
+                              <Checkbox 
+                                checked={isGroupFullySelected(items)}
+                                ref={el => {
+                                  if (el && isGroupPartiallySelected(items)) {
+                                    el.indeterminate = true;
+                                  }
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                onCheckedChange={(checked) => {
+                                  handleGroupCheckboxChange(variantName, items, checked as boolean);
+                                }}
                               />
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => remove(index)}
-                              >
-                                <X className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                      </Table>
+                              <span className="font-medium">{variantName}</span>
+                              <span className="text-sm text-muted-foreground">
+                                ({items.length} options)
+                              </span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                append({
+                                  name: variantName,
+                                  value: `New ${variantName}`,
+                                  price: price || 20,
+                                  stock: 0,
+                                });
+                              }}
+                            >
+                              <Plus className="w-4 h-4 mr-1" />
+                              Add {variantName}
+                            </Button>
+                          </div>
+
+                          {/* Sub-variants (e.g., Small, Medium, Large) */}
+                          {expandedVariants[variantName] && (
+                            <div className="bg-white">
+                              {/* Sub-variant Header */}
+                              <div className="grid grid-cols-12 gap-2 px-4 py-2 border-b bg-gray-50/50 text-sm font-medium text-gray-500">
+                                <div className="col-span-5 pl-8">Option</div>
+                                <div className="col-span-3">Price</div>
+                                <div className="col-span-3">Available</div>
+                                <div className="col-span-1"></div>
+                              </div>
+                              
+                              {/* Sub-variant Rows */}
+                              {items.map(({ index, field }) => (
+                                <div
+                                  key={field.id}
+                                  className="grid grid-cols-12 gap-2 px-4 py-3 border-b last:border-b-0 items-center hover:bg-gray-50/50"
+                                >
+                                  <div className="col-span-5">
+                                    <div className="flex items-center space-x-2 pl-8">
+                                      <Checkbox 
+                                        checked={selectedVariants.has(index)}
+                                        onCheckedChange={(checked) => {
+                                          handleVariantCheckboxChange(index, checked as boolean);
+                                        }}
+                                      />
+                                      <Input
+                                        {...register(`variations.${index}.value`)}
+                                        className="max-w-[180px]"
+                                        placeholder="e.g., Small (S)"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="col-span-3">
+                                    <div className="relative w-28">
+                                      <span className="absolute left-3 top-2.5 text-sm text-gray-500">
+                                        {currencySymbol}
+                                      </span>
+                                      <Input
+                                        {...register(`variations.${index}.price`, {
+                                          valueAsNumber: true,
+                                        })}
+                                        type="number"
+                                        step="0.01"
+                                        className="pl-12"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="col-span-3">
+                                    <Input
+                                      {...register(`variations.${index}.stock`, {
+                                        valueAsNumber: true,
+                                      })}
+                                      type="number"
+                                      className="w-20"
+                                    />
+                                  </div>
+                                  <div className="col-span-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => remove(index)}
+                                    >
+                                      <X className="w-4 h-4 text-destructive" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
 
-                  <Button
-                    variant="outline"
-                    onClick={() =>
-                      append({
-                        name: "Size",
-                        value: "New Size",
-                        price: price || 20,
-                        stock: 0,
-                      })
-                    }
-                  >
-                    Add variation
-                  </Button>
+                  {/* Empty State */}
+                  {Object.keys(groupedVariations).length === 0 && (
+                    <div className="border rounded-lg p-8 text-center bg-gray-50">
+                      <p className="text-muted-foreground mb-4">
+                        No variations added yet. Add variations like sizes or colors.
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          append({
+                            name: "Size",
+                            value: "Small (S)",
+                            price: price || 20,
+                            stock: 0,
+                          })
+                        }
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add Size Variation
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -498,6 +674,45 @@ const NewProductSaleInformation = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Variant Type Dialog */}
+      <Dialog open={showAddVariantDialog} onOpenChange={setShowAddVariantDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Variant Type</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="variantName">Variant Type Name</Label>
+              <Input
+                id="variantName"
+                placeholder="e.g., Size, Color, Material, Style"
+                value={newVariantName}
+                onChange={(e) => setNewVariantName(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleConfirmVariantType();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowAddVariantDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmVariantType}
+              disabled={!newVariantName.trim()}
+            >
+              Add Variant Type
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

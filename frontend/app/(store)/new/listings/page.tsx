@@ -20,11 +20,86 @@ import {
 import { cn } from "@/lib/utils";
 
 const categories = [
-  { value: "phone", label: "Phone" },
-  { value: "laptop", label: "Laptop" },
-  { value: "tablet", label: "Tablet" },
-  { value: "desktop", label: "Desktop" },
-  { value: "accessory", label: "Accessory" },
+  // Electronics
+  { value: "smartphone", label: "Smartphones" },
+  { value: "laptop", label: "Laptops" },
+  { value: "tablet", label: "Tablets" },
+  { value: "desktop", label: "Desktop Computers" },
+  { value: "accessory", label: "Electronics Accessories" },
+  { value: "camera", label: "Cameras" },
+  { value: "headphones", label: "Headphones & Audio" },
+  
+  // Fashion & Clothing
+  { value: "mens_clothing", label: "Men's Clothing" },
+  { value: "womens_clothing", label: "Women's Clothing" },
+  { value: "shoes", label: "Shoes" },
+  { value: "bags", label: "Bags & Luggage" },
+  { value: "accessories_fashion", label: "Fashion Accessories" },
+  { value: "jewelry", label: "Jewelry" },
+  { value: "watches", label: "Watches" },
+  
+  // Home & Furniture
+  { value: "furniture", label: "Furniture" },
+  { value: "home_decor", label: "Home Decor" },
+  { value: "bedding", label: "Bedding" },
+  { value: "kitchen", label: "Kitchen Appliances" },
+  { value: "lighting", label: "Lighting" },
+  
+  // Health & Beauty
+  { value: "skincare", label: "Skincare" },
+  { value: "cosmetics", label: "Cosmetics" },
+  { value: "haircare", label: "Hair Care" },
+  { value: "health_supplements", label: "Health Supplements" },
+  { value: "fitness", label: "Fitness Equipment" },
+  
+  // Food & Beverages
+  { value: "beverages", label: "Beverages" },
+  { value: "snacks", label: "Snacks" },
+  { value: "groceries", label: "Groceries" },
+  { value: "bakery", label: "Bakery Products" },
+  { value: "organic_food", label: "Organic Food" },
+  
+  // Sports & Outdoors
+  { value: "sports_equipment", label: "Sports Equipment" },
+  { value: "outdoor_gear", label: "Outdoor Gear" },
+  { value: "bikes", label: "Bikes" },
+  { value: "camping", label: "Camping Gear" },
+  
+  // Books & Media
+  { value: "books", label: "Books" },
+  { value: "ebooks", label: "E-Books" },
+  { value: "magazines", label: "Magazines" },
+  { value: "music", label: "Music & CDs" },
+  
+  // Toys & Games
+  { value: "toys", label: "Toys" },
+  { value: "games", label: "Games" },
+  { value: "hobbies", label: "Hobbies & Crafts" },
+  
+  // Automotive
+  { value: "car_parts", label: "Car Parts" },
+  { value: "car_accessories", label: "Car Accessories" },
+  { value: "motorcycle", label: "Motorcycle Parts" },
+  
+  // Pet Supplies
+  { value: "pet_food", label: "Pet Food" },
+  { value: "pet_accessories", label: "Pet Accessories" },
+  { value: "pet_toys", label: "Pet Toys" },
+  
+  // Office & Stationery
+  { value: "stationery", label: "Stationery" },
+  { value: "office_supplies", label: "Office Supplies" },
+  { value: "furniture_office", label: "Office Furniture" },
+  
+  // Services
+  { value: "service_repair", label: "Repair Services" },
+  { value: "service_cleaning", label: "Cleaning Services" },
+  { value: "service_consulting", label: "Consulting Services" },
+  { value: "service_tutoring", label: "Tutoring Services" },
+  { value: "service_photography", label: "Photography Services" },
+  { value: "service_personal_training", label: "Personal Training" },
+  
+  // Other
   { value: "other", label: "Other" },
 ] as const;
 

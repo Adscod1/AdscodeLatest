@@ -339,7 +339,7 @@ export interface ProductQueryParams {
 export const productsApi = {
   // Create product
   create: (data: CreateProductInput) => 
-    apiRequest<{ success: boolean; product: Product }>('/products', {
+    apiRequest<{ success: boolean; product: Product }>('/product', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -347,34 +347,35 @@ export const productsApi = {
   // Get products by store
   getByStore: (params: ProductQueryParams) => {
     const searchParams = new URLSearchParams();
-    searchParams.set('storeId', params.storeId);
+    // Only add optional query params, storeId is in the path
     if (params.status) searchParams.set('status', params.status);
     if (params.search) searchParams.set('search', params.search);
     if (params.page) searchParams.set('page', params.page.toString());
     if (params.limit) searchParams.set('limit', params.limit.toString());
-    return apiRequest<{ success: boolean; products: Product[]; total: number }>(`/products?${searchParams.toString()}`);
+    const queryString = searchParams.toString();
+    return apiRequest<{ success: boolean; products: Product[]; total: number }>(`/product/store/${params.storeId}${queryString ? `?${queryString}` : ''}`);
   },
   
   // Get product by ID
   getById: (id: string) => 
-    apiRequest<{ success: boolean; product: Product }>(`/products/${id}`),
+    apiRequest<{ success: boolean; product: Product }>(`/product/${id}`),
   
   // Update product
   update: (id: string, data: Partial<CreateProductInput>) => 
-    apiRequest<{ success: boolean; product: Product }>(`/products/${id}`, {
+    apiRequest<{ success: boolean; product: Product }>(`/product/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
   
   // Delete product
   delete: (id: string) => 
-    apiRequest<{ success: boolean; message: string }>(`/products/${id}`, {
+    apiRequest<{ success: boolean; message: string }>(`/product/${id}`, {
       method: 'DELETE',
     }),
   
   // Add comment
   addComment: (productId: string, content: string) => 
-    apiRequest<{ success: boolean; comment: unknown }>(`/products/${productId}/comments`, {
+    apiRequest<{ success: boolean; comment: unknown }>(`/comments/${productId}`, {
       method: 'POST',
       body: JSON.stringify({ content }),
     }),
@@ -385,15 +386,15 @@ export const productsApi = {
   
   // Upload media
   uploadMedia: (file: File) => 
-    uploadFile('/products/media/upload', file),
+    uploadFile('/product/media', file),
   
   // Get store activity
   getStoreActivity: (storeId: string) => 
-    apiRequest<{ success: boolean; activities: unknown[] }>(`/products/store/${storeId}/activity`),
+    apiRequest<{ success: boolean; activities: unknown[] }>(`/product/store/${storeId}/activity`),
   
   // Get popular products
   getPopularProducts: (storeId: string) => 
-    apiRequest<{ success: boolean; products: Product[] }>(`/products/store/${storeId}/popular`),
+    apiRequest<{ success: boolean; products: Product[] }>(`/product/store/${storeId}/popular`),
 };
 
 // ============================================================================

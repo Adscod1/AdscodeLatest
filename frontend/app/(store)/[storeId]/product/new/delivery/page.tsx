@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ChevronLeft, Search, Info } from "lucide-react";
+import { ChevronLeft, Info } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm } from "react-hook-form";
@@ -38,11 +38,11 @@ interface ExtendedDeliveryInput extends CreateProductInput {
 const DeliveryPage = () => {
   const { storeId } = useParams();
   const router = useRouter();
-  const { product, updateProduct, reset } = useProductStore();
+  const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
+  const hasSyncedRef = React.useRef(false);
 
-  const { register, handleSubmit, watch, setValue } = useForm<ExtendedDeliveryInput>({
+  const { register, handleSubmit, watch, setValue, reset: resetForm } = useForm<ExtendedDeliveryInput>({
     defaultValues: {
-      ...product,
       storeId: storeId as string,
       weightUnit: "kg",
       sizeUnit: "cm",
@@ -54,9 +54,43 @@ const DeliveryPage = () => {
     },
   });
 
+  // Sync form with store data ONCE after hydration
+  React.useEffect(() => {
+    if (_hasHydrated && !hasSyncedRef.current) {
+      hasSyncedRef.current = true;
+      resetForm({
+        ...product,
+        storeId: storeId as string,
+        weightUnit: product.weightUnit || "kg",
+        sizeUnit: product.sizeUnit || "cm",
+        requiresShipping: (product as ExtendedDeliveryInput).requiresShipping !== false,
+        processingTime: (product as ExtendedDeliveryInput).processingTime || "",
+        shippingMethod: (product as ExtendedDeliveryInput).shippingMethod || "standard",
+        shippingCost: (product as ExtendedDeliveryInput).shippingCost || 0,
+        offerFreeShipping: (product as ExtendedDeliveryInput).offerFreeShipping || false,
+      });
+    }
+  }, [_hasHydrated]);
+
   const requiresShipping = watch("requiresShipping");
   const shippingMethod = watch("shippingMethod");
   const offerFreeShipping = watch("offerFreeShipping");
+
+  // Get currency from product store
+  const selectedCurrency = (product as any).currency || "UGX - Ugandan Shilling";
+
+  // Get currency symbol based on selected currency
+  const getCurrencySymbol = (currency: string): string => {
+    const currencyMap: Record<string, string> = {
+      "UGX - Ugandan Shilling": "UGX",
+      "USD - US Dollar": "$",
+      "EUR - Euro": "€",
+      "GBP - British Pound": "£",
+    };
+    return currencyMap[currency] || "UGX";
+  };
+
+  const currencySymbol = getCurrencySymbol(selectedCurrency);
 
   const onSubmit = (data: ExtendedDeliveryInput) => {
     updateProduct({
@@ -67,9 +101,35 @@ const DeliveryPage = () => {
   };
 
   const handleCancel = () => {
-    reset();
+    resetStore();
     router.push(`/${storeId}/listings`);
   };
+
+  // Auto-save form data to store on change
+  React.useEffect(() => {
+    const subscription = watch((data) => {
+      // Only save if we have hydrated to avoid overwriting with empty defaults
+      if (hasSyncedRef.current) {
+        updateProduct({
+          ...data,
+          storeId: storeId as string,
+        } as Partial<ExtendedDeliveryInput>);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, updateProduct, storeId]);
+
+  // Show loading state until hydration completes
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -118,8 +178,11 @@ const DeliveryPage = () => {
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="requires-shipping" 
-                    checked={requiresShipping}
-                    onCheckedChange={(checked) => setValue("requiresShipping", checked as boolean)}
+                    checked={requiresShipping ?? true}
+                    onCheckedChange={(checked) => {
+                      setValue("requiresShipping", checked as boolean);
+                      updateProduct({ requiresShipping: checked as boolean });
+                    }}
                   />
                   <Label htmlFor="requires-shipping" className="text-sm font-medium">
                     This product requires shipping
@@ -186,8 +249,11 @@ const DeliveryPage = () => {
                     </TooltipProvider>
                   </div>
                   <Select
-                    value={watch("processingTime")}
-                    onValueChange={(value) => setValue("processingTime", value)}
+                    value={watch("processingTime") || ""}
+                    onValueChange={(value) => {
+                      setValue("processingTime", value);
+                      updateProduct({ processingTime: value });
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select processing time" />
@@ -205,8 +271,11 @@ const DeliveryPage = () => {
                 <div className="space-y-4">
                   <Label className="text-base font-medium">Shipping Methods</Label>
                   <RadioGroup
-                    value={shippingMethod}
-                    onValueChange={(value) => setValue("shippingMethod", value)}
+                    value={shippingMethod || "standard"}
+                    onValueChange={(value) => {
+                      setValue("shippingMethod", value);
+                      updateProduct({ shippingMethod: value });
+                    }}
                   >
                     <div className="flex items-center space-x-2 py-2 sm:py-3">
                       <RadioGroupItem value="standard" id="standard" />
@@ -232,8 +301,11 @@ const DeliveryPage = () => {
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-2">
                     <Checkbox 
                       id="free-shipping"
-                      checked={offerFreeShipping}
-                      onCheckedChange={(checked) => setValue("offerFreeShipping", checked as boolean)}
+                      checked={offerFreeShipping ?? false}
+                      onCheckedChange={(checked) => {
+                        setValue("offerFreeShipping", checked as boolean);
+                        updateProduct({ offerFreeShipping: checked as boolean });
+                      }}
                     />
                     <Label htmlFor="free-shipping" className="font-normal cursor-pointer">
                       Offer free shipping
@@ -247,7 +319,7 @@ const DeliveryPage = () => {
                     <Label htmlFor="shipping-cost">Shipping Cost</Label>
                     <div className="relative w-full sm:w-48">
                       <span className="absolute left-3 top-2.5 text-sm text-gray-500">
-                        $
+                        {currencySymbol}
                       </span>
                       <Input
                         id="shipping-cost"
@@ -255,7 +327,7 @@ const DeliveryPage = () => {
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="pl-7"
+                        className="pl-12"
                       />
                     </div>
                   </div>
@@ -282,8 +354,11 @@ const DeliveryPage = () => {
                     <div className="space-y-2">
                       <Label>Country/Region of origin</Label>
                       <Select
-                        value={watch("countryOfOrigin")}
-                        onValueChange={(value) => setValue("countryOfOrigin", value)}
+                        value={watch("countryOfOrigin") || ""}
+                        onValueChange={(value) => {
+                          setValue("countryOfOrigin", value);
+                          updateProduct({ countryOfOrigin: value });
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Enter region of origin" />
@@ -304,20 +379,6 @@ const DeliveryPage = () => {
                           <SelectItem value="Tanzania">Tanzania</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-
-                    {/* HS Code Search */}
-                    <div className="space-y-2">
-                      <Label>HS (Harmonize system code)</Label>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-2.5 w-5 h-5 text-muted-foreground" />
-                        <Input
-                          {...register("harmonizedSystemCode")}
-                          type="text"
-                          placeholder="Search (product keyword/code)"
-                          className="pl-10"
-                        />
-                      </div>
                     </div>
                   </div>
                 </div>
