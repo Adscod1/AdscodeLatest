@@ -13,7 +13,8 @@ import {
   Smartphone,
   UtensilsCrossed,
   SlidersHorizontal,
-  X
+  X,
+  Accessibility
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -69,7 +70,7 @@ interface Store {
 
 const BusinessCard = ({ store }: { store: Store }) => {
   return (
-    <div className="flex flex-col lg:flex-row bg-white  rounded-lg overflow-hidden  hover:bg-gray-100 transition-shadow">
+    <div className="flex flex-col lg:flex-row bg-white  rounded-lg overflow-hidden transition-shadow">
       {/* Image Gallery */}
       <div className="w-full lg:w-1/2 xl:w-[500px] h-64 lg:h-[340px] relative flex-shrink-0">
         <div className="flex h-full gap-1">
@@ -83,7 +84,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
             />
           </div>
           {/* 4 smaller images in a 2x2 grid */}
-          <div className="w-24 lg:w-32 grid grid-cols-1 gap-1">
+          <div className="w-20 lg:w-28 grid grid-cols-1 gap-1">
             <div className="relative h-full">
               <Image
                 src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400"
@@ -126,7 +127,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
           <div className="flex justify-between items-start mb-3">
             <div className="min-w-0">
               <Link href={`/business/${store.id}`}>
-                <h3 className="text-xl lg:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors truncate">
+                <h3 className="text-xl lg:text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors truncate">
                   {store.name}
                 </h3>
               </Link>
@@ -159,17 +160,19 @@ const BusinessCard = ({ store }: { store: Store }) => {
           </div>
 
           {/* Features */}
-          <div className="flex flex-wrap items-center gap-4 lg:gap-6 mb-3 lg:mb-4">
+          <div className="flex flex-wrap items-center gap-2 lg:gap-3 mb-3 lg:mb-4">
             <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500 flex-shrink-0" />
+              <Car className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500 flex-shrink-0" />
               <span className="text-xs lg:text-sm text-gray-600">Ample parking</span>
             </div>
+            <span className="text-gray-400">•</span>
             <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500 flex-shrink-0" />
+              <Accessibility className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500 flex-shrink-0" />
               <span className="text-xs lg:text-sm text-gray-600">Wheelchair access</span>
             </div>
+            <span className="text-gray-400">•</span>
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500 flex-shrink-0" />
+              <Users className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500 flex-shrink-0" />
               <span className="text-xs lg:text-sm text-gray-600">Family friendly</span>
             </div>
           </div>
@@ -182,6 +185,9 @@ const BusinessCard = ({ store }: { store: Store }) => {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 mt-auto sm:justify-end sm:ml-auto">
+          <Button variant="outline" size="default" className="w-full sm:w-auto px-4 lg:px-6">
+           Contacts
+          </Button>
           <Button variant="outline" size="default" className="w-full sm:w-auto px-4 lg:px-6">
            Get Directions
           </Button>
@@ -219,7 +225,7 @@ const CategoryButton = ({ label, active = false }: { label: string; active?: boo
   <button
     className={`px-3 py-1 rounded-full text-sm border transition-colors ${
       active
-        ? "bg-blue-600 text-white border-blue-600"
+        ? "bg-blue-100 border-blue-200"
         : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
     }`}
   >
@@ -263,8 +269,8 @@ const BusinessesPageContent = () => {
   const resultCount = filteredStores.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex flex-col lg:flex-row">
+    <div className="h-screen bg-gray-50 overflow-hidden">
+      <div className="flex flex-col lg:flex-row h-full">
         {/* Mobile Filter Overlay */}
         {showFilters && (
           <div 
@@ -279,7 +285,7 @@ const BusinessesPageContent = () => {
           transform transition-transform duration-300 ease-in-out lg:transform-none
           ${showFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
-          <div className="bg-white border-r border-gray-200 h-full lg:h-screen lg:sticky lg:top-0 p-4 lg:p-6 overflow-y-auto">
+          <div className="bg-white border-r border-gray-200 h-full lg:h-screen lg:sticky lg:top-0 p-4 lg:p-6 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
               <h2 className="text-lg lg:text-xl font-bold text-gray-900">Filters</h2>
               <button 
@@ -317,7 +323,7 @@ const BusinessesPageContent = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-4 lg:p-6 min-w-0">
+        <div className="flex-1 p-4 lg:p-6 min-w-0 overflow-y-auto h-full">
           {/* Header with Filter Button */}
           <div className="mb-6 lg:mb-8">
             <div className="flex items-center justify-between gap-4">

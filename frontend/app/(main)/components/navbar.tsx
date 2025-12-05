@@ -309,7 +309,7 @@ export const FeedNavbar = () => {
                   placeholder="Search creators, products, or deals..."
                   value={localSearchValue}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="w-full px-4 py-2.5 h-10 pl-12 pr-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                  className="w-full px-4 py-2.5 h-10 pl-12 pr-10 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-3 forcus:ring-offset-0 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {localSearchValue && (
                   <button
@@ -324,7 +324,7 @@ export const FeedNavbar = () => {
               
             </div>
             {/* Create Button */}
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-full h-10 w-[11%] px-6 py-2 flex items-center gap-2 mr-[100px]">
+              <Button className="bg-blue-600 hover:bg-blue-800 text-white rounded-full h-10 w-[11%] px-6 py-2 flex items-center gap-2 mr-[100px]">
                 <PlusIcon />
                 <span>Create Store</span>
               </Button>
@@ -492,7 +492,7 @@ export const FeedNavbar = () => {
                 onClick={() => handleCategoryChange(category)}
                 className={`px-5 py-2 text-sm font-medium whitespace-nowrap rounded-full transition-colors border ${
                   activeCategory === category
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-blue-500 text-white border-blue-500"
                     : "bg-white text-gray-800 border-gray-200 hover:bg-gray-50"
                 }`}
               >
