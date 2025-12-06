@@ -36,10 +36,16 @@ const storeFormSchema = z.object({
   country: z.string().optional().nullable(),
   zip: z.string().optional().nullable(),
   website: z.string().url().optional().nullable(),
+  facebook: z.string().url().optional().nullable(),
+  instagram: z.string().url().optional().nullable(),
+  twitter: z.string().url().optional().nullable(),
   logo: z.string().optional().nullable(),
   banner: z.string().optional().nullable(),
+  galleryImages: z.array(z.string()).optional(),
+  galleryVideos: z.array(z.string()).optional(),
   businessHours: businessHoursSchema,
   hasSpecialHours: z.boolean().optional(),
+  selectedHighlights: z.array(z.string()).optional(),
 });
 
 export type StoreFormData = z.infer<typeof storeFormSchema>;

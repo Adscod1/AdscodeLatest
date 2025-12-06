@@ -22,11 +22,20 @@ import { StorePreview } from "./components/store-preview";
 
 const CreateNewStorePage = () => {
   const { formData, setFormData } = useStoreForm();
+  const hasInitialized = React.useRef(false);
 
   const methods = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
     defaultValues: formData,
   });
+
+  // Reset form with latest data only once when component mounts
+  React.useEffect(() => {
+    if (!hasInitialized.current) {
+      methods.reset(formData);
+      hasInitialized.current = true;
+    }
+  }, []); // Empty dependency array - only run once
 
   // Update store data when form changes
   React.useEffect(() => {
@@ -34,7 +43,7 @@ const CreateNewStorePage = () => {
       setFormData(value as Partial<StoreFormData>);
     });
     return () => subscription.unsubscribe();
-  }, [methods, setFormData]);
+  }, [methods.watch, setFormData]);
 
   return (
     <FormProvider {...methods}>

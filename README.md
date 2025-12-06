@@ -112,3 +112,13 @@ npx prisma studio
 
 npx prisma db push
 
+git pull --rebase origin main
+
+
+
+User fills form → Zustand store → Media page submit → 
+API client → NestJS backend → Prisma → MySQL database
+
+cd backend && npx prisma migrate dev --name add_store_highlight_table
+cd backend && npx prisma generate
+npx prisma generate

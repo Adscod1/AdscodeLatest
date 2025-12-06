@@ -106,10 +106,34 @@ const categories = [
 const ListingsAndHighlightsPage = () => {
   const { formData, setFormData } = useStoreForm();
 
+  const highlights = [
+    "Fast Service",
+    "Free WiFi",
+    "Parking",
+    "Warranty",
+    "TV & Rest Room",
+  ];
+
   const methods = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
-    defaultValues: formData,
+    defaultValues: {
+      ...formData,
+      selectedHighlights: formData.selectedHighlights || [],
+    },
   });
+
+  const { watch, setValue } = methods;
+  const selectedHighlights = watch("selectedHighlights") || [];
+
+  const toggleHighlight = (highlight: string) => {
+    const current = selectedHighlights || [];
+    const updated = current.includes(highlight)
+      ? current.filter((h) => h !== highlight)
+      : [...current, highlight];
+    
+    setValue("selectedHighlights", updated);
+    setFormData({ selectedHighlights: updated });
+  };
 
   const onSubmit = async () => {
     try {
@@ -147,69 +171,24 @@ const ListingsAndHighlightsPage = () => {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold">Business Highlights</h2>
-                  <Button
-                    variant="ghost"
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add Highlight
-                  </Button>
                 </div>
 
-                <div className="space-y-4">
-                  {/* Fast Service Highlight */}
-                  <div className="bg-white rounded-xl p-6 border border-gray-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <Input
-                        defaultValue="Fast Service"
-                        className={cn(
-                          "text-lg font-medium bg-transparent border-none p-0 h-auto",
-                          "focus-visible:ring-0 focus-visible:ring-offset-0"
-                        )}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </Button>
-                    </div>
-                    <Input
-                      defaultValue="Same-day repairs for most devices."
+                <div className="flex flex-wrap gap-3">
+                  {highlights.map((highlight) => (
+                    <button
+                      key={highlight}
+                      onClick={() => toggleHighlight(highlight)}
                       className={cn(
-                        "bg-transparent border-none p-0 h-auto text-gray-600",
-                        "focus-visible:ring-0 focus-visible:ring-offset-0"
+                        "inline-flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                        selectedHighlights.includes(highlight)
+                          ? "bg-blue-50 border border-blue-200 text-blue-700"
+                          : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
                       )}
-                    />
-                  </div>
-
-                  {/* Free WiFi Highlight */}
-                  <div className="bg-white rounded-xl p-6 border border-gray-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <Input
-                        defaultValue="Free WiFi"
-                        className={cn(
-                          "text-lg font-medium bg-transparent border-none p-0 h-auto",
-                          "focus-visible:ring-0 focus-visible:ring-offset-0"
-                        )}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </Button>
-                    </div>
-                    <Input
-                      defaultValue="We offer free WiFi to all our visitors."
-                      className={cn(
-                        "bg-transparent border-none p-0 h-auto text-gray-600",
-                        "focus-visible:ring-0 focus-visible:ring-offset-0"
-                      )}
-                    />
-                  </div>
+                    >
+                      <Plus className="w-4 h-4 mr-2 text-blue-500" />
+                      {highlight}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>

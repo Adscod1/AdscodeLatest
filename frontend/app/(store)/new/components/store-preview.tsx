@@ -4,12 +4,13 @@ import {
   Phone, 
   Mail, 
   Globe, 
-  CheckCircle,
+  Check,
   Zap,
   Wifi,
   Car,
   Shield,
-  Monitor
+  Monitor,
+  Plus
 } from "lucide-react";
 import Image from "next/image";
 import { useFormContext } from "react-hook-form";
@@ -19,46 +20,33 @@ const businessHighlights = [
   {
     icon: Zap,
     title: "Fast Service",
-    description: "Same-day repairs for most devices",
     bgColor: "bg-blue-50",
     iconColor: "text-blue-600"
   },
   {
     icon: Wifi, 
     title: "Free WiFi",
-    description: "We offer free WiFi to all our visitors",
     bgColor: "bg-cyan-50",
     iconColor: "text-cyan-600"
   },
   {
     icon: Car,
     title: "Parking",
-    description: "We have enough parking space",
     bgColor: "bg-blue-50", 
     iconColor: "text-blue-600"
   },
   {
     icon: Shield,
     title: "Warranty",
-    description: "90-day warranty on all repairs",
     bgColor: "bg-indigo-50",
     iconColor: "text-indigo-600"
   },
   {
     icon: Monitor,
     title: "TV & Rest Room",
-    description: "We have ample space for you to wait in.",
     bgColor: "bg-blue-50",
     iconColor: "text-blue-600"
   },
-];
-
-const profileSections = [
-  { name: "Basic Info", status: "Complete", color: "bg-green-500" },
-  { name: "Contact", status: "Complete", color: "bg-green-500" },
-  { name: "Business Hours", status: "Complete", color: "bg-green-500" },
-  { name: "Services", status: "Complete", color: "bg-green-500" },
-  { name: "Media", status: "Not Started", color: "bg-orange-400" },
 ];
 
 const tips = [
@@ -67,9 +55,117 @@ const tips = [
   "Set accurate business hours for customer convenience"
 ];
 
+// Helper function to calculate completion percentage for a section
+const calculateSectionCompletion = (formData: Partial<StoreFormData>) => {
+  // Basic Info fields
+  const basicInfoFields = [
+    formData.name,
+    formData.tagline,
+    formData.description,
+    formData.category,
+    formData.regNumber,
+    formData.yearEstablished,
+  ].filter(field => field !== undefined && field !== null && field !== "");
+  const basicInfoCompletion = (basicInfoFields.length / 6) * 100;
+
+  // Contact fields
+  const contactFields = [
+    formData.phone,
+    formData.email,
+    formData.address,
+    formData.city,
+    formData.state,
+    formData.country,
+    formData.zip,
+    formData.website,
+  ].filter(field => field !== undefined && field !== null && field !== "");
+  const contactCompletion = (contactFields.length / 8) * 100;
+
+  // Business Hours - check if at least one day is open with valid times
+  const businessHours = formData.businessHours || {};
+  const daysConfigured = Object.values(businessHours).filter(
+    (day: any) => day?.isOpen === true && day?.open && day?.close
+  ).length;
+  const businessHoursCompletion = (daysConfigured / 7) * 100;
+
+  // Highlights (Services)
+  const highlightsCompletion = (formData.selectedHighlights?.length || 0) > 0 ? 100 : 0;
+
+  // Media fields
+  const mediaFields = [
+    formData.logo,
+    formData.banner,
+  ].filter(field => field !== undefined && field !== null && field !== "");
+  const mediaCompletion = (mediaFields.length / 2) * 100;
+
+  return {
+    basicInfo: basicInfoCompletion,
+    contact: contactCompletion,
+    businessHours: businessHoursCompletion,
+    highlights: highlightsCompletion,
+    media: mediaCompletion,
+  };
+};
+
 export function StorePreview() {
-  const { watch } = useFormContext<StoreFormData>();
-  const formData = watch();
+  const context = useFormContext<StoreFormData>();
+  
+  // Fallback if form context is not available
+  if (!context) {
+    return (
+      <div className="w-80">
+        <div className="bg-white rounded-xl border border-gray-200 sticky top-24">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900">Preview</h2>
+          </div>
+          <div className="p-4 text-center text-gray-500">
+            <p>Fill in the form to see preview</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const { watch } = context;
+  const watchedData = watch();
+  const formData = watchedData || {};
+
+  // Calculate completion percentages
+  const completion = calculateSectionCompletion(formData);
+
+  // Generate profile sections with real-time status
+  const profileSections = [
+    { 
+      name: "Basic Info", 
+      completion: completion.basicInfo,
+      status: completion.basicInfo === 100 ? "Complete" : completion.basicInfo > 0 ? "In Progress" : "Not Started",
+      color: "bg-green-500" 
+    },
+    { 
+      name: "Contact", 
+      completion: completion.contact,
+      status: completion.contact === 100 ? "Complete" : completion.contact > 0 ? "In Progress" : "Not Started",
+      color: "bg-green-500" 
+    },
+    { 
+      name: "Business Hours", 
+      completion: completion.businessHours,
+      status: completion.businessHours === 100 ? "Complete" : completion.businessHours > 0 ? "In Progress" : "Not Started",
+      color: "bg-green-500" 
+    },
+    { 
+      name: "Services", 
+      completion: completion.highlights,
+      status: completion.highlights === 100 ? "Complete" : "Not Started",
+      color: "bg-green-500" 
+    },
+    { 
+      name: "Media", 
+      completion: completion.media,
+      status: completion.media === 100 ? "Complete" : completion.media > 0 ? "In Progress" : "Not Started",
+      color: "bg-orange-400" 
+    },
+  ];
 
   // Get initials from store name
   const getInitials = (name: string = "") => {
@@ -91,7 +187,7 @@ export function StorePreview() {
 
         <div className="p-4 space-y-6">
           {/* Store Card */}
-          <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Cover Image */}
             <div className="aspect-[16/10] bg-gradient-to-br from-orange-200 to-yellow-300 relative">
               {formData.banner ? (
@@ -115,16 +211,16 @@ export function StorePreview() {
             </div>
             
             {/* Store Info Section */}
-            <div className="p-4">
+            <div className="p-4 pb-4 border-b border-gray-200">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 overflow-hidden">
+                <div className="relative w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 overflow-hidden">
                   {formData.logo ? (
                     <Image
                       src={formData.logo}
                       alt="Store logo"
-                      width={40}
-                      height={40}
-                      className="object-cover w-full h-full"
+                      fill
+                      sizes="40px"
+                      className="object-cover"
                     />
                   ) : (
                     getInitials(formData.name)
@@ -171,30 +267,26 @@ export function StorePreview() {
           </div>
 
           {/* Business Highlights */}
-          <div className="mt-4">
+          <div className="pb-4 border-b border-gray-200">
             <h3 className="font-semibold text-gray-900 mb-4">Business Highlights</h3>
-            <div className="space-y-4">
-              {businessHighlights.map((highlight) => {
-                const IconComponent = highlight.icon;
-                return (
-                  <div key={highlight.title} className="flex items-start space-x-3">
-                    <div className={`w-10 h-10 ${highlight.bgColor} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                      <IconComponent className={`w-5 h-5 ${highlight.iconColor}`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h4 className="font-medium text-gray-900 text-sm">{highlight.title}</h4>
-                      <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                        {highlight.description}
-                      </p>
-                    </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.selectedHighlights && formData.selectedHighlights.length > 0 ? (
+                formData.selectedHighlights.map((highlight) => (
+                  <div
+                    key={highlight}
+                    className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    {highlight}
                   </div>
-                );
-              })}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No highlights selected</p>
+              )}
             </div>
           </div>
 
           {/* Profile Completion */}
-          <div>
+          <div className="pb-4 border-b border-gray-200">
             <h3 className="font-semibold text-gray-900 mb-4">Profile Completion</h3>
             <div className="space-y-3">
               {profileSections.map((item) => (
@@ -202,16 +294,25 @@ export function StorePreview() {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-700">{item.name}</span>
                     <span className={`text-xs font-medium ${
-                      item.status === "Complete" ? "text-green-600" : "text-orange-600"
+                      item.status === "Complete" 
+                        ? "text-green-600" 
+                        : item.status === "In Progress" 
+                        ? "text-blue-600" 
+                        : "text-orange-600"
                     }`}>
                       {item.status}
                     </span>
                   </div>
                   <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full rounded-full ${item.color} ${
-                        item.status === "Complete" ? "w-full" : "w-0"
+                      className={`h-full rounded-full transition-all duration-500 ease-out ${
+                        item.status === "Complete" 
+                          ? "bg-green-500" 
+                          : item.status === "In Progress" 
+                          ? "bg-blue-500" 
+                          : "bg-orange-400"
                       }`}
+                      style={{ width: `${item.completion}%` }}
                     />
                   </div>
                 </div>
@@ -220,12 +321,12 @@ export function StorePreview() {
           </div>
 
           {/* Tips Section */}
-          <div>
+          <div className="pb-4 border-b border-gray-200">
             <h3 className="font-semibold text-gray-900 mb-4">Tips</h3>
             <div className="space-y-3">
               {tips.map((tip, index) => (
                 <div key={index} className="flex items-start space-x-3">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-gray-600 leading-relaxed">{tip}</p>
                 </div>
               ))}

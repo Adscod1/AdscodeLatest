@@ -44,33 +44,39 @@ const StoreMediaPage = () => {
     methods.setValue('banner', url);
   };
 
-  // Gallery state
-  const [galleryImages, setGalleryImages] = React.useState<string[]>([]);
-  const [galleryVideos, setGalleryVideos] = React.useState<string[]>([]);
+  // Gallery state - initialize from form data
+  const [galleryImages, setGalleryImages] = React.useState<string[]>(formData.galleryImages || []);
+  const [galleryVideos, setGalleryVideos] = React.useState<string[]>(formData.galleryVideos || []);
 
   // Handle gallery image upload
   const handleGalleryImageUpload = (url: string) => {
     const updatedImages = [...galleryImages, url];
     setGalleryImages(updatedImages);
-    // Gallery images will be stored separately for now
+    setFormData({ ...formData, galleryImages: updatedImages });
+    methods.setValue('galleryImages', updatedImages);
   };
 
   // Handle gallery video upload
   const handleGalleryVideoUpload = (url: string) => {
     const updatedVideos = [...galleryVideos, url];
     setGalleryVideos(updatedVideos);
-    // Gallery videos will be stored separately for now
+    setFormData({ ...formData, galleryVideos: updatedVideos });
+    methods.setValue('galleryVideos', updatedVideos);
   };
 
   // Remove gallery item
   const removeGalleryImage = (index: number) => {
     const updatedImages = galleryImages.filter((_, i) => i !== index);
     setGalleryImages(updatedImages);
+    setFormData({ ...formData, galleryImages: updatedImages });
+    methods.setValue('galleryImages', updatedImages);
   };
 
   const removeGalleryVideo = (index: number) => {
     const updatedVideos = galleryVideos.filter((_, i) => i !== index);
     setGalleryVideos(updatedVideos);
+    setFormData({ ...formData, galleryVideos: updatedVideos });
+    methods.setValue('galleryVideos', updatedVideos);
   };
 
   const storeMutation = useMutation({
@@ -108,8 +114,15 @@ const StoreMediaPage = () => {
         country: cleanData.country as string | undefined,
         zip: cleanData.zip as string | undefined,
         website: cleanData.website as string | undefined,
+        facebook: data.facebook || undefined,
+        instagram: data.instagram || undefined,
+        twitter: data.twitter || undefined,
         logo: cleanData.logo as string | undefined,
         banner: cleanData.banner as string | undefined,
+        galleryImages: data.galleryImages || [],
+        galleryVideos: data.galleryVideos || [],
+        businessHours: data.businessHours,
+        selectedHighlights: data.selectedHighlights || [],
       };
 
       return createStoreAction(storeData);

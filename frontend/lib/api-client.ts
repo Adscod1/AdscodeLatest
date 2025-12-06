@@ -166,6 +166,22 @@ export interface Store {
   updatedAt: Date;
 }
 
+export interface BusinessHour {
+  isOpen: boolean;
+  open: string;
+  close: string;
+}
+
+export interface BusinessHours {
+  monday?: BusinessHour;
+  tuesday?: BusinessHour;
+  wednesday?: BusinessHour;
+  thursday?: BusinessHour;
+  friday?: BusinessHour;
+  saturday?: BusinessHour;
+  sunday?: BusinessHour;
+}
+
 export interface CreateStoreInput {
   name: string;
   tagline?: string;
@@ -181,8 +197,15 @@ export interface CreateStoreInput {
   country?: string;
   zip?: string;
   website?: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
   logo?: string;
   banner?: string;
+  galleryImages?: string[];
+  galleryVideos?: string[];
+  businessHours?: BusinessHours;
+  selectedHighlights?: string[];
 }
 
 export interface GetStoresParams {

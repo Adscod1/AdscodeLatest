@@ -27,13 +27,13 @@ const timeOptions = Array.from({ length: 24 }, (_, i) => {
 });
 
 const defaultBusinessHours: BusinessHours = {
-  monday: { isOpen: true, open: "09:00", close: "18:00" },
-  tuesday: { isOpen: true, open: "09:00", close: "18:00" },
-  wednesday: { isOpen: true, open: "09:00", close: "18:00" },
-  thursday: { isOpen: true, open: "09:00", close: "18:00" },
-  friday: { isOpen: true, open: "09:00", close: "18:00" },
-  saturday: { isOpen: true, open: "10:00", close: "16:00" },
-  sunday: { isOpen: false, open: "09:00", close: "18:00" },
+  monday: { isOpen: false, open: "00:00", close: "00:00" },
+  tuesday: { isOpen: false, open: "00:00", close: "00:00" },
+  wednesday: { isOpen: false, open: "00:00", close: "00:00" },
+  thursday: { isOpen: false, open: "00:00", close: "00:00" },
+  friday: { isOpen: false, open: "00:00", close: "00:00" },
+  saturday: { isOpen: false, open: "00:00", close: "00:00" },
+  sunday: { isOpen: false, open: "00:00", close: "00:00" },
 };
 
 const BusinessHoursPage = () => {
@@ -47,6 +47,14 @@ const BusinessHoursPage = () => {
       hasSpecialHours: formData.hasSpecialHours || false,
     },
   });
+
+  // Update store data when business hours change
+  React.useEffect(() => {
+    const subscription = methods.watch((value) => {
+      setFormData(value as Partial<StoreFormData>);
+    });
+    return () => subscription.unsubscribe();
+  }, [methods, setFormData]);
 
   const onSubmit = async () => {
     try {

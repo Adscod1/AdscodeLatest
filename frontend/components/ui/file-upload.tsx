@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ImageIcon, Upload, X, Loader2 } from 'lucide-react';
 import { useFileUpload } from '@/hooks/use-file-upload';
+import { ImageCropModal } from '@/components/ui/image-crop-modal';
 
 interface FileUploadProps {
   type: 'logo' | 'banner' | 'gallery' | 'video' | 'product';
@@ -27,6 +28,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { uploadFile, uploading } = useFileUpload();
   const [preview, setPreview] = useState<string | null>(currentUrl || null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [imageTooCrop, setImageToCrop] = useState<string | null>(null);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -42,16 +45,32 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       return;
     }
 
-    // Only show preview if no children (means it's a standalone upload component)
-    if (!children) {
-      // Create local preview temporarily
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+    // Create local preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      
+      // For logos, show crop modal
+      if (type === 'logo') {
+        setImageToCrop(dataUrl);
+        setShowCropModal(true);
+      } else {
+        // For other types, proceed normally
+        if (!children) {
+          setPreview(dataUrl);
+        }
+        handleUpload(file);
+      }
+    };
+    reader.readAsDataURL(file);
+    
+    // Reset the input so the same file can be selected again if needed
+    if (event.target) {
+      event.target.value = '';
     }
+  };
 
+  const handleUpload = async (file: File) => {
     // Upload file
     const result = await uploadFile(file, type, endpoint);
     if (result.success && result.url) {
@@ -70,12 +89,30 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       // Revert to current URL or clear preview on error
       setPreview(currentUrl || null);
     }
-    
-    // Reset the input so the same file can be selected again if needed
-    if (event.target) {
-      event.target.value = '';
-    }
   };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    setShowCropModal(false);
+    setImageToCrop(null);
+    
+    // Create a File from the cropped Blob
+    const croppedFile = new File([croppedBlob], 'logo.jpg', { type: 'image/jpeg' });
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(croppedBlob);
+    
+    // Upload the cropped file
+    await handleUpload(croppedFile);
+  };
+
+  const handleCropCancel = () => {
+    setShowCropModal(false);
+    setImageToCrop(null);
+  }
 
   const handleRemove = () => {
     setPreview(null);
@@ -117,7 +154,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       />
       
       {preview ? (
-        <div className="relative group">
+        <div className="relative group h-full w-full overflow-hidden rounded-lg">
           {type === 'video' ? (
             <video 
               src={preview} 
@@ -189,6 +226,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             )}
           </div>
         </div>
+      )}
+      
+      {/* Crop modal for logo */}
+      {imageTooCrop && (
+        <ImageCropModal
+          isOpen={showCropModal}
+          imageSrc={imageTooCrop}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          aspectRatio={1}
+          cropShape="rect"
+          title="Crop Logo"
+        />
       )}
     </div>
   );

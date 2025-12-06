@@ -76,18 +76,6 @@ const ContactInformationPage = () => {
                       className="w-full"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Website <span className="text-gray-400">(optional)</span>
-                    </label>
-                    <Input
-                      {...methods.register("website")}
-                      type="url"
-                      placeholder="www.horizonelectronics.com"
-                      className="w-full"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -181,9 +169,10 @@ const ContactInformationPage = () => {
                         <Facebook className="h-4 w-4 text-blue-600" />
                       </div>
                       <Input
+                        {...methods.register("facebook")}
+                        type="url"
                         placeholder="https://facebook.com/mystore"
                         className="pl-10 w-full"
-                        disabled
                       />
                     </div>
                   </div>
@@ -197,9 +186,10 @@ const ContactInformationPage = () => {
                         <Instagram className="h-4 w-4 text-pink-600" />
                       </div>
                       <Input
+                        {...methods.register("instagram")}
+                        type="url"
                         placeholder="https://instagram.com/mystore"
                         className="pl-10 w-full"
-                        disabled
                       />
                     </div>
                   </div>
@@ -215,23 +205,14 @@ const ContactInformationPage = () => {
                         </svg>
                       </div>
                       <Input
+                        {...methods.register("twitter")}
+                        type="url"
                         placeholder="https://x.com/mystore"
                         className="pl-10 w-full"
-                        disabled
                       />
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Add Button */}
-              <div className="flex justify-end">
-                <Button 
-                  type="button"
-                  className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-lg"
-                >
-                  Add
-                </Button>
               </div>
             </div>
           </div>

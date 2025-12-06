@@ -1,50 +1,38 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { CalendarIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { StoreFormData } from "@/lib/validations/store";
 
 export function FoundingDatePicker() {
   const { setValue, watch } = useFormContext<StoreFormData>();
   const date = watch("yearEstablished");
 
-  const handleSelect = (date: Date | undefined) => {
-    setValue("yearEstablished", date || null);
+  const handleChange = (selectedDate: Date | null) => {
+    setValue("yearEstablished", selectedDate, { shouldValidate: true });
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-[240px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date || undefined}
-          onSelect={handleSelect}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
+    <div className="relative">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+        <CalendarIcon className="h-4 w-4 text-gray-500" />
+      </div>
+      <DatePicker
+        selected={date}
+        onChange={handleChange}
+        dateFormat="dd MMMM yyyy"
+        placeholderText="Pick a date"
+        maxDate={new Date()}
+        showMonthDropdown
+        showYearDropdown
+        dropdownMode="select"
+        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        calendarClassName="shadow-lg border border-gray-200 rounded-lg"
+        wrapperClassName="w-full"
+      />
+    </div>
   );
 }

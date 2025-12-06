@@ -11,6 +11,22 @@ export interface GetStoresParams {
   sortOrder?: 'asc' | 'desc';
 }
 
+export interface BusinessHourDto {
+  isOpen: boolean;
+  open: string;
+  close: string;
+}
+
+export interface BusinessHoursDto {
+  monday?: BusinessHourDto;
+  tuesday?: BusinessHourDto;
+  wednesday?: BusinessHourDto;
+  thursday?: BusinessHourDto;
+  friday?: BusinessHourDto;
+  saturday?: BusinessHourDto;
+  sunday?: BusinessHourDto;
+}
+
 export interface CreateStoreDto {
   name: string;
   tagline?: string;
@@ -26,8 +42,15 @@ export interface CreateStoreDto {
   country?: string;
   zip?: string;
   website?: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
   logo?: string;
   banner?: string;
+  galleryImages?: string[];
+  galleryVideos?: string[];
+  businessHours?: BusinessHoursDto;
+  selectedHighlights?: string[];
 }
 
 @Injectable()
@@ -52,6 +75,7 @@ export class StoresService {
       throw new BadRequestException('Store name is required');
     }
 
+    // Create store with basic data
     const store = await this.prisma.store.create({
       data: {
         name: data.name,
@@ -76,7 +100,98 @@ export class StoresService {
       },
     });
 
-    return store;
+    // Create social media links
+    const socialMediaLinks = [];
+    if (data.facebook) {
+      socialMediaLinks.push({
+        storeId: store.id,
+        social: `facebook:${data.facebook}`,
+      });
+    }
+    if (data.instagram) {
+      socialMediaLinks.push({
+        storeId: store.id,
+        social: `instagram:${data.instagram}`,
+      });
+    }
+    if (data.twitter) {
+      socialMediaLinks.push({
+        storeId: store.id,
+        social: `twitter:${data.twitter}`,
+      });
+    }
+
+    if (socialMediaLinks.length > 0) {
+      await this.prisma.storeSocial.createMany({
+        data: socialMediaLinks,
+      });
+    }
+
+    // Create business hours
+    if (data.businessHours) {
+      const hoursData = [];
+      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      
+      for (const day of days) {
+        const dayData = data.businessHours[day as keyof BusinessHoursDto];
+        if (dayData && dayData.isOpen) {
+          hoursData.push({
+            storeId: store.id,
+            day: day.charAt(0).toUpperCase() + day.slice(1),
+            open: dayData.open,
+            close: dayData.close,
+          });
+        }
+      }
+
+      if (hoursData.length > 0) {
+        await this.prisma.storeHours.createMany({
+          data: hoursData,
+        });
+      }
+    }
+
+    // Create gallery images
+    if (data.galleryImages && data.galleryImages.length > 0) {
+      await this.prisma.storeImage.createMany({
+        data: data.galleryImages.map((image) => ({
+          storeId: store.id,
+          image,
+        })),
+      });
+    }
+
+    // Create gallery videos
+    if (data.galleryVideos && data.galleryVideos.length > 0) {
+      await this.prisma.storeVideo.createMany({
+        data: data.galleryVideos.map((video) => ({
+          storeId: store.id,
+          video,
+        })),
+      });
+    }
+
+    // Create highlights
+    if (data.selectedHighlights && data.selectedHighlights.length > 0) {
+      await this.prisma.storeHighlight.createMany({
+        data: data.selectedHighlights.map((highlight) => ({
+          storeId: store.id,
+          highlight,
+        })),
+      });
+    }
+
+    // Return store with all related data
+    return this.prisma.store.findUnique({
+      where: { id: store.id },
+      include: {
+        StoreSocial: true,
+        StoreHours: true,
+        StoreImage: true,
+        StoreVideo: true,
+        StoreHighlight: true,
+      },
+    });
   }
 
   /**

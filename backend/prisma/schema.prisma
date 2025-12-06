@@ -101,10 +101,10 @@ model Profile {
 }
 
 model Store {
-  id              String          @id @default(uuid())
+  id              String           @id @default(uuid())
   name            String
   tagline         String?
-  description     String?         @db.Text
+  description     String?          @db.Text
   category        String?
   regNumber       String?
   yearEstablished Int?
@@ -119,16 +119,17 @@ model Store {
   logo            String?
   banner          String?
   userId          String
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   StoreReview     StoreReview[]
   Product         Product[]
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   StoreActivity   StoreActivity[]
   StoreHours      StoreHours[]
   StoreImage      StoreImage[]
   StoreSocial     StoreSocial[]
   StoreVideo      StoreVideo[]
+  StoreHighlight  StoreHighlight[]
   campaigns       Campaign[]
 
   @@index([userId], map: "store_userId_fkey")
@@ -175,6 +176,16 @@ model StoreVideo {
 
   @@index([storeId], map: "store_video_storeId_fkey")
   @@map("store_video")
+}
+
+model StoreHighlight {
+  id        String @id @default(uuid())
+  storeId   String
+  highlight String
+  store     Store  @relation(fields: [storeId], references: [id])
+
+  @@index([storeId], map: "store_highlight_storeId_fkey")
+  @@map("store_highlight")
 }
 
 model Product {
