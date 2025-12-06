@@ -580,7 +580,7 @@ const CreateNewProduct = () => {
                               type="video"
                               onUpload={handleVideoUpload}
                               accept="video/*"
-                              maxSize={10}
+                              maxSize={30}
                               endpoint="/product/media"
                               className="h-full"
                             >

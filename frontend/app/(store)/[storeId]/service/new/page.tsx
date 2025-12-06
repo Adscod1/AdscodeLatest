@@ -381,7 +381,7 @@ const CreateNewService = () => {
                         type="gallery"
                         onUpload={handleMediaUpload}
                         accept="image/*,video/*"
-                        maxSize={10}
+                        maxSize={30}
                         endpoint="/service/media"
                       >
                         <div>
@@ -429,7 +429,7 @@ const CreateNewService = () => {
                           type="gallery"
                           onUpload={handleMediaUpload}
                           accept="image/*,video/*"
-                          maxSize={10}
+                          maxSize={30}
                           endpoint="/service/media"
                           className="h-full"
                         >

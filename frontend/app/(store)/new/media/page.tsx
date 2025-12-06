@@ -305,7 +305,7 @@ const StoreMediaPage = () => {
                           type="video"
                           onUpload={handleGalleryVideoUpload}
                           accept="video/*"
-                          maxSize={10}
+                          maxSize={30}
                           className="h-full"
                           endpoint="/new/media"
                         >
