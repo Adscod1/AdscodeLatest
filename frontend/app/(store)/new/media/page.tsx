@@ -17,7 +17,7 @@ import { FileUpload } from "@/components/ui/file-upload";
 
 const StoreMediaPage = () => {
   const router = useRouter();
-  const { formData, setFormData, reset } = useStoreForm();
+  const { formData, setFormData, clearAll } = useStoreForm();
 
   const methods = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
@@ -154,8 +154,14 @@ const StoreMediaPage = () => {
     onSuccess: (data) => {
       toast.success("Store created successfully!");
       const storeId = data.id;
+      
+      // Clear react-hook-form state
       methods.reset();
-      reset();
+      
+      // Clear Zustand store and localStorage completely
+      clearAll();
+      
+      // Navigate to store page
       router.push(`/${storeId}`);
     },
     onError: (error) => {

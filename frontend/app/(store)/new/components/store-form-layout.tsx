@@ -21,7 +21,7 @@ export function StoreFormLayout({
   isSaving,
 }: StoreFormLayoutProps) {
   const router = useRouter();
-  const { currentStep, setCurrentStep, formData, reset } = useStoreForm();
+  const { currentStep, setCurrentStep, formData, clearAll } = useStoreForm();
   const progress = ((currentStep + 1) / STORE_FORM_TABS.length) * 100;
 
   // Check if there's any progress to cancel
@@ -46,7 +46,8 @@ export function StoreFormLayout({
   };
 
   const handleCancel = () => {
-    reset();
+    // Clear all form data and localStorage
+    clearAll();
     router.push("/new");
   };
 
