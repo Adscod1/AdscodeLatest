@@ -47,6 +47,7 @@ export interface CreateStoreDto {
   twitter?: string;
   logo?: string;
   banner?: string;
+  bannerImages?: string[];
   galleryImages?: string[];
   galleryVideos?: string[];
   businessHours?: BusinessHoursDto;
@@ -153,32 +154,54 @@ export class StoresService {
 
     // Create gallery images
     if (data.galleryImages && data.galleryImages.length > 0) {
-      await this.prisma.storeImage.createMany({
-        data: data.galleryImages.map((image) => ({
-          storeId: store.id,
-          image,
-        })),
-      });
+      const validGalleryImages = data.galleryImages.filter(img => img && typeof img === 'string');
+      if (validGalleryImages.length > 0) {
+        await this.prisma.storeImage.createMany({
+          data: validGalleryImages.map((image) => ({
+            storeId: store.id,
+            image,
+          })),
+        });
+      }
+    }
+
+    // Create banner images
+    if (data.bannerImages && data.bannerImages.length > 0) {
+      const validBannerImages = data.bannerImages.filter(img => img && typeof img === 'string');
+      if (validBannerImages.length > 0) {
+        await this.prisma.storeImage.createMany({
+          data: validBannerImages.map((image) => ({
+            storeId: store.id,
+            image,
+          })),
+        });
+      }
     }
 
     // Create gallery videos
     if (data.galleryVideos && data.galleryVideos.length > 0) {
-      await this.prisma.storeVideo.createMany({
-        data: data.galleryVideos.map((video) => ({
-          storeId: store.id,
-          video,
-        })),
-      });
+      const validVideos = data.galleryVideos.filter(video => video && typeof video === 'string');
+      if (validVideos.length > 0) {
+        await this.prisma.storeVideo.createMany({
+          data: validVideos.map((video) => ({
+            storeId: store.id,
+            video,
+          })),
+        });
+      }
     }
 
     // Create highlights
     if (data.selectedHighlights && data.selectedHighlights.length > 0) {
-      await this.prisma.storeHighlight.createMany({
-        data: data.selectedHighlights.map((highlight) => ({
-          storeId: store.id,
-          highlight,
-        })),
-      });
+      const validHighlights = data.selectedHighlights.filter(h => h && typeof h === 'string');
+      if (validHighlights.length > 0) {
+        await this.prisma.storeHighlight.createMany({
+          data: validHighlights.map((highlight) => ({
+            storeId: store.id,
+            highlight,
+          })),
+        });
+      }
     }
 
     // Return store with all related data

@@ -136,7 +136,10 @@ const ContactInformationPage = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Country
                       </label>
-                      <Select defaultValue="usa">
+                      <Select 
+                        value={methods.watch("country") || "usa"}
+                        onValueChange={(value) => methods.setValue("country", value)}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select Country" />
                         </SelectTrigger>

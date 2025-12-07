@@ -5,6 +5,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StoreFormData, storeFormSchema } from "@/lib/validations/store";
 import { useStoreForm } from "@/store/use-store-form";
+import { getHighlightIcon } from "@/lib/highlight-icons";
 import { StoreFormLayout } from "../components/store-form-layout";
 import { StorePreview } from "../components/store-preview";
 import { Input } from "@/components/ui/input";
@@ -174,21 +175,32 @@ const ListingsAndHighlightsPage = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  {highlights.map((highlight) => (
-                    <button
-                      key={highlight}
-                      onClick={() => toggleHighlight(highlight)}
-                      className={cn(
-                        "inline-flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all",
-                        selectedHighlights.includes(highlight)
-                          ? "bg-blue-50 border border-blue-200 text-blue-700"
-                          : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-                      )}
-                    >
-                      <Plus className="w-4 h-4 mr-2 text-blue-500" />
-                      {highlight}
-                    </button>
-                  ))}
+                  {highlights.map((highlight) => {
+                    const iconConfig = getHighlightIcon(highlight);
+                    const IconComponent = iconConfig?.icon;
+                    const isSelected = selectedHighlights.includes(highlight);
+                    
+                    return (
+                      <button
+                        key={highlight}
+                        onClick={() => toggleHighlight(highlight)}
+                        className={cn(
+                          "inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium transition-all",
+                          isSelected
+                            ? "bg-blue-50 border border-blue-200 text-blue-700"
+                            : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                        )}
+                      >
+                        {IconComponent && (
+                          <IconComponent className={cn(
+                            "w-4 h-4 mr-2",
+                            isSelected ? "text-blue-500" : iconConfig?.color
+                          )} />
+                        )}
+                        {highlight}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

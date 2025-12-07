@@ -44,6 +44,29 @@ const StoreMediaPage = () => {
     methods.setValue('banner', url);
   };
 
+  // Banner images state - initialize from form data
+  const [bannerImages, setBannerImages] = React.useState<string[]>(formData.bannerImages || []);
+
+  // Handle banner image upload
+  const handleBannerImageUpload = (url: string) => {
+    if (bannerImages.length >= 3) {
+      toast.error("You can only upload 3 banner images");
+      return;
+    }
+    const updatedBanners = [...bannerImages, url];
+    setBannerImages(updatedBanners);
+    setFormData({ ...formData, bannerImages: updatedBanners });
+    methods.setValue('bannerImages', updatedBanners);
+  };
+
+  // Remove banner image
+  const removeBannerImage = (index: number) => {
+    const updatedBanners = bannerImages.filter((_, i) => i !== index);
+    setBannerImages(updatedBanners);
+    setFormData({ ...formData, bannerImages: updatedBanners });
+    methods.setValue('bannerImages', updatedBanners);
+  };
+
   // Gallery state - initialize from form data
   const [galleryImages, setGalleryImages] = React.useState<string[]>(formData.galleryImages || []);
   const [galleryVideos, setGalleryVideos] = React.useState<string[]>(formData.galleryVideos || []);
@@ -119,6 +142,7 @@ const StoreMediaPage = () => {
         twitter: data.twitter || undefined,
         logo: cleanData.logo as string | undefined,
         banner: cleanData.banner as string | undefined,
+        bannerImages: data.bannerImages || [],
         galleryImages: data.galleryImages || [],
         galleryVideos: data.galleryVideos || [],
         businessHours: data.businessHours,
@@ -167,14 +191,6 @@ const StoreMediaPage = () => {
           <div className="flex-1">
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               {/* Header */}
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-lg font-semibold text-gray-900">Media</h2>
-                <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add Listings
-                </Button>
-              </div>
-
               <div className="space-y-8">
                 {/* Business Logo */}
                 <div>
@@ -194,21 +210,60 @@ const StoreMediaPage = () => {
                   </div>
                 </div>
 
-                {/* Banner Image */}
+                {/* Banner Images */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-4">
-                    Banner Image
-                  </label>
-                  <div className="h-64">
-                    <FileUpload
-                      type="banner"
-                      onUpload={handleBannerUpload}
-                      currentUrl={formData.banner || undefined}
-                      accept="image/*"
-                      maxSize={5}
-                      className="h-full"
-                      endpoint="/new/media"
-                    />
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Banner Images
+                      </label>
+                      <p className="text-xs text-red-600 font-medium mt-1">Must be three</p>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {bannerImages.length}/3 images
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-4">
+                    {/* Existing banner images */}
+                    {bannerImages.map((imageUrl, index) => (
+                      <div key={index} className="aspect-video relative group">
+                        <div className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-200">
+                          <img
+                            src={imageUrl}
+                            alt={`Banner ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeBannerImage(index)}
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    ))}
+                    
+                    {/* Add new banner button */}
+                    {bannerImages.length < 3 && (
+                      <div className="aspect-video">
+                        <FileUpload
+                          type="banner"
+                          onUpload={handleBannerImageUpload}
+                          accept="image/*"
+                          maxSize={5}
+                          className="h-full"
+                          endpoint="/new/media"
+                        >
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <Plus className="w-8 h-8 text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500">Add Banner</span>
+                          </div>
+                        </FileUpload>
+                      </div>
+                    )}
                   </div>
                 </div>
 

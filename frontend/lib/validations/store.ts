@@ -41,6 +41,7 @@ const storeFormSchema = z.object({
   twitter: z.string().url().optional().nullable(),
   logo: z.string().optional().nullable(),
   banner: z.string().optional().nullable(),
+  bannerImages: z.array(z.string()).optional(),
   galleryImages: z.array(z.string()).optional(),
   galleryVideos: z.array(z.string()).optional(),
   businessHours: businessHoursSchema,

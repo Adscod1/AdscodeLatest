@@ -15,6 +15,8 @@ import {
 import Image from "next/image";
 import { useFormContext } from "react-hook-form";
 import { StoreFormData } from "@/lib/validations/store";
+import { getHighlightIcon } from "@/lib/highlight-icons";
+import { cn } from "@/lib/utils";
 
 const businessHighlights = [
   {
@@ -68,18 +70,28 @@ const calculateSectionCompletion = (formData: Partial<StoreFormData>) => {
   ].filter(field => field !== undefined && field !== null && field !== "");
   const basicInfoCompletion = (basicInfoFields.length / 6) * 100;
 
-  // Contact fields
-  const contactFields = [
+  // Contact fields - Essential fields for completion
+  // Required: phone, email, address, city, country
+  // Optional: state, zip, website
+  const requiredContactFields = [
     formData.phone,
     formData.email,
     formData.address,
     formData.city,
-    formData.state,
     formData.country,
+  ].filter(field => field !== undefined && field !== null && field !== "");
+  
+  const optionalContactFields = [
+    formData.state,
     formData.zip,
     formData.website,
   ].filter(field => field !== undefined && field !== null && field !== "");
-  const contactCompletion = (contactFields.length / 8) * 100;
+  
+  // Calculate completion: all required fields must be filled (5/5)
+  // Optional fields add bonus progress
+  const contactCompletion = requiredContactFields.length === 5 
+    ? 100 
+    : (requiredContactFields.length / 5) * 100;
 
   // Business Hours - check if at least one day is open with valid times
   const businessHours = formData.businessHours || {};
@@ -271,14 +283,25 @@ export function StorePreview() {
             <h3 className="font-semibold text-gray-900 mb-4">Business Highlights</h3>
             <div className="flex flex-wrap gap-2">
               {formData.selectedHighlights && formData.selectedHighlights.length > 0 ? (
-                formData.selectedHighlights.map((highlight) => (
-                  <div
-                    key={highlight}
-                    className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    {highlight}
-                  </div>
-                ))
+                formData.selectedHighlights.map((highlight) => {
+                  const iconConfig = getHighlightIcon(highlight);
+                  const IconComponent = iconConfig?.icon;
+                  
+                  return (
+                    <div
+                      key={highlight}
+                      className="inline-flex items-center px-3 py-2 bg-white border border-gray-200 rounded-full text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      {IconComponent && (
+                        <IconComponent className={cn(
+                          "w-3.5 h-3.5 mr-1.5 sm:w-4 sm:h-4 sm:mr-2",
+                          iconConfig?.color
+                        )} />
+                      )}
+                      <span className="whitespace-nowrap">{highlight}</span>
+                    </div>
+                  );
+                })
               ) : (
                 <p className="text-sm text-gray-500">No highlights selected</p>
               )}

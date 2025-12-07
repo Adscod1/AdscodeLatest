@@ -129,6 +129,7 @@ model Store {
   StoreImage      StoreImage[]
   StoreSocial     StoreSocial[]
   StoreVideo      StoreVideo[]
+  StoreHighlight  StoreHighlight[]
   campaigns       Campaign[]
 
   @@index([userId], map: "store_userId_fkey")
@@ -175,6 +176,16 @@ model StoreVideo {
 
   @@index([storeId], map: "store_video_storeId_fkey")
   @@map("store_video")
+}
+
+model StoreHighlight {
+  id        String @id @default(uuid())
+  storeId   String
+  highlight String
+  store     Store  @relation(fields: [storeId], references: [id])
+
+  @@index([storeId], map: "store_highlight_storeId_fkey")
+  @@map("store_highlight")
 }
 
 model Product {

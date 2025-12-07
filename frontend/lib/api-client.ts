@@ -202,6 +202,7 @@ export interface CreateStoreInput {
   twitter?: string;
   logo?: string;
   banner?: string;
+  bannerImages?: string[];
   galleryImages?: string[];
   galleryVideos?: string[];
   businessHours?: BusinessHours;
