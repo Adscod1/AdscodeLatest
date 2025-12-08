@@ -481,9 +481,9 @@ const BusinessPage = () => {
           </div>
 
           {/* Rest of Content */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 -mt- lg:-mt-10">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-12 mt-12 lg:mt-16">
           {/* Left Column - Main Content */}
-          <div className="flex-1 space-y-6 lg:space-y-8 min-w-0 w-full">
+          <div className="flex-1 space-y-8 lg:space-y-10 min-w-0 w-full">
 
             {/* Campaigns */}
             <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
@@ -542,7 +542,7 @@ const BusinessPage = () => {
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
                       <Card className="overflow-hidden border border-gray-300 hover:shadow-lg transition-shadow cursor-pointer border-0 shadow-none">
-                        <div className="aspect-square bg-gray-100">
+                        <div className="h-40 bg-gray-100">
                           {item.images && item.images.length > 0 ? (
                             <Image
                               src={item.images[0].url}
@@ -903,7 +903,7 @@ const BusinessPage = () => {
           </div>
 
           {/* Right Column - Sidebars Container */}
-          <div className="w-full lg:w-80 flex flex-col gap-6 lg:gap-8 mt-8  flex-shrink-0">
+          <div className="w-full lg:w-80 flex flex-col gap-8 lg:gap-10 mt-12 lg:mt-0 flex-shrink-0">
             {/* Business Hours Sidebar */}
             <div className="bg-white shadow-sm w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
