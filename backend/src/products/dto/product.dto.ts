@@ -31,6 +31,47 @@ export class ProductMediaDto {
   url: string;
 }
 
+export class ProductBenefitDto {
+  @ApiProperty({ description: 'Benefit title' })
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiProperty({ description: 'Benefit description' })
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+}
+
+export class ProductIngredientDto {
+  @ApiProperty({ description: 'Ingredient name' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiPropertyOptional({ description: 'Ingredient image URL' })
+  @IsString()
+  @IsOptional()
+  image?: string;
+
+  @ApiProperty({ description: 'Ingredient description' })
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+}
+
+export class ProductFaqDto {
+  @ApiProperty({ description: 'FAQ question' })
+  @IsString()
+  @IsNotEmpty()
+  question: string;
+
+  @ApiProperty({ description: 'FAQ answer' })
+  @IsString()
+  @IsNotEmpty()
+  answer: string;
+}
+
 export class CreateProductDto {
   @ApiProperty({ description: 'Product title' })
   @IsString()
@@ -144,6 +185,47 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   storeId: string;
+
+  @ApiPropertyOptional({ description: 'Benefits introduction text' })
+  @IsString()
+  @IsOptional()
+  benefitsIntroText?: string;
+
+  @ApiPropertyOptional({ description: 'Benefits section image URL' })
+  @IsString()
+  @IsOptional()
+  benefitsSectionImage?: string;
+
+  @ApiPropertyOptional({ description: 'Product benefits', type: [ProductBenefitDto] })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ProductBenefitDto)
+  benefitItems?: ProductBenefitDto[];
+
+  @ApiPropertyOptional({ description: 'Product ingredients', type: [ProductIngredientDto] })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ProductIngredientDto)
+  ingredientItems?: ProductIngredientDto[];
+
+  @ApiPropertyOptional({ description: 'How to use video URL' })
+  @IsString()
+  @IsOptional()
+  howToUseVideo?: string;
+
+  @ApiPropertyOptional({ description: 'How to use description' })
+  @IsString()
+  @IsOptional()
+  howToUseDescription?: string;
+
+  @ApiPropertyOptional({ description: 'Product FAQs', type: [ProductFaqDto] })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ProductFaqDto)
+  faqItems?: ProductFaqDto[];
 }
 
 export class UpdateProductDto extends CreateProductDto {}

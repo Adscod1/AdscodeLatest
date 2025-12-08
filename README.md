@@ -124,3 +124,7 @@ cd backend && npx prisma generate
 npx prisma generate
 
 npx prisma migrate reset --force
+
+
+cd backend && npx prisma migrate dev --name 
+npx prisma db push

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 interface ProductTabsProps {
   activeTab:
     | "Basic Information"
+    | "Specific Information"
     | "Sale Information"
     | "Delivery"
     | "Scheduling"
@@ -30,6 +31,12 @@ export function ProductTabs({ activeTab, productId, type }: ProductTabsProps) {
       href: isEdit
         ? `/${storeId}/${basePath}/${productId}/edit`
         : `/${storeId}/${basePath}/new${itemType === "service" ? "?type=service" : ""}`,
+    },
+    {
+      name: "Specific Information",
+      href: isEdit
+        ? `/${storeId}/${basePath}/${productId}/edit/specific-information`
+        : `/${storeId}/${basePath}/new/specific-information${itemType === "service" ? "?type=service" : ""}`,
     },
     {
       name: "Sale Information",

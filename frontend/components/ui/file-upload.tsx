@@ -189,7 +189,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       ) : (
         <div 
           onClick={handleFileSelect}
-          className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-gray-400 cursor-pointer transition-colors"
+          className={children ? "cursor-pointer" : "border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-gray-400 cursor-pointer transition-colors"}
         >
           <div className="text-center">
             {children || (

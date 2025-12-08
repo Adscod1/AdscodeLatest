@@ -52,6 +52,10 @@ export class ProductsService {
         harmonizedSystemCode: dto.harmonizedSystemCode,
         status: dto.status || 'DRAFT',
         storeId: dto.storeId,
+        benefitsIntroText: dto.benefitsIntroText,
+        benefitsSectionImage: dto.benefitsSectionImage,
+        howToUseVideo: dto.howToUseVideo,
+        howToUseDescription: dto.howToUseDescription,
         variations: dto.variations?.length
           ? {
               create: dto.variations.map((v) => ({
@@ -76,11 +80,39 @@ export class ProductsService {
               })),
             }
           : undefined,
+        benefitItems: dto.benefitItems?.length
+          ? {
+              create: dto.benefitItems.map((item) => ({
+                title: item.title,
+                description: item.description,
+              })),
+            }
+          : undefined,
+        ingredientItems: dto.ingredientItems?.length
+          ? {
+              create: dto.ingredientItems.map((item) => ({
+                name: item.name,
+                image: item.image,
+                description: item.description,
+              })),
+            }
+          : undefined,
+        faqItems: dto.faqItems?.length
+          ? {
+              create: dto.faqItems.map((item) => ({
+                question: item.question,
+                answer: item.answer,
+              })),
+            }
+          : undefined,
       },
       include: {
         variations: true,
         images: true,
         videos: true,
+        benefitItems: true,
+        ingredientItems: true,
+        faqItems: true,
       },
     });
 
@@ -110,6 +142,9 @@ export class ProductsService {
         variations: true,
         images: true,
         videos: true,
+        benefitItems: true,
+        ingredientItems: true,
+        faqItems: true,
         store: true,
         _count: {
           select: {
@@ -138,6 +173,9 @@ export class ProductsService {
         variations: true,
         images: true,
         videos: true,
+        benefitItems: true,
+        ingredientItems: true,
+        faqItems: true,
         store: {
           select: {
             id: true,
@@ -206,6 +244,10 @@ export class ProductsService {
         countryOfOrigin: dto.countryOfOrigin,
         harmonizedSystemCode: dto.harmonizedSystemCode,
         status: dto.status || 'DRAFT',
+        benefitsIntroText: dto.benefitsIntroText,
+        benefitsSectionImage: dto.benefitsSectionImage,
+        howToUseVideo: dto.howToUseVideo,
+        howToUseDescription: dto.howToUseDescription,
         variations: dto.variations?.length
           ? {
               deleteMany: {},
@@ -233,11 +275,42 @@ export class ProductsService {
               })),
             }
           : undefined,
+        benefitItems: dto.benefitItems?.length
+          ? {
+              deleteMany: {},
+              create: dto.benefitItems.map((item) => ({
+                title: item.title,
+                description: item.description,
+              })),
+            }
+          : undefined,
+        ingredientItems: dto.ingredientItems?.length
+          ? {
+              deleteMany: {},
+              create: dto.ingredientItems.map((item) => ({
+                name: item.name,
+                image: item.image,
+                description: item.description,
+              })),
+            }
+          : undefined,
+        faqItems: dto.faqItems?.length
+          ? {
+              deleteMany: {},
+              create: dto.faqItems.map((item) => ({
+                question: item.question,
+                answer: item.answer,
+              })),
+            }
+          : undefined,
       },
       include: {
         variations: true,
         images: true,
         videos: true,
+        benefitItems: true,
+        ingredientItems: true,
+        faqItems: true,
       },
     });
 

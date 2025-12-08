@@ -209,6 +209,10 @@ model Product {
   status               String             @default("DRAFT")
   storeId              String
   views                Int                @default(0)
+  benefitsIntroText    String?            @db.Text
+  benefitsSectionImage String?
+  howToUseVideo        String?
+  howToUseDescription  String?            @db.Text
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
   store                Store              @relation(fields: [storeId], references: [id])
@@ -216,6 +220,9 @@ model Product {
   variations           ProductVariation[]
   videos               ProductVideo[]
   comments             Comment[]
+  benefitItems         ProductBenefit[]
+  ingredientItems      ProductIngredient[]
+  faqItems             ProductFaq[]
 
   @@index([storeId], map: "product_storeId_fkey")
   @@map("product")
@@ -267,6 +274,40 @@ model Comment {
   @@index([userId], map: "comment_userId_fkey")
   @@index([productId], map: "comment_productId_fkey")
   @@map("comment")
+}
+
+model ProductBenefit {
+  id          String  @id @default(uuid())
+  title       String
+  description String  @db.Text
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "product_benefit_productId_fkey")
+  @@map("product_benefit")
+}
+
+model ProductIngredient {
+  id          String  @id @default(uuid())
+  name        String
+  image       String?
+  description String  @db.Text
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "product_ingredient_productId_fkey")
+  @@map("product_ingredient")
+}
+
+model ProductFaq {
+  id        String  @id @default(uuid())
+  question  String  @db.Text
+  answer    String  @db.Text
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "product_faq_productId_fkey")
+  @@map("product_faq")
 }
 
 model StoreActivity {
