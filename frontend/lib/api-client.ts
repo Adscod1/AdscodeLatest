@@ -345,6 +345,9 @@ export interface CreateProductInput {
   sizeUnit?: string;
   countryOfOrigin?: string;
   harmonizedSystemCode?: string;
+  processingTime?: string;
+  shippingMethod?: string;
+  offerFreeShipping?: boolean;
   status?: string;
   storeId: string;
   variations?: ProductVariation[];
@@ -563,6 +566,7 @@ export interface CampaignQueryParams {
   status?: string;
   page?: number;
   limit?: number;
+  storeId?: string;
 }
 
 export const campaignsApi = {
@@ -579,6 +583,7 @@ export const campaignsApi = {
     if (params?.status) searchParams.set('status', params.status);
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.storeId) searchParams.set('storeId', params.storeId);
     const query = searchParams.toString();
     return apiRequest<{ success: boolean; campaigns: Campaign[] }>(`/campaigns${query ? `?${query}` : ''}`);
   },

@@ -17,6 +17,7 @@ import { useFormContext } from "react-hook-form";
 import { StoreFormData } from "@/lib/validations/store";
 import { getHighlightIcon } from "@/lib/highlight-icons";
 import { cn } from "@/lib/utils";
+import { useStoreForm } from "@/store/use-store-form";
 
 const businessHighlights = [
   {
@@ -106,7 +107,7 @@ const calculateSectionCompletion = (formData: Partial<StoreFormData>) => {
   // Media fields
   const mediaFields = [
     formData.logo,
-    formData.banner,
+    formData.bannerImages && formData.bannerImages.length === 3 ? "complete" : null,
   ].filter(field => field !== undefined && field !== null && field !== "");
   const mediaCompletion = (mediaFields.length / 2) * 100;
 
@@ -121,6 +122,7 @@ const calculateSectionCompletion = (formData: Partial<StoreFormData>) => {
 
 export function StorePreview() {
   const context = useFormContext<StoreFormData>();
+  const { activeBannerIndex } = useStoreForm();
   
   // Fallback if form context is not available
   if (!context) {
@@ -202,9 +204,9 @@ export function StorePreview() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Cover Image */}
             <div className="aspect-[16/10] bg-gradient-to-br from-orange-200 to-yellow-300 relative">
-              {formData.banner ? (
+              {formData.bannerImages && formData.bannerImages.length > 0 ? (
                 <Image
-                  src={formData.banner}
+                  src={formData.bannerImages[activeBannerIndex] || formData.bannerImages[0]}
                   alt="Store cover"
                   fill
                   className="object-cover"

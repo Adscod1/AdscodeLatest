@@ -5,8 +5,10 @@ import { StoreFormData } from "@/lib/validations/store";
 interface StoreFormState {
   formData: Partial<StoreFormData>;
   currentStep: number;
+  activeBannerIndex: number;
   setFormData: (data: Partial<StoreFormData>) => void;
   setCurrentStep: (step: number) => void;
+  setActiveBannerIndex: (index: number) => void;
   reset: () => void;
   clearAll: () => void;
 }
@@ -43,15 +45,17 @@ export const useStoreForm = create<StoreFormState>()(
     (set) => ({
       formData: initialState,
       currentStep: 0,
+      activeBannerIndex: 0,
       setFormData: (data: Partial<StoreFormData>) =>
         set((state) => ({
           formData: { ...state.formData, ...data },
         })),
       setCurrentStep: (step: number) => set({ currentStep: step }),
-      reset: () => set({ formData: { ...initialState }, currentStep: 0 }),
+      setActiveBannerIndex: (index: number) => set({ activeBannerIndex: index }),
+      reset: () => set({ formData: { ...initialState }, currentStep: 0, activeBannerIndex: 0 }),
       clearAll: () => {
         // Clear the state
-        set({ formData: { ...initialState }, currentStep: 0 });
+        set({ formData: { ...initialState }, currentStep: 0, activeBannerIndex: 0 });
         // Clear from localStorage
         localStorage.removeItem("store-form-storage");
       },

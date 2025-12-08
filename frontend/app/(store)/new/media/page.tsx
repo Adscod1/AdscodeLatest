@@ -14,10 +14,11 @@ import { useRouter } from "next/navigation";
 import { Store } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/ui/file-upload";
+import { cn } from "@/lib/utils";
 
 const StoreMediaPage = () => {
   const router = useRouter();
-  const { formData, setFormData, clearAll } = useStoreForm();
+  const { formData, setFormData, clearAll, activeBannerIndex, setActiveBannerIndex } = useStoreForm();
 
   const methods = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
@@ -65,6 +66,11 @@ const StoreMediaPage = () => {
     setBannerImages(updatedBanners);
     setFormData({ ...formData, bannerImages: updatedBanners });
     methods.setValue('bannerImages', updatedBanners);
+    
+    // Reset active banner index if needed
+    if (activeBannerIndex >= updatedBanners.length) {
+      setActiveBannerIndex(Math.max(0, updatedBanners.length - 1));
+    }
   };
 
   // Gallery state - initialize from form data
@@ -233,19 +239,36 @@ const StoreMediaPage = () => {
                   <div className="grid grid-cols-3 gap-4">
                     {/* Existing banner images */}
                     {bannerImages.map((imageUrl, index) => (
-                      <div key={index} className="aspect-video relative group">
-                        <div className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-200">
+                      <div 
+                        key={index} 
+                        className="aspect-video relative group cursor-pointer"
+                        onClick={() => setActiveBannerIndex(index)}
+                      >
+                        <div className={cn(
+                          "w-full h-full rounded-lg overflow-hidden border-2 transition-all",
+                          activeBannerIndex === index 
+                            ? "border-blue-500 ring-2 ring-blue-200" 
+                            : "border-gray-200 hover:border-blue-300"
+                        )}>
                           <img
                             src={imageUrl}
                             alt={`Banner ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
                         </div>
+                        {activeBannerIndex === index && (
+                          <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                            Active
+                          </div>
+                        )}
                         <Button
                           variant="destructive"
                           size="sm"
                           className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => removeBannerImage(index)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeBannerImage(index);
+                          }}
                         >
                           ×
                         </Button>
