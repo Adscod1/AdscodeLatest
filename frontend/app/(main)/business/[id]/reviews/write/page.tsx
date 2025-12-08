@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { 
-  Star, 
-  ArrowLeft, 
+  ChevronLeft, 
+  ChevronRight,
   Camera,
   Video,
   X,
@@ -27,6 +27,43 @@ import Link from "next/link";
 import api from "@/lib/api-client";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+
+const StarRating = ({ rating }: { rating: number }) => {
+  const SoftStar = ({ filled }: { filled: boolean }) => (
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path
+        d="M12 2.5c.3 0 .6.2.7.5l2.1 4.3 4.7.7c.3 0 .6.3.7.6.1.3 0 .6-.2.8l-3.4 3.3.8 4.7c.1.3 0 .6-.2.8-.2.2-.5.3-.8.1L12 15.4l-4.2 2.2c-.3.2-.6.1-.8-.1-.2-.2-.3-.5-.2-.8l.8-4.7L4.2 8.7c-.2-.2-.3-.5-.2-.8.1-.3.4-.6.7-.6l4.7-.7L11.3 3c.1-.3.4-.5.7-.5z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
+  return (
+    <div className="flex items-center space-x-0.5">
+      {[...Array(5)].map((_, i) => (
+        <div
+          key={i}
+          className={
+            i < Math.floor(rating)
+              ? "text-orange-400"
+              : i < rating
+              ? "text-orange-400 opacity-60"
+              : "text-gray-300"
+          }
+        >
+          <SoftStar filled={i < Math.floor(rating)} />
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const WriteReviewPage = () => {
   const params = useParams();
@@ -233,6 +270,13 @@ const WriteReviewPage = () => {
     },
   });
 
+  // Refetch reviews when rating changes
+  useEffect(() => {
+    if (rating > 0) {
+      refetchReviews();
+    }
+  }, [rating, refetchReviews]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -265,6 +309,8 @@ const WriteReviewPage = () => {
       toast.error("Your review must be at least 85 characters long");
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       console.log('Submitting review:', { storeId, rating, reviewTitle, comment: comment.substring(0, 50) + '...' });
@@ -330,7 +376,7 @@ const WriteReviewPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-blue-50">
       {/* Login Required Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent className="sm:max-w-md mx-4">
@@ -373,45 +419,69 @@ const WriteReviewPage = () => {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      <div className="max-w-8xl p-3 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-white">
         {/* Header */}
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-4 px-2 sm:mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               <Link href={`/business/${storeId}`}>
-                <Button variant="outline" size="sm" className="flex items-center gap-2 flex-shrink-0">
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">Back</span>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 flex-shrink-0 -mt-2 hover:bg-transparent p-0">
+                  <ChevronLeft className="w-5 h-5" />
+                 
                 </Button>
               </Link>
               <div className="flex items-start sm:items-center gap-3 min-w-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black rounded flex items-center justify-center flex-shrink-0">
                   {store.logo ? (
                     <Image
                       src={store.logo}
                       alt={store.name}
-                      width={48}
-                      height={48}
+                      width={80}
+                      height={80}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
-                    <span className="text-lg sm:text-xl font-bold text-white">
+                    <span className="text-2xl sm:text-3xl font-bold text-white">
                       {store.name.charAt(0)}
                     </span>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{store.name}</h1>
-                  <p className="text-sm sm:text-base text-gray-600">Write a review</p>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{store.name}</h1>
+                    <svg 
+                      className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" 
+                      viewBox="0,0,256,256"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g 
+                        fill="#228be6" 
+                        fillRule="nonzero" 
+                        stroke="none" 
+                        strokeWidth="1" 
+                        strokeLinecap="butt" 
+                        strokeLinejoin="miter" 
+                        strokeMiterlimit="10" 
+                        strokeDasharray="" 
+                        strokeDashoffset="0" 
+                        fontFamily="none" 
+                        fontWeight="normal" 
+                        fontSize="none" 
+                        textAnchor="inherit" 
+                        style={{mixBlendMode: 'normal'}}
+                      >
+                        <g transform="scale(8.53333,8.53333)">
+                          <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                        </g>
+                      </g>
+                    </svg>
+                  </div>
+                  {store.tagline && (
+                    <p className="text-xs sm:text-sm text-gray-500 truncate">{store.tagline}</p>
+                  )}
                   {isLoadingSession && (
                     <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1 mt-1">
                       Checking login status...
-                    </p>
-                  )}
-                  {!isLoadingSession && user && (
-                    <p className="text-xs sm:text-sm text-green-600 flex items-center gap-1 mt-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      <span className="truncate">Logged in as {user.name || user.email}</span>
                     </p>
                   )}
                   {!isLoadingSession && !user && (
@@ -420,67 +490,95 @@ const WriteReviewPage = () => {
                       Please login to submit a review
                     </p>
                   )}
+                  {/* Followers Count */}
+                  <div className="flex items-center gap-1 mt-2">
+                    <span className="text-xs sm:text-sm text-gray-600">
+                      {Math.floor(Math.random() * 500) + 50} followers
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-            <Link href="/review-guidelines" className="text-blue-600 text-xs sm:text-sm hover:underline self-start sm:self-auto">
-              Read review guidelines →
-            </Link>
+            
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 px-16 bg-blue-50  ">
           {/* Main Review Form */}
-          <div className="lg:col-span-2">
-            <Card className="p-4 sm:p-6 lg:p-8">
+          <div className="lg:col-span-3 mt-8">
+            <Card className="sm:p-6 lg:p-8">
+              <div className="flex justify-end mb-4">
+                <Link href="/review-guidelines" className="text-blue-700 text-xs sm:text-sm hover:underline flex">
+                  <span className="font-semibold">Read review guidelines</span> <span><ChevronRight className="w-5 h-5" /></span>
+                </Link>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
                 {/* Rating Section */}
                 <div>
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Select your rating</h2>
-                  <div className="flex items-center gap-1 sm:gap-2 mb-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setRating(star)}
-                        onMouseEnter={() => setHoveredRating(star)}
-                        onMouseLeave={() => setHoveredRating(0)}
-                        className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        <Star
-                          className={`w-6 h-6 sm:w-8 sm:h-8 ${
-                            star <= (hoveredRating || rating)
-                              ? 'text-yellow-400 fill-yellow-400'
-                              : 'text-gray-300'
-                          } transition-colors`}
-                        />
-                      </button>
-                    ))}
+                  <h2 className="text-2xl sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Select your rating</h2>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const ratingLabels = ['Not good', 'Could\'ve been better', 'Ok', 'Good', 'Great'];
+                      const orangeIntensities = ['text-orange-200', 'text-orange-300', 'text-orange-400', 'text-orange-500', 'text-orange-600'];
+                      return (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setRating(star)}
+                          onMouseEnter={() => setHoveredRating(star)}
+                          onMouseLeave={() => setHoveredRating(0)}
+                          className="transition-colors"
+                        >
+                          <svg
+                            className={`w-8 h-8 sm:w-10 sm:h-10 ${
+                              star <= (hoveredRating || rating)
+                                ? orangeIntensities[star - 1]
+                                : 'text-gray-300'
+                            } transition-colors`}
+                            viewBox="0 0 24 24"
+                            fill={star <= (hoveredRating || rating) ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                          >
+                            <path
+                              d="M12 2.5c.3 0 .6.2.7.5l2.1 4.3 4.7.7c.3 0 .6.3.7.6.1.3 0 .6-.2.8l-3.4 3.3.8 4.7c.1.3 0 .6-.2.8-.2.2-.5.3-.8.1L12 15.4l-4.2 2.2c-.3.2-.6.1-.8-.1-.2-.2-.3-.5-.2-.8l.8-4.7L4.2 8.7c-.2-.2-.3-.5-.2-.8.1-.3.4-.6.7-.6l4.7-.7L11.3 3c.1-.3.4-.5.7-.5z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+                      );
+                    })}
+                    {(hoveredRating || rating) > 0 && (
+                      <p className="text-sm sm:text-base font-medium text-gray-700 ml-2">
+                        {['Not good', 'Could\'ve been better', 'Ok', 'Good', 'Great'][(hoveredRating || rating) - 1]}
+                      </p>
+                    )}
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600 mt-2">
                     Some keywords to include in your review
                   </p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <Badge variant="outline" className="text-xs">Service Quality</Badge>
-                    <Badge variant="outline" className="text-xs">Product Prices</Badge>
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    <Badge variant="outline" className="text-sm px-4 py-2 border bg-gray-50">Service Quality</Badge>
+                    <Badge variant="outline" className="text-sm px-4 py-2 border bg-gray-50">Product Prices</Badge>
                   </div>
                 </div>
 
                 {/* Review Title */}
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Review Title</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Review title</h3>
                   <Input
                     placeholder="Give your review a title..."
                     value={reviewTitle}
                     onChange={(e) => setReviewTitle(e.target.value)}
-                    className="text-base sm:text-lg"
+                    className="text-base sm:text-lg h-12"
                     maxLength={100}
                   />
                 </div>
 
                 {/* Review Content */}
                 <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Your Review</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Tell us about your experience</h3>
                   
                   {/* Media Upload Buttons */}
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
@@ -502,7 +600,7 @@ const WriteReviewPage = () => {
                         >
                           <span>
                             <Camera className="w-4 h-4" />
-                            <span className="truncate">Images ({attachedImages.length}/5)</span>
+                           
                           </span>
                         </Button>
                       </label>
@@ -526,7 +624,7 @@ const WriteReviewPage = () => {
                         >
                           <span>
                             <Video className="w-4 h-4" />
-                            <span className="truncate">Videos ({attachedVideos.length}/2)</span>
+                            
                           </span>
                         </Button>
                       </label>
@@ -545,7 +643,7 @@ const WriteReviewPage = () => {
                               alt={`Preview ${index + 1}`}
                               width={120}
                               height={120}
-                              className="w-full h-20 sm:h-24 object-cover rounded-lg border"
+                              className="w-30 h-20 sm:h-24 object-cover rounded-lg border"
                             />
                             <button
                               type="button"
@@ -587,35 +685,52 @@ const WriteReviewPage = () => {
 
                   {/* Text Area */}
                   <Textarea
-                    placeholder="Share details about your experience with this business. What did you like or dislike? What should others know before visiting?"
+                    placeholder="Write your review..."
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     className="min-h-[120px] sm:min-h-[150px] resize-none text-sm sm:text-base"
                     maxLength={2000}
                   />
                   
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mt-3">
+                  <div className="flex items-center gap-2 mt-3">
                     <span className="text-xs sm:text-sm text-gray-600">
-                      Min 85 characters required
+                      Reviews need to be atleast 85 characters.
                     </span>
-                    <span className="text-xs sm:text-sm text-gray-500">
-                      {comment.length}/2000
-                    </span>
+                    <svg className="w-5 h-5 transform -rotate-90">
+                      <circle
+                        cx="10"
+                        cy="10"
+                        r="8"
+                        stroke="#e5e7eb"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      <circle
+                        cx="10"
+                        cy="10"
+                        r="8"
+                        stroke="#10b981"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 8}`}
+                        strokeDashoffset={`${2 * Math.PI * 8 * (1 - Math.min(comment.length / 85, 1))}`}
+                        strokeLinecap="round"
+                        className="transition-all duration-300"
+                      />
+                    </svg>
                   </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
-                  <Button variant="outline" size="sm" type="button" className="w-full sm:w-auto">
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={!rating || !reviewTitle.trim() || !comment.trim() || comment.length < 85 || isSubmitting}
-                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
-                  >
-                    {isSubmitting ? "Posting..." : "Post review"}
-                  </Button>
+                  
+                  {/* Submit Button */}
+                  <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-4 mt-4">
+                    
+                    <Button 
+                      type="submit" 
+                      disabled={!rating || !reviewTitle.trim() || !comment.trim() || comment.length < 85 || isSubmitting}
+                      className="w-full sm:w-40 h-11 bg-blue-600 hover:bg-blue-700 font-bold text-base rounded"
+                    >
+                      {isSubmitting ? "Posting..." : "Post review"}
+                    </Button>
+                  </div>
                 </div>
               </form>
             </Card>
@@ -636,19 +751,12 @@ const WriteReviewPage = () => {
                         }
                       </span>
                       <div className="flex items-center">
-                        {[1, 2, 3, 4, 5].map((star) => {
-                          const avgRating = reviews && reviews.length > 0 
+                        <StarRating 
+                          rating={reviews && reviews.length > 0 
                             ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-                            : 0;
-                          return (
-                            <Star
-                              key={star}
-                              className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                                star <= avgRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
-                              }`}
-                            />
-                          );
-                        })}
+                            : 0
+                          } 
+                        />
                       </div>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600">
@@ -660,14 +768,20 @@ const WriteReviewPage = () => {
                 {/* Rating Breakdown */}
                 <div className="space-y-2">
                   {[5, 4, 3, 2, 1].map((ratingValue) => {
+                    // Calculate current counts
                     const count = reviews?.filter(r => r.rating === ratingValue).length || 0;
-                    const percentage = reviews && reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                    
+                    // Add the user's selected rating to the calculation
+                    const adjustedCount = rating === ratingValue ? count + 1 : count;
+                    const totalReviews = (reviews?.length || 0) + (rating > 0 ? 1 : 0);
+                    const percentage = totalReviews > 0 ? (adjustedCount / totalReviews) * 100 : 0;
+                    
                     return (
                       <div key={ratingValue} className="flex items-center gap-2 sm:gap-3">
                         <span className="text-xs sm:text-sm w-6 sm:w-8">{ratingValue}</span>
                         <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-yellow-400 rounded-full transition-all"
+                            className="h-full bg-yellow-400 rounded-full transition-all duration-300"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
@@ -713,16 +827,7 @@ const WriteReviewPage = () => {
                           </span>
                         </div>
                         <div className="flex items-center mb-3">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                                star <= review.rating
-                                  ? 'text-yellow-400 fill-yellow-400'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
+                          <StarRating rating={review.rating} />
                         </div>
                         <div className="text-sm sm:text-base text-gray-700 prose prose-sm max-w-none break-words">
                           {review.comment?.split('\n').map((paragraph, idx) => (
@@ -786,9 +891,21 @@ const WriteReviewPage = () => {
 
                 {reviews?.length === 0 && (
                   <div className="text-center py-8 sm:py-12">
-                    <div className="text-4xl sm:text-6xl mb-4">💬</div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
-                    <p className="text-sm sm:text-base text-gray-600">Be the first to review this business!</p>
+                    <svg
+                      className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 text-gray-300"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path
+                        d="M12 2.5c.3 0 .6.2.7.5l2.1 4.3 4.7.7c.3 0 .6.3.7.6.1.3 0 .6-.2.8l-3.4 3.3.8 4.7c.1.3 0 .6-.2.8-.2.2-.5.3-.8.1L12 15.4l-4.2 2.2c-.3.2-.6.1-.8-.1-.2-.2-.3-.5-.2-.8l.8-4.7L4.2 8.7c-.2-.2-.3-.5-.2-.8.1-.3.4-.6.7-.6l4.7-.7L11.3 3c.1-.3.4-.5.7-.5z"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No reviews yet</h3>
+                    <p className="text-sm sm:text-base text-gray-600">Be the first to review<br />this business!</p>
                   </div>
                 )}
               </div>
@@ -796,11 +913,13 @@ const WriteReviewPage = () => {
           </div>
 
           {/* Latest Reviews Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2 mt-8">
             <Card className="p-4 sm:p-6 lg:sticky lg:top-6">
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-lg">▶</span>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900">Latest Reviews</h3>
+              <div className="hover:bg-gray-100 p-1"> 
+                <ChevronRight className="w-6 h-6" />
+              </div>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900">Latest reviews</h3>
               </div>
               
               <div className="space-y-4">
@@ -841,16 +960,7 @@ const WriteReviewPage = () => {
                         
                         {/* Star Rating */}
                         <div className="flex items-center gap-0.5 mb-2">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-3 h-3 ${
-                                star <= review.rating
-                                  ? 'text-orange-400 fill-orange-400'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
+                          <StarRating rating={review.rating} />
                         </div>
                       </div>
                     </div>
@@ -1005,7 +1115,7 @@ const WriteReviewPage = () => {
 
                 {reviews?.length === 0 && (
                   <div className="text-center py-6 sm:py-8">
-                    <div className="text-3xl sm:text-4xl mb-2">💭</div>
+                    <MessageCircle className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-2 text-gray-300" />
                     <p className="text-xs sm:text-sm text-gray-500">No reviews yet</p>
                   </div>
                 )}
