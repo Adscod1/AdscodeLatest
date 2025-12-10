@@ -10,7 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import AddCatalogDialog from "@/components/AddCatalogDialog";
 import api from "@/lib/api-client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -74,6 +74,7 @@ interface Product {
 
 const StoreListings = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const storeId = pathname.split("/")[1];
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -189,7 +190,11 @@ const StoreListings = () => {
                 </TableRow>
               ) : (
                 products?.map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow 
+                    key={product.id}
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => router.push(`/${storeId}/products/${product.id}`)}
+                  >
                     <TableCell>
                       <div className="flex items-center min-w-0">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg mr-2 sm:mr-3 overflow-hidden flex-shrink-0">
@@ -243,7 +248,7 @@ const StoreListings = () => {
                         {product.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
