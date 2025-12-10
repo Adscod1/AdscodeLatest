@@ -41,6 +41,21 @@ const DeliveryPage = () => {
   const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
   const hasSyncedRef = React.useRef(false);
 
+  // Format number with commas
+  const formatNumberWithCommas = (value: number | string | undefined): string => {
+    if (!value && value !== 0) return "";
+    const numValue = typeof value === "string" ? parseFloat(value) : value;
+    if (isNaN(numValue)) return "";
+    return numValue.toLocaleString("en-US");
+  };
+
+  // Remove commas and convert to number
+  const parseFormattedNumber = (value: string): number => {
+    const cleaned = value.replace(/,/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   const { register, handleSubmit, watch, setValue, reset: resetForm } = useForm<ExtendedDeliveryInput>({
     defaultValues: {
       storeId: storeId as string,
@@ -323,11 +338,14 @@ const DeliveryPage = () => {
                       </span>
                       <Input
                         id="shipping-cost"
-                        {...register("shippingCost", { valueAsNumber: true })}
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
+                        type="text"
+                        placeholder="0"
                         className="pl-12"
+                        value={formatNumberWithCommas(watch("shippingCost"))}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setValue("shippingCost", value);
+                        }}
                       />
                     </div>
                   </div>
