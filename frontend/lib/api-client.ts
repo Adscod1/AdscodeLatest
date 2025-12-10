@@ -306,6 +306,23 @@ export interface Product {
   variations: ProductVariation[];
   images: ProductImage[];
   videos: ProductVideo[];
+  brand?: string;
+  model?: string;
+  condition?: string;
+  warranty?: string;
+  specifications?: string;
+  shippingCost?: number;
+  offerFreeShipping?: boolean;
+  processingTime?: string;
+  shippingMethod?: string;
+  currency?: string;
+  taxRate?: number;
+  productId?: string;
+  stockQuantity?: number;
+  lowStockAlert?: number;
+  trackQuantity?: boolean;
+  continueSellingWhenOutOfStock?: boolean;
+  requiresShipping?: boolean;
   store?: {
     id: string;
     name: string;
@@ -347,12 +364,23 @@ export interface CreateProductInput {
   harmonizedSystemCode?: string;
   processingTime?: string;
   shippingMethod?: string;
+  shippingCost?: number;
   offerFreeShipping?: boolean;
   status?: string;
   storeId: string;
   variations?: ProductVariation[];
   images?: ProductImage[];
   videos?: ProductVideo[];
+  brand?: string;
+  model?: string;
+  condition?: string;
+  warranty?: string;
+  specifications?: string;
+  currency?: string;
+  taxRate?: number;
+  productId?: string;
+  stockQuantity?: number;
+  lowStockAlert?: number;
 }
 
 export interface ProductQueryParams {

@@ -189,40 +189,59 @@ model StoreHighlight {
 }
 
 model Product {
-  id                   String             @id @default(uuid())
-  title                String
-  description          String?            @db.Text
-  category             String?
-  vendor               String?
-  tags                 String?
-  price                Float
-  comparePrice         Float?
-  costPerItem          Float?
-  weight               Float?
-  weightUnit           String?
-  length               Float?
-  width                Float?
-  height               Float?
-  sizeUnit             String?
-  countryOfOrigin      String?
-  harmonizedSystemCode String?
-  status               String             @default("DRAFT")
-  storeId              String
-  views                Int                @default(0)
-  benefitsIntroText    String?            @db.Text
-  benefitsSectionImage String?
-  howToUseVideo        String?
-  howToUseDescription  String?            @db.Text
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  store                Store              @relation(fields: [storeId], references: [id])
-  images               ProductImage[]
-  variations           ProductVariation[]
-  videos               ProductVideo[]
-  comments             Comment[]
-  benefitItems         ProductBenefit[]
-  ingredientItems      ProductIngredient[]
-  faqItems             ProductFaq[]
+  id                            String              @id @default(uuid())
+  title                         String
+  description                   String?             @db.Text
+  category                      String?
+  vendor                        String?
+  tags                          String?
+  price                         Float
+  comparePrice                  Float?
+  costPerItem                   Float?
+  weight                        Float?
+  weightUnit                    String?
+  length                        Float?
+  width                         Float?
+  height                        Float?
+  sizeUnit                      String?
+  countryOfOrigin               String?
+  harmonizedSystemCode          String?
+  status                        String              @default("DRAFT")
+  storeId                       String
+  views                         Int                 @default(0)
+  benefitsIntroText             String?             @db.Text
+  benefitsSectionImage          String?
+  howToUseVideo                 String?
+  howToUseDescription           String?             @db.Text
+  brand                         String?
+  model                         String?
+  condition                     String?
+  warranty                      String?
+  specifications                String?             @db.Text
+  shippingCost                  Float?
+  offerFreeShipping             Boolean?            @default(false)
+  processingTime                String?
+  shippingMethod                String?
+  currency                      String?
+  taxRate                       Float?
+  sku                           String?
+  barcode                       String?
+  productId                     String?
+  stockQuantity                 Int?
+  lowStockAlert                 Int?
+  trackQuantity                 Boolean?            @default(false)
+  continueSellingWhenOutOfStock Boolean?            @default(false)
+  requiresShipping              Boolean?            @default(true)
+  createdAt                     DateTime            @default(now())
+  updatedAt                     DateTime            @updatedAt
+  store                         Store               @relation(fields: [storeId], references: [id])
+  images                        ProductImage[]
+  variations                    ProductVariation[]
+  videos                        ProductVideo[]
+  comments                      Comment[]
+  benefitItems                  ProductBenefit[]
+  ingredientItems               ProductIngredient[]
+  faqItems                      ProductFaq[]
 
   @@index([storeId], map: "product_storeId_fkey")
   @@map("product")

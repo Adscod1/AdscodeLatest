@@ -128,3 +128,8 @@ npx prisma migrate reset --force
 
 cd backend && npx prisma migrate dev --name 
 npx prisma db push
+
+
+cd backend && npx prisma migrate dev --name add_product_extended_fields
+
+npx prisma db push

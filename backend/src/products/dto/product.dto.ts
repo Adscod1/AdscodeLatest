@@ -226,6 +226,100 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => ProductFaqDto)
   faqItems?: ProductFaqDto[];
+
+  @ApiPropertyOptional({ description: 'Product brand' })
+  @IsString()
+  @IsOptional()
+  brand?: string;
+
+  @ApiPropertyOptional({ description: 'Product model' })
+  @IsString()
+  @IsOptional()
+  model?: string;
+
+  @ApiPropertyOptional({ description: 'Product condition (new, used, refurbished, etc.)' })
+  @IsString()
+  @IsOptional()
+  condition?: string;
+
+  @ApiPropertyOptional({ description: 'Warranty information' })
+  @IsString()
+  @IsOptional()
+  warranty?: string;
+
+  @ApiPropertyOptional({ description: 'Product specifications' })
+  @IsString()
+  @IsOptional()
+  specifications?: string;
+
+  @ApiPropertyOptional({ description: 'Shipping cost' })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  shippingCost?: number;
+
+  @ApiPropertyOptional({ description: 'Offer free shipping' })
+  @IsOptional()
+  offerFreeShipping?: boolean;
+
+  @ApiPropertyOptional({ description: 'Processing time' })
+  @IsString()
+  @IsOptional()
+  processingTime?: string;
+
+  @ApiPropertyOptional({ description: 'Shipping method' })
+  @IsString()
+  @IsOptional()
+  shippingMethod?: string;
+
+  @ApiPropertyOptional({ description: 'Currency code' })
+  @IsString()
+  @IsOptional()
+  currency?: string;
+
+  @ApiPropertyOptional({ description: 'Tax rate' })
+  @IsNumber()
+  @IsOptional()
+  taxRate?: number;
+
+  @ApiPropertyOptional({ description: 'SKU' })
+  @IsString()
+  @IsOptional()
+  sku?: string;
+
+  @ApiPropertyOptional({ description: 'Barcode' })
+  @IsString()
+  @IsOptional()
+  barcode?: string;
+
+  @ApiPropertyOptional({ description: 'Product ID (generated)' })
+  @IsString()
+  @IsOptional()
+  productId?: string;
+
+  @ApiPropertyOptional({ description: 'Stock quantity' })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  stockQuantity?: number;
+
+  @ApiPropertyOptional({ description: 'Low stock alert threshold' })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  lowStockAlert?: number;
+
+  @ApiPropertyOptional({ description: 'Track quantity' })
+  @IsOptional()
+  trackQuantity?: boolean;
+
+  @ApiPropertyOptional({ description: 'Continue selling when out of stock' })
+  @IsOptional()
+  continueSellingWhenOutOfStock?: boolean;
+
+  @ApiPropertyOptional({ description: 'Requires shipping' })
+  @IsOptional()
+  requiresShipping?: boolean;
 }
 
 export class UpdateProductDto extends CreateProductDto {}
