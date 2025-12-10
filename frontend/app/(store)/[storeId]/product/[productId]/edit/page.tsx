@@ -52,6 +52,21 @@ const EditProductPage = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  // Format number with commas
+  const formatNumberWithCommas = (value: number | string | undefined): string => {
+    if (!value && value !== 0) return "";
+    const numValue = typeof value === "string" ? parseFloat(value) : value;
+    if (isNaN(numValue)) return "";
+    return numValue.toLocaleString("en-US");
+  };
+
+  // Remove commas and convert to number
+  const parseFormattedNumber = (value: string): number => {
+    const cleaned = value.replace(/,/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   // Fetch product data
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", productId],
@@ -61,7 +76,7 @@ const EditProductPage = () => {
     },
   });
 
-  const { register, handleSubmit, setValue } = useForm<FormData>({
+  const { register, handleSubmit, setValue, watch } = useForm<FormData>({
     defaultValues: {
       title: "",
       description: "",
@@ -116,6 +131,10 @@ const EditProductPage = () => {
       stock: v.stock ?? 0,
     }));
 
+    // Strip out id and productId from images and videos
+    const cleanImages = product?.images?.map(img => ({ url: img.url })) || [];
+    const cleanVideos = product?.videos?.map(vid => ({ url: vid.url })) || [];
+
     updateProductMutation.mutate({
       ...data,
       storeId: storeId as string,
@@ -123,10 +142,10 @@ const EditProductPage = () => {
       price: Number(data.price),
       comparePrice: data.comparePrice ? Number(data.comparePrice) : undefined,
       costPerItem: data.costPerItem ? Number(data.costPerItem) : undefined,
-      // Keep existing relations if not modified
+      // Keep existing relations if not modified - strip id/productId fields
       variations: transformedVariations,
-      images: product?.images,
-      videos: product?.videos,
+      images: cleanImages,
+      videos: cleanVideos,
     });
   };
 
@@ -232,27 +251,39 @@ const EditProductPage = () => {
                       <Label htmlFor="price">Price</Label>
                       <Input
                         id="price"
-                        type="number"
-                        {...register("price", { required: true })}
+                        type="text"
                         placeholder="0.00"
+                        value={formatNumberWithCommas(watch("price"))}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setValue("price", value);
+                        }}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="comparePrice">Compare-at price</Label>
                       <Input
                         id="comparePrice"
-                        type="number"
-                        {...register("comparePrice")}
+                        type="text"
                         placeholder="0.00"
+                        value={formatNumberWithCommas(watch("comparePrice"))}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setValue("comparePrice", value);
+                        }}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="costPerItem">Cost per item</Label>
                       <Input
                         id="costPerItem"
-                        type="number"
-                        {...register("costPerItem")}
+                        type="text"
                         placeholder="0.00"
+                        value={formatNumberWithCommas(watch("costPerItem"))}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setValue("costPerItem", value);
+                        }}
                       />
                     </div>
                   </div>
