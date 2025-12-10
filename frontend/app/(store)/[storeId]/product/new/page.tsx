@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import ProductStatusCard from "../components/product-status-card";
 import { useProductStore } from "@/store/use-product-store";
 import { FileUpload } from "@/components/ui/file-upload";
 import { X } from "lucide-react";
@@ -603,82 +604,19 @@ const CreateNewProduct = () => {
             </Card>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar - reuse ProductStatusCard from publishing */}
           <div className="w-full lg:w-80 order-first lg:order-last">
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Status</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                      value={watch("status") || "DRAFT"}
-                      onValueChange={(value) => {
-                        setValue("status", value);
-                        updateProduct({ status: value });
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="DRAFT">Draft</SelectItem>
-                        <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="ARCHIVED">Archived</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      This product will be available to 2 sale channels
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">
-                      Sale channels and Apps
-                    </h3>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="all"
-                          checked={allChannelsSelected}
-                          ref={el => {
-                            if (el && someChannelsSelected && !allChannelsSelected) {
-                              el.indeterminate = true;
-                            }
-                          }}
-                          onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
-                        />
-                        <Label htmlFor="all">Select all</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="online-store"
-                          checked={saleChannels.onlineStore}
-                          onCheckedChange={(checked) => handleChannelChange('onlineStore', checked as boolean)}
-                        />
-                        <Label htmlFor="online-store">Online Store</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="buy-button"
-                          checked={saleChannels.buyButton}
-                          onCheckedChange={(checked) => handleChannelChange('buyButton', checked as boolean)}
-                        />
-                        <Label htmlFor="buy-button">Buy Button</Label>
-                      </div>
-                    </div>
-                    <Button
-                      variant="link"
-                      className="text-pink-500 mt-2 h-auto p-0"
-                    >
-                      Schedule availability
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ProductStatusCard
+              product={product}
+              statusValue={watch("status")}
+              onStatusChange={(value: string) => {
+                setValue("status", value);
+                updateProduct({ status: value });
+              }}
+              updateProduct={updateProduct}
+              showScheduleButton={false}
+              onOpenSchedule={() => {}}
+            />
           </div>
         </div>
       </div>

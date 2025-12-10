@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -20,6 +21,8 @@ import { ReviewsModule } from './reviews/reviews.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    // Scheduler for cron jobs
+    ScheduleModule.forRoot(),
     // Database
     PrismaModule,
     // Feature modules

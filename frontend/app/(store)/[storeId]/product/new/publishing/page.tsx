@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/table";
 import { useProductStore } from "@/store/use-product-store";
 import { useParams } from "next/navigation";
+import { ScheduleAvailabilityModal } from "../../components/schedule-availability-modal";
+import ProductStatusCard from "../../components/product-status-card";
 
 const getCategoryLabel = (categoryValue: string): string => {
   const categoryMap: Record<string, string> = {
@@ -94,7 +96,8 @@ const getCategoryLabel = (categoryValue: string): string => {
 const NewProductPublishingPage = () => {
   const router = useRouter();
   const { storeId } = useParams();
-  const { product, reset, _hasHydrated } = useProductStore();
+  const { product, updateProduct, reset, _hasHydrated } = useProductStore();
+  const [showScheduleModal, setShowScheduleModal] = React.useState(false);
 
   // Get currency symbol based on selected currency
   const getCurrencySymbol = (currency?: string): string => {
@@ -141,6 +144,22 @@ const NewProductPublishingPage = () => {
     },
   });
 
+  const handleScheduleSave = (data: {
+    scheduledPublishDate?: Date | null;
+    scheduledUnpublishDate?: Date | null;
+    isScheduled: boolean;
+  }) => {
+    updateProduct({
+      scheduledPublishDate: data.scheduledPublishDate || undefined,
+      scheduledUnpublishDate: data.scheduledUnpublishDate || undefined,
+      isScheduled: data.isScheduled,
+    } as Partial<CreateProductInput>);
+    
+    if (data.isScheduled && (data.scheduledPublishDate || data.scheduledUnpublishDate)) {
+      toast.success("Product availability scheduled successfully");
+    }
+  };
+
   const onSubmit = (data: CreateProductInput) => {
     // Validate required fields
     if (!product.title || !product.title.trim()) {
@@ -184,6 +203,10 @@ const NewProductPublishingPage = () => {
       harmonizedSystemCode: product.harmonizedSystemCode || data.harmonizedSystemCode || undefined,
       weightUnit: product.weightUnit || data.weightUnit || undefined,
       sizeUnit: product.sizeUnit || data.sizeUnit || undefined,
+      // Schedule fields
+      scheduledPublishDate: (product as any).scheduledPublishDate || undefined,
+      scheduledUnpublishDate: (product as any).scheduledUnpublishDate || undefined,
+      isScheduled: (product as any).isScheduled || false,
       // Sanitize variations to only include allowed fields (name, value, price, stock)
       variations:
         product.variations?.map((v) => ({
@@ -495,11 +518,32 @@ const NewProductPublishingPage = () => {
                       </div>
                     </div>
                     <Button
+                      type="button"
                       variant="link"
                       className="text-pink-500 mt-2 h-auto p-0"
+                      onClick={() => setShowScheduleModal(true)}
                     >
                       Schedule availability
                     </Button>
+                    
+                    {/* Show scheduled info if exists */}
+                    {(product as any).isScheduled && ((product as any).scheduledPublishDate || (product as any).scheduledUnpublishDate) && (
+                      <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p className="text-xs text-blue-800">
+                          <strong>Scheduled:</strong>
+                          {(product as any).scheduledPublishDate && (
+                            <span className="block mt-1">
+                              Publish: {new Date((product as any).scheduledPublishDate).toLocaleString()}
+                            </span>
+                          )}
+                          {(product as any).scheduledUnpublishDate && (
+                            <span className="block mt-1">
+                              Unpublish: {new Date((product as any).scheduledUnpublishDate).toLocaleString()}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -507,6 +551,16 @@ const NewProductPublishingPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Schedule Availability Modal */}
+      <ScheduleAvailabilityModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSave={handleScheduleSave}
+        initialPublishDate={(product as any).scheduledPublishDate ? new Date((product as any).scheduledPublishDate) : null}
+        initialUnpublishDate={(product as any).scheduledUnpublishDate ? new Date((product as any).scheduledUnpublishDate) : null}
+        initialIsScheduled={(product as any).isScheduled || false}
+      />
     </div>
   );
 };

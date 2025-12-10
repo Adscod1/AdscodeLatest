@@ -133,3 +133,10 @@ npx prisma db push
 cd backend && npx prisma migrate dev --name add_product_extended_fields
 
 npx prisma db push
+
+cd backend && npx prisma db push
+npx prisma generate
+
+cd backend && npx prisma generate
+npx prisma generate
+npx prisma db push

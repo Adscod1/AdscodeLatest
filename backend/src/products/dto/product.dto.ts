@@ -320,6 +320,18 @@ export class CreateProductDto {
   @ApiPropertyOptional({ description: 'Requires shipping' })
   @IsOptional()
   requiresShipping?: boolean;
+
+  @ApiPropertyOptional({ description: 'Scheduled publish date' })
+  @IsOptional()
+  scheduledPublishDate?: Date;
+
+  @ApiPropertyOptional({ description: 'Scheduled unpublish date' })
+  @IsOptional()
+  scheduledUnpublishDate?: Date;
+
+  @ApiPropertyOptional({ description: 'Is product scheduled' })
+  @IsOptional()
+  isScheduled?: boolean;
 }
 
 export class UpdateProductDto extends CreateProductDto {}

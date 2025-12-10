@@ -232,6 +232,9 @@ model Product {
   trackQuantity                 Boolean?            @default(false)
   continueSellingWhenOutOfStock Boolean?            @default(false)
   requiresShipping              Boolean?            @default(true)
+  scheduledPublishDate          DateTime?
+  scheduledUnpublishDate        DateTime?
+  isScheduled                   Boolean?            @default(false)
   createdAt                     DateTime            @default(now())
   updatedAt                     DateTime            @updatedAt
   store                         Store               @relation(fields: [storeId], references: [id])

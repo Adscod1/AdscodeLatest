@@ -323,6 +323,9 @@ export interface Product {
   trackQuantity?: boolean;
   continueSellingWhenOutOfStock?: boolean;
   requiresShipping?: boolean;
+  scheduledPublishDate?: string;
+  scheduledUnpublishDate?: string;
+  isScheduled?: boolean;
   store?: {
     id: string;
     name: string;
@@ -381,6 +384,9 @@ export interface CreateProductInput {
   productId?: string;
   stockQuantity?: number;
   lowStockAlert?: number;
+  scheduledPublishDate?: Date | string;
+  scheduledUnpublishDate?: Date | string;
+  isScheduled?: boolean;
 }
 
 export interface ProductQueryParams {
