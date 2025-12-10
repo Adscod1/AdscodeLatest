@@ -366,50 +366,46 @@ const NewProductPublishingPage = () => {
                 {/* Sale Information */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-medium">Sale information</h3>
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                        <div>
-                          <Label>Price</Label>
-                          <div className="text-lg font-medium">
-                            {currencySymbol} {product.price?.toFixed(2) || "0.00"}
-                          </div>
-                        </div>
-                        <div>
-                          <Label>Compare-at price</Label>
-                          <div className="text-lg font-medium">
-                            {currencySymbol} {product.comparePrice?.toFixed(2) || "0.00"}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                        <div>
-                          <Label>Profit</Label>
-                          <div className="text-lg font-medium">
-                            ${" "}
-                            {(
-                              (product.price || 0) - (product.costPerItem || 0)
-                            ).toFixed(2)}
-                          </div>
-                        </div>
-                        <div>
-                          <Label>Margin</Label>
-                          <div className="text-lg font-medium">
-                            {(
-                              (((product.price || 0) -
-                                (product.costPerItem || 0)) /
-                                (product.price || 1)) *
-                              100
-                            ).toFixed(0)}
-                            %
-                          </div>
-                        </div>
-                      </div>
+                  
+                  {/* Price Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Price Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-sm text-gray-600 font-medium mb-2">Price</p>
+                      <p className="text-2xl font-bold text-blue-900">
+                        {currencySymbol} {product.price?.toFixed(2) || "0.00"}
+                      </p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="tax" defaultChecked />
-                      <Label htmlFor="tax">Charge tax on this product</Label>
+
+                    {/* Compare-at Price Card */}
+                    <div className="bg-gradient-to-br from-amber-50 to-amber-50 border border-amber-200 rounded-lg p-4">
+                      <p className="text-sm text-gray-600 font-medium mb-2">Compare-at price</p>
+                      <p className="text-2xl font-bold text-amber-900">
+                        {currencySymbol} {product.comparePrice?.toFixed(2) || "0.00"}
+                      </p>
                     </div>
+
+                    {/* Profit Card */}
+                    <div className="bg-gradient-to-br from-green-50 to-green-50 border border-green-200 rounded-lg p-4">
+                      <p className="text-sm text-gray-600 font-medium mb-2">Profit</p>
+                      <p className="text-2xl font-bold text-green-900">
+                        $ {((product.price || 0) - (product.costPerItem || 0)).toFixed(2)}
+                      </p>
+                    </div>
+
+                    {/* Margin Card */}
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-50 border border-purple-200 rounded-lg p-4">
+                      <p className="text-sm text-gray-600 font-medium mb-2">Margin</p>
+                      <p className="text-2xl font-bold text-purple-900">
+                        {((((product.price || 0) - (product.costPerItem || 0)) / (product.price || 1)) * 100).toFixed(0)}%
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tax Checkbox */}
+                  <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <Checkbox id="tax" defaultChecked />
+                    <Label htmlFor="tax" className="font-medium cursor-pointer">Charge tax on this product</Label>
                   </div>
 
                   {/* Variations Table */}
