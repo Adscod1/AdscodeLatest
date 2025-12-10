@@ -93,6 +93,10 @@ const getCategoryLabel = (categoryValue: string): string => {
   return categoryMap[categoryValue] || categoryValue;
 };
 
+const formatNumberWithCommas = (value: number): string => {
+  return value.toLocaleString("en-US");
+};
+
 const NewProductPublishingPage = () => {
   const router = useRouter();
   const { storeId } = useParams();
@@ -373,7 +377,7 @@ const NewProductPublishingPage = () => {
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <p className="text-sm text-gray-600 font-medium mb-2">Price</p>
                       <p className="text-lg font-bold text-gray-900">
-                        {currencySymbol} {product.price?.toFixed(2) || "0.00"}
+                        {currencySymbol} {formatNumberWithCommas(product.price || 0)}
                       </p>
                     </div>
 
@@ -381,7 +385,7 @@ const NewProductPublishingPage = () => {
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <p className="text-sm text-gray-600 font-medium mb-2">Compare-at price</p>
                       <p className="text-lg font-bold text-gray-900">
-                        {currencySymbol} {product.comparePrice?.toFixed(2) || "0.00"}
+                        {currencySymbol} {formatNumberWithCommas(product.comparePrice || 0)}
                       </p>
                     </div>
 
@@ -389,7 +393,7 @@ const NewProductPublishingPage = () => {
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <p className="text-sm text-gray-600 font-medium mb-2">Profit</p>
                       <p className="text-lg font-bold text-gray-900">
-                        $ {((product.price || 0) - (product.costPerItem || 0)).toFixed(2)}
+                        {currencySymbol} {formatNumberWithCommas((product.price || 0) - (product.costPerItem || 0))}
                       </p>
                     </div>
 
@@ -421,7 +425,7 @@ const NewProductPublishingPage = () => {
                       {product.variations?.map((variation, index) => (
                         <TableRow key={index}>
                           <TableCell>{variation.value}</TableCell>
-                          <TableCell>{currencySymbol} {(variation.price ?? 0).toFixed(2)}</TableCell>
+                          <TableCell>{currencySymbol} {formatNumberWithCommas(variation.price ?? 0)}</TableCell>
                           <TableCell>{variation.stock ?? 0}</TableCell>
                         </TableRow>
                       ))}
