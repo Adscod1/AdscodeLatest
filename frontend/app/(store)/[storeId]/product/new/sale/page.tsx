@@ -77,6 +77,21 @@ const NewProductSaleInformation = () => {
     productIdRef.current = generateProductId();
   }
 
+  // Format number with commas
+  const formatNumberWithCommas = (value: number | string | undefined): string => {
+    if (!value && value !== 0) return "";
+    const numValue = typeof value === "string" ? parseFloat(value) : value;
+    if (isNaN(numValue)) return "";
+    return numValue.toLocaleString("en-US");
+  };
+
+  // Remove commas and convert to number
+  const parseFormattedNumber = (value: string): number => {
+    const cleaned = value.replace(/,/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   const { register, control, watch, handleSubmit, setValue, reset: resetForm } =
     useForm<ExtendedProductInput>({
       defaultValues: {
@@ -314,11 +329,14 @@ const NewProductSaleInformation = () => {
                       </span>
                       <Input
                         id="price"
-                        {...register("price", { valueAsNumber: true })}
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
+                        type="text"
+                        placeholder="0"
                         className="pl-12"
+                        value={formatNumberWithCommas(watch("price"))}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setValue("price", value);
+                        }}
                       />
                     </div>
                   </div>
@@ -330,11 +348,14 @@ const NewProductSaleInformation = () => {
                       </span>
                       <Input
                         id="comparePrice"
-                        {...register("comparePrice", { valueAsNumber: true })}
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
+                        type="text"
+                        placeholder="0"
                         className="pl-12"
+                        value={formatNumberWithCommas(watch("comparePrice"))}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setValue("comparePrice", value);
+                        }}
                       />
                     </div>
                     <p className="text-xs text-gray-500">
@@ -559,12 +580,13 @@ const NewProductSaleInformation = () => {
                                         {currencySymbol}
                                       </span>
                                       <Input
-                                        {...register(`variations.${index}.price`, {
-                                          valueAsNumber: true,
-                                        })}
-                                        type="number"
-                                        step="0.01"
+                                        type="text"
                                         className="pl-12"
+                                        value={formatNumberWithCommas(watch(`variations.${index}.price`))}
+                                        onChange={(e) => {
+                                          const value = parseFormattedNumber(e.target.value);
+                                          setValue(`variations.${index}.price`, value);
+                                        }}
                                       />
                                     </div>
                                   </div>
