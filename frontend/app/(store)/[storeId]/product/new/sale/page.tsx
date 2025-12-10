@@ -112,7 +112,7 @@ const NewProductSaleInformation = () => {
       resetForm({
         ...product,
         storeId: storeId as string,
-        productId: storedProductId,
+        productId: storedProductId ?? undefined,
         stockQuantity: (product as ExtendedProductInput).stockQuantity || 0,
         lowStockAlert: (product as ExtendedProductInput).lowStockAlert || 5,
         currency: (product as ExtendedProductInput).currency || "UGX - Ugandan Shilling",
@@ -380,7 +380,7 @@ const NewProductSaleInformation = () => {
                         variant="outline"
                         size="icon"
                         onClick={() => {
-                          navigator.clipboard.writeText(productIdRef.current);
+                          navigator.clipboard.writeText(productIdRef.current ?? "");
                           setCopied(true);
                           setTimeout(() => setCopied(false), 2000);
                         }}
@@ -508,12 +508,7 @@ const NewProductSaleInformation = () => {
                                 <ChevronRight className="w-4 h-4 text-gray-500" />
                               )}
                               <Checkbox 
-                                checked={isGroupFullySelected(items)}
-                                ref={el => {
-                                  if (el && isGroupPartiallySelected(items)) {
-                                    el.indeterminate = true;
-                                  }
-                                }}
+                                checked={isGroupFullySelected(items) ? true : isGroupPartiallySelected(items) ? "indeterminate" : false}
                                 onClick={(e) => e.stopPropagation()}
                                 onCheckedChange={(checked) => {
                                   handleGroupCheckboxChange(variantName, items, checked as boolean);
