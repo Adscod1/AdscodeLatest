@@ -20,7 +20,8 @@ import {
   UserPlus,
   Upload,
   ImageIcon,
-  MessageCircle
+  MessageCircle,
+  ThumbsUp
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -121,7 +122,7 @@ const WriteReviewPage = () => {
     try {
       console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
 
-      const data = await api.upload.uploadMedia(file);
+      const data = await api.upload.uploadReviewMedia(file);
 
       console.log('Upload successful:', data);
       return data.url;
@@ -315,13 +316,30 @@ const WriteReviewPage = () => {
     try {
       console.log('Submitting review:', { storeId, rating, reviewTitle, comment: comment.substring(0, 50) + '...' });
       
-      const reviewData = {
+      // Filter out any null values from upload arrays
+      const validImageUrls = uploadedImageUrls.filter(url => url !== null && url !== undefined);
+      const validVideoUrls = uploadedVideoUrls.filter(url => url !== null && url !== undefined);
+      
+      const reviewData: {
+        storeId: string;
+        rating: number;
+        comment: string;
+        images?: string;
+        videos?: string;
+      } = {
         storeId,
         rating,
         comment: `**${reviewTitle.trim()}**\n\n${comment.trim()}`,
-        images: uploadedImageUrls.length > 0 ? JSON.stringify(uploadedImageUrls) : undefined,
-        videos: uploadedVideoUrls.length > 0 ? JSON.stringify(uploadedVideoUrls) : undefined,
       };
+      
+      // Only add images/videos if we have valid URLs
+      if (validImageUrls.length > 0) {
+        reviewData.images = JSON.stringify(validImageUrls);
+      }
+      
+      if (validVideoUrls.length > 0) {
+        reviewData.videos = JSON.stringify(validVideoUrls);
+      }
       
       console.log('Review data with media:', reviewData);
       
@@ -350,6 +368,13 @@ const WriteReviewPage = () => {
       
     } catch (error) {
       console.error("Error submitting review:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        });
+      }
       toast.error(`Failed to submit review: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
@@ -475,6 +500,7 @@ const WriteReviewPage = () => {
                         </g>
                       </g>
                     </svg>
+                    <span className="text-gray-500">@username</span>
                   </div>
                   {store.tagline && (
                     <p className="text-xs sm:text-sm text-gray-500 truncate">{store.tagline}</p>
@@ -819,9 +845,32 @@ const WriteReviewPage = () => {
                           <span className="text-sm sm:text-base font-medium text-gray-900 break-words">
                             {review.user.name || "Anonymous User"}
                           </span>
-                          <Badge variant="outline" className="text-xs flex-shrink-0">
-                            Verified
-                          </Badge>
+                          <svg 
+                            className="w-3.5 h-3.5 flex-shrink-0 " 
+                            viewBox="0,0,256,256"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g 
+                              fill="#22c55E" 
+                              fillRule="nonzero" 
+                              stroke="none" 
+                              strokeWidth="1" 
+                              strokeLinecap="butt" 
+                              strokeLinejoin="miter" 
+                              strokeMiterlimit="10" 
+                              strokeDasharray="" 
+                              strokeDashoffset="0" 
+                              fontFamily="none" 
+                              fontWeight="normal" 
+                              fontSize="none" 
+                              textAnchor="inherit" 
+                              style={{mixBlendMode: 'normal'}}
+                            >
+                              <g transform="scale(8.53333,8.53333)">
+                                <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                              </g>
+                            </g>
+                          </svg>
                           <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0">
                             {new Date(review.createdAt).toLocaleDateString()}
                           </span>
@@ -924,7 +973,7 @@ const WriteReviewPage = () => {
               
               <div className="space-y-4">
                 {reviews?.slice(0, 10).map((review) => (
-                  <div key={review.id} className="border-b border-gray-100 pb-4 last:border-b-0">
+                  <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0">
                     {/* Review Header */}
                     <div className="flex items-start gap-2 sm:gap-3 mb-2">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -937,7 +986,7 @@ const WriteReviewPage = () => {
                             className="w-full h-full object-cover rounded-full"
                           />
                         ) : (
-                          <span className="text-xs sm:text-sm font-bold text-white">
+                          <span className="text-lg  sm:text-sm font-bold text-white">
                             {(review.user.name || "U").charAt(0)}
                           </span>
                         )}
@@ -945,18 +994,49 @@ const WriteReviewPage = () => {
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-xs sm:text-sm text-gray-900">
+                          <span className=" text-gray-900 text-xl font-bold">
                             {review.user.name || "Anonymous"}
                           </span>
-                          <Badge variant="outline" className="text-xs px-1.5 py-0">✓</Badge>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-gray-500 text-sm">@username</span>
+                          
+                        
+                          <svg 
+                            className="w-3.5 h-3.5 flex-shrink-0 " 
+                            viewBox="0,0,256,256"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g 
+                              fill="#22c55E" 
+                              fillRule="nonzero" 
+                              stroke="none" 
+                              strokeWidth="1" 
+                              strokeLinecap="butt" 
+                              strokeLinejoin="miter" 
+                              strokeMiterlimit="10" 
+                              strokeDasharray="" 
+                              strokeDashoffset="0" 
+                              fontFamily="none" 
+                              fontWeight="normal" 
+                              fontSize="none" 
+                              textAnchor="inherit" 
+                              style={{mixBlendMode: 'normal'}}
+                            >
+                              <g transform="scale(8.53333,8.53333)">
+                                <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                              </g>
+                            </g>
+                          </svg>
+                         
+                          <span className="text-gray-500 text-xs">
                             {new Date(review.createdAt).toLocaleTimeString('en-US', { 
                               hour: '2-digit', 
                               minute: '2-digit',
-                              hour12: false 
+                              hour12: true 
+
                             })}
                           </span>
                         </div>
+                        
                         
                         {/* Star Rating */}
                         <div className="flex items-center gap-0.5 mb-2">
@@ -978,7 +1058,7 @@ const WriteReviewPage = () => {
                           return (
                             <div className="mb-3 grid grid-cols-2 gap-2">
                               {imageUrls.slice(0, 4).map((url: string, idx: number) => (
-                                <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
+                                <div key={idx} className="relative w-60 h-40 rounded overflow-hidden border border-gray-100">
                                   <Image
                                     src={url}
                                     alt={`Review image ${idx + 1}`}
@@ -1002,13 +1082,16 @@ const WriteReviewPage = () => {
                     })()}
 
                     {/* Reply Button and Count */}
-                    <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-4 mt-2 ml-3">
+                      <ThumbsUp className="w-3.5 h-3.5 text-gray-500" />
+
                       <button
                         onClick={() => handleReplyClick(review.id)}
                         className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors text-xs"
                       >
-                        <MessageCircle className="w-3.5 h-3.5" />
+                        
                         <span>Reply</span>
+                        <span>(20)</span>
                       </button>
                       
                       {replies[review.id] && replies[review.id].length > 0 && (
@@ -1027,7 +1110,7 @@ const WriteReviewPage = () => {
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             placeholder="Write a reply..."
-                            className="w-full p-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            className="w-full p-2 border border-gray-200 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                             rows={3}
                           />
                           {/* Emoji Toolbar */}
@@ -1041,23 +1124,12 @@ const WriteReviewPage = () => {
                               <button type="button" className="hover:scale-110 transition-transform">🔥</button>
                             </div>
                             <div className="flex gap-2">
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => {
-                                  setReplyingTo(null);
-                                  setReplyText("");
-                                }}
-                                className="text-gray-600 h-7 text-xs px-2"
-                              >
-                                Cancel
-                              </Button>
+                              
                               <Button
                                 type="button"
                                 size="sm"
                                 onClick={() => handleReplySubmit(review.id)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white h-7 text-xs px-3"
+                                className="bg-blue-500 rounded hover:bg-blue-700 text-white h-7 text-xs px-3"
                               >
                                 Post
                               </Button>
@@ -1083,27 +1155,54 @@ const WriteReviewPage = () => {
                                   <span className="font-semibold text-gray-900 text-xs">
                                     {reply.user}
                                   </span>
-                                  {reply.user === store?.name && (
-                                    <Badge className="bg-blue-500 text-white text-xs px-2 py-0 h-4">Author</Badge>
-                                  )}
+                                  <svg 
+                                    className="w-3.5 h-3.5 flex-shrink-0" 
+                                    viewBox="0,0,256,256"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <g 
+                                      fill="#22c55E" 
+                                      fillRule="nonzero" 
+                                      stroke="none" 
+                                      strokeWidth="1" 
+                                      strokeLinecap="butt" 
+                                      strokeLinejoin="miter" 
+                                      strokeMiterlimit="10" 
+                                      strokeDasharray="" 
+                                      strokeDashoffset="0" 
+                                      fontFamily="none" 
+                                      fontWeight="normal" 
+                                      fontSize="none" 
+                                      textAnchor="inherit" 
+                                      style={{mixBlendMode: 'normal'}}
+                                    >
+                                      <g transform="scale(8.53333,8.53333)">
+                                        <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                                      </g>
+                                    </g>
+                                  </svg>
+                                  <Badge className="bg-blue-500 text-white rounded-full text-xs p-4 px-2 py-0 h-4">Author</Badge>
                                   <span className="text-xs text-gray-500">
                                     {new Date(reply.date).toLocaleTimeString('en-US', { 
                                       hour: '2-digit', 
                                       minute: '2-digit',
-                                      hour12: false 
+                                      hour12: true
                                     })}
                                   </span>
                                 </div>
                                 <p className="text-xs text-gray-700">{reply.text}</p>
                                 
                                 {/* Reply to reply button */}
+                                <div className="flex items-center gap-4 mt-2">
+                                 <ThumbsUp className="w-3.5 h-3.5 text-gray-500" />
                                 <button 
                                   type="button"
                                   className="flex items-center gap-1 text-gray-500 hover:text-blue-600 mt-1 text-xs"
                                 >
-                                  <MessageCircle className="w-3 h-3" />
+                                  
                                   <span>Reply</span>
                                 </button>
+                                </div>
                               </div>
                             </div>
                           </div>

@@ -14,6 +14,8 @@ export class ReviewsService {
    * Create a store review
    */
   async create(userId: string, data: CreateReviewDto) {
+    console.log('Service received data:', JSON.stringify(data, null, 2));
+    
     // Verify store exists
     const store = await this.prisma.store.findUnique({
       where: { id: data.storeId },
@@ -23,17 +25,14 @@ export class ReviewsService {
       throw new NotFoundException('Store not found');
     }
 
-    // Check if user already reviewed this store
-    const existingReview = await this.prisma.storeReview.findFirst({
-      where: {
-        storeId: data.storeId,
-        userId: userId,
-      },
+    console.log('Creating review with data:', {
+      rating: data.rating,
+      comment: data.comment,
+      images: data.images,
+      videos: data.videos,
+      userId,
+      storeId: data.storeId,
     });
-
-    if (existingReview) {
-      throw new BadRequestException('You have already reviewed this store');
-    }
 
     const review = await this.prisma.storeReview.create({
       data: {

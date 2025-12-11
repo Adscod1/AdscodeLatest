@@ -37,6 +37,8 @@ export class ReviewsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Store not found' })
   async create(@UserId() userId: string, @Body() data: CreateReviewDto) {
+    console.log('Received review data:', JSON.stringify(data, null, 2));
+    console.log('User ID:', userId);
     const review = await this.reviewsService.create(userId, data);
     return {
       success: true,

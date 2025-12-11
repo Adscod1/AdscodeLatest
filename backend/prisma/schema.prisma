@@ -350,7 +350,7 @@ model StoreReview {
   userId    String
   storeId   String
   rating    Int
-  comment   String?
+  comment   String?  @db.Text
   images    String?  @db.Text // JSON array of image URLs
   videos    String?  @db.Text // JSON array of video URLs
   createdAt DateTime @default(now())

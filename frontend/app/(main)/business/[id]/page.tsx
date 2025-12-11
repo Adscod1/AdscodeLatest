@@ -379,7 +379,7 @@ const BusinessPage = () => {
           {/* Top Row: Description + About side by side */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-0 lg:mb-0">
             {/* Description Section */}
-            <div className="flex-1 bg-white shadow-sm overflow-hidden w-full max-h-80">
+            <div className="flex-1 bg-white shadow-sm overflow-hidden w-full max-h-120">
               <div className="p-3 sm:p-4 lg:p-5 w-full">
                 <h3 className="font-semibold text-gray-900 mb-1.5 sm:mb-2 pb-2 border-b border-gray-200 flex items-center text-base sm:text-lg break-words">
                   Description
@@ -492,7 +492,7 @@ const BusinessPage = () => {
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
                   Campaigns
                 </h2>
-                <Link href="#" className="text-blue-600 hover:text-blue-700 flex items-center text-sm sm:text-base">
+                <Link href={`/business/${store?.id}/campaigns`} className="text-blue-600 hover:text-blue-700 flex items-center text-sm sm:text-base">
                   <span className="hidden sm:inline">See all campaigns</span>
                   <span className="sm:hidden">See all</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
@@ -522,7 +522,7 @@ const BusinessPage = () => {
                   <span className="sm:hidden">Products & Services</span>
                 </h2>
                 <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
-                  See all
+                  See all listings
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
@@ -590,7 +590,7 @@ const BusinessPage = () => {
                 Media
                 </h2>
                 <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
-                  <span className="hidden sm:inline">See all Media</span>
+                  <span className="hidden sm:inline">See all media</span>
                   <span className="sm:hidden">See all</span>
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
@@ -657,9 +657,9 @@ const BusinessPage = () => {
                   <div className="grid grid-cols-1 gap-8 mb-8">
                     <div>
                       <div className="mb-4">
-                        <span className="text-sm text-gray-600">Overall rating</span>
+                        <span className="text-sm text-gray-600 font-bold">Overall rating</span>
                         <div className="flex items-center mt-2">
-                          <div className="flex items-center mr-3">
+                          <div className="flex items-center mr-3 ">
                             {[1, 2, 3, 4, 5].map((star) => (
                               <Star 
                                 key={star} 
@@ -903,7 +903,7 @@ const BusinessPage = () => {
           </div>
 
           {/* Right Column - Sidebars Container */}
-          <div className="w-full lg:w-80 flex flex-col gap-8 lg:gap-10 mt-12 lg:mt-0 flex-shrink-0">
+          <div className="w-full  lg:w-80 flex flex-col gap-8 lg:gap-10 mt-12 lg:mt-0 flex-shrink-0">
             {/* Business Hours Sidebar */}
             <div className="bg-white shadow-sm w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
@@ -914,7 +914,7 @@ const BusinessPage = () => {
                   <span className="ml-auto text-xs sm:text-sm">08:30 AM to 05:00 PM</span>
                 </div>
                 
-                <div className="space-y-6 sm:space-y-4 p-3">
+                <div className="space-y-6 sm:space-y-[38px] p-3">
                   {businessHours.map((schedule, index) => (
                     <div key={index} className="flex justify-between text-sm sm:text-sm">
                       <span className={schedule.isOpen ? "text-green-400" : "text-gray-500"}>
