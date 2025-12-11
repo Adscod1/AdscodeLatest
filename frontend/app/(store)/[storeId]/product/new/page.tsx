@@ -150,7 +150,7 @@ const CreateNewProduct = () => {
       images: productImages.map(url => ({ url })),
       videos: productVideos.map(url => ({ url })),
     });
-    router.push(`/${storeId}/product/new/sale`);
+    router.push(`/${storeId}/product/new/specific-information`);
   };
 
   const handleCancel = () => {

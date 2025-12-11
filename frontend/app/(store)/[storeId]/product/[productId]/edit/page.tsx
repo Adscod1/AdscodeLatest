@@ -51,6 +51,7 @@ const EditProductPage = () => {
   const { storeId, productId } = useParams();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = React.useState("Basic Information");
 
   // Format number with commas
   const formatNumberWithCommas = (value: number | string | undefined): string => {
@@ -76,7 +77,7 @@ const EditProductPage = () => {
     },
   });
 
-  const { register, handleSubmit, setValue, watch } = useForm<FormData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       title: "",
       description: "",
@@ -172,12 +173,19 @@ const EditProductPage = () => {
               <span>Back to listings</span>
             </Link>
           </Button>
+          <div className="border-l h-6 border-gray-300"></div>
+          <h1 className="text-xl font-semibold">Edit Product</h1>
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="outline" onClick={() => router.back()}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit(onSubmit)}>Save Changes</Button>
+          <Button 
+            onClick={handleSubmit(onSubmit)}
+            disabled={updateProductMutation.isPending}
+          >
+            {updateProductMutation.isPending ? "Saving..." : "Save Changes"}
+          </Button>
         </div>
       </div>
 
@@ -185,7 +193,7 @@ const EditProductPage = () => {
         <div className="flex gap-8">
           {/* Main Content */}
           <div className="flex-1">
-            <ProductTabs activeTab="Basic Information" />
+            <ProductTabs activeTab="Basic Information" productId={productId as string} />
 
             {/* Basic Information Form */}
             <Card>
@@ -203,14 +211,47 @@ const EditProductPage = () => {
                         {...register("title", { required: true })}
                         placeholder="Product title"
                       />
+                      {errors.title && (
+                        <p className="text-sm text-red-600">Product title is required</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="category">Product category</Label>
-                      <Input
-                        id="category"
-                        {...register("category")}
-                        placeholder="Enter category"
-                      />
+                      <Select
+                        value={watch("category") || ""}
+                        onValueChange={(value) => setValue("category", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="smartphone">Smartphones</SelectItem>
+                          <SelectItem value="laptop">Laptops</SelectItem>
+                          <SelectItem value="tablet">Tablets</SelectItem>
+                          <SelectItem value="desktop">Desktop Computers</SelectItem>
+                          <SelectItem value="accessory">Electronics Accessories</SelectItem>
+                          <SelectItem value="camera">Cameras</SelectItem>
+                          <SelectItem value="headphones">Headphones & Audio</SelectItem>
+                          <SelectItem value="mens_clothing">Men's Clothing</SelectItem>
+                          <SelectItem value="womens_clothing">Women's Clothing</SelectItem>
+                          <SelectItem value="shoes">Shoes</SelectItem>
+                          <SelectItem value="bags">Bags & Luggage</SelectItem>
+                          <SelectItem value="accessories_fashion">Fashion Accessories</SelectItem>
+                          <SelectItem value="jewelry">Jewelry</SelectItem>
+                          <SelectItem value="watches">Watches</SelectItem>
+                          <SelectItem value="furniture">Furniture</SelectItem>
+                          <SelectItem value="home_decor">Home Decor</SelectItem>
+                          <SelectItem value="bedding">Bedding</SelectItem>
+                          <SelectItem value="kitchen">Kitchen Appliances</SelectItem>
+                          <SelectItem value="lighting">Lighting</SelectItem>
+                          <SelectItem value="skincare">Skincare</SelectItem>
+                          <SelectItem value="cosmetics">Cosmetics</SelectItem>
+                          <SelectItem value="haircare">Hair Care</SelectItem>
+                          <SelectItem value="health_supplements">Health Supplements</SelectItem>
+                          <SelectItem value="fitness">Fitness Equipment</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
@@ -327,8 +368,8 @@ const EditProductPage = () => {
                   <div>
                     <Label htmlFor="status">Status</Label>
                     <Select
-                      {...register("status")}
-                      defaultValue={product?.status}
+                      value={watch("status") || "DRAFT"}
+                      onValueChange={(value) => setValue("status", value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
@@ -340,7 +381,7 @@ const EditProductPage = () => {
                       </SelectContent>
                     </Select>
                     <p className="text-sm text-muted-foreground mt-1">
-                      This product will be available to 2 sale channels
+                      This product will be available to sale channels
                     </p>
                   </div>
                 </div>
