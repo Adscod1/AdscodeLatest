@@ -1,12 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, Rocket, CheckCircle2, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ProductTabs } from "../../../product/components/product-tabs";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -25,6 +27,7 @@ const NewServicePublishingPage = () => {
   const { storeId } = useParams();
   const { service, reset } = useServiceStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
 
   const { register, handleSubmit } = useForm<CreateServiceInput>({
     defaultValues: {
@@ -127,14 +130,14 @@ const NewServicePublishingPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 max-w-[1600px]">
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <ProductTabs activeTab="Publishing" type="service" />
 
             {/* Publishing Preview */}
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
                 <h2 className="text-xl sm:text-2xl font-semibold text-pink-500">
                   Let&apos;s check everything before publishing
@@ -244,6 +247,38 @@ const NewServicePublishingPage = () => {
                   )}
                 </div>
 
+                {/* Featured Listing */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Featured Listing</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Boost your visibility with a featured placement
+                  </p>
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-blue-600 rounded-full p-2">
+                          <Rocket className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Feature this listing</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Appear at the top of search results
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={isFeatured}
+                        onCheckedChange={setIsFeatured}
+                      />
+                    </div>
+                    {isFeatured && (
+                      <p className="text-sm text-blue-600 font-medium mt-3">
+                        +$9.99/month for featured placement
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 {/* Pricing Information */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-medium">Pricing information</h3>
@@ -322,17 +357,73 @@ const NewServicePublishingPage = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Listing Completion */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-medium">Listing Completion</h3>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-blue-600">80%</div>
+                      <div className="text-xs text-muted-foreground">Complete</div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Complete all sections before publishing
+                  </p>
+                  <Progress value={80} className="mb-6 w-full" />
+                  
+                  <div className="space-y-3 overflow-x-auto">
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium">Basic Information</span>
+                      </div>
+                      <span className="text-sm text-blue-600 font-medium">Complete</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium">Specific Information</span>
+                      </div>
+                      <span className="text-sm text-blue-600 font-medium">Complete</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium">Sale Information</span>
+                      </div>
+                      <span className="text-sm text-blue-600 font-medium">Complete</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <Info className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm font-medium text-gray-500">Scheduling & Availability</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium">Media & Images</span>
+                      </div>
+                      <span className="text-sm text-blue-600 font-medium">Complete</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="w-full lg:w-80 order-first lg:order-last">
-            <div className="bg-white rounded-lg shadow-sm">
-              <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
+          <div className="w-full lg:w-80 lg:flex-shrink-0 order-first lg:order-last lg:max-h-screen lg:overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-sm lg:sticky lg:top-4">
+              <div className="px-4 py-6 border-b">
                 <h3 className="text-lg font-semibold">Service Status</h3>
               </div>
-              <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+              <div className="px-4 py-6 space-y-6">
                 <div className="space-y-4">
                   <div>
                     <Label className="mb-1">Status</Label>

@@ -18,12 +18,14 @@ import {
 import { toast } from "sonner";
 import { useServiceStore } from "@/store/use-service-store";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
 interface ServicePricingInput {
   price: number;
   comparePrice?: number;
   costPerService?: number;
   status: string;
+  currency: string;
 }
 
 const NewServiceSalePage = () => {
@@ -37,6 +39,7 @@ const NewServiceSalePage = () => {
       comparePrice: service.comparePrice || 0,
       costPerService: service.costPerService || 0,
       status: service.status || "DRAFT",
+      currency: service.currency || "USD",
     },
   });
 
@@ -51,6 +54,7 @@ const NewServiceSalePage = () => {
       comparePrice: data.comparePrice ? Number(data.comparePrice) : undefined,
       costPerService: data.costPerService ? Number(data.costPerService) : undefined,
       status: data.status,
+      currency: data.currency,
       storeId: storeId as string,
     });
     router.push(`/${storeId}/service/new/delivery`);
@@ -142,59 +146,86 @@ const NewServiceSalePage = () => {
                   
                   {/* Pricing Section */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="price">
-                        Service Price <span className="text-red-500">*</span>
-                      </Label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-sm text-gray-500">$</span>
-                        <Input
-                          id="price"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          {...register("price", { 
-                            required: "Service price is required",
-                            min: {
-                              value: 0.01,
-                              message: "Price must be greater than 0"
-                            }
-                          })}
-                          placeholder="0.00"
-                          className={`pl-7 ${errors.price ? 'border-red-500' : ''}`}
-                        />
+                      <div className="space-y-2">
+                        <Label htmlFor="price">
+                          Service Price <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2.5 text-sm text-gray-500">
+                            {watch("currency") === "USD" ? "$" : 
+                             watch("currency") === "EUR" ? "€" : 
+                             watch("currency") === "GBP" ? "£" : 
+                             watch("currency") === "UGX" ? "USh" : 
+                             watch("currency") === "KES" ? "KSh" : 
+                             watch("currency") === "TZS" ? "TSh" : 
+                             watch("currency") === "NGN" ? "₦" : 
+                             watch("currency") === "ZAR" ? "R" : "$"}
+                          </span>
+                          <Input
+                            id="price"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            {...register("price", { 
+                              required: "Service price is required",
+                              min: {
+                                value: 0.01,
+                                message: "Price must be greater than 0"
+                              }
+                            })}
+                            placeholder="0.00"
+                            className={`pl-12 ${errors.price ? 'border-red-500' : ''}`}
+                          />
+                        </div>
+                        {errors.price && (
+                          <p className="text-sm text-red-500">{errors.price.message}</p>
+                        )}
                       </div>
-                      {errors.price && (
-                        <p className="text-sm text-red-500">{errors.price.message}</p>
-                      )}
-                    </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="comparePrice">Compare at Price</Label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-sm text-gray-500">$</span>
-                        <Input
-                          id="comparePrice"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          {...register("comparePrice")}
-                          placeholder="0.00"
-                          className="pl-7"
-                        />
+                      <div className="space-y-2">
+                        <Label htmlFor="comparePrice">Compare at Price</Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2.5 text-sm text-gray-500">
+                            {watch("currency") === "USD" ? "$" : 
+                             watch("currency") === "EUR" ? "€" : 
+                             watch("currency") === "GBP" ? "£" : 
+                             watch("currency") === "UGX" ? "USh" : 
+                             watch("currency") === "KES" ? "KSh" : 
+                             watch("currency") === "TZS" ? "TSh" : 
+                             watch("currency") === "NGN" ? "₦" : 
+                             watch("currency") === "ZAR" ? "R" : "$"}
+                          </span>
+                          <Input
+                            id="comparePrice"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            {...register("comparePrice")}
+                            placeholder="0.00"
+                            className="pl-12"
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Original price to show discount
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-500">
-                        Original price to show discount
-                      </p>
                     </div>
-                  </div>
 
                   {/* Cost and Profit Section */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="costPerService">Cost per Service</Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-sm text-gray-500">$</span>
+                        <span className="absolute left-3 top-2.5 text-sm text-gray-500">
+                          {watch("currency") === "USD" ? "$" : 
+                           watch("currency") === "EUR" ? "€" : 
+                           watch("currency") === "GBP" ? "£" : 
+                           watch("currency") === "UGX" ? "USh" : 
+                           watch("currency") === "KES" ? "KSh" : 
+                           watch("currency") === "TZS" ? "TSh" : 
+                           watch("currency") === "NGN" ? "₦" : 
+                           watch("currency") === "ZAR" ? "R" : "$"}
+                        </span>
                         <Input
                           id="costPerService"
                           type="number"
@@ -202,7 +233,7 @@ const NewServiceSalePage = () => {
                           min="0"
                           {...register("costPerService")}
                           placeholder="0.00"
-                          className="pl-7"
+                          className="pl-12"
                         />
                       </div>
                       <p className="text-xs text-gray-500">
@@ -213,7 +244,14 @@ const NewServiceSalePage = () => {
                       <Label>Profit</Label>
                       <div className="bg-muted px-3 py-2.5 rounded-md">
                         <span className="text-sm text-muted-foreground">
-                          ${profit.toFixed(2)}
+                          {watch("currency") === "USD" ? "$" : 
+                           watch("currency") === "EUR" ? "€" : 
+                           watch("currency") === "GBP" ? "£" : 
+                           watch("currency") === "UGX" ? "USh" : 
+                           watch("currency") === "KES" ? "KSh" : 
+                           watch("currency") === "TZS" ? "TSh" : 
+                           watch("currency") === "NGN" ? "₦" : 
+                           watch("currency") === "ZAR" ? "R" : "$"}{profit.toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -223,6 +261,60 @@ const NewServiceSalePage = () => {
                         <span className="text-sm text-muted-foreground">
                           {margin.toFixed(1)}%
                         </span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="currency">Currency</Label>
+                      <Select
+                        value={watch("currency")}
+                        onValueChange={(value) => setValue("currency", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD - US Dollar ($)</SelectItem>
+                          <SelectItem value="EUR">EUR - Euro (€)</SelectItem>
+                          <SelectItem value="GBP">GBP - British Pound (£)</SelectItem>
+                          <SelectItem value="UGX">UGX - Ugandan Shilling (USh)</SelectItem>
+                          <SelectItem value="KES">KES - Kenyan Shilling (KSh)</SelectItem>
+                          <SelectItem value="TZS">TZS - Tanzanian Shilling (TSh)</SelectItem>
+                          <SelectItem value="NGN">NGN - Nigerian Naira (₦)</SelectItem>
+                          <SelectItem value="ZAR">ZAR - South African Rand (R)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Promotional Discount Section */}
+                  <div className="border-t pt-6">
+                    <div className="bg-white border border-gray-200 rounded-lg p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                            <span className="text-2xl text-blue-600">%</span>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            Promotional Discount
+                          </h3>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Offer a limited-time discount to attract customers
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 flex items-center justify-between bg-gray-50 rounded-lg p-4">
+                        <div>
+                          <Label htmlFor="enable-discount" className="text-sm font-medium text-gray-900">
+                            Enable Discount
+                          </Label>
+                          <p className="text-sm text-gray-500 mt-0.5">
+                            Show a promotional price
+                          </p>
+                        </div>
+                        <Switch id="enable-discount" />
                       </div>
                     </div>
                   </div>

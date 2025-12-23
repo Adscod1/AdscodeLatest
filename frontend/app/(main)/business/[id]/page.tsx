@@ -541,7 +541,7 @@ const BusinessPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
-                      <Card className="overflow-hidden border border-gray-300 hover:shadow-lg transition-shadow cursor-pointer border-0 shadow-none">
+                      <Card className="overflow-hidden border border-gray-100 rounded hover:shadow-lg transition-shadow cursor-pointer shadow-none">
                         <div className="h-40 bg-gray-100">
                           {item.images && item.images.length > 0 ? (
                             <Image
@@ -676,7 +676,7 @@ const BusinessPage = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-2 max-w-md">
+                    <div className="space-y-2 ">
                       {[5, 4, 3, 2, 1].map((rating) => {
                         const count = reviews.filter(r => r.rating === rating).length;
                         const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;

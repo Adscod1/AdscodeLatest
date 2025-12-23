@@ -18,6 +18,7 @@ export interface CreateServiceInput {
   price?: number;
   comparePrice?: number;
   costPerService?: number;
+  currency?: string;
   requiresBooking?: boolean;
   media?: Array<{
     url: string;
