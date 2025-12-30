@@ -589,7 +589,7 @@ const BusinessPage = () => {
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
                 Media
                 </h2>
-                <Link href="#" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
+                <Link href={`/business/${store?.id}/media`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
                   <span className="hidden sm:inline">See all media</span>
                   <span className="sm:hidden">See all</span>
                   <ChevronRight className="w-4 h-4 ml-1" />

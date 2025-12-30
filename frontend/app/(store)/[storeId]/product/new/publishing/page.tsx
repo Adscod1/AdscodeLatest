@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Calendar, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -102,6 +103,16 @@ const NewProductPublishingPage = () => {
   const { storeId } = useParams();
   const { product, updateProduct, reset, _hasHydrated } = useProductStore();
   const [showScheduleModal, setShowScheduleModal] = React.useState(false);
+  const [hasDiscount, setHasDiscount] = React.useState(false);
+  const [publishTiming, setPublishTiming] = React.useState("immediate");
+  const [isFeatured, setIsFeatured] = React.useState(false);
+
+  const handleDiscountToggle = (checked: boolean) => {
+    setHasDiscount(checked);
+    if (checked) {
+      router.push(`/${storeId}/discounts`);
+    }
+  };
 
   // Get currency symbol based on selected currency
   const getCurrencySymbol = (currency?: string): string => {
@@ -467,6 +478,156 @@ const NewProductPublishingPage = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Publish Timing Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg font-medium">Publish Timing</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Choose when your listing goes live
+                  </p>
+
+                  <div className="space-y-3">
+                    {/* Publish Immediately */}
+                    <div
+                      onClick={() => setPublishTiming("immediate")}
+                      className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                        publishTiming === "immediate"
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                    >
+                      <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 ${
+                          publishTiming === "immediate"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {publishTiming === "immediate" && (
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 mb-1">Publish immediately</h4>
+                        <p className="text-sm text-gray-500">Your listing will be visible right away</p>
+                      </div>
+                    </div>
+
+                    {/* Schedule for Later */}
+                    <div
+                      onClick={() => setPublishTiming("scheduled")}
+                      className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                        publishTiming === "scheduled"
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                    >
+                      <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 ${
+                          publishTiming === "scheduled"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {publishTiming === "scheduled" && (
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 mb-1">Schedule for Later</h4>
+                        <p className="text-sm text-gray-500">Set a specific date and time for publishing</p>
+                      </div>
+                    </div>
+
+                    {/* Save as Draft */}
+                    <div
+                      onClick={() => setPublishTiming("draft")}
+                      className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                        publishTiming === "draft"
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                    >
+                      <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 ${
+                          publishTiming === "draft"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {publishTiming === "draft" && (
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 mb-1">Save as Draft</h4>
+                        <p className="text-sm text-gray-500">Save your progress and publish later</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Featured Listing Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Featured Listing</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Boost your visibility with a featured placement
+                  </p>
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-blue-600 rounded-full p-2">
+                          <Rocket className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Feature this listing</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Appear at the top of search results
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={isFeatured}
+                        onCheckedChange={setIsFeatured}
+                      />
+                    </div>
+                    {isFeatured && (
+                      <p className="text-sm text-blue-600 font-medium mt-3">
+                        +$9.99/month for featured placement
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-between pt-6 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => router.push(`/${storeId}/product/preview`)}
+                  >
+                    Preview Listing
+                  </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        updateProduct({ status: "DRAFT" } as Partial<CreateProductInput>);
+                        toast.success("Product saved as draft");
+                      }}
+                    >
+                      Save Draft
+                    </Button>
+                    <Button
+                      onClick={handleSubmit(onSubmit)}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Rocket className="w-4 h-4 mr-2" />
+                      Publish Now
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -544,6 +705,22 @@ const NewProductPublishingPage = () => {
                         </p>
                       </div>
                     )}
+                  </div>
+
+                  {/* Discount Section */}
+                  <div className="border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-medium mb-1">Apply Discount</h3>
+                        <p className="text-xs text-muted-foreground">
+                          Create and manage coupons & discounts
+                        </p>
+                      </div>
+                      <Switch
+                        checked={hasDiscount}
+                        onCheckedChange={handleDiscountToggle}
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
