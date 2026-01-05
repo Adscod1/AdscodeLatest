@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Search, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,6 @@ const MediaGalleryPage = () => {
   const router = useRouter();
   const params = useParams();
   const storeId = params.id as string;
-
-  const [activeTab, setActiveTab] = useState<"all" | "images" | "videos">("all");
 
   // Fetch store data
   const { data: store } = useQuery({
@@ -87,14 +85,8 @@ const MediaGalleryPage = () => {
   // Use actual media if available, otherwise use dummy data
   const allMedia = actualMedia.length > 0 ? actualMedia : dummyMedia;
 
-  const filteredMedia = activeTab === "all" 
-    ? allMedia 
-    : allMedia.filter((m: any) => m.type === activeTab.replace("s", ""));
-
-  // Group media into sections
-  const recentMedia = filteredMedia.slice(0, 8);
-  const popularMedia = filteredMedia.slice(0, 8).reverse();
-  const featuredMedia = filteredMedia.slice(0, 8);
+  const imagesOnly = allMedia.filter((m: any) => m.type === "image");
+  const videosOnly = allMedia.filter((m: any) => m.type === "video");
 
   const ScrollSection = ({ title, items }: { title: string; items: any[] }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -109,38 +101,40 @@ const MediaGalleryPage = () => {
       }
     };
 
+    if (items.length === 0) return null;
+
     return (
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Search className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => scroll("left")}
-              className="hover:bg-gray-100"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => scroll("right")}
-              className="hover:bg-gray-100"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </Button>
-          </div>
+      <div className="mb-12">
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
+        <div className="relative">
+          {/* Left Arrow */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll("left")}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-white shadow-lg rounded-full w-10 h-10"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+
+          {/* Right Arrow */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll("right")}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-white shadow-lg rounded-full w-10 h-10"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </Button>
+
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4 px-12"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
           {items.map((item, index) => (
             <div
               key={index}
@@ -180,6 +174,7 @@ const MediaGalleryPage = () => {
             </div>
           ))}
         </div>
+        </div>
       </div>
     );
   };
@@ -216,50 +211,16 @@ const MediaGalleryPage = () => {
               </div>
             </div>
           </div>
-
-          {/* Tabs */}
-          <div className="flex items-center gap-6 mt-4">
-            <button
-              onClick={() => setActiveTab("all")}
-              className={`pb-2 text-sm font-medium transition-colors ${
-                activeTab === "all"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-500 hover:text-gray-900"
-              }`}
-            >
-              All Media
-            </button>
-            <button
-              onClick={() => setActiveTab("images")}
-              className={`pb-2 text-sm font-medium transition-colors ${
-                activeTab === "images"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-500 hover:text-gray-900"
-              }`}
-            >
-              Images
-            </button>
-            <button
-              onClick={() => setActiveTab("videos")}
-              className={`pb-2 text-sm font-medium transition-colors ${
-                activeTab === "videos"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-500 hover:text-gray-900"
-              }`}
-            >
-              Videos
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-8">
-        {filteredMedia.length > 0 ? (
+        {allMedia.length > 0 ? (
           <>
-            <ScrollSection title="DISCOVER" items={recentMedia} />
-            <ScrollSection title="TRENDING" items={popularMedia} />
-            <ScrollSection title="FOLLOWING" items={featuredMedia} />
+            <ScrollSection title="All Media" items={allMedia} />
+            <ScrollSection title="Images" items={imagesOnly} />
+            <ScrollSection title="Videos" items={videosOnly} />
           </>
         ) : (
           <div className="text-center py-20">
