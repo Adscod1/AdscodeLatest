@@ -6,6 +6,11 @@ export const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   confirmPassword: z.string().min(8),
+  phoneNumber: z.string().optional(),
+  location: z.string().optional(),
+  username: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  acceptTerms: z.boolean().optional(),
 });
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 

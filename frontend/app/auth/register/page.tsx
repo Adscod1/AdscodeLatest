@@ -26,10 +26,40 @@ const registerSchema = z
         "Password must contain at least one uppercase letter, one lowercase letter, and one number"
       ),
     confirmPassword: z.string(),
+    phoneNumber: z.string().optional(),
+    location: z.string().optional(),
+    username: z.string().optional(),
+    dateOfBirth: z.string().optional(),
+    acceptTerms: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
+  })
+  .refine((data) => {
+    // Only validate phone, username, and terms if they are provided
+    if (data.phoneNumber && data.phoneNumber.length > 0 && data.phoneNumber.length < 10) {
+      return false;
+    }
+    return true;
+  }, {
+    message: "Please enter a valid phone number (at least 10 digits)",
+    path: ["phoneNumber"],
+  })
+  .refine((data) => {
+    // Only validate username if it's provided
+    if (data.username && data.username.length > 0) {
+      if (!data.username.startsWith('@')) {
+        return false;
+      }
+      if (data.username.length < 4) { // @ + at least 3 characters
+        return false;
+      }
+    }
+    return true;
+  }, {
+    message: "Username must start with @ and be at least 3 characters (excluding @)",
+    path: ["username"],
   });
 
 const RegisterPage = () => {
@@ -37,6 +67,7 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
 
   const {
     register,
@@ -49,6 +80,11 @@ const RegisterPage = () => {
       email: "",
       password: "",
       confirmPassword: "",
+      phoneNumber: "",
+      location: "",
+      username: "",
+      dateOfBirth: "",
+      acceptTerms: false,
     },
   });
 
@@ -82,7 +118,7 @@ const RegisterPage = () => {
       setIsGoogleLoading(true);
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3000/profile",
+        callbackURL: "http://localhost:3000/auth/complete-profile",
       });
     } catch {
       toast.error("Failed to sign up with Google. Please try again.");
@@ -91,6 +127,17 @@ const RegisterPage = () => {
   };
 
   const onSubmit: SubmitHandler<RegisterFormValues> = async (data) => {
+    if (!showAdditionalFields) {
+      setShowAdditionalFields(true);
+      return;
+    }
+    
+    // Validate that terms are accepted when creating account
+    if (!data.acceptTerms) {
+      toast.error("You must accept the terms and conditions");
+      return;
+    }
+    
     mutation.mutate(data);
   };
 
@@ -147,6 +194,9 @@ const RegisterPage = () => {
             )}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
                 <Input
                   type="text"
                   placeholder="Full Name"
@@ -160,6 +210,9 @@ const RegisterPage = () => {
                 )}
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
                 <Input
                   type="email"
                   placeholder="Email"
@@ -173,6 +226,9 @@ const RegisterPage = () => {
                 )}
               </div>
               <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
                 <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
@@ -227,6 +283,9 @@ const RegisterPage = () => {
                 )}
               </div>
               <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password
+                </label>
                 <Input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
@@ -282,13 +341,126 @@ const RegisterPage = () => {
                   </p>
                 )}
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                disabled={mutation.isPending}
-              >
-                {mutation.isPending ? "Creating account..." : "Create Account"}
-              </Button>
+              {!showAdditionalFields && (
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                  disabled={mutation.isPending}
+                >
+                  Continue
+                </Button>
+              )}
+              
+              {/* Additional Fields Dropdown */}
+              {showAdditionalFields && (
+                <div className="space-y-4 pt-4 border-t border-gray-200 animate-in slide-in-from-top-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number
+                    </label>
+                    <Input
+                      type="tel"
+                      placeholder="Phone Number"
+                      {...register("phoneNumber")}
+                      aria-invalid={!!errors.phoneNumber}
+                    />
+                    {errors.phoneNumber && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.phoneNumber.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Location
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Location (e.g., New York, USA)"
+                      {...register("location")}
+                      aria-invalid={!!errors.location}
+                    />
+                    {errors.location && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.location.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Username
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Username (e.g., @johndoe)"
+                      {...register("username", {
+                        onChange: (e) => {
+                          const value = e.target.value;
+                          if (value && !value.startsWith('@')) {
+                            e.target.value = '@' + value;
+                          }
+                        }
+                      })}
+                      aria-invalid={!!errors.username}
+                    />
+                    {errors.username && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.username.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Date of Birth
+                    </label>
+                    <Input
+                      type="date"
+                      placeholder="Date of Birth"
+                      {...register("dateOfBirth")}
+                      aria-invalid={!!errors.dateOfBirth}
+                    />
+                    {errors.dateOfBirth && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.dateOfBirth.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      {...register("acceptTerms")}
+                      className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      aria-invalid={!!errors.acceptTerms}
+                    />
+                    <label className="text-sm text-gray-600">
+                      By signing up, you agree to the{" "}
+                      <Link href="/terms" className="text-blue-600 hover:underline">
+                        Terms of Use of Service
+                      </Link>{" "}
+                      and{" "}
+                      <Link href="/privacy" className="text-blue-600 hover:underline">
+                        Privacy Policy
+                      </Link>
+                      , including{" "}
+                      <Link href="/cookies" className="text-blue-600 hover:underline">
+                        Cookies Use
+                      </Link>
+                      . Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Learn more. Others will be able to find you by email or phone number, when provided, unless you choose otherwise{" "}
+                      <Link href="/settings" className="text-blue-600 hover:underline">
+                        here
+                      </Link>
+                      .
+                    </label>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    disabled={mutation.isPending}
+                  >
+                    {mutation.isPending ? "Creating account..." : "Create Account"}
+                  </Button>
+                </div>
+              )}
             </form>
             <p className="mt-6 text-center text-sm text-gray-600">
               Already have an account?{" "}
