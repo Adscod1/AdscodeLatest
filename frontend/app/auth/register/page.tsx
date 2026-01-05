@@ -238,7 +238,7 @@ const RegisterPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -295,7 +295,7 @@ const RegisterPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
                   aria-label={
                     showConfirmPassword ? "Hide password" : "Show password"
                   }
