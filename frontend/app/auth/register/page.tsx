@@ -20,19 +20,30 @@ const registerSchema = z
     email: z.string().email("Please enter a valid email address"),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+      .optional()
+      .refine((val) => !val || val.length >= 8, {
+        message: "Password must be at least 8 characters",
+      })
+      .refine(
+        (val) => !val || /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(val),
+        {
+          message: "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+        }
       ),
-    confirmPassword: z.string(),
+    confirmPassword: z.string().optional(),
     phoneNumber: z.string().optional(),
     location: z.string().optional(),
     username: z.string().optional(),
     dateOfBirth: z.string().optional(),
     acceptTerms: z.boolean().optional(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => {
+    // Only validate password match if both are provided
+    if (data.password && data.confirmPassword) {
+      return data.password === data.confirmPassword;
+    }
+    return true;
+  }, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   })
@@ -73,8 +84,11 @@ const RegisterPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    trigger,
+    getValues,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    mode: "onChange",
     defaultValues: {
       name: "",
       email: "",
@@ -94,7 +108,7 @@ const RegisterPage = () => {
       // Better-Auth handles both user creation and profile creation
       const result = await authClient.signUp.email({
         email: data.email,
-        password: data.password,
+        password: data.password || "",
         name: data.name,
       });
       
@@ -128,7 +142,11 @@ const RegisterPage = () => {
 
   const onSubmit: SubmitHandler<RegisterFormValues> = async (data) => {
     if (!showAdditionalFields) {
-      setShowAdditionalFields(true);
+      // Validate only the first step fields
+      const isValid = await trigger(['name', 'email', 'username', 'phoneNumber', 'location', 'dateOfBirth']);
+      if (isValid) {
+        setShowAdditionalFields(true);
+      }
       return;
     }
     
@@ -193,237 +211,262 @@ const RegisterPage = () => {
               </div>
             )}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <Input
-                  type="text"
-                  placeholder="Full Name"
-                  {...register("name")}
-                  aria-invalid={!!errors.name}
-                />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  {...register("email")}
-                  aria-invalid={!!errors.email}
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  {...register("password")}
-                  aria-invalid={!!errors.password}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  )}
-                </button>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password
-                </label>
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm Password"
-                  {...register("confirmPassword")}
-                  aria-invalid={!!errors.confirmPassword}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                  aria-label={
-                    showConfirmPassword ? "Hide password" : "Show password"
-                  }
-                >
-                  {showConfirmPassword ? (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  )}
-                </button>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
-              {!showAdditionalFields && (
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                  disabled={mutation.isPending}
-                >
-                  Continue
-                </Button>
-              )}
-              
-              {/* Additional Fields Dropdown */}
-              {showAdditionalFields && (
-                <div className="space-y-4 pt-4 border-t border-gray-200 animate-in slide-in-from-top-2">
+              {!showAdditionalFields ? (
+                <>
+                  {/* First Step: Basic Information */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number
+                      Name
                     </label>
-                    <Input
-                      type="tel"
-                      placeholder="Phone Number"
-                      {...register("phoneNumber")}
-                      aria-invalid={!!errors.phoneNumber}
-                    />
-                    {errors.phoneNumber && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.phoneNumber.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Location
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Location (e.g., New York, USA)"
-                      {...register("location")}
-                      aria-invalid={!!errors.location}
-                    />
-                    {errors.location && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.location.message}
-                      </p>
-                    )}
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        placeholder="Full Name"
+                        {...register("name")}
+                        aria-invalid={!!errors.name}
+                        className={errors.name ? "border-red-500" : ""}
+                      />
+                      {errors.name && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.name.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Username
                     </label>
-                    <Input
-                      type="text"
-                      placeholder="Username (e.g., @johndoe)"
-                      {...register("username", {
-                        onChange: (e) => {
-                          const value = e.target.value;
-                          if (value && !value.startsWith('@')) {
-                            e.target.value = '@' + value;
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        placeholder="Username (e.g., @johndoe)"
+                        {...register("username", {
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            if (value && !value.startsWith('@')) {
+                              e.target.value = '@' + value;
+                            }
                           }
-                        }
-                      })}
-                      aria-invalid={!!errors.username}
-                    />
-                    {errors.username && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.username.message}
-                      </p>
-                    )}
+                        })}
+                        aria-invalid={!!errors.username}
+                        className={errors.username ? "border-red-500" : ""}
+                      />
+                      {errors.username && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.username.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        {...register("email")}
+                        aria-invalid={!!errors.email}
+                        className={errors.email ? "border-red-500" : ""}
+                      />
+                      {errors.email && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.email.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="tel"
+                        placeholder="Phone Number"
+                        {...register("phoneNumber")}
+                        aria-invalid={!!errors.phoneNumber}
+                        className={errors.phoneNumber ? "border-red-500" : ""}
+                      />
+                      {errors.phoneNumber && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.phoneNumber.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Location
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        placeholder="Location (e.g., New York, USA)"
+                        {...register("location")}
+                        aria-invalid={!!errors.location}
+                        className={errors.location ? "border-red-500" : ""}
+                      />
+                      {errors.location && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.location.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Date of Birth
                     </label>
-                    <Input
-                      type="date"
-                      placeholder="Date of Birth"
-                      {...register("dateOfBirth")}
-                      aria-invalid={!!errors.dateOfBirth}
-                    />
-                    {errors.dateOfBirth && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.dateOfBirth.message}
-                      </p>
-                    )}
+                    <div className="relative">
+                      <Input
+                        type="date"
+                        placeholder="Date of Birth"
+                        {...register("dateOfBirth")}
+                        aria-invalid={!!errors.dateOfBirth}
+                        className={errors.dateOfBirth ? "border-red-500" : ""}
+                      />
+                      {errors.dateOfBirth && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.dateOfBirth.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    disabled={mutation.isPending}
+                  >
+                    Continue
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {/* Second Step: Password and Terms */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        {...register("password")}
+                        aria-invalid={!!errors.password}
+                        className={errors.password ? "border-red-500" : ""}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                      {errors.password && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.password.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Confirm Password
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm Password"
+                        {...register("confirmPassword")}
+                        aria-invalid={!!errors.confirmPassword}
+                        className={errors.confirmPassword ? "border-red-500" : ""}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                        aria-label={
+                          showConfirmPassword ? "Hide password" : "Show password"
+                        }
+                    >
+                      {showConfirmPassword ? (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                      {errors.confirmPassword && (
+                        <p className="absolute -bottom-5 left-0 text-xs text-red-600">
+                          {errors.confirmPassword.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <input
@@ -445,7 +488,10 @@ const RegisterPage = () => {
                       <Link href="/cookies" className="text-blue-600 hover:underline">
                         Cookies Use
                       </Link>
-                      . Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Learn more. Others will be able to find you by email or phone number, when provided, unless you choose otherwise{" "}
+                      .
+                    
+                      <br />
+                      Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Learn more. Others will be able to find you by email or phone number, when provided, unless you choose otherwise{" "}
                       <Link href="/settings" className="text-blue-600 hover:underline">
                         here
                       </Link>
@@ -457,9 +503,9 @@ const RegisterPage = () => {
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                     disabled={mutation.isPending}
                   >
-                    {mutation.isPending ? "Creating account..." : "Create Account"}
+                    {mutation.isPending ? "Creating account..." : "Sign Up"}
                   </Button>
-                </div>
+                </>
               )}
             </form>
             <p className="mt-6 text-center text-sm text-gray-600">

@@ -4,8 +4,8 @@ import { z } from "zod";
 export const registerSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
+  password: z.string().optional(),
+  confirmPassword: z.string().optional(),
   phoneNumber: z.string().optional(),
   location: z.string().optional(),
   username: z.string().optional(),
