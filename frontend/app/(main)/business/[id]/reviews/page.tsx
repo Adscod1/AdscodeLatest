@@ -115,7 +115,7 @@ const ReviewsPage = () => {
   }
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-white">
       <div className="mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-4 px-2 sm:mb-6">
