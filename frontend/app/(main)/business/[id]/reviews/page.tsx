@@ -382,6 +382,56 @@ const ReviewsPage = () => {
                     </div>
                     <p className="text-gray-700 leading-relaxed mb-4 break-all max-w-full">{review.comment}</p>
                     
+                    {/* Display Review Media */}
+                    {(review as any).images && (() => {
+                      try {
+                        const imageUrls = JSON.parse((review as any).images);
+                        if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+                          return (
+                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-4">
+                              {imageUrls.map((url: string, idx: number) => (
+                                <div key={idx} className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border border-gray-200">
+                                  <Image
+                                    src={url}
+                                    alt={`Review image ${idx + 1}`}
+                                    fill
+                                    className="object-cover hover:scale-105 transition-transform"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        }
+                      } catch (e) {
+                        console.error('Error parsing review images:', e);
+                      }
+                      return null;
+                    })()}
+                  
+                    {(review as any).videos && (() => {
+                      try {
+                        const videoUrls = JSON.parse((review as any).videos);
+                        if (Array.isArray(videoUrls) && videoUrls.length > 0) {
+                          return (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                              {videoUrls.map((url: string, idx: number) => (
+                                <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
+                                  <video
+                                    src={url}
+                                    controls
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        }
+                      } catch (e) {
+                        console.error('Error parsing review videos:', e);
+                      }
+                      return null;
+                    })()}
+
                     {/* Review Actions */}
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <button className="flex items-center gap-1 hover:text-gray-700 transition-colors">
