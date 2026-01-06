@@ -10,18 +10,52 @@ import {
   ChevronLeft, 
   Filter,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  MessageCircle
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import api, { Review } from "@/lib/api-client";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const ReviewsPage = () => {
   const params = useParams();
   const storeId = params.id as string;
   const [filterRating, setFilterRating] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
+  
+  // Reply functionality state
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, date: Date}>}>({});
+
+  // Reply handlers
+  const handleReplyClick = (reviewId: string) => {
+    setReplyingTo(reviewId);
+    setReplyText("");
+  };
+
+  const handleReplySubmit = async (reviewId: string) => {
+    if (!replyText.trim()) return;
+
+    // TODO: Add API call to save reply
+    const newReply = {
+      id: Date.now().toString(),
+      text: replyText,
+      user: "Current User",
+      date: new Date()
+    };
+
+    setReplies(prev => ({
+      ...prev,
+      [reviewId]: [...(prev[reviewId] || []), newReply]
+    }));
+
+    setReplyText("");
+    setReplyingTo(null);
+    toast.success("Reply posted successfully!");
+  };
 
   const { data: store, isLoading: isLoadingStore } = useQuery({
     queryKey: ["store", storeId],
@@ -232,8 +266,10 @@ const ReviewsPage = () => {
                   variant={filterRating === rating ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterRating(filterRating === rating ? null : rating)}
+                  className="flex items-center gap-1"
                 >
-                  {rating}★
+                  {rating}
+                  <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
                 </Button>
               ))}
             </div>
@@ -257,7 +293,7 @@ const ReviewsPage = () => {
         <div className="space-y-6">
           {filteredAndSortedReviews.length > 0 ? (
             filteredAndSortedReviews.map((review: Review) => (
-              <Card key={review.id} className="p-6">
+              <Card key={review.id} className="p-6 border-b border-gray-200">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     {review.user.image ? (
@@ -308,11 +344,109 @@ const ReviewsPage = () => {
                         <ThumbsUp className="w-4 h-4" />
                         Helpful
                       </button>
-                      <button className="flex items-center gap-1 hover:text-gray-700 transition-colors">
-                        <ThumbsDown className="w-4 h-4" />
-                        Not helpful
+                      <button
+                        onClick={() => handleReplyClick(review.id)}
+                        className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Reply
+                        {replies[review.id] && replies[review.id].length > 0 && (
+                          <span>({replies[review.id].length})</span>
+                        )}
                       </button>
                     </div>
+
+                    {/* Reply Form */}
+                    {replyingTo === review.id && (
+                      <div className="mt-4 pl-4 border-l-2 border-blue-400">
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write a reply..."
+                            className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            rows={3}
+                          />
+                          {/* Emoji Toolbar */}
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-1 text-base">
+                              <button type="button" className="hover:scale-110 transition-transform">👍</button>
+                              <button type="button" className="hover:scale-110 transition-transform">❤️</button>
+                              <button type="button" className="hover:scale-110 transition-transform">👏</button>
+                              <button type="button" className="hover:scale-110 transition-transform">😂</button>
+                              <button type="button" className="hover:scale-110 transition-transform">😍</button>
+                              <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setReplyingTo(null)}
+                                className="h-8 text-sm px-3"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => handleReplySubmit(review.id)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white h-8 text-sm px-3"
+                              >
+                                Post
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Display Replies */}
+                    {replies[review.id] && replies[review.id].length > 0 && (
+                      <div className="mt-4 space-y-3">
+                        {replies[review.id].map((reply) => (
+                          <div key={reply.id} className="pl-4 border-l-2 border-gray-200">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                                <span className="text-sm font-bold text-white">
+                                  {reply.user.charAt(0)}
+                                </span>
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-gray-900 text-sm">
+                                    {reply.user}
+                                  </span>
+                                  <Badge className="bg-blue-500 text-white rounded-full text-xs px-2 py-0 h-4">Author</Badge>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(reply.date).toLocaleTimeString('en-US', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit',
+                                      hour12: true
+                                    })}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-700">{reply.text}</p>
+                                
+                                {/* Reply to reply button */}
+                                <div className="flex items-center gap-4 mt-2">
+                                  <button className="flex items-center gap-1 hover:text-gray-700 transition-colors">
+                                    <ThumbsUp className="w-3.5 h-3.5 text-gray-500" />
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-xs"
+                                  >
+                                    <MessageCircle className="w-3.5 h-3.5" />
+                                    <span>Reply</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
