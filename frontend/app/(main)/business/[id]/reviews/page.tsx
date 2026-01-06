@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Star, 
-  ArrowLeft, 
+  ChevronLeft, 
   Filter,
   ThumbsUp,
   ThumbsDown
@@ -84,48 +84,88 @@ const ReviewsPage = () => {
     <div className="bg-gray-50">
       <div className="mx-auto px-4 py-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Link href={`/business/${storeId}`}>
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
-                {store.logo ? (
-                  <Image
-                    src={store.logo}
-                    alt={store.name}
-                    width={48}
-                    height={48}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                ) : (
-                  <span className="text-xl font-bold text-white">
-                    {store.name.charAt(0)}
-                  </span>
-                )}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{store.name}</h1>
-                <p className="text-gray-600">All Reviews ({reviews?.length || 0})</p>
+        <div className="mb-4 px-2 sm:mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+              <Link href={`/business/${storeId}`}>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 flex-shrink-0 -mt-2 hover:bg-transparent p-0">
+                  <ChevronLeft className="w-5 h-5" />
+                </Button>
+              </Link>
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black rounded flex items-center justify-center flex-shrink-0">
+                  {store.logo ? (
+                    <Image
+                      src={store.logo}
+                      alt={store.name}
+                      width={80}
+                      height={80}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <span className="text-2xl sm:text-3xl font-bold text-white">
+                      {store.name.charAt(0)}
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{store.name}</h1>
+                    <svg 
+                      className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" 
+                      viewBox="0,0,256,256"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g 
+                        fill="#228be6" 
+                        fillRule="nonzero" 
+                        stroke="none" 
+                        strokeWidth="1" 
+                        strokeLinecap="butt" 
+                        strokeLinejoin="miter" 
+                        strokeMiterlimit="10" 
+                        strokeDasharray="" 
+                        strokeDashoffset="0" 
+                        fontFamily="none" 
+                        fontWeight="normal" 
+                        fontSize="none" 
+                        textAnchor="inherit" 
+                        style={{mixBlendMode: 'normal'}}
+                      >
+                        <g transform="scale(8.53333,8.53333)">
+                          <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                        </g>
+                      </g>
+                    </svg>
+                    <span className="text-gray-500">@username</span>
+                  </div>
+                  {store.tagline && (
+                    <p className="text-xs sm:text-sm text-gray-500 truncate">{store.tagline}</p>
+                  )}
+                  {/* Followers Count */}
+                  <div className="flex items-center gap-1 mt-2">
+                    <span className="text-xs sm:text-sm text-gray-600">
+                      {Math.floor(Math.random() * 500) + 50} followers
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
+            
+            {/* Write Review Button */}
+            <Link href={`/business/${storeId}/reviews/write`}>
+              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+                Write Review
+              </Button>
+            </Link>
           </div>
-          <Link href={`/business/${storeId}/reviews/write`}>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              Write Review
-            </Button>
-          </Link>
         </div>
 
         {/* Rating Summary */}
         <Card className="p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <div className="mb-4">
+              <div className="mb-4 px-2">
                 <span className="text-sm text-gray-600">Overall rating</span>
                 <div className="flex items-center mt-2">
                   <div className="flex items-center mr-3">
@@ -161,7 +201,7 @@ const ReviewsPage = () => {
                     </button>
                     <div className="flex-1 mx-3 h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-orange-400 rounded-full transition-all"
+                        className="h-full bg-yellow-500 rounded-full transition-all"
                         style={{ width: `${percentage}%` }}
                       ></div>
                     </div>
@@ -174,7 +214,7 @@ const ReviewsPage = () => {
         </Card>
 
         {/* Filter and Sort Controls */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 px-8">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-gray-500" />
@@ -260,7 +300,7 @@ const ReviewsPage = () => {
                         />
                       ))}
                     </div>
-                    <p className="text-gray-700 leading-relaxed mb-4">{review.comment}</p>
+                    <p className="text-gray-700 leading-relaxed mb-4 break-all max-w-full">{review.comment}</p>
                     
                     {/* Review Actions */}
                     <div className="flex items-center gap-4 text-sm text-gray-500">
