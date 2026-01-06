@@ -297,6 +297,17 @@ const RegisterPage = () => {
                       )}
                     </div>
                   </div>
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    disabled={mutation.isPending}
+                  >
+                    Continue
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {/* Second Step: Password and Terms */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Location
@@ -335,17 +346,6 @@ const RegisterPage = () => {
                       )}
                     </div>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                    disabled={mutation.isPending}
-                  >
-                    Continue
-                  </Button>
-                </>
-              ) : (
-                <>
-                  {/* Second Step: Password and Terms */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Password
@@ -491,7 +491,7 @@ const RegisterPage = () => {
                       .
                     
                       <br />
-                      Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Learn more. Others will be able to find you by email or phone number, when provided, unless you choose otherwise{" "}
+                      Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services,{" "}
                       <Link href="/settings" className="text-blue-600 hover:underline">
                         here
                       </Link>
