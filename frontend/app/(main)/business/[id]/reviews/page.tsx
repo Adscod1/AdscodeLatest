@@ -502,20 +502,20 @@ const ReviewsPage = () => {
                     {/* Display Replies */}
                     {replies[review.id] && replies[review.id].length > 0 && (
                       <div className="mt-4 space-y-3">
-                        {replies[review.id].map((reply) => (
-                          <div key={reply.id} className="pl-4 border-l-2 border-gray-200">
+                        {replies[review.id].map((reply, index) => (
+                          <div key={reply.id} className={`${index > 0 ? 'pl-8 border-l border-gray-300' : 'pl-4 border-l-2 border-gray-200'}`}>
                             <div className="flex items-start gap-3">
-                              <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                                <span className="text-sm font-bold text-white">
+                              <div className={`${index > 0 ? 'w-7 h-7 bg-gradient-to-br from-purple-400 to-purple-600' : 'w-8 h-8 bg-gradient-to-br from-green-400 to-green-600'} flex-shrink-0 rounded-full flex items-center justify-center`}>
+                                <span className={`${index > 0 ? 'text-xs' : 'text-sm'} font-bold text-white`}>
                                   {reply.user.charAt(0)}
                                 </span>
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-semibold text-gray-900 text-sm">
+                                  <span className={`font-semibold text-gray-900 ${index > 0 ? 'text-xs' : 'text-sm'}`}>
                                     {reply.user}
                                   </span>
-                                  <Badge className="bg-blue-500 text-white rounded-full text-xs px-2 py-0 h-4">Author</Badge>
+                                  {index === 0 && <Badge className="bg-blue-500 text-white rounded-full text-xs px-2 py-0 h-4">Author</Badge>}
                                   <span className="text-xs text-gray-500">
                                     {new Date(reply.date).toLocaleTimeString('en-US', { 
                                       hour: '2-digit', 
@@ -524,7 +524,7 @@ const ReviewsPage = () => {
                                     })}
                                   </span>
                                 </div>
-                                <p className="text-sm text-gray-700">{reply.text}</p>
+                                <p className={`${index > 0 ? 'text-xs' : 'text-sm'} text-gray-700`}>{reply.text}</p>
                                 
                                 {/* Reply to reply button */}
                                 <div className="flex items-center gap-4 mt-2">
