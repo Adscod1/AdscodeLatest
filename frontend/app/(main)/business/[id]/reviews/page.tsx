@@ -261,6 +261,7 @@ const ReviewsPage = () => {
                 variant={filterRating === null ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilterRating(null)}
+                className={filterRating === null ? "" : "border-gray-200"}
               >
                 All
               </Button>
@@ -270,7 +271,7 @@ const ReviewsPage = () => {
                   variant={filterRating === rating ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterRating(filterRating === rating ? null : rating)}
-                  className="flex items-center gap-1"
+                  className={`flex items-center gap-1 ${filterRating === rating ? "" : "border-gray-200"}`}
                 >
                   {rating}
                   <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
