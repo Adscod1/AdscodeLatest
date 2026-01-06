@@ -188,13 +188,15 @@ const ReviewsPage = () => {
             
             {/* Write Review Button */}
             <Link href={`/business/${storeId}/reviews/write`}>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+              <Button className="bg-blue-600 rounded hover:bg-blue-700 w-full sm:w-auto">
                 Write Review
               </Button>
             </Link>
           </div>
         </div>
 
+        {/* Content Container with Increased Padding */}
+        <div className="px-8 sm:px-12 lg:px-24">
         {/* Rating Summary */}
         <Card className="p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -344,6 +346,10 @@ const ReviewsPage = () => {
                         <ThumbsUp className="w-4 h-4" />
                         Helpful
                       </button>
+                      <button className="flex items-center gap-1 hover:text-gray-700 transition-colors">
+                        <ThumbsDown className="w-4 h-4" />
+                        Not helpful
+                      </button>
                       <button
                         onClick={() => handleReplyClick(review.id)}
                         className="flex items-center gap-1 hover:text-blue-600 transition-colors"
@@ -482,6 +488,7 @@ const ReviewsPage = () => {
             </Button>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
