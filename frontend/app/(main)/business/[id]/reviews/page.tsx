@@ -18,6 +18,7 @@ import Link from "next/link";
 import api, { Review } from "@/lib/api-client";
 import { useState } from "react";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 const ReviewsPage = () => {
   const params = useParams();
@@ -43,7 +44,7 @@ const ReviewsPage = () => {
     const newReply = {
       id: Date.now().toString(),
       text: replyText,
-      user: "Current User",
+      user: user?.name || "Anonymous User",
       date: new Date()
     };
 
@@ -56,6 +57,19 @@ const ReviewsPage = () => {
     setReplyingTo(null);
     toast.success("Reply posted successfully!");
   };
+
+  const { data: user } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      try {
+        const session = await authClient.getSession();
+        return session?.data?.user ?? null;
+      } catch (error) {
+        console.error('Session error:', error);
+        return null;
+      }
+    },
+  });
 
   const { data: store, isLoading: isLoadingStore } = useQuery({
     queryKey: ["store", storeId],
@@ -118,7 +132,7 @@ const ReviewsPage = () => {
     <div className="bg-white">
       <div className="mx-auto px-4 py-6">
         {/* Header */}
-        <div className="mb-4 px-2 sm:mb-6">
+        <div className="mb-4 px-2 sm:mb-6 pb-4 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               <Link href={`/business/${storeId}`}>
@@ -200,7 +214,7 @@ const ReviewsPage = () => {
         {/* Content Container with Increased Padding */}
         <div className="px-4 sm:px-8 lg:px-12">
         {/* Rating Summary */}
-        <Card className="p-6 mb-6">
+        <Card className="p-6 mb-6 border-b border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <div className="mb-4 px-2">
@@ -469,6 +483,7 @@ const ReviewsPage = () => {
                                   </button>
                                   <button 
                                     type="button"
+                                    onClick={() => handleReplyClick(review.id)}
                                     className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-xs"
                                   >
                                     <MessageCircle className="w-3.5 h-3.5" />
