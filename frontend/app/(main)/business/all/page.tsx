@@ -70,9 +70,9 @@ interface Store {
 
 const BusinessCard = ({ store }: { store: Store }) => {
   return (
-    <div className="flex flex-col lg:flex-row bg-white  rounded-lg overflow-hidden transition-shadow">
+    <div className="flex flex-col lg:flex-row bg-white rounded-lg overflow-hidden transition-shadow h-64 lg:h-[340px]">
       {/* Image Gallery */}
-      <div className="w-full lg:w-1/2 xl:w-[500px] h-64 lg:h-[340px] relative flex-shrink-0">
+      <div className="w-full lg:w-1/2 xl:w-[500px] h-full relative flex-shrink-0">
         <div className="flex h-full gap-1">
           {/* Main large image */}
           <div className="relative flex-1">
@@ -269,7 +269,7 @@ const BusinessesPageContent = () => {
   const resultCount = filteredStores.length;
 
   return (
-    <div className="h-screen bg-gray-50 overflow-hidden">
+    <div className="h-screen overflow-hidden">
       <div className="flex flex-col lg:flex-row h-full">
         {/* Mobile Filter Overlay */}
         {showFilters && (
