@@ -27,7 +27,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 
 interface PrismaProduct {
   id: string;
@@ -88,6 +88,7 @@ const BusinessPage = () => {
       const response = await api.stores.getById(businessId);
       return response.store;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { data: products, isLoading: isLoadingProducts } = useQuery({
@@ -97,6 +98,7 @@ const BusinessPage = () => {
       return response.products;
     },
     enabled: !!businessId,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: services, isLoading: isLoadingServices } = useQuery({
@@ -106,6 +108,7 @@ const BusinessPage = () => {
       return response.services;
     },
     enabled: !!businessId,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery({
@@ -115,6 +118,7 @@ const BusinessPage = () => {
       return response.reviews;
     },
     enabled: !!businessId,
+    staleTime: 2 * 60 * 1000,
   });
 
   const { data: similarStores, isLoading: isLoadingSimilarStores } = useQuery({
@@ -125,15 +129,22 @@ const BusinessPage = () => {
       return { stores: response.stores || [] };
     },
     enabled: !!store?.category,
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Combine products and services for the main listing
-  const allItems = [...(products || []), ...(services || [])].slice(0, 4); // Show only first 4 items
+  // Combine products and services for the main listing - Memoized for performance
+  const allItems = useMemo(() => 
+    [...(products || []), ...(services || [])].slice(0, 4),
+    [products, services]
+  );
 
-  // Calculate average rating
-  const averageRating = reviews && reviews.length > 0
-    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-    : 0;
+  // Calculate average rating - Memoized for performance
+  const averageRating = useMemo(() => 
+    reviews && reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+      : 0,
+    [reviews]
+  );
 
   // Sample images for carousel - replace with actual store images
   const carouselImages = [
@@ -217,6 +228,8 @@ const BusinessPage = () => {
                 alt="Business Image 1"
                 fill
                 className="object-cover"
+                sizes="(max-width: 640px) 0vw, 33vw"
+                loading="lazy"
               />
             </div>
             
@@ -227,6 +240,8 @@ const BusinessPage = () => {
                 alt="Business Image 2"
                 fill
                 className="object-cover"
+                priority
+                sizes="(max-width: 640px) 100vw, 33vw"
               />
             </div>
             
@@ -237,6 +252,8 @@ const BusinessPage = () => {
                 alt="Business Image 3"
                 fill
                 className="object-cover"
+                sizes="(max-width: 640px) 0vw, 33vw"
+                loading="lazy"
               />
             </div>
           </div>
@@ -261,7 +278,7 @@ const BusinessPage = () => {
 
         
         {/* Top Section: Business Profile + Action Buttons */}
-        <div className="bg-white shadow-sm px-4 sm:px-6 lg:px-12 py-1 sm:py-4 w-full overflow-visible">
+        <div className="bg-white border border-gray-100 px-4 sm:px-6 lg:px-12 py-1 sm:py-4 w-full overflow-visible">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-full">
             {/* Left Side: Business Profile with Logo and Name inline */}
             <div className="flex items-center gap-4 sm:gap-6">
@@ -275,6 +292,7 @@ const BusinessPage = () => {
                       width={112}
                       height={112}
                       className="w-full h-full object-cover"
+                      priority
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -316,6 +334,8 @@ const BusinessPage = () => {
                     </g>
                   </svg>
 
+                  <span className="text-gray-500 font-normal text-sm sm:text-base">@username</span>
+
                   {store.category && (
                   <span className=" mt-1 font-normal px-2 py-0.5 bg-gray-100 text-gray-700 text-xs sm:text-xs rounded-full">
                     {store.category}
@@ -327,7 +347,7 @@ const BusinessPage = () => {
                   </span>
                   <span className="text-gray-300 mx-1 text-sm">|</span>
                   <span className="text-sm font-normal text-gray-600 flex items-center gap-1">
-                    <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
+                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                     <span className="font-semibold text-gray-900">{averageRating.toFixed(1)}</span><span>Rating</span>
                   </span>
                   <span className="text-gray-300 mx-1 text-sm">|</span>
@@ -336,7 +356,7 @@ const BusinessPage = () => {
                   </span>
                 </h1>
                 
-                <p className="text-gray-500 text-xl sm:text-[14px] truncate -mt-1">
+                <p className="text-gray-500 text-xs sm:text-[14px] truncate -mt-1">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
                 </p>
                 
@@ -344,27 +364,27 @@ const BusinessPage = () => {
             </div>
             
             {/* Right Side: Action Buttons */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto max-w-full">
-              <Button className="bg-white rounded-full border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 text-gray-800 px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 flex items-center gap-2 text-sm sm:text-base">
-                <svg className="w-4 h-4" viewBox="0 0 640 512" fill="currentColor">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto max-w-full">
+              <Button className="bg-white rounded-full border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 text-gray-800 px-2.5 sm:px-3 lg:px-4 py-1.5 sm:py-2 flex items-center gap-1.5 text-xs sm:text-sm">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 640 512" fill="currentColor">
                   <path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
                 </svg>
                 <span className="hidden sm:inline">Follow</span>
               </Button>
               <Link href={`/business/${store.id}/reviews/write`}>
-                <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-2 text-sm sm:text-base rounded-full">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <Button variant="outline" className="px-2.5 sm:px-3 lg:px-4 py-1.5 sm:py-2 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-1.5 text-xs sm:text-sm rounded-full">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   <span className="hidden sm:inline">Write Review</span>
                 </Button>
               </Link>
-              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-2 text-sm sm:text-base rounded-full">
-                <Mail className="w-4 h-4" />
+              <Button variant="outline" className="px-2.5 sm:px-3 lg:px-4 py-1.5 sm:py-2 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-1.5 text-xs sm:text-sm rounded-full">
+                <Mail className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Inbox</span>
               </Button>
-              <Button variant="outline" className="px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-2 text-sm sm:text-base rounded-full">
-                <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor">
+              <Button variant="outline" className="px-2.5 sm:px-3 lg:px-4 py-1.5 sm:py-2 bg-white border border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 flex items-center gap-1.5 text-xs sm:text-sm rounded-full">
+                <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor">
                   <path d="M 35.478516 5.9804688 A 2.0002 2.0002 0 0 0 34.085938 9.4140625 L 35.179688 10.507812 C 23.476587 10.680668 14 20.256715 14 32 A 2.0002 2.0002 0 1 0 18 32 C 18 22.427546 25.627423 14.702715 35.154297 14.517578 L 34.085938 15.585938 A 2.0002 2.0002 0 1 0 36.914062 18.414062 L 41.236328 14.091797 A 2.0002 2.0002 0 0 0 41.228516 10.900391 L 36.914062 6.5859375 A 2.0002 2.0002 0 0 0 35.478516 5.9804688 z M 12.5 6 C 8.9338464 6 6 8.9338464 6 12.5 L 6 35.5 C 6 39.066154 8.9338464 42 12.5 42 L 35.5 42 C 39.066154 42 42 39.066154 42 35.5 L 42 28 A 2.0002 2.0002 0 1 0 38 28 L 38 35.5 C 38 36.903846 36.903846 38 35.5 38 L 12.5 38 C 11.096154 38 10 36.903846 10 35.5 L 10 12.5 C 10 11.096154 11.096154 10 12.5 10 L 20 10 A 2.0002 2.0002 0 1 0 20 6 L 12.5 6 z"></path>
                 </svg>
                 <span className="hidden sm:inline">Share</span>
@@ -402,7 +422,7 @@ const BusinessPage = () => {
 
             {/* About Section */}
             <div className="w-full lg:w-80 flex-shrink-0">
-              <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden h-full">
+              <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden h-full">
                 <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">About</h3>
                 <div className="border-b border-gray-200 mb-4 sm:mb-6"></div>
                 <div className="space-y-3 sm:space-y-4">
@@ -486,7 +506,7 @@ const BusinessPage = () => {
           <div className="flex-1 space-y-8 lg:space-y-10 min-w-0 w-full">
 
             {/* Campaigns */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
@@ -518,7 +538,7 @@ const BusinessPage = () => {
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
-                  <span className="hidden sm:inline">Products/Services</span>
+                  <span className="hidden sm:inline">Listings</span>
                   <span className="sm:hidden">Products & Services</span>
                 </h2>
                 <Link href={`${store.id}/bservices`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
@@ -548,8 +568,10 @@ const BusinessPage = () => {
                               src={item.images[0].url}
                               alt={item.title}
                               width={300}
-                              height={200}
+                              height={300}
                               className="w-full h-full object-cover"
+                              loading="lazy"
+                              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-4xl">
@@ -583,7 +605,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Media */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
@@ -604,6 +626,8 @@ const BusinessPage = () => {
                       width={200}
                       height={200}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                      loading="lazy"
+                      sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   </div>
                 ))}
@@ -612,7 +636,7 @@ const BusinessPage = () => {
 
 
             {/* Highlights */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Business Highlights</h2>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
                 {highlights.map((highlight, index) => (
@@ -627,7 +651,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Reviews */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Recommended Reviews</h2>
                 <Link href={`/business/${store.id}/reviews`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
@@ -665,7 +689,7 @@ const BusinessPage = () => {
                                 key={star} 
                                 className={`w-5 h-5 ${
                                   star <= Math.round(averageRating) 
-                                    ? 'fill-orange-400 text-orange-400' 
+                                    ? 'fill-yellow-400 text-yellow-400' 
                                     : 'text-gray-300'
                                 }`} 
                               />
@@ -685,7 +709,7 @@ const BusinessPage = () => {
                             <span className="w-12">{rating} Stars</span>
                             <div className="flex-1 mx-3 h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div 
-                                className="h-full bg-orange-400 rounded-full transition-all"
+                                className="h-full bg-yellow-400 rounded-full transition-all"
                                 style={{ width: `${percentage}%` }}
                               ></div>
                             </div>
@@ -704,8 +728,8 @@ const BusinessPage = () => {
                     </div>
                     
                     <div className="space-y-4">
-                      {reviews.slice(0, 10).map((review) => (
-                        <div key={review.id} className="bg-white border-b border-gray-100 pb-4 last:border-b-0">
+                      {reviews.slice(0, 3).map((review) => (
+                        <div key={review.id} className="bg-white   pb-4 ">
                           {/* Review Header */}
                           <div className="flex items-start gap-3">
                             <div className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
@@ -745,7 +769,7 @@ const BusinessPage = () => {
                                     key={star}
                                     className={`w-3.5 h-3.5 ${
                                       star <= review.rating
-                                        ? 'text-orange-400 fill-orange-400'
+                                        ? 'text-yellow-400 fill-yellow-400'
                                         : 'text-gray-300'
                                     }`}
                                   />
@@ -753,7 +777,7 @@ const BusinessPage = () => {
                               </div>
                               
                               {/* Review Text */}
-                              <p className="text-gray-700 text-sm leading-relaxed mb-3">
+                              <p className="text-gray-700 text-sm leading-relaxed mb-3 break-words max-w-[100%]">
                                 {review.comment}
                               </p>
                               
@@ -905,7 +929,7 @@ const BusinessPage = () => {
           {/* Right Column - Sidebars Container */}
           <div className="w-full  lg:w-80 flex flex-col gap-8 lg:gap-10 mt-12 lg:mt-0 flex-shrink-0">
             {/* Business Hours Sidebar */}
-            <div className="bg-white shadow-sm w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
+            <div className="bg-white border border-gray-100 w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
               <div>
                 <div className="bg-green-400 text-white  sm:px-4 py-2 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
@@ -914,7 +938,7 @@ const BusinessPage = () => {
                   <span className="ml-auto text-xs sm:text-sm">08:30 AM to 05:00 PM</span>
                 </div>
                 
-                <div className="space-y-6 sm:space-y-[38px] p-3">
+                <div className="space-y-4 sm:space-y-4 p-3">
                   {businessHours.map((schedule, index) => (
                     <div key={index} className="flex justify-between text-sm sm:text-sm">
                       <span className={schedule.isOpen ? "text-green-400" : "text-gray-500"}>
@@ -928,7 +952,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Similar Businesses Sidebar */}
-            <div className="bg-white shadow-sm p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex items-center gap-2 mb-4">
                 <ChevronRight className="w-5 h-5 text-gray-700" />
                 <h3 className="text-base font-bold text-gray-900">Similar Businesses</h3>
@@ -954,6 +978,7 @@ const BusinessPage = () => {
                                 width={48}
                                 height={48}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
                               />
                             ) : (
                               <span className="text-sm font-bold text-white">
