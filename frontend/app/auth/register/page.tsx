@@ -491,7 +491,7 @@ const RegisterPage = () => {
                       .
                     
                       <br />
-                      Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services,{" "}
+                      Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services{" "}
                       <Link href="/settings" className="text-blue-600 hover:underline">
                         here
                       </Link>
