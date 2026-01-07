@@ -561,7 +561,7 @@ const BusinessPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
-                      <Card className="overflow-hidden border border-gray-100 rounded hover:shadow-lg transition-shadow cursor-pointer shadow-none">
+                      <Card className="overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer shadow-none">
                         <div className="h-40 bg-gray-100">
                           {item.images && item.images.length > 0 ? (
                             <Image
