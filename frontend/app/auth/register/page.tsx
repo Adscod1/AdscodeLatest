@@ -478,7 +478,7 @@ const RegisterPage = () => {
                     <label className="text-sm text-gray-600">
                       By signing up, you agree to the{" "}
                       <Link href="/terms" className="text-blue-600 hover:underline">
-                        Terms of Use of Service
+                        Terms of Use
                       </Link>{" "}
                       and{" "}
                       <Link href="/privacy" className="text-blue-600 hover:underline">

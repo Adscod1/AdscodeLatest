@@ -183,7 +183,7 @@ const CompleteProfilePage = () => {
                 <label className="text-sm text-gray-600">
                   By signing up, you agree to the{" "}
                   <Link href="/terms" className="text-blue-600 hover:underline">
-                    Terms of Use of Service
+                    Terms of Use
                   </Link>{" "}
                   and{" "}
                   <Link href="/privacy" className="text-blue-600 hover:underline">
@@ -193,7 +193,7 @@ const CompleteProfilePage = () => {
                   <Link href="/cookies" className="text-blue-600 hover:underline">
                     Cookies Use
                   </Link>
-                  . Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services, including ads. Learn more. Others will be able to find you by email or phone number, when provided, unless you choose otherwise{" "}
+                  . Adscod may use your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, like keeping your account secure and personalizing our services,{""}
                   <Link href="/settings" className="text-blue-600 hover:underline">
                     here
                   </Link>
