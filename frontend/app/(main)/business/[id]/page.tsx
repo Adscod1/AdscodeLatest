@@ -278,7 +278,7 @@ const BusinessPage = () => {
 
         
         {/* Top Section: Business Profile + Action Buttons */}
-        <div className="bg-white border border-gray-100 px-4 sm:px-6 lg:px-12 py-1 sm:py-4 w-full overflow-visible">
+        <div className="bg-white border border-gray-200 px-4 sm:px-6 lg:px-12 py-1 sm:py-4 w-full overflow-visible">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-full">
             {/* Left Side: Business Profile with Logo and Name inline */}
             <div className="flex items-center gap-4 sm:gap-6">
@@ -422,7 +422,7 @@ const BusinessPage = () => {
 
             {/* About Section */}
             <div className="w-full lg:w-80 flex-shrink-0">
-              <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden h-full">
+              <div className="bg-white border border-gray-200 p-4 sm:p-6 lg:p-8 w-full overflow-hidden h-full">
                 <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">About</h3>
                 <div className="border-b border-gray-200 mb-4 sm:mb-6"></div>
                 <div className="space-y-3 sm:space-y-4">
@@ -506,7 +506,7 @@ const BusinessPage = () => {
           <div className="flex-1 space-y-8 lg:space-y-10 min-w-0 w-full">
 
             {/* Campaigns */}
-            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-200 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
@@ -561,7 +561,7 @@ const BusinessPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
-                      <Card className="overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer shadow-none">
+                      <Card className="overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer shadow-none">
                         <div className="h-40 bg-gray-100">
                           {item.images && item.images.length > 0 ? (
                             <Image
@@ -614,7 +614,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Media */}
-            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-200 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
@@ -645,7 +645,7 @@ const BusinessPage = () => {
 
 
             {/* Highlights */}
-            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-200 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Business Highlights</h2>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
                 {highlights.map((highlight, index) => (
@@ -660,7 +660,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Reviews */}
-            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-200 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Recommended Reviews</h2>
                 <Link href={`/business/${store.id}/reviews`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
@@ -938,7 +938,7 @@ const BusinessPage = () => {
           {/* Right Column - Sidebars Container */}
           <div className="w-full  lg:w-80 flex flex-col gap-8 lg:gap-10 mt-12 lg:mt-0 flex-shrink-0">
             {/* Business Hours Sidebar */}
-            <div className="bg-white border border-gray-100 w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
+            <div className="bg-white border border-gray-200 w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
               <div>
                 <div className="bg-green-400 text-white  sm:px-4 py-2 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
@@ -961,7 +961,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Similar Businesses Sidebar */}
-            <div className="bg-white border border-gray-100 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white border border-gray-200 p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex items-center gap-2 mb-4">
                 <ChevronRight className="w-5 h-5 text-gray-700" />
                 <h3 className="text-base font-bold text-gray-900">Similar Businesses</h3>
@@ -978,7 +978,7 @@ const BusinessPage = () => {
                     .slice(0, 5)
                     .map((similarStore: any) => (
                       <Link key={similarStore.id} href={`/business/${similarStore.id}`}>
-                        <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer border border-gray-100">
+                        <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer border border-gray-200">
                           <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                             {similarStore.logo ? (
                               <Image
