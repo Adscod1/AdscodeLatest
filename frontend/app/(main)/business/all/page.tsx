@@ -45,9 +45,9 @@ const StarRating = ({ rating }: { rating: number }) => {
           key={i}
           className={
             i < Math.floor(rating)
-              ? "text-orange-400"
+              ? "text-yellow-400"
               : i < rating
-              ? "text-orange-400 opacity-60"
+              ? "text-yellow-400 opacity-60"
               : "text-gray-300"
           }
         >
@@ -162,17 +162,17 @@ const BusinessCard = ({ store }: { store: Store }) => {
           {/* Features */}
           <div className="flex flex-wrap items-center gap-2 lg:gap-3 mb-3 lg:mb-4">
             <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500 flex-shrink-0" />
+              <Car className="h-4 w-4 lg:h-5 lg:w-5 text-yellow-400 flex-shrink-0" />
               <span className="text-xs lg:text-sm text-gray-600">Ample parking</span>
             </div>
             <span className="text-gray-400">•</span>
             <div className="flex items-center gap-2">
-              <Accessibility className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500 flex-shrink-0" />
+              <Accessibility className="h-4 w-4 lg:h-5 lg:w-5 text-yellow-400 flex-shrink-0" />
               <span className="text-xs lg:text-sm text-gray-600">Wheelchair access</span>
             </div>
             <span className="text-gray-400">•</span>
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500 flex-shrink-0" />
+              <Users className="h-4 w-4 lg:h-5 lg:w-5 text-yellow-400 flex-shrink-0" />
               <span className="text-xs lg:text-sm text-gray-600">Family friendly</span>
             </div>
           </div>
@@ -221,11 +221,12 @@ const FilterCheckbox = ({ label }: { label: string }) => (
   </div>
 );
 
-const CategoryButton = ({ label, active = false }: { label: string; active?: boolean }) => (
+const CategoryButton = ({ label, active = false, onClick }: { label: string; active?: boolean; onClick?: () => void }) => (
   <button
+    onClick={onClick}
     className={`px-3 py-1 rounded-full text-sm border transition-colors ${
       active
-        ? "bg-blue-100 border-blue-200"
+        ? "bg-blue-100 border-blue-200 text-blue-700"
         : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
     }`}
   >
@@ -237,6 +238,7 @@ const BusinessesPageContent = () => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams?.get('search') || '';
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>(['Restaurants']);
   
   const { data: stores, isLoading } = useQuery({
     queryKey: ["stores"],
@@ -304,13 +306,53 @@ const BusinessesPageContent = () => {
 
             <FilterSection title="Tags">
               <div className="space-y-3 space-x-2">
-                <CategoryButton label="Restaurants" active />
-                <CategoryButton label="Cuiesnness" />
+                <CategoryButton 
+                  label="Restaurants" 
+                  active={selectedTags.includes('Restaurants')} 
+                  onClick={() => setSelectedTags(prev => 
+                    prev.includes('Restaurants') 
+                      ? prev.filter(t => t !== 'Restaurants') 
+                      : [...prev, 'Restaurants']
+                  )}
+                />
+                <CategoryButton 
+                  label="Cuiesnness" 
+                  active={selectedTags.includes('Cuiesnness')} 
+                  onClick={() => setSelectedTags(prev => 
+                    prev.includes('Cuiesnness') 
+                      ? prev.filter(t => t !== 'Cuiesnness') 
+                      : [...prev, 'Cuiesnness']
+                  )}
+                />
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
-                <CategoryButton label="Steakouts" />
-                <CategoryButton label="Pizza" />
-                <CategoryButton label="Locals" />
+                <CategoryButton 
+                  label="Steakouts" 
+                  active={selectedTags.includes('Steakouts')} 
+                  onClick={() => setSelectedTags(prev => 
+                    prev.includes('Steakouts') 
+                      ? prev.filter(t => t !== 'Steakouts') 
+                      : [...prev, 'Steakouts']
+                  )}
+                />
+                <CategoryButton 
+                  label="Pizza" 
+                  active={selectedTags.includes('Pizza')} 
+                  onClick={() => setSelectedTags(prev => 
+                    prev.includes('Pizza') 
+                      ? prev.filter(t => t !== 'Pizza') 
+                      : [...prev, 'Pizza']
+                  )}
+                />
+                <CategoryButton 
+                  label="Locals" 
+                  active={selectedTags.includes('Locals')} 
+                  onClick={() => setSelectedTags(prev => 
+                    prev.includes('Locals') 
+                      ? prev.filter(t => t !== 'Locals') 
+                      : [...prev, 'Locals']
+                  )}
+                />
               </div>
             </FilterSection>
 
