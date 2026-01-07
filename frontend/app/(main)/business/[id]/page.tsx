@@ -28,6 +28,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo, lazy, Suspense } from "react";
+import { authClient } from "@/lib/auth-client";
 
 interface PrismaProduct {
   id: string;
@@ -55,7 +56,10 @@ const BusinessPage = () => {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, date: Date}>}>({});
+  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, userImage: string | null, date: Date}>}>({});
+
+  // Get current user session
+  const { data: session } = authClient.useSession();
 
   const handleReplyClick = (reviewId: string) => {
     setReplyingTo(reviewId);
@@ -65,11 +69,17 @@ const BusinessPage = () => {
   const handleReplySubmit = async (reviewId: string) => {
     if (!replyText.trim()) return;
 
+    // Get current user info from session
+    const currentUser = session?.user;
+    const userName = currentUser?.name || "Anonymous User";
+    const userImage = currentUser?.image || null;
+
     // TODO: Add API call to save reply
     const newReply = {
       id: Date.now().toString(),
       text: replyText,
-      user: "Current User",
+      user: userName,
+      userImage: userImage,
       date: new Date()
     };
 
@@ -798,19 +808,19 @@ const BusinessPage = () => {
                                     return (
                                       <div className="flex gap-2 mb-3 flex-wrap">
                                         {images.slice(0, 4).map((imageUrl: string, idx: number) => (
-                                          <div key={idx} className="w-24 h-16 rounded overflow-hidden bg-gray-100 flex-shrink-0">
+                                          <div key={idx} className="w-32 h-20 rounded overflow-hidden bg-gray-100 flex-shrink-0">
                                             <Image
                                               src={imageUrl}
                                               alt={`Review image ${idx + 1}`}
-                                              width={96}
-                                              height={64}
+                                              width={128}
+                                              height={80}
                                               className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
                                               loading="lazy"
                                             />
                                           </div>
                                         ))}
                                         {images.length > 4 && (
-                                          <div className="w-24 h-16 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
+                                          <div className="w-32 h-20 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
                                             +{images.length - 4}
                                           </div>
                                         )}
@@ -825,13 +835,7 @@ const BusinessPage = () => {
                               
                               {/* Action Buttons */}
                               <div className="flex items-center gap-4 mt-2">
-                                <button
-                                  onClick={() => handleReplyClick(review.id)}
-                                  className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
-                                >
-                                  <MessageCircle className="w-4 h-4" />
-                                  <span className="text-xs">Reply</span>
-                                </button>
+                                
                                 
                                 <button className="flex items-center gap-1 text-gray-500 hover:text-green-600 transition-colors">
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -844,9 +848,15 @@ const BusinessPage = () => {
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
                                   </svg>
-                                  <span className="text-xs">Unhelpful</span>
+                                  <span className="text-xs">Not helpful</span>
                                 </button>
-                                
+                                <button
+                                  onClick={() => handleReplyClick(review.id)}
+                                  className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                                >
+                                  <MessageCircle className="w-4 h-4" />
+                                  <span className="text-xs">Reply</span>
+                                </button>
                                 {/* Show reply count if there are replies */}
                                 {replies[review.id] && replies[review.id].length > 0 && (
                                   <button 
@@ -913,10 +923,20 @@ const BusinessPage = () => {
                                   {replies[review.id].map((reply) => (
                                     <div key={reply.id} className="pl-6 border-l-2 border-gray-200">
                                       <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                                          <span className="text-xs font-bold text-white">
-                                            {reply.user.charAt(0)}
-                                          </span>
+                                        <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center overflow-hidden">
+                                          {reply.userImage ? (
+                                            <Image
+                                              src={reply.userImage}
+                                              alt={reply.user}
+                                              width={32}
+                                              height={32}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          ) : (
+                                            <span className="text-xs font-bold text-white">
+                                              {reply.user.charAt(0)}
+                                            </span>
+                                          )}
                                         </div>
                                         <div className="flex-1">
                                           <div className="flex items-center gap-2 mb-1">
