@@ -140,14 +140,14 @@ const BusinessCard = ({ store }: { store: Store }) => {
           </div>
 
           {/* Categories */}
-          <div className="flex flex-wrap gap-2 mb-3 lg:mb-4">
-            <span className="inline-block bg-gray-100 text-gray-700 text-xs lg:text-sm px-2 lg:px-3 py-1 rounded-full">
+          <div className="flex flex-wrap gap-1.5 mb-3 lg:mb-4">
+            <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
                Seafood 
             </span>
-            <span className="inline-block bg-gray-100 text-gray-700 text-xs lg:text-sm px-2 lg:px-3 py-1 rounded-full">
+            <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
               Wines Bars
             </span>
-            <span className="inline-block bg-gray-100 text-gray-700 text-xs lg:text-sm px-2 lg:px-3 py-1 rounded-full">
+            <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
               Cocktails
             </span>
           </div>
@@ -178,8 +178,8 @@ const BusinessCard = ({ store }: { store: Store }) => {
           </div>
 
           {/* Description */}
-          <p className="text-sm lg:text-base text-gray-600 mb-4 lg:mb-6 line-clamp-2 lg:line-clamp-3 leading-relaxed">
-            {store.description || "Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, laudantium! Quia, cupiditate nisl ipsam delectus possimus aliquam repellendus itaque ullam perferendis qui distinctio cum eveniet placeat incidunt tempore veritatis nemo corrupti inventore."}
+          <p className="text-sm lg:text-base text-gray-600 mb-4 lg:mb-6 line-clamp-2 leading-relaxed">
+            {store.description || "Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, laudantium! Quia, cupiditate nisl ipsam delectus possimus aliquam repellendus itaque ullam perferendis qui distinctio cum eveniet placeat incidunt tempore veritatis nemo corrupti inventore..."}
           </p>
         </div>
 
