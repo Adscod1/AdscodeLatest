@@ -70,7 +70,7 @@ interface Store {
 
 const BusinessCard = ({ store }: { store: Store }) => {
   return (
-    <div className="flex flex-col lg:flex-row bg-white rounded-lg overflow-hidden transition-shadow h-64 lg:h-[340px]">
+    <div className="flex flex-col lg:flex-row bg-white rounded-lg overflow-hidden transition-shadow h-64 lg:h-[340px] border border-gray-200">
       {/* Image Gallery */}
       <div className="w-full lg:w-1/2 xl:w-[500px] h-full relative flex-shrink-0">
         <div className="flex h-full gap-1">
