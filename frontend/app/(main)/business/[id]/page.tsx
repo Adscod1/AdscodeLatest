@@ -305,7 +305,7 @@ const BusinessPage = () => {
               </div>
               {/* Business Info */}
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-1 sm:mb-2 flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2">
                   <span className="truncate">{store.name}</span>
                   <svg 
                     className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" 
@@ -334,8 +334,6 @@ const BusinessPage = () => {
                     </g>
                   </svg>
 
-                  <span className="text-gray-500 font-normal text-sm sm:text-base">@username</span>
-
                   {store.category && (
                   <span className=" mt-1 font-normal px-2 py-0.5 bg-gray-100 text-gray-700 text-xs sm:text-xs rounded-full">
                     {store.category}
@@ -355,8 +353,10 @@ const BusinessPage = () => {
                     <span className="font-semibold text-green-600">92%</span> Performance Score
                   </span>
                 </h1>
+
+                <p className="text-gray-500 font-normal text-sm mb-1">@username</p>
                 
-                <p className="text-gray-500 text-xs sm:text-[14px] truncate -mt-1">
+                <p className="text-gray-500 text-xs sm:text-[14px] truncate">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
                 </p>
                 
