@@ -188,7 +188,7 @@ const BusinessPage = () => {
 
   if (!store) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Store Not Found
@@ -205,7 +205,7 @@ const BusinessPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+    <div className="min-h-screen  overflow-x-hidden">
       <div className="mx-auto w-full">
         {/* Hero Carousel Section with Three Images - Full Width */}
         <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden w-full">
@@ -375,7 +375,7 @@ const BusinessPage = () => {
         </div>
 
         {/* Main Content - Responsive padding */}
-        <div className="px-4 sm:px-6 lg:px-12 bg-blue-50 pt-5 w-full max-w-full overflow-hidden">
+        <div className="px-4 sm:px-6 lg:px-12  pt-5 w-full max-w-full overflow-hidden">
           {/* Top Row: Description + About side by side */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-0 lg:mb-0">
             {/* Description Section */}
