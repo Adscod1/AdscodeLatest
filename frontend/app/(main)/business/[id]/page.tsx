@@ -581,6 +581,15 @@ const BusinessPage = () => {
                         </div>
                         <div className="p-3 sm:p-4">
                           <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 text-sm sm:text-base">{item.title}</h3>
+                          <div className="flex items-center gap-1 mb-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className="w-3 h-3 text-yellow-400 fill-yellow-400"
+                              />
+                            ))}
+                            <span className="text-xs text-gray-500 ml-1">(4.5)</span>
+                          </div>
                           <p className="text-gray-600 text-xs sm:text-sm line-clamp-2 mb-2">
                             {item.description || "No description available"}
                           </p>
