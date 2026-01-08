@@ -36,6 +36,21 @@ export class UpdateProfileDto {
   @IsString()
   @IsOptional()
   image?: string;
+
+  @ApiPropertyOptional({ description: 'Phone number' })
+  @IsString()
+  @IsOptional()
+  phoneNumber?: string;
+
+  @ApiPropertyOptional({ description: 'Username (must start with @)' })
+  @IsString()
+  @IsOptional()
+  username?: string;
+
+  @ApiPropertyOptional({ description: 'Date of birth' })
+  @IsString()
+  @IsOptional()
+  dateOfBirth?: string;
 }
 
 export class ProfileResponseDto {

@@ -836,6 +836,9 @@ export interface UpdateProfileInput {
   location?: string;
   bio?: string;
   image?: string;
+  phoneNumber?: string;
+  username?: string;
+  dateOfBirth?: string;
 }
 
 export const profilesApi = {

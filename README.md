@@ -141,3 +141,8 @@ npx prisma db push
 
 // Update review comment to TEXT
 npx prisma migrate dev --name update_review_comment_to_text
+
+
+//2026
+
+npx prisma generate

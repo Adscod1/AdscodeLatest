@@ -71,6 +71,7 @@ export class ProfilesService {
       throw new NotFoundException('Profile not found');
     }
 
+    // Update Profile table
     const profile = await this.prisma.profile.update({
       where: { userId },
       data: {
@@ -81,6 +82,18 @@ export class ProfilesService {
       },
     });
 
+    // Update User table for phoneNumber, username, and dateOfBirth
+    if (data.phoneNumber !== undefined || data.username !== undefined || data.dateOfBirth !== undefined) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(data.phoneNumber !== undefined && { phoneNumber: data.phoneNumber }),
+          ...(data.username !== undefined && { username: data.username }),
+          ...(data.dateOfBirth !== undefined && { dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null }),
+        },
+      });
+    }
+
     return profile;
   }
 
@@ -89,7 +102,7 @@ export class ProfilesService {
    */
   async updateFields(
     userId: string,
-    data: { name?: string; location?: string; bio?: string },
+    data: UpdateProfileDto,
   ) {
     const existingProfile = await this.prisma.profile.findUnique({
       where: { userId },
@@ -99,14 +112,28 @@ export class ProfilesService {
       throw new NotFoundException('Profile not found');
     }
 
+    // Update Profile table
     const profile = await this.prisma.profile.update({
       where: { userId },
       data: {
-        name: data.name,
-        location: data.location,
-        bio: data.bio,
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.location !== undefined && { location: data.location }),
+        ...(data.bio !== undefined && { bio: data.bio }),
+        ...(data.image !== undefined && { image: data.image }),
       },
     });
+
+    // Update User table for phoneNumber, username, and dateOfBirth
+    if (data.phoneNumber !== undefined || data.username !== undefined || data.dateOfBirth !== undefined) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(data.phoneNumber !== undefined && { phoneNumber: data.phoneNumber }),
+          ...(data.username !== undefined && { username: data.username }),
+          ...(data.dateOfBirth !== undefined && { dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null }),
+        },
+      });
+    }
 
     return profile;
   }

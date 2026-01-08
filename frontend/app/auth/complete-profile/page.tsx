@@ -10,6 +10,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Logo } from "../../(main)/components/navbar";
+import api from "@/lib/api-client";
 
 const completeProfileSchema = z
   .object({
@@ -67,16 +68,18 @@ const CompleteProfilePage = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: CompleteProfileFormValues) => {
-      // Here you would typically update the user's profile with the additional information
-      // For now, we'll just simulate a successful update
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return data;
+      return await api.profiles.update({
+        phoneNumber: data.phoneNumber || undefined,
+        location: data.location || undefined,
+        username: data.username || undefined,
+        dateOfBirth: data.dateOfBirth || undefined,
+      });
     },
     onSuccess: () => {
       toast.success("Profile completed successfully");
       router.push("/profile");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(error.message || "Failed to complete profile");
     },
   });
