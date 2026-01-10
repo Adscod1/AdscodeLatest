@@ -185,7 +185,7 @@ const ReviewsPage = () => {
                         </g>
                       </g>
                     </svg>
-                    <span className="text-gray-500">@username</span>
+                    <span className="text-gray-500">@{store.user?.username?.replace(/^@/, '') || 'username'}</span>
                   </div>
                   {store.tagline && (
                     <p className="text-xs sm:text-sm text-gray-500 truncate">{store.tagline}</p>
@@ -334,6 +334,7 @@ const ReviewsPage = () => {
                       <span className="font-medium text-gray-900">
                         {review.user.name || "Anonymous User"}
                       </span>
+                      <span className="text-gray-500 text-sm">@{review.user.username?.replace(/^@/, '') || 'user'}</span>
                       <svg 
                         className="w-4 h-4 flex-shrink-0" 
                         viewBox="0,0,256,256"

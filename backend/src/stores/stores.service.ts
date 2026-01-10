@@ -255,6 +255,7 @@ export class StoresService {
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         _count: {
@@ -325,6 +326,7 @@ export class StoresService {
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         _count: {

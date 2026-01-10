@@ -500,7 +500,7 @@ const WriteReviewPage = () => {
                         </g>
                       </g>
                     </svg>
-                    <span className="text-gray-500">@username</span>
+                    <span className="text-gray-500">@{store.user?.username?.replace(/^@/, '') || 'username'}</span>
                   </div>
                   {store.tagline && (
                     <p className="text-xs sm:text-sm text-gray-500 truncate">{store.tagline}</p>
@@ -997,7 +997,7 @@ const WriteReviewPage = () => {
                           <span className=" text-gray-900 text-xl font-bold">
                             {review.user.name || "Anonymous"}
                           </span>
-                          <span className="text-gray-500 text-sm">@username</span>
+                          <span className="text-gray-500 text-sm">@{review.user.username?.replace(/^@/, '') || 'user'}</span>
                           
                         
                           <svg 

@@ -164,6 +164,12 @@ export interface Store {
   banner: string | null;
   createdAt: Date;
   updatedAt: Date;
+  user?: {
+    id: string;
+    name: string | null;
+    image: string | null;
+    username: string | null;
+  };
 }
 
 export interface BusinessHour {
@@ -877,6 +883,7 @@ export interface Review {
     id: string;
     name: string | null;
     image: string | null;
+    username: string | null;
   };
   createdAt: Date;
   updatedAt: Date;

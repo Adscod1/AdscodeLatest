@@ -14,6 +14,7 @@ export const getStores = async () => {
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         _count: {
@@ -39,6 +40,7 @@ export const getStoreById = async (storeId: string) => {
             id: true,
             name: true,
             image: true,
+            username: true,
           },
         },
         _count: {
