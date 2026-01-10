@@ -48,7 +48,7 @@ const LoginPage = () => {
       setError(null);
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3000/profile",
+        callbackURL: "http://localhost:3000/auth/complete-profile",
       });
     } catch {
       setError("Failed to sign in with Google. Please try again.");

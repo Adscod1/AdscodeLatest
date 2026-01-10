@@ -16,7 +16,7 @@ const completeProfileSchema = z
   .object({
     phoneNumber: z.string().optional(),
     location: z.string().optional(),
-    username: z.string().optional(),
+    username: z.string().min(1, "Username is required"),
     dateOfBirth: z.string().optional(),
     acceptTerms: z.boolean().refine((val) => val === true, {
       message: "You must accept the terms and conditions",
@@ -101,7 +101,7 @@ const CompleteProfilePage = () => {
             <Logo />
             <h2 className="mt-8 text-2xl font-bold">Complete Your Profile</h2>
             <p className="text-gray-500 mb-6">
-              Help us personalize your experience on Adscod
+              Please choose a unique username to continue
             </p>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -139,7 +139,7 @@ const CompleteProfilePage = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
+                  Username <span className="text-red-500">*</span>
                 </label>
                 <Input
                   type="text"
@@ -153,6 +153,7 @@ const CompleteProfilePage = () => {
                     }
                   })}
                   aria-invalid={!!errors.username}
+                  required
                 />
                 {errors.username && (
                   <p className="mt-1 text-sm text-red-600">
@@ -216,15 +217,6 @@ const CompleteProfilePage = () => {
                 {mutation.isPending ? "Completing profile..." : "Complete Profile"}
               </Button>
             </form>
-
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => router.push("/profile")}
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                Skip for now
-              </button>
-            </div>
           </div>
         </div>
 

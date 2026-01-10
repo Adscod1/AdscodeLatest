@@ -15,6 +15,16 @@ const ProfilePage = async () => {
     redirect("/auth/login");
   }
 
+  // Check if user has a username (required for all users)
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { username: true },
+  });
+
+  if (!user?.username) {
+    redirect("/auth/complete-profile");
+  }
+
   const response = await api.profiles.getMe();
   let profile = response.profile;
 
