@@ -60,6 +60,30 @@ export class ProfilesService {
   }
 
   /**
+   * Get current user data including username
+   */
+  async getCurrentUser(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        username: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  /**
    * Update profile (creates if doesn't exist - for OAuth users)
    */
   async update(userId: string, data: UpdateProfileDto) {

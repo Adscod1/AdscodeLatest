@@ -4,6 +4,9 @@ import { Profile } from "@prisma/client";
 import Image from "next/image";
 import { X, Users, User } from 'lucide-react';
 import { ProfileEditForm } from "@/app/(dashboard)/profile/components/profile-edit-form";
+import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api-client";
 
 interface ProfileCardProps {
   profile: Profile | null;
@@ -19,6 +22,28 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   onSuccess 
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
+  
+  // Get current user session
+  const { data: session } = authClient.useSession();
+  
+  // Log session data to see what's available
+  React.useEffect(() => {
+    if (session) {
+      console.log('Session data:', session);
+      console.log('User data:', session.user);
+    }
+  }, [session]);
+  
+  // Fetch current user details including username
+  const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      const response = await api.profiles.getCurrentUser();
+      console.log('Profiles API response:', response);
+      return response.user;
+    },
+    enabled: !!session?.user?.id,
+  });
 
   if (!isOpen || !profile) return null;
 
@@ -84,6 +109,12 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
                       Edit
                     </button>
                   </div>
+                  <p className="text-sm text-gray-500 truncate mb-1">
+                    @{
+                      currentUser?.username?.replace(/^@/, '') ||
+                      'username'
+                    }
+                  </p>
                   <p className="text-sm text-gray-500 truncate mb-3">{profile?.role || "User"}</p>
                   
                   <div className="flex items-center space-x-4 text-sm">

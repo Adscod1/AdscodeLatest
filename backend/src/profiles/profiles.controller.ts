@@ -41,6 +41,24 @@ export class ProfilesController {
     };
   }
 
+  @Get('me/user')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user data including username' })
+  @ApiResponse({
+    status: 200,
+    description: 'User data retrieved successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getCurrentUser(@UserId() userId: string) {
+    const user = await this.profilesService.getCurrentUser(userId);
+    return {
+      success: true,
+      user,
+    };
+  }
+
   @Put('me')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()

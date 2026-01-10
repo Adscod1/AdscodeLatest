@@ -823,6 +823,16 @@ export const notificationsApi = {
 // Note: Role enum matches Prisma schema
 export type Role = 'ADMIN' | 'USER' | 'INFLUENCER';
 
+export interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  username: string | null;
+  image: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Profile {
   id: string;
   userId: string;
@@ -851,6 +861,10 @@ export const profilesApi = {
   // Get current profile
   getMe: () => 
     apiRequest<{ success: boolean; profile: Profile | null }>('/profiles/me'),
+  
+  // Get current user data including username
+  getCurrentUser: () => 
+    apiRequest<{ success: boolean; user: User }>('/profiles/me/user'),
   
   // Update profile
   update: (data: UpdateProfileInput) => 
