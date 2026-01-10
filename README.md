@@ -144,6 +144,7 @@ npx prisma migrate dev --name update_review_comment_to_text
 
 
 //2026
+git pull --rebase origin main
 
 npx prisma@6.18.0 generate --schema=backend/prisma/schema.prisma
 npx prisma@6.18.0 db push --schema=backend/prisma/schema.prisma
