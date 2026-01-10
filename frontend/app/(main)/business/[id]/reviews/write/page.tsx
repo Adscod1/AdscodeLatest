@@ -21,13 +21,15 @@ import {
   Upload,
   ImageIcon,
   MessageCircle,
-  ThumbsUp
+  ThumbsUp,
+  ThumbsDown
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import api from "@/lib/api-client";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { getRelativeTime } from "@/lib/utils/time";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const SoftStar = ({ filled }: { filled: boolean }) => (
@@ -90,6 +92,18 @@ const WriteReviewPage = () => {
   const [replyText, setReplyText] = useState("");
   const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, date: Date}>}>({});
 
+  // Vote state
+  const [helpfulVotes, setHelpfulVotes] = useState<{[key: string]: {helpful: number, notHelpful: number}}>({});
+  const [userVotes, setUserVotes] = useState<{[key: string]: 'helpful' | 'notHelpful' | null}>({});
+  
+  // Likes state
+  const [likes, setLikes] = useState<{[key: string]: number}>({});
+  const [userLikes, setUserLikes] = useState<{[key: string]: boolean}>({});
+  
+  // Dislikes state
+  const [dislikes, setDislikes] = useState<{[key: string]: number}>({});
+  const [userDislikes, setUserDislikes] = useState<{[key: string]: boolean}>({});
+
   // Reply handlers
   const handleReplyClick = (reviewId: string) => {
     setReplyingTo(reviewId);
@@ -115,6 +129,72 @@ const WriteReviewPage = () => {
     setReplyText("");
     setReplyingTo(null);
     toast.success("Reply posted successfully!");
+  };
+
+  const handleVote = (reviewId: string, voteType: 'helpful' | 'notHelpful') => {
+    const currentVote = userVotes[reviewId];
+    
+    if (currentVote === voteType) {
+      setUserVotes(prev => ({ ...prev, [reviewId]: null }));
+      setHelpfulVotes(prev => ({
+        ...prev,
+        [reviewId]: {
+          helpful: voteType === 'helpful' ? (prev[reviewId]?.helpful || 1) - 1 : (prev[reviewId]?.helpful || 0),
+          notHelpful: voteType === 'notHelpful' ? (prev[reviewId]?.notHelpful || 1) - 1 : (prev[reviewId]?.notHelpful || 0)
+        }
+      }));
+      return;
+    }
+
+    setUserVotes(prev => ({ ...prev, [reviewId]: voteType }));
+    setHelpfulVotes(prev => {
+      const current = prev[reviewId] || { helpful: 0, notHelpful: 0 };
+      return {
+        ...prev,
+        [reviewId]: {
+          helpful: voteType === 'helpful' ? current.helpful + 1 : currentVote === 'helpful' ? current.helpful - 1 : current.helpful,
+          notHelpful: voteType === 'notHelpful' ? current.notHelpful + 1 : currentVote === 'notHelpful' ? current.notHelpful - 1 : current.notHelpful
+        }
+      };
+    });
+  };
+
+  const handleLike = (reviewId: string) => {
+    const isLiked = userLikes[reviewId];
+    const isDisliked = userDislikes[reviewId];
+    
+    if (isDisliked) {
+      setUserDislikes(prev => ({ ...prev, [reviewId]: false }));
+      setDislikes(prev => ({
+        ...prev,
+        [reviewId]: (prev[reviewId] || 1) - 1
+      }));
+    }
+    
+    setUserLikes(prev => ({ ...prev, [reviewId]: !isLiked }));
+    setLikes(prev => ({
+      ...prev,
+      [reviewId]: isLiked ? (prev[reviewId] || 1) - 1 : (prev[reviewId] || 0) + 1
+    }));
+  };
+
+  const handleDislike = (reviewId: string) => {
+    const isDisliked = userDislikes[reviewId];
+    const isLiked = userLikes[reviewId];
+    
+    if (isLiked) {
+      setUserLikes(prev => ({ ...prev, [reviewId]: false }));
+      setLikes(prev => ({
+        ...prev,
+        [reviewId]: (prev[reviewId] || 1) - 1
+      }));
+    }
+    
+    setUserDislikes(prev => ({ ...prev, [reviewId]: !isDisliked }));
+    setDislikes(prev => ({
+      ...prev,
+      [reviewId]: isDisliked ? (prev[reviewId] || 1) - 1 : (prev[reviewId] || 0) + 1
+    }));
   };
 
   // Upload file to server
@@ -986,7 +1066,7 @@ const WriteReviewPage = () => {
                   <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0">
                     {/* Review Header */}
                     <div className="flex items-start gap-2 sm:gap-3 mb-2">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                         {review.user.image ? (
                           <Image
                             src={review.user.image}
@@ -1038,12 +1118,7 @@ const WriteReviewPage = () => {
                           </svg>
                          
                           <span className="text-gray-500 text-xs">
-                            {new Date(review.createdAt).toLocaleTimeString('en-US', { 
-                              hour: '2-digit', 
-                              minute: '2-digit',
-                              hour12: true 
-
-                            })}
+                            {getRelativeTime(review.createdAt)}
                           </span>
                         </div>
                         
@@ -1102,24 +1177,56 @@ const WriteReviewPage = () => {
                     })()}
 
                     {/* Reply Button and Count */}
-                    <div className="flex items-center gap-4 mt-2 ml-3">
-                      <ThumbsUp className="w-3.5 h-3.5 text-gray-500" />
-
+                    <div className="flex items-center gap-3 mt-2 ml-3 text-xs">
+                      <button 
+                        onClick={() => handleVote(review.id, 'helpful')}
+                        className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
+                          userVotes[review.id] === 'helpful' ? 'text-yellow-600 font-semibold' : 'text-gray-500'
+                        }`}
+                      >
+                        <ThumbsUp className="w-3.5 h-3.5" />
+                        <span>Helpful{helpfulVotes[review.id]?.helpful ? ` (${helpfulVotes[review.id].helpful})` : ''}</span>
+                      </button>
+                      <button 
+                        onClick={() => handleVote(review.id, 'notHelpful')}
+                        className={`flex items-center gap-1 hover:text-red-600 transition-colors ${
+                          userVotes[review.id] === 'notHelpful' ? 'text-red-600 font-semibold' : 'text-gray-500'
+                        }`}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                        </svg>
+                        <span>Not helpful{helpfulVotes[review.id]?.notHelpful ? ` (${helpfulVotes[review.id].notHelpful})` : ''}</span>
+                      </button>
+                      <button
+                        onClick={() => handleLike(review.id)}
+                        className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
+                          userLikes[review.id] ? 'text-pink-600 font-semibold' : 'text-gray-500'
+                        }`}
+                      >
+                        <svg className="w-3.5 h-3.5" fill={userLikes[review.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span>Likes{likes[review.id] ? ` (${likes[review.id]})` : ''}</span>
+                      </button>
+                      <button
+                        onClick={() => handleDislike(review.id)}
+                        className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
+                          userDislikes[review.id] ? 'text-purple-600 font-semibold' : 'text-gray-500'
+                        }`}
+                      >
+                        <svg className="w-3.5 h-3.5" fill={userDislikes[review.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Dislikes{dislikes[review.id] ? ` (${dislikes[review.id]})` : ''}</span>
+                      </button>
                       <button
                         onClick={() => handleReplyClick(review.id)}
-                        className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors text-xs"
+                        className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
                       >
-                        
-                        <span>Reply</span>
-                        <span>(20)</span>
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>Reply{replies[review.id] && replies[review.id].length > 0 ? ` (${replies[review.id].length})` : ''}</span>
                       </button>
-                      
-                      {replies[review.id] && replies[review.id].length > 0 && (
-                        <span className="flex items-center gap-1 text-blue-600 text-xs">
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          <span>Reply ({replies[review.id].length})</span>
-                        </span>
-                      )}
                     </div>
 
                     {/* Reply Form */}
@@ -1212,16 +1319,57 @@ const WriteReviewPage = () => {
                                 </div>
                                 <p className="text-xs text-gray-700">{reply.text}</p>
                                 
-                                {/* Reply to reply button */}
-                                <div className="flex items-center gap-4 mt-2">
-                                 <ThumbsUp className="w-3.5 h-3.5 text-gray-500" />
-                                <button 
-                                  type="button"
-                                  className="flex items-center gap-1 text-gray-500 hover:text-blue-600 mt-1 text-xs"
-                                >
-                                  
-                                  <span>Reply</span>
-                                </button>
+                                {/* Reply action buttons */}
+                                <div className="flex items-center gap-3 mt-2 text-xs">
+                                  <button 
+                                    onClick={() => handleVote(reply.id, 'helpful')}
+                                    className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
+                                      userVotes[reply.id] === 'helpful' ? 'text-yellow-600 font-semibold' : 'text-gray-500'
+                                    }`}
+                                  >
+                                    <ThumbsUp className="w-3.5 h-3.5" />
+                                    <span>Helpful{helpfulVotes[reply.id]?.helpful ? ` (${helpfulVotes[reply.id].helpful})` : ''}</span>
+                                  </button>
+                                  <button 
+                                    onClick={() => handleVote(reply.id, 'notHelpful')}
+                                    className={`flex items-center gap-1 hover:text-red-600 transition-colors ${
+                                      userVotes[reply.id] === 'notHelpful' ? 'text-red-600 font-semibold' : 'text-gray-500'
+                                    }`}
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                                    </svg>
+                                    <span>Not helpful{helpfulVotes[reply.id]?.notHelpful ? ` (${helpfulVotes[reply.id].notHelpful})` : ''}</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handleLike(reply.id)}
+                                    className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
+                                      userLikes[reply.id] ? 'text-pink-600 font-semibold' : 'text-gray-500'
+                                    }`}
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill={userLikes[reply.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    <span>Likes{likes[reply.id] ? ` (${likes[reply.id]})` : ''}</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handleDislike(reply.id)}
+                                    className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
+                                      userDislikes[reply.id] ? 'text-purple-600 font-semibold' : 'text-gray-500'
+                                    }`}
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill={userDislikes[reply.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    <span>Dislikes{dislikes[reply.id] ? ` (${dislikes[reply.id]})` : ''}</span>
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    className="flex items-center gap-1 text-gray-500 hover:text-blue-600"
+                                  >
+                                    <MessageCircle className="w-3.5 h-3.5" />
+                                    <span>Reply</span>
+                                  </button>
                                 </div>
                               </div>
                             </div>

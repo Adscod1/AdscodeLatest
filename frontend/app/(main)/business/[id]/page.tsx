@@ -29,6 +29,7 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo, lazy, Suspense } from "react";
 import { authClient } from "@/lib/auth-client";
+import { getRelativeTime } from "@/lib/utils/time";
 
 interface PrismaProduct {
   id: string;
@@ -55,14 +56,28 @@ const BusinessPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyingToReplyId, setReplyingToReplyId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, userImage: string | null, date: Date}>}>({});
+  
+  // Vote state
+  const [helpfulVotes, setHelpfulVotes] = useState<{[key: string]: {helpful: number, notHelpful: number}}>({});
+  const [userVotes, setUserVotes] = useState<{[key: string]: 'helpful' | 'notHelpful' | null}>({});
+  
+  // Likes state
+  const [likes, setLikes] = useState<{[key: string]: number}>({});
+  const [userLikes, setUserLikes] = useState<{[key: string]: boolean}>({});
+  
+  // Dislikes state
+  const [dislikes, setDislikes] = useState<{[key: string]: number}>({});
+  const [userDislikes, setUserDislikes] = useState<{[key: string]: boolean}>({});
 
   // Get current user session
   const { data: session } = authClient.useSession();
 
-  const handleReplyClick = (reviewId: string) => {
+  const handleReplyClick = (reviewId: string, replyId?: string) => {
     setReplyingTo(reviewId);
+    setReplyingToReplyId(replyId || null);
     setReplyText("");
   };
 
@@ -90,6 +105,77 @@ const BusinessPage = () => {
 
     setReplyText("");
     setReplyingTo(null);
+    setReplyingToReplyId(null);
+  };
+
+  const handleVote = (reviewId: string, voteType: 'helpful' | 'notHelpful') => {
+    const currentVote = userVotes[reviewId];
+    
+    // If clicking the same vote type, remove the vote
+    if (currentVote === voteType) {
+      setUserVotes(prev => ({ ...prev, [reviewId]: null }));
+      setHelpfulVotes(prev => ({
+        ...prev,
+        [reviewId]: {
+          helpful: voteType === 'helpful' ? (prev[reviewId]?.helpful || 1) - 1 : (prev[reviewId]?.helpful || 0),
+          notHelpful: voteType === 'notHelpful' ? (prev[reviewId]?.notHelpful || 1) - 1 : (prev[reviewId]?.notHelpful || 0)
+        }
+      }));
+      return;
+    }
+
+    // Update vote
+    setUserVotes(prev => ({ ...prev, [reviewId]: voteType }));
+    setHelpfulVotes(prev => {
+      const current = prev[reviewId] || { helpful: 0, notHelpful: 0 };
+      return {
+        ...prev,
+        [reviewId]: {
+          helpful: voteType === 'helpful' ? current.helpful + 1 : currentVote === 'helpful' ? current.helpful - 1 : current.helpful,
+          notHelpful: voteType === 'notHelpful' ? current.notHelpful + 1 : currentVote === 'notHelpful' ? current.notHelpful - 1 : current.notHelpful
+        }
+      };
+    });
+  };
+
+  const handleLike = (reviewId: string) => {
+    const isLiked = userLikes[reviewId];
+    const isDisliked = userDislikes[reviewId];
+    
+    // If already disliked, remove dislike first
+    if (isDisliked) {
+      setUserDislikes(prev => ({ ...prev, [reviewId]: false }));
+      setDislikes(prev => ({
+        ...prev,
+        [reviewId]: (prev[reviewId] || 1) - 1
+      }));
+    }
+    
+    setUserLikes(prev => ({ ...prev, [reviewId]: !isLiked }));
+    setLikes(prev => ({
+      ...prev,
+      [reviewId]: isLiked ? (prev[reviewId] || 1) - 1 : (prev[reviewId] || 0) + 1
+    }));
+  };
+
+  const handleDislike = (reviewId: string) => {
+    const isDisliked = userDislikes[reviewId];
+    const isLiked = userLikes[reviewId];
+    
+    // If already liked, remove like first
+    if (isLiked) {
+      setUserLikes(prev => ({ ...prev, [reviewId]: false }));
+      setLikes(prev => ({
+        ...prev,
+        [reviewId]: (prev[reviewId] || 1) - 1
+      }));
+    }
+    
+    setUserDislikes(prev => ({ ...prev, [reviewId]: !isDisliked }));
+    setDislikes(prev => ({
+      ...prev,
+      [reviewId]: isDisliked ? (prev[reviewId] || 1) - 1 : (prev[reviewId] || 0) + 1
+    }));
   };
 
   const { data: store, isLoading: isLoadingStore } = useQuery({
@@ -751,7 +837,7 @@ const BusinessPage = () => {
                         <div key={review.id} className="bg-white   pb-4 ">
                           {/* Review Header */}
                           <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                            <div className="w-10 h-10 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center">
                               {review.user.image ? (
                                 <Image
                                   src={review.user.image}
@@ -773,11 +859,7 @@ const BusinessPage = () => {
                                   {(review.user.name || "Anonymous User").replace(/\*\*/g, '')}
                                 </span>
                                 <span className="text-xs text-gray-500">
-                                  {new Date(review.createdAt).toLocaleTimeString('en-US', { 
-                                    hour: '2-digit', 
-                                    minute: '2-digit',
-                                    hour12: false 
-                                  })}
+                                  {getRelativeTime(review.createdAt)}
                                 </span>
                               </div>
                               
@@ -796,9 +878,21 @@ const BusinessPage = () => {
                               </div>
                               
                               {/* Review Text */}
-                              <p className="text-gray-700 text-sm leading-relaxed mb-3 break-words max-w-[100%]">
-                                {review.comment?.replace(/\*\*/g, '') || ''}
-                              </p>
+                              <div className="text-gray-700 text-sm leading-relaxed mb-3 break-words max-w-[100%]">
+                                {(() => {
+                                  const lines = review.comment?.split('\n') || [];
+                                  const title = lines[0]?.replace(/^\*\*(.+?)\*\*$/, '$1') || lines[0];
+                                  const body = lines.slice(2).join('\n');
+                                  return (
+                                    <>
+                                      {title && <p className="font-bold mb-2">{title}</p>}
+                                      {body && body.split('\n').map((paragraph, idx) => (
+                                        <p key={idx} className="mb-2 last:mb-0">{paragraph}</p>
+                                      ))}
+                                    </>
+                                  );
+                                })()}
+                              </div>
                               
                               {/* Review Images */}
                               {review.images && (() => {
@@ -837,42 +931,62 @@ const BusinessPage = () => {
                               <div className="flex items-center gap-4 mt-2">
                                 
                                 
-                                <button className="flex items-center gap-1 text-gray-500 hover:text-green-600 transition-colors">
+                                <button 
+                                  onClick={() => handleVote(review.id, 'helpful')}
+                                  className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
+                                    userVotes[review.id] === 'helpful' ? 'text-yellow-600 font-semibold' : 'text-gray-500'
+                                  }`}
+                                >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
                                   </svg>
-                                  <span className="text-xs">Helpful</span>
+                                  <span className="text-xs">Helpful{helpfulVotes[review.id]?.helpful ? ` (${helpfulVotes[review.id].helpful})` : ''}</span>
                                 </button>
                                 
-                                <button className="flex items-center gap-1 text-gray-500 hover:text-red-600 transition-colors">
+                                <button 
+                                  onClick={() => handleVote(review.id, 'notHelpful')}
+                                  className={`flex items-center gap-1 hover:text-red-600 transition-colors ${
+                                    userVotes[review.id] === 'notHelpful' ? 'text-red-600 font-semibold' : 'text-gray-500'
+                                  }`}
+                                >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
                                   </svg>
-                                  <span className="text-xs">Not helpful</span>
+                                  <span className="text-xs">Not helpful{helpfulVotes[review.id]?.notHelpful ? ` (${helpfulVotes[review.id].notHelpful})` : ''}</span>
+                                </button>
+                                <button
+                                  onClick={() => handleLike(review.id)}
+                                  className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
+                                    userLikes[review.id] ? 'text-pink-600 font-semibold' : 'text-gray-500'
+                                  }`}
+                                >
+                                  <svg className="w-4 h-4" fill={userLikes[review.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                  </svg>
+                                  <span className="text-xs">Likes{likes[review.id] ? ` (${likes[review.id]})` : ''}</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDislike(review.id)}
+                                  className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
+                                    userDislikes[review.id] ? 'text-purple-600 font-semibold' : 'text-gray-500'
+                                  }`}
+                                >
+                                  <svg className="w-4 h-4" fill={userDislikes[review.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span className="text-xs">Dislikes{dislikes[review.id] ? ` (${dislikes[review.id]})` : ''}</span>
                                 </button>
                                 <button
                                   onClick={() => handleReplyClick(review.id)}
                                   className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
                                 >
                                   <MessageCircle className="w-4 h-4" />
-                                  <span className="text-xs">Reply</span>
+                                  <span className="text-xs">Reply{replies[review.id] && replies[review.id].length > 0 ? ` (${replies[review.id].length})` : ''}</span>
                                 </button>
-                                {/* Show reply count if there are replies */}
-                                {replies[review.id] && replies[review.id].length > 0 && (
-                                  <button 
-                                    className="flex items-center gap-1 text-blue-600 text-xs"
-                                    onClick={() => {
-                                      // Toggle showing replies (optional)
-                                    }}
-                                  >
-                                    <MessageCircle className="w-4 h-4" />
-                                    <span>Reply ({replies[review.id].length})</span>
-                                  </button>
-                                )}
                               </div>
 
                               {/* Reply Form */}
-                              {replyingTo === review.id && (
+                              {replyingTo === review.id && !replyingToReplyId && (
                                 <div className="mt-4 pl-4 border-l-2 border-blue-400">
                                   <div className="bg-gray-50 p-3 rounded-lg">
                                     <textarea
@@ -898,6 +1012,7 @@ const BusinessPage = () => {
                                           variant="ghost"
                                           onClick={() => {
                                             setReplyingTo(null);
+                                            setReplyingToReplyId(null);
                                             setReplyText("");
                                           }}
                                           className="text-gray-600"
@@ -947,20 +1062,113 @@ const BusinessPage = () => {
                                               <Badge className="bg-blue-500 text-white text-xs px-2 py-0">Author</Badge>
                                             )}
                                             <span className="text-xs text-gray-500">
-                                              {new Date(reply.date).toLocaleTimeString('en-US', { 
-                                                hour: '2-digit', 
-                                                minute: '2-digit',
-                                                hour12: false 
-                                              })}
+                                              {getRelativeTime(reply.date)}
                                             </span>
                                           </div>
                                           <p className="text-sm text-gray-700">{reply.text}</p>
                                           
-                                          {/* Reply to reply button */}
-                                          <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 mt-1">
-                                            <MessageCircle className="w-3 h-3" />
-                                            <span className="text-xs">Reply</span>
-                                          </button>
+                                          {/* Reply action buttons */}
+                                          <div className="flex items-center gap-3 mt-2 text-xs">
+                                            <button 
+                                              onClick={() => handleVote(reply.id, 'helpful')}
+                                              className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
+                                                userVotes[reply.id] === 'helpful' ? 'text-yellow-600 font-semibold' : 'text-gray-500'
+                                              }`}
+                                            >
+                                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                              </svg>
+                                              <span>Helpful{helpfulVotes[reply.id]?.helpful ? ` (${helpfulVotes[reply.id].helpful})` : ''}</span>
+                                            </button>
+                                            
+                                            <button 
+                                              onClick={() => handleVote(reply.id, 'notHelpful')}
+                                              className={`flex items-center gap-1 hover:text-red-600 transition-colors ${
+                                                userVotes[reply.id] === 'notHelpful' ? 'text-red-600 font-semibold' : 'text-gray-500'
+                                              }`}
+                                            >
+                                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                                              </svg>
+                                              <span>Not helpful{helpfulVotes[reply.id]?.notHelpful ? ` (${helpfulVotes[reply.id].notHelpful})` : ''}</span>
+                                            </button>
+                                            <button
+                                              onClick={() => handleLike(reply.id)}
+                                              className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
+                                                userLikes[reply.id] ? 'text-pink-600 font-semibold' : 'text-gray-500'
+                                              }`}
+                                            >
+                                              <svg className="w-3 h-3" fill={userLikes[reply.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                              </svg>
+                                              <span>Likes{likes[reply.id] ? ` (${likes[reply.id]})` : ''}</span>
+                                            </button>
+                                            <button
+                                              onClick={() => handleDislike(reply.id)}
+                                              className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
+                                                userDislikes[reply.id] ? 'text-purple-600 font-semibold' : 'text-gray-500'
+                                              }`}
+                                            >
+                                              <svg className="w-3 h-3" fill={userDislikes[reply.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                              </svg>
+                                              <span>Dislikes{dislikes[reply.id] ? ` (${dislikes[reply.id]})` : ''}</span>
+                                            </button>
+                                            
+                                            <button 
+                                              onClick={() => handleReplyClick(review.id, reply.id)}
+                                              className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                                            >
+                                              <MessageCircle className="w-3 h-3" />
+                                              <span>Reply</span>
+                                            </button>
+                                          </div>
+
+                                          {/* Reply Form for nested reply */}
+                                          {replyingTo === review.id && replyingToReplyId === reply.id && (
+                                            <div className="mt-3 pl-4 border-l-2 border-blue-400">
+                                              <div className="bg-gray-50 p-3 rounded-lg">
+                                                <textarea
+                                                  value={replyText}
+                                                  onChange={(e) => setReplyText(e.target.value)}
+                                                  placeholder={`Reply to ${reply.user}...`}
+                                                  className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                                  rows={3}
+                                                />
+                                                <div className="flex items-center justify-between mt-2">
+                                                  <div className="flex items-center gap-1 text-lg">
+                                                    <button className="hover:scale-110 transition-transform">👍</button>
+                                                    <button className="hover:scale-110 transition-transform">❤️</button>
+                                                    <button className="hover:scale-110 transition-transform">👏</button>
+                                                    <button className="hover:scale-110 transition-transform">😂</button>
+                                                    <button className="hover:scale-110 transition-transform">😍</button>
+                                                    <button className="hover:scale-110 transition-transform">🔥</button>
+                                                  </div>
+                                                  <div className="flex gap-2">
+                                                    <Button
+                                                      size="sm"
+                                                      variant="ghost"
+                                                      onClick={() => {
+                                                        setReplyingTo(null);
+                                                        setReplyingToReplyId(null);
+                                                        setReplyText("");
+                                                      }}
+                                                      className="text-gray-600"
+                                                    >
+                                                      Cancel
+                                                    </Button>
+                                                    <Button
+                                                      size="sm"
+                                                      onClick={() => handleReplySubmit(review.id)}
+                                                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                    >
+                                                      Post Reply
+                                                    </Button>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
                                     </div>
