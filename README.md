@@ -146,3 +146,4 @@ npx prisma migrate dev --name update_review_comment_to_text
 //2026
 
 npx prisma generate
+cd backend && npx prisma migrate reset --force
