@@ -329,7 +329,7 @@ const WriteReviewPage = () => {
       } = {
         storeId,
         rating,
-        comment: `**${reviewTitle.trim()}**\n\n${comment.trim()}`,
+        comment: `${reviewTitle.trim()}\n\n${comment.trim()}`,
       };
       
       // Only add images/videos if we have valid URLs
@@ -401,7 +401,7 @@ const WriteReviewPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen">
       {/* Login Required Dialog */}
       <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
         <DialogContent className="sm:max-w-md mx-4">
@@ -529,10 +529,10 @@ const WriteReviewPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 px-16 bg-blue-50  ">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 px-16  ">
           {/* Main Review Form */}
           <div className="lg:col-span-3 mt-8">
-            <Card className="sm:p-6 lg:p-8">
+            <Card className="sm:p-6 lg:p-8 border border-gray-200">
               <div className="flex justify-end mb-4">
                 <Link href="/review-guidelines" className="text-blue-700 text-xs sm:text-sm hover:underline flex">
                   <span className="font-semibold">Read review guidelines</span> <span><ChevronRight className="w-5 h-5" /></span>
@@ -766,7 +766,7 @@ const WriteReviewPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Reviews</h2>
               
               {/* Review Summary */}
-              <Card className="p-4 sm:p-6 mb-4 sm:mb-6">
+              <Card className="p-4 sm:p-6 mb-4 sm:mb-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2">
@@ -823,7 +823,7 @@ const WriteReviewPage = () => {
               {/* Individual Reviews */}
               <div className="space-y-4">
                 {reviews?.slice(0, 3).map((review) => (
-                  <Card key={review.id} className="p-4 sm:p-6 overflow-hidden">
+                  <Card key={review.id} className="p-4 sm:p-6 overflow-hidden border border-gray-200">
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                         {review.user.image ? (
@@ -851,7 +851,7 @@ const WriteReviewPage = () => {
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <g 
-                              fill="#22c55E" 
+                              fill="#2284c5ff" 
                               fillRule="nonzero" 
                               stroke="none" 
                               strokeWidth="1" 
@@ -879,9 +879,19 @@ const WriteReviewPage = () => {
                           <StarRating rating={review.rating} />
                         </div>
                         <div className="text-sm sm:text-base text-gray-700 prose prose-sm max-w-none break-words">
-                          {review.comment?.split('\n').map((paragraph, idx) => (
-                            <p key={idx} className="mb-2 last:mb-0 break-words">{paragraph}</p>
-                          ))}
+                          {(() => {
+                            const lines = review.comment?.split('\n') || [];
+                            const title = lines[0]?.replace(/^\*\*(.+?)\*\*$/, '$1') || lines[0];
+                            const body = lines.slice(2).join('\n');
+                            return (
+                              <>
+                                {title && <p className="mb-2 font-bold break-words">{title}</p>}
+                                {body && body.split('\n').map((paragraph, idx) => (
+                                  <p key={idx} className="mb-2 last:mb-0 break-words">{paragraph}</p>
+                                ))}
+                              </>
+                            );
+                          })()}
                         </div>
                       
                         {/* Display Review Media */}
@@ -963,7 +973,7 @@ const WriteReviewPage = () => {
 
           {/* Latest Reviews Sidebar */}
           <div className="lg:col-span-2 mt-8">
-            <Card className="p-4 sm:p-6 lg:sticky lg:top-6">
+            <Card className="p-4 sm:p-6 lg:sticky lg:top-6 border border-gray-200">
               <div className="flex items-center gap-2 mb-4">
               <div className="hover:bg-gray-100 p-1"> 
                 <ChevronRight className="w-6 h-6" />
@@ -1006,7 +1016,7 @@ const WriteReviewPage = () => {
                             xmlns="http://www.w3.org/2000/svg"
                           >
                             <g 
-                              fill="#22c55E" 
+                              fill="#2271c5ff" 
                               fillRule="nonzero" 
                               stroke="none" 
                               strokeWidth="1" 
@@ -1046,9 +1056,19 @@ const WriteReviewPage = () => {
                     </div>
 
                     {/* Review Text */}
-                    <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-2 break-words">
-                      {review.comment}
-                    </p>
+                    <div className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-2 break-words">
+                      {(() => {
+                        const lines = review.comment?.split('\n') || [];
+                        const title = lines[0]?.replace(/^\*\*(.+?)\*\*$/, '$1') || lines[0];
+                        const body = lines.slice(2).join('\n');
+                        return (
+                          <>
+                            {title && <p className="font-bold mb-1">{title}</p>}
+                            {body && <p>{body}</p>}
+                          </>
+                        );
+                      })()}
+                    </div>
 
                     {/* Review Images - Larger Size */}
                     {(review as any).images && (() => {

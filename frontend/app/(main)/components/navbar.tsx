@@ -466,7 +466,8 @@ export const FeedNavbar = () => {
         </div>
       </>
 
-      {/* Category Navigation */}
+      {/* Category Navigation - Only show on landing page */}
+      {pathname === "/" && (
       <div className="bg-white w-full border-t border-gray-100">
         <div className="w-full px-4 sm:px-6 lg:px-8 relative">
           {/* Left chevron */}
@@ -512,6 +513,7 @@ export const FeedNavbar = () => {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 };

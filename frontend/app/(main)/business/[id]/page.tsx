@@ -769,8 +769,8 @@ const BusinessPage = () => {
                             
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-semibold text-gray-900 text-sm">
-                                  {review.user.name || "Anonymous User"}
+                                <span className="font-bold text-gray-900 text-base">
+                                  {(review.user.name || "Anonymous User").replace(/\*\*/g, '')}
                                 </span>
                                 <span className="text-xs text-gray-500">
                                   {new Date(review.createdAt).toLocaleTimeString('en-US', { 
@@ -797,7 +797,7 @@ const BusinessPage = () => {
                               
                               {/* Review Text */}
                               <p className="text-gray-700 text-sm leading-relaxed mb-3 break-words max-w-[100%]">
-                                {review.comment}
+                                {review.comment?.replace(/\*\*/g, '') || ''}
                               </p>
                               
                               {/* Review Images */}
@@ -808,19 +808,19 @@ const BusinessPage = () => {
                                     return (
                                       <div className="flex gap-2 mb-3 flex-wrap">
                                         {images.slice(0, 4).map((imageUrl: string, idx: number) => (
-                                          <div key={idx} className="w-32 h-20 rounded overflow-hidden bg-gray-100 flex-shrink-0">
+                                          <div key={idx} className="w-56 h-36 rounded overflow-hidden bg-gray-100 flex-shrink-0">
                                             <Image
                                               src={imageUrl}
                                               alt={`Review image ${idx + 1}`}
-                                              width={128}
-                                              height={80}
+                                              width={224}
+                                              height={144}
                                               className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
                                               loading="lazy"
                                             />
                                           </div>
                                         ))}
                                         {images.length > 4 && (
-                                          <div className="w-32 h-20 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
+                                          <div className="w-56 h-36 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
                                             +{images.length - 4}
                                           </div>
                                         )}

@@ -70,22 +70,56 @@ interface Store {
 
 const BusinessCard = ({ store }: { store: Store }) => {
   return (
-    <div className="flex flex-col lg:flex-row bg-white rounded-lg overflow-hidden transition-shadow h-64 lg:h-[340px]">
-      {/* Image Gallery */}
-      <div className="w-full lg:w-1/2 xl:w-[500px] h-full relative flex-shrink-0">
-        <div className="flex h-full gap-1">
-          {/* Main large image */}
-          <div className="relative flex-1">
-            <Image
-              src={store.logo || "https://images.unsplash.com/photo-1551232864-3f0890e580d9?q=80&w=800"}
-              alt={store.name}
-              fill
-              className="object-cover"
-            />
+    <div className="flex bg-white rounded-lg overflow-hidden transition-shadow">
+      {/* Mobile Layout - Compact horizontal card */}
+      <div className="flex lg:hidden w-full gap-3 p-3">
+        {/* Small Image */}
+        <div className="relative w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+          <Image
+            src={store.logo || "https://images.unsplash.com/photo-1551232864-3f0890e580d9?q=80&w=800"}
+            alt={store.name}
+            fill
+            className="object-cover"
+          />
+        </div>
+        
+        {/* Business Info */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <Link href={`/business/${store.id}`}>
+            <h3 className="text-base font-bold text-gray-900 hover:text-blue-600 transition-colors truncate mb-1">
+              {store.name}
+            </h3>
+          </Link>
+          <div className="flex items-center gap-2">
+            <StarRating rating={4} />
+            <span className="text-sm font-medium">4.0</span>
+            <span className="text-xs text-gray-500">(45)</span>
           </div>
-          {/* 4 smaller images in a 2x2 grid */}
-          <div className="w-20 lg:w-28 grid grid-cols-1 gap-1">
-            <div className="relative h-full">
+          {store.category && (
+            <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full mt-2 w-fit">
+              {store.category}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop Layout - Full card */}
+      <div className="hidden lg:flex flex-row w-full h-[340px]">
+        {/* Image Gallery */}
+        <div className="w-1/2 xl:w-[600px] h-full relative flex-shrink-0">
+          <div className="flex h-full gap-1">
+            {/* Main large image */}
+            <div className="relative flex-[1.4]">
+              <Image
+                src={store.logo || "https://images.unsplash.com/photo-1551232864-3f0890e580d9?q=80&w=800"}
+                alt={store.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+            {/* 4 smaller images in a 2x2 grid */}
+            <div className="w-48 grid grid-cols-1 gap-1">
+            <div className="relative h-40">
               <Image
                 src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400"
                 alt="Restaurant interior"
@@ -93,7 +127,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
                 className="object-cover"
               />
             </div>
-            <div className="relative h-full">
+            <div className="relative h-40">
               <Image
                 src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400"
                 alt="Restaurant food"
@@ -101,7 +135,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
                 className="object-cover"
               />
             </div>
-            <div className="relative h-full">
+            <div className="relative h-40">
               <Image
                 src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=400"
                 alt="Restaurant ambiance"
@@ -109,7 +143,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
                 className="object-cover"
               />
             </div>
-            <div className="relative h-full">
+            <div className="relative h-40">
               <Image
                 src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=400"
                 alt="Restaurant dishes"
@@ -122,7 +156,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-4 lg:p-6 flex flex-col justify-between min-w-0">
+      <div className="flex-1 p-6 flex flex-col justify-between min-w-0">
         <div>
           <div className="flex justify-between items-start mb-3">
             <div className="min-w-0">
@@ -195,6 +229,7 @@ const BusinessCard = ({ store }: { store: Store }) => {
             Visit Website
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );

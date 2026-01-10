@@ -201,7 +201,7 @@ const ReviewsPage = () => {
             </div>
             
             {/* Write Review Button */}
-            <div className="sm:ml-auto mr-16">
+            <div className="mx-auto sm:ml-auto sm:mr-16">
               <Link href={`/business/${storeId}/reviews/write`}>
                 <Button className="bg-blue-600 rounded hover:bg-blue-700 w-full sm:w-auto">
                   Write Review
@@ -288,7 +288,7 @@ const ReviewsPage = () => {
                   className={`flex items-center gap-1 ${filterRating === rating ? "" : "border-gray-200"}`}
                 >
                   {rating}
-                  <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
+                  <Star className="w-3.5 h-3.5 fill-black text-black" />
                 </Button>
               ))}
             </div>
@@ -381,7 +381,7 @@ const ReviewsPage = () => {
                         />
                       ))}
                     </div>
-                    <p className="text-gray-700 leading-relaxed mb-4 break-all max-w-full">{review.comment}</p>
+                    <p className="text-gray-700 leading-relaxed mb-4 break-all max-w-full">{review.comment?.replace(/\*\*/g, '') || ''}</p>
                     
                     {/* Display Review Media */}
                     {(review as any).images && (() => {
@@ -389,9 +389,9 @@ const ReviewsPage = () => {
                         const imageUrls = JSON.parse((review as any).images);
                         if (Array.isArray(imageUrls) && imageUrls.length > 0) {
                           return (
-                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
                               {imageUrls.map((url: string, idx: number) => (
-                                <div key={idx} className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border border-gray-200">
+                                <div key={idx} className="relative w-56 h-36 sm:w-64 sm:h-40 rounded-lg overflow-hidden border border-gray-200">
                                   <Image
                                     src={url}
                                     alt={`Review image ${idx + 1}`}
