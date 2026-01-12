@@ -140,7 +140,7 @@ const MediaGalleryPage = () => {
               key={index}
               className="flex-shrink-0 w-64 group cursor-pointer"
             >
-              <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden mb-3 shadow-md hover:shadow-xl transition-shadow">
+              <div className="relative aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden mb-3 shadow-md hover:shadow-xl transition-shadow">
                 {item.type === "video" ? (
                   <>
                     <video
@@ -164,13 +164,15 @@ const MediaGalleryPage = () => {
                   />
                 )}
               </div>
-              <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-1">
-                {item.title}
-              </h3>
-              <p className="text-xs text-gray-500">
-                {store?.store?.name || "Business Name"}
-              </p>
-              <p className="text-xs text-gray-400">1,854,481,298 views</p>
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 flex-1">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-gray-500 flex-shrink-0">
+                  {store?.store?.name || "Business Name"}
+                </p>
+              </div>
+              <p className="text-xs text-gray-400">1.8B views</p>
             </div>
           ))}
         </div>
