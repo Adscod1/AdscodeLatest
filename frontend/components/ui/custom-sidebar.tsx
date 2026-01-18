@@ -245,8 +245,8 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
 
         {/* Navigation */}
         <div className="flex-1 px-6 pb-6 overflow-y-auto">
-          <div className="space-y-1">
-            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">MAIN</h2>
+          <div className="space-y-1 mt-4">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">MAIN</h2>
             <nav className="space-y-1">
               <Link
                 href="/profile"

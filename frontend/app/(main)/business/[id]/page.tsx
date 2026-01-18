@@ -312,7 +312,7 @@ const BusinessPage = () => {
   }
 
   return (
-    <div className="min-h-screen  overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <div className="mx-auto w-full">
         {/* Hero Carousel Section with Three Images - Full Width */}
         <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden w-full">
@@ -374,7 +374,7 @@ const BusinessPage = () => {
 
         
         {/* Top Section: Business Profile + Action Buttons */}
-        <div className="bg-white border border-gray-200 rounded px-4 sm:px-6 lg:px-12 py-1 sm:py-4 w-full overflow-visible">
+        <div className="bg-white rounded px-4 sm:px-6 lg:px-12 py-1 sm:py-4 w-full overflow-visible">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-full">
             {/* Left Side: Business Profile with Logo and Name inline */}
             <div className="flex items-center gap-4 sm:gap-6">
@@ -495,7 +495,7 @@ const BusinessPage = () => {
           {/* Top Row: Description + About side by side */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-0 lg:mb-0">
             {/* Description Section */}
-            <div className="flex-1 bg-white border border-gray-200 rounded overflow-hidden w-full max-h-120">
+            <div className="flex-1 bg-white rounded overflow-hidden w-full max-h-120">
               <div className="p-3 sm:p-4 lg:p-5 w-full">
                 <h3 className="font-semibold text-gray-900 mb-1.5 sm:mb-2 pb-2 border-b border-gray-200 flex items-center text-base sm:text-lg break-words">
                   Description
@@ -518,7 +518,7 @@ const BusinessPage = () => {
 
             {/* About Section */}
             <div className="w-full lg:w-80 flex-shrink-0">
-              <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden h-full">
+              <div className="bg-white rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden h-full">
                 <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">About</h3>
                 <div className="border-b border-gray-200 mb-4 sm:mb-6"></div>
                 <div className="space-y-3 sm:space-y-4">
@@ -602,7 +602,7 @@ const BusinessPage = () => {
           <div className="flex-1 space-y-8 lg:space-y-10 min-w-0 w-full">
 
             {/* Campaigns */}
-            <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
@@ -630,7 +630,7 @@ const BusinessPage = () => {
             </div>
             
             {/* Services */}
-            <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
@@ -657,8 +657,8 @@ const BusinessPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {allItems.map((item, index) => (
                     <Link key={item.id} href={`/product/${item.id}`}>
-                      <Card className="overflow-hidden border border-gray-200 rounded hover:shadow-lg transition-shadow cursor-pointer shadow-none">
-                        <div className="h-40 bg-gray-100">
+                      <Card className="overflow-hidden border border-gray-100 rounded hover:shadow-lg transition-shadow cursor-pointer shadow-none">
+                        <div className="h-40 bg-gray-200">
                           {item.images && item.images.length > 0 ? (
                             <Image
                               src={item.images[0].url}
@@ -710,7 +710,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Media */}
-            <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-xl font-bold text-gray-900 flex items-center">
                   {/* <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" /> */}
@@ -741,7 +741,7 @@ const BusinessPage = () => {
 
 
             {/* Highlights */}
-            <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Business Highlights</h2>
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
                 {highlights.map((highlight, index) => (
@@ -756,7 +756,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Reviews */}
-            <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Recommended Reviews</h2>
                 <Link href={`/business/${store.id}/reviews`} className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
@@ -933,8 +933,8 @@ const BusinessPage = () => {
                                 
                                 <button 
                                   onClick={() => handleVote(review.id, 'helpful')}
-                                  className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
-                                    userVotes[review.id] === 'helpful' ? 'text-yellow-600 font-semibold' : 'text-gray-500'
+                                  className={`flex items-center gap-1 hover:text-green-600 transition-colors ${
+                                    userVotes[review.id] === 'helpful' ? 'text-green-600 font-semibold' : 'text-gray-500'
                                   }`}
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -954,7 +954,8 @@ const BusinessPage = () => {
                                   </svg>
                                   <span className="text-xs">Not helpful{helpfulVotes[review.id]?.notHelpful ? ` (${helpfulVotes[review.id].notHelpful})` : ''}</span>
                                 </button>
-                                <button
+                                
+                                {/* <button
                                   onClick={() => handleLike(review.id)}
                                   className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
                                     userLikes[review.id] ? 'text-pink-600 font-semibold' : 'text-gray-500'
@@ -964,8 +965,9 @@ const BusinessPage = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                   </svg>
                                   <span className="text-xs">Likes{likes[review.id] ? ` (${likes[review.id]})` : ''}</span>
-                                </button>
-                                <button
+                                </button> */}
+                                
+                                {/* <button
                                   onClick={() => handleDislike(review.id)}
                                   className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
                                     userDislikes[review.id] ? 'text-purple-600 font-semibold' : 'text-gray-500'
@@ -975,7 +977,8 @@ const BusinessPage = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                   </svg>
                                   <span className="text-xs">Dislikes{dislikes[review.id] ? ` (${dislikes[review.id]})` : ''}</span>
-                                </button>
+                                </button> */}
+                                
                                 <button
                                   onClick={() => handleReplyClick(review.id)}
                                   className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
@@ -1071,8 +1074,8 @@ const BusinessPage = () => {
                                           <div className="flex items-center gap-3 mt-2 text-xs">
                                             <button 
                                               onClick={() => handleVote(reply.id, 'helpful')}
-                                              className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
-                                                userVotes[reply.id] === 'helpful' ? 'text-yellow-600 font-semibold' : 'text-gray-500'
+                                              className={`flex items-center gap-1 hover:text-green-600 transition-colors ${
+                                                userVotes[reply.id] === 'helpful' ? 'text-green-600 font-semibold' : 'text-gray-500'
                                               }`}
                                             >
                                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1208,18 +1211,18 @@ const BusinessPage = () => {
           </div>
 
           {/* Right Column - Sidebars Container */}
-          <div className="w-full  lg:w-80 flex flex-col gap-8 lg:gap-10 mt-12 lg:mt-0 flex-shrink-0">
+          <div className="w-full  lg:w-80 flex flex-col gap-10 lg:gap-12 mt-12 lg:mt-0 flex-shrink-0">
             {/* Business Hours Sidebar */}
-            <div className="bg-white border border-gray-200 rounded w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
+            <div className="bg-white rounded w-full overflow-hidden lg:sticky lg:top-6 lg:self-start">
               {/* Business Hours */}
               <div>
                 <div className="bg-green-400 text-white  sm:px-4 py-2 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
                   <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
                   <span className="font-medium">OPEN NOW</span>
-                  <span className="ml-auto text-xs sm:text-sm">08:30 AM to 05:00 PM</span>
+                  <span className="ml-auto text-sm sm:text-sm">08:30 AM to 05:00 PM</span>
                 </div>
                 
-                <div className="space-y-4 sm:space-y-4 p-3">
+                <div className="space-y-4 sm:space-y-5 p-4">
                   {businessHours.map((schedule, index) => (
                     <div key={index} className="flex justify-between text-sm sm:text-sm">
                       <span className={schedule.isOpen ? "text-green-400" : "text-gray-500"}>
@@ -1233,7 +1236,7 @@ const BusinessPage = () => {
             </div>
 
             {/* Similar Businesses Sidebar */}
-            <div className="bg-white border border-gray-200 rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
+            <div className="bg-white rounded p-4 sm:p-6 lg:p-8 w-full overflow-hidden">
               <div className="flex items-center gap-2 mb-4">
                 <ChevronRight className="w-5 h-5 text-gray-700" />
                 <h3 className="text-base font-bold text-gray-900">Similar Businesses</h3>

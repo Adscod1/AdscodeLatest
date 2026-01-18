@@ -55,9 +55,9 @@ const StarRating = ({ rating }: { rating: number }) => {
           key={i}
           className={
             i < Math.floor(rating)
-              ? "text-orange-400"
+              ? "text-yellow-400"
               : i < rating
-              ? "text-orange-400 opacity-60"
+              ? "text-yellow-400 opacity-60"
               : "text-gray-300"
           }
         >
@@ -524,10 +524,10 @@ const WriteReviewPage = () => {
         </div>
       )}
 
-      <div className="max-w-8xl p-3 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-white">
+      <div className="max-w-8xl p-3 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50">
         {/* Header */}
         <div className="mb-4 px-2 sm:mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="max-w-8xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white">
             <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               <Link href={`/business/${storeId}`}>
                 <Button variant="ghost" size="sm" className="flex items-center gap-2 flex-shrink-0 -mt-2 hover:bg-transparent p-0">
@@ -612,7 +612,7 @@ const WriteReviewPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 px-16  ">
           {/* Main Review Form */}
           <div className="lg:col-span-3 mt-8">
-            <Card className="sm:p-6 lg:p-8 border border-gray-200">
+            <Card className="sm:p-6 lg:p-8 bg-white">
               <div className="flex justify-end mb-4">
                 <Link href="/review-guidelines" className="text-blue-700 text-xs sm:text-sm hover:underline flex">
                   <span className="font-semibold">Read review guidelines</span> <span><ChevronRight className="w-5 h-5" /></span>
@@ -625,7 +625,7 @@ const WriteReviewPage = () => {
                   <div className="flex items-center gap-2 sm:gap-3">
                     {[1, 2, 3, 4, 5].map((star) => {
                       const ratingLabels = ['Not good', 'Could\'ve been better', 'Ok', 'Good', 'Great'];
-                      const orangeIntensities = ['text-orange-200', 'text-orange-300', 'text-orange-400', 'text-orange-500', 'text-orange-600'];
+                      const orangeIntensities = ['text-yellow-100', 'text-yellow-200', 'text-yellow-300', 'text-yellow-400', 'text-yellow-500'];
                       return (
                         <button
                           key={star}
@@ -665,8 +665,16 @@ const WriteReviewPage = () => {
                     Some keywords to include in your review
                   </p>
                   <div className="flex flex-wrap gap-3 mt-3">
-                    <Badge variant="outline" className="text-sm px-4 py-2 border bg-gray-50">Service Quality</Badge>
-                    <Badge variant="outline" className="text-sm px-4 py-2 border bg-gray-50">Product Prices</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px-4 py-2 border bg-gray-50">Quality</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Pricing</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Work Ethic</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Customer Care</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Ambience</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Timeliness</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Delivery</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Management</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Parking</Badge>
+                    <Badge variant="outline" className="text-xs border rounded-full px- py-2 border bg-gray-50">Discount</Badge>
                   </div>
                 </div>
 
@@ -754,9 +762,9 @@ const WriteReviewPage = () => {
                             <button
                               type="button"
                               onClick={() => removeImage(index)}
-                              className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                              className="absolute -top-1 left-28 sm:-top-1 sm:-right-2 bg-red-500 text-white rounded-full w-3 h-3 sm:w-3 sm:h-3 flex items-center justify-center text-xs hover:bg-red-600"
                             >
-                              <X className="w-3 h-3" />
+                              <X className="w-6 h-6" />
                             </button>
                           </div>
                         ))}
@@ -774,12 +782,12 @@ const WriteReviewPage = () => {
                             <video
                               src={url}
                               controls
-                              className="w-full h-32 object-cover rounded-lg border"
+                              className="w-full h-48 object-cover rounded-lg border"
                             />
                             <button
                               type="button"
                               onClick={() => removeVideo(index)}
-                              className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                              className="absolute -top-1 -left-24 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -832,7 +840,7 @@ const WriteReviewPage = () => {
                     <Button 
                       type="submit" 
                       disabled={!rating || !reviewTitle.trim() || !comment.trim() || comment.length < 85 || isSubmitting}
-                      className="w-full sm:w-40 h-11 bg-blue-600 hover:bg-blue-700 font-bold text-base rounded"
+                      className="w-full sm:w-40 h-11 bg-blue-500 hover:bg-blue-600 font-semibold text-base rounded"
                     >
                       {isSubmitting ? "Posting..." : "Post review"}
                     </Button>
@@ -846,7 +854,7 @@ const WriteReviewPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Reviews</h2>
               
               {/* Review Summary */}
-              <Card className="p-4 sm:p-6 mb-4 sm:mb-6 border border-gray-200">
+              <Card className="p-4 sm:p-6 mb-4 sm:mb-6 bg-white">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2">
@@ -903,7 +911,7 @@ const WriteReviewPage = () => {
               {/* Individual Reviews */}
               <div className="space-y-4">
                 {reviews?.slice(0, 3).map((review) => (
-                  <Card key={review.id} className="p-4 sm:p-6 overflow-hidden border border-gray-200">
+                  <Card key={review.id} className="p-4 sm:p-6 overflow-hidden bg-white">
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                         {review.user.image ? (
@@ -1053,7 +1061,7 @@ const WriteReviewPage = () => {
 
           {/* Latest Reviews Sidebar */}
           <div className="lg:col-span-2 mt-8">
-            <Card className="p-4 sm:p-6 lg:sticky lg:top-6 border border-gray-200">
+            <Card className="p-4 sm:p-6 lg:sticky lg:top-6 bg-white">
               <div className="flex items-center gap-2 mb-4">
               <div className="hover:bg-gray-100 p-1"> 
                 <ChevronRight className="w-6 h-6" />
@@ -1089,7 +1097,6 @@ const WriteReviewPage = () => {
                           </span>
                           <span className="text-gray-500 text-sm">@{review.user.username?.replace(/^@/, '') || 'user'}</span>
                           
-                        
                           <svg 
                             className="w-3.5 h-3.5 flex-shrink-0 " 
                             viewBox="0,0,256,256"
@@ -1180,8 +1187,8 @@ const WriteReviewPage = () => {
                     <div className="flex items-center gap-3 mt-2 ml-3 text-xs">
                       <button 
                         onClick={() => handleVote(review.id, 'helpful')}
-                        className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
-                          userVotes[review.id] === 'helpful' ? 'text-yellow-600 font-semibold' : 'text-gray-500'
+                        className={`flex items-center gap-1 hover:text-green-600 transition-colors ${
+                          userVotes[review.id] === 'helpful' ? 'text-green-600 font-semibold' : 'text-gray-500'
                         }`}
                       >
                         <ThumbsUp className="w-3.5 h-3.5" />
@@ -1198,7 +1205,8 @@ const WriteReviewPage = () => {
                         </svg>
                         <span>Not helpful{helpfulVotes[review.id]?.notHelpful ? ` (${helpfulVotes[review.id].notHelpful})` : ''}</span>
                       </button>
-                      <button
+                      
+                      {/* <button
                         onClick={() => handleLike(review.id)}
                         className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
                           userLikes[review.id] ? 'text-pink-600 font-semibold' : 'text-gray-500'
@@ -1208,8 +1216,9 @@ const WriteReviewPage = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                         <span>Likes{likes[review.id] ? ` (${likes[review.id]})` : ''}</span>
-                      </button>
-                      <button
+                      </button> */}
+                      
+                      {/* <button
                         onClick={() => handleDislike(review.id)}
                         className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
                           userDislikes[review.id] ? 'text-purple-600 font-semibold' : 'text-gray-500'
@@ -1219,7 +1228,8 @@ const WriteReviewPage = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         <span>Dislikes{dislikes[review.id] ? ` (${dislikes[review.id]})` : ''}</span>
-                      </button>
+                      </button> */}
+                      
                       <button
                         onClick={() => handleReplyClick(review.id)}
                         className="flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"

@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { LoadingState } from "@/app/components/skeletons/stores-skeleton-loader";
 import { ErrorState } from "@/app/components/errors/error-state";
 import { Store } from "@prisma/client";
-import { MoreVertical, UserPlus, Users, LogOut, X, Trash2 } from "lucide-react";
+import { MoreVertical, UserPlus, Users, LogOut, X, Trash2, Plus } from "lucide-react";
 import api from "@/lib/api-client";
 
 const AllStoresCards = () => {
@@ -108,16 +108,16 @@ const AllStoresCards = () => {
   if (!stores?.length) {
     return (
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <div className="text-center py-4">
+        <div className="text-left py-4">
           <h3 className="font-medium text-gray-900 mb-1">No stores yet</h3>
           <p className="text-sm text-gray-500 mb-3">
-            Create your first store to get started
+            Create your first <br/> store to get started
           </p>
           <Link
             href="/new"
             className="text-sm text-blue-500 hover:text-blue-600 font-medium"
           >
-            Create Store →
+           Create Store →
           </Link>
         </div>
       </div>

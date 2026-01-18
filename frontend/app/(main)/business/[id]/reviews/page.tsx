@@ -302,7 +302,7 @@ const ReviewsPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <div className="mb-4 px-2">
-                <span className="text-sm text-gray-600">Overall rating</span>
+                <span className="text-lg text-semibold text-gray-600">Overall rating</span>
                 <div className="flex items-center mt-2">
                   <div className="flex items-center mr-3">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -310,7 +310,7 @@ const ReviewsPage = () => {
                         key={star} 
                         className={`w-6 h-6 ${
                           star <= Math.round(averageRating) 
-                            ? 'fill-orange-400 text-orange-400' 
+                            ? 'fill-yellow-400 text-yellow-400' 
                             : 'text-gray-300'
                         }`} 
                       />
@@ -321,6 +321,7 @@ const ReviewsPage = () => {
                 </div>
               </div>
             </div>
+            
             <div className="space-y-2">
               {[5, 4, 3, 2, 1].map((rating) => {
                 const count = reviews?.filter(r => r.rating === rating).length || 0;
@@ -337,7 +338,7 @@ const ReviewsPage = () => {
                     </button>
                     <div className="flex-1 mx-3 h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-yellow-500 rounded-full transition-all"
+                        className="h-full bg-yellow-400 rounded-full transition-all"
                         style={{ width: `${percentage}%` }}
                       ></div>
                     </div>
@@ -353,13 +354,14 @@ const ReviewsPage = () => {
         <div className="flex items-center justify-between mb-6 px-8">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
+              <Filter className="w-4 h-4 text-gray-100" />
               <span className="text-sm font-medium">Filter:</span>
+              
               <Button
                 variant={filterRating === null ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilterRating(null)}
-                className={filterRating === null ? "" : "border-gray-200"}
+                className={filterRating === null ? "" : "border-gray-100 border rounded-full"}
               >
                 All
               </Button>
@@ -369,20 +371,21 @@ const ReviewsPage = () => {
                   variant={filterRating === rating ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterRating(filterRating === rating ? null : rating)}
-                  className={`flex items-center gap-1 ${filterRating === rating ? "" : "border-gray-200"}`}
+                  className={`flex items-center gap-1 ${filterRating === rating ? "" : "border-gray-100 rounded-full"}`}
                 >
                   {rating}
-                  <Star className="w-3.5 h-3.5 fill-black text-black" />
+                  <Star className="w-3.5 h-3.5 fill-gray-600 text-gray-600" />
                 </Button>
               ))}
             </div>
           </div>
+          
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Sort by:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="px-3 py-1 border border-gray-300 rounded text-sm"
+              className="px-3 py-1.5 border border-gray-200 rounded text-sm"
             >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -455,7 +458,7 @@ const ReviewsPage = () => {
                           key={star}
                           className={`w-4 h-4 ${
                             star <= review.rating
-                              ? 'text-orange-400 fill-orange-400'
+                              ? 'text-yellow-400 fill-yellow-400'
                               : 'text-gray-300'
                           }`}
                         />
@@ -510,11 +513,11 @@ const ReviewsPage = () => {
                           return (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                               {videoUrls.map((url: string, idx: number) => (
-                                <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
+                                <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200 max-w-md mx-h-96">
                                   <video
                                     src={url}
                                     controls
-                                    className="w-full h-full object-cover"
+                                    className="max-w-md max-h-96 object-cover"
                                   />
                                 </div>
                               ))}
@@ -531,13 +534,14 @@ const ReviewsPage = () => {
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <button 
                         onClick={() => handleVote(review.id, 'helpful')}
-                        className={`flex items-center gap-1 hover:text-yellow-600 transition-colors ${
-                          userVotes[review.id] === 'helpful' ? 'text-yellow-600 font-semibold' : ''
+                        className={`flex items-center gap-1 hover:text-green-600 transition-colors ${
+                          userVotes[review.id] === 'helpful' ? 'text-green-600 font-semibold' : ''
                         }`}
                       >
                         <ThumbsUp className="w-4 h-4" />
                         Helpful{helpfulVotes[review.id]?.helpful ? ` (${helpfulVotes[review.id].helpful})` : ''}
                       </button>
+                      
                       <button 
                         onClick={() => handleVote(review.id, 'notHelpful')}
                         className={`flex items-center gap-1 hover:text-red-600 transition-colors ${
@@ -547,7 +551,8 @@ const ReviewsPage = () => {
                         <ThumbsDown className="w-4 h-4" />
                         Not helpful{helpfulVotes[review.id]?.notHelpful ? ` (${helpfulVotes[review.id].notHelpful})` : ''}
                       </button>
-                      <button
+                      
+                      {/* <button
                         onClick={() => handleLike(review.id)}
                         className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
                           userLikes[review.id] ? 'text-pink-600 font-semibold' : ''
@@ -557,8 +562,9 @@ const ReviewsPage = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                         Likes{likes[review.id] ? ` (${likes[review.id]})` : ''}
-                      </button>
-                      <button
+                      </button> */}
+                      
+                      {/* <button
                         onClick={() => handleDislike(review.id)}
                         className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
                           userDislikes[review.id] ? 'text-purple-600 font-semibold' : ''
@@ -568,7 +574,8 @@ const ReviewsPage = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         Dislikes{dislikes[review.id] ? ` (${dislikes[review.id]})` : ''}
-                      </button>
+                      </button> */}
+                      
                       <button
                         onClick={() => handleReplyClick(review.id)}
                         className="flex items-center gap-1 hover:text-blue-600 transition-colors">
