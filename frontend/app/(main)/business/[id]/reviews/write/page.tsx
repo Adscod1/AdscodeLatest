@@ -555,7 +555,7 @@ const WriteReviewPage = () => {
                   <div className="flex items-center gap-2">
                     <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{store.name}</h1>
                     <svg 
-                      className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" 
+                      className="w-5 h-5 sm:w-4 sm:h-4 flex-shrink-0" 
                       viewBox="0,0,256,256"
                       xmlns="http://www.w3.org/2000/svg"
                     >
