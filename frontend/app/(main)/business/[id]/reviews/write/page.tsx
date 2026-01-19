@@ -117,7 +117,7 @@ const WriteReviewPage = () => {
     const newReply = {
       id: Date.now().toString(),
       text: replyText,
-      user: user?.name || "Current User",
+      user: user?.name || user?.email?.split('@')[0] || "Anonymous",
       date: new Date()
     };
 
@@ -524,7 +524,7 @@ const WriteReviewPage = () => {
         </div>
       )}
 
-      <div className="max-w-8xl p-3 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50">
+      <div className="max-w-8xl p-3 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         {/* Header */}
         <div className="mb-4 px-2 sm:mb-6">
           <div className="max-w-8xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white">
@@ -749,7 +749,7 @@ const WriteReviewPage = () => {
                   {imagePreviewUrls.length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Attached Images:</h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {imagePreviewUrls.map((url, index) => (
                           <div key={index} className="relative">
                             <Image
@@ -757,14 +757,14 @@ const WriteReviewPage = () => {
                               alt={`Preview ${index + 1}`}
                               width={120}
                               height={120}
-                              className="w-30 h-20 sm:h-24 object-cover rounded-lg border"
+                              className="w-full h-48 object-cover rounded-lg border"
                             />
                             <button
                               type="button"
                               onClick={() => removeImage(index)}
-                              className="absolute -top-1 left-28 sm:-top-1 sm:-right-2 bg-red-500 text-white rounded-full w-3 h-3 sm:w-3 sm:h-3 flex items-center justify-center text-xs hover:bg-red-600"
+                              className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs hover:bg-red-600"
                             >
-                              <X className="w-6 h-6" />
+                              <X className="w-3 h-3" />
                             </button>
                           </div>
                         ))}
@@ -912,7 +912,7 @@ const WriteReviewPage = () => {
               <Card className="p-4 sm:p-6 border border-gray-200">
                 <div className="space-y-0">
                   {reviews?.slice(0, 3).map((review, index, array) => (
-                    <div key={review.id} className={`py-4 ${index !== array.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                    <div key={review.id} className="py-4">
                       <div className="flex items-start gap-3 sm:gap-4">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                           {review.user.image ? (
@@ -932,8 +932,9 @@ const WriteReviewPage = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <span className="text-sm sm:text-base font-medium text-gray-900 break-words">
-                              {review.user.name || "Anonymous User"}
+                              {review.user.name || "Anonymous"}
                             </span>
+                            <span className="text-gray-500 text-sm">@{review.user.username?.replace(/^@/, '') || 'user'}</span>
                             <svg 
                               className="w-3.5 h-3.5 flex-shrink-0 " 
                               viewBox="0,0,256,256"
@@ -961,7 +962,7 @@ const WriteReviewPage = () => {
                               </g>
                             </svg>
                             <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0">
-                              {new Date(review.createdAt).toLocaleDateString()}
+                              {getRelativeTime(review.createdAt)}
                             </span>
                           </div>
                           <div className="flex items-center mb-3">
@@ -989,9 +990,9 @@ const WriteReviewPage = () => {
                               const imageUrls = JSON.parse((review as any).images);
                               if (Array.isArray(imageUrls) && imageUrls.length > 0) {
                                 return (
-                                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4 max-w-full">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 max-w-full">
                                     {imageUrls.map((url: string, idx: number) => (
-                                      <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+                                      <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
                                         <Image
                                           src={url}
                                           alt={`Review image ${idx + 1}`}
@@ -1228,6 +1229,73 @@ const WriteReviewPage = () => {
                                           <span>Reply</span>
                                         </button>
                                       </div>
+
+                                      {/* Reply Form for nested replies */}
+                                      {replyingTo === reply.id && (
+                                        <div className="mt-3 pl-3 border-l-2 border-blue-400">
+                                          <div className="bg-gray-50 p-3 rounded-lg">
+                                            <textarea
+                                              value={replyText}
+                                              onChange={(e) => setReplyText(e.target.value)}
+                                              placeholder="Write a reply..."
+                                              className="w-full p-2 border border-gray-200 rounded text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                              rows={3}
+                                            />
+                                            <div className="flex items-center justify-between mt-2">
+                                              <div className="flex items-center gap-1 text-base">
+                                                <button type="button" className="hover:scale-110 transition-transform">👍</button>
+                                                <button type="button" className="hover:scale-110 transition-transform">❤️</button>
+                                                <button type="button" className="hover:scale-110 transition-transform">👏</button>
+                                                <button type="button" className="hover:scale-110 transition-transform">😂</button>
+                                                <button type="button" className="hover:scale-110 transition-transform">😍</button>
+                                                <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                                              </div>
+                                              <div className="flex gap-2">
+                                                <Button
+                                                  type="button"
+                                                  size="sm"
+                                                  onClick={() => handleReplySubmit(reply.id)}
+                                                  className="bg-blue-500 rounded hover:bg-blue-700 text-white h-7 text-xs px-3"
+                                                >
+                                                  Post
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* Display nested replies (replies to this reply) */}
+                                      {replies[reply.id] && replies[reply.id].length > 0 && (
+                                        <div className="mt-3 ml-4 space-y-2">
+                                          {replies[reply.id].map((nestedReply) => (
+                                            <div key={nestedReply.id} className="pl-4 border-l-2 border-gray-200">
+                                              <div className="flex items-start gap-2">
+                                                <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                                                  <span className="text-xs font-bold text-white">
+                                                    {nestedReply.user.charAt(0)}
+                                                  </span>
+                                                </div>
+                                                <div className="flex-1">
+                                                  <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-semibold text-gray-900 text-xs">
+                                                      {nestedReply.user}
+                                                    </span>
+                                                    <span className="text-xs text-gray-500">
+                                                      {new Date(nestedReply.date).toLocaleTimeString('en-US', { 
+                                                        hour: '2-digit', 
+                                                        minute: '2-digit',
+                                                        hour12: true
+                                                      })}
+                                                    </span>
+                                                  </div>
+                                                  <p className="text-xs text-gray-700">{nestedReply.text}</p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -1275,7 +1343,7 @@ const WriteReviewPage = () => {
               
               <div className="space-y-4">
                 {reviews?.slice(0, 10).map((review) => (
-                  <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                  <div key={review.id} className="pb-4">
                     {/* Review Header */}
                     <div className="flex items-start gap-2 sm:gap-3 mb-2">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1362,22 +1430,17 @@ const WriteReviewPage = () => {
                         const imageUrls = JSON.parse((review as any).images);
                         if (Array.isArray(imageUrls) && imageUrls.length > 0) {
                           return (
-                            <div className="mb-3 grid grid-cols-2 gap-2">
-                              {imageUrls.slice(0, 4).map((url: string, idx: number) => (
-                                <div key={idx} className="relative w-60 h-40 rounded overflow-hidden border border-gray-100">
+                            <div className="mb-3 grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-full">
+                              {imageUrls.map((url: string, idx: number) => (
+                                <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
                                   <Image
                                     src={url}
                                     alt={`Review image ${idx + 1}`}
                                     fill
-                                    className="object-cover"
+                                    className="object-cover hover:scale-105 transition-transform"
                                   />
                                 </div>
                               ))}
-                              {imageUrls.length > 4 && (
-                                <div className="relative aspect-video rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
-                                  <span className="text-sm font-semibold text-gray-600">+{imageUrls.length - 4}</span>
-                                </div>
-                              )}
                             </div>
                           );
                         }
@@ -1586,6 +1649,73 @@ const WriteReviewPage = () => {
                                     <span>Reply</span>
                                   </button>
                                 </div>
+
+                                {/* Reply Form for nested replies */}
+                                {replyingTo === reply.id && (
+                                  <div className="mt-3 pl-3 border-l-2 border-blue-400">
+                                    <div className="bg-gray-50 p-3 rounded-lg">
+                                      <textarea
+                                        value={replyText}
+                                        onChange={(e) => setReplyText(e.target.value)}
+                                        placeholder="Write a reply..."
+                                        className="w-full p-2 border border-gray-200 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                        rows={3}
+                                      />
+                                      <div className="flex items-center justify-between mt-2">
+                                        <div className="flex items-center gap-1 text-base">
+                                          <button type="button" className="hover:scale-110 transition-transform">👍</button>
+                                          <button type="button" className="hover:scale-110 transition-transform">❤️</button>
+                                          <button type="button" className="hover:scale-110 transition-transform">👏</button>
+                                          <button type="button" className="hover:scale-110 transition-transform">😂</button>
+                                          <button type="button" className="hover:scale-110 transition-transform">😍</button>
+                                          <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                                        </div>
+                                        <div className="flex gap-2">
+                                          <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() => handleReplySubmit(reply.id)}
+                                            className="bg-blue-500 rounded hover:bg-blue-700 text-white h-7 text-xs px-3"
+                                          >
+                                            Post
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Display nested replies (replies to this reply) */}
+                                {replies[reply.id] && replies[reply.id].length > 0 && (
+                                  <div className="mt-3 ml-4 space-y-2">
+                                    {replies[reply.id].map((nestedReply) => (
+                                      <div key={nestedReply.id} className="pl-4 border-l-2 border-gray-200">
+                                        <div className="flex items-start gap-2">
+                                          <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                                            <span className="text-xs font-bold text-white">
+                                              {nestedReply.user.charAt(0)}
+                                            </span>
+                                          </div>
+                                          <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                              <span className="font-semibold text-gray-900 text-xs">
+                                                {nestedReply.user}
+                                              </span>
+                                              <span className="text-xs text-gray-500">
+                                                {new Date(nestedReply.date).toLocaleTimeString('en-US', { 
+                                                  hour: '2-digit', 
+                                                  minute: '2-digit',
+                                                  hour12: true
+                                                })}
+                                              </span>
+                                            </div>
+                                            <p className="text-xs text-gray-700">{nestedReply.text}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
