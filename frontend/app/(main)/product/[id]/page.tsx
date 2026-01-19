@@ -225,7 +225,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-8xl mx-auto px-4 py-8">
+      <div className="max-w-8xl mx-auto px-4 py-8 sm px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-600 mb-6">
           <span>Adscod</span> / <span>Best selling</span> / <span>Sub-category</span> / 
