@@ -55,17 +55,34 @@ const influencers: Influencer[] = [
 const Filter = ({
   title,
   children,
+  defaultOpen = false,
 }: {
   title: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
   return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-medium text-sm">{title}</h3>
-        <ChevronDown className="w-4 h-4" />
+    <div className="border-b border-gray-100 last:border-b-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full py-3 hover:bg-gray-50 transition-colors px-2 -mx-2 rounded"
+      >
+        <h3 className="font-medium text-sm text-gray-900">{title}</h3>
+        <ChevronDown
+          className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+            isOpen ? "transform rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-200 ${
+          isOpen ? "max-h-96 pb-4" : "max-h-0"
+        }`}
+      >
+        <div className="px-2">{children}</div>
       </div>
-      {children}
     </div>
   );
 };
@@ -187,36 +204,42 @@ const AllInfluencersPage = () => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Filters Sidebar */}
-        <div className="w-full md:w-64 shrink-0">
-          <div className="bg-white rounded-lg border p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold">Filters</h2>
-              <button className="text-blue-500 text-sm">Clear all</button>
+        <div className="w-full md:w-80 shrink-0">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sticky top-4">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
+              <h2 className="font-semibold text-gray-900">Filters</h2>
+              <button className="text-blue-500 text-sm hover:text-blue-600 font-medium">
+                Clear all
+              </button>
             </div>
 
-            <Filter title="Category">
-              <CheckboxItem label="Banking" />
-              <CheckboxItem label="Fashion" />
-              <CheckboxItem label="Technology" />
-              <button className="text-blue-500 text-xs">See more</button>
-            </Filter>
+            <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+              <Filter title="Category" defaultOpen={true}>
+                <CheckboxItem label="Banking" />
+                <CheckboxItem label="Fashion" />
+                <CheckboxItem label="Technology" />
+                <button className="text-blue-500 text-xs hover:text-blue-600 mt-2">
+                  See more
+                </button>
+              </Filter>
 
-            <Filter title="Followers">
-              <CheckboxItem label="1K - 10K" />
-              <CheckboxItem label="10K - 100K" />
-              <CheckboxItem label="100K - 1M" />
-              <button className="text-blue-500 text-xs">See more</button>
-            </Filter>
+              <Filter title="Followers" defaultOpen={true}>
+                <CheckboxItem label="1K - 10K" />
+                <CheckboxItem label="10K - 100K" />
+                <CheckboxItem label="100K - 1M" />
+                <button className="text-blue-500 text-xs hover:text-blue-600 mt-2">
+                  See more
+                </button>
+              </Filter>
 
-            <Filter title="Age Criteria">
-              <CheckboxItem label="13 - 17 years" />
-              <CheckboxItem label="18 - 25 years" />
-              <CheckboxItem label="26 - 40 years" />
-              <CheckboxItem label="40+ years" />
-            </Filter>
+              <Filter title="Age Criteria">
+                <CheckboxItem label="13 - 17 years" />
+                <CheckboxItem label="18 - 25 years" />
+                <CheckboxItem label="26 - 40 years" />
+                <CheckboxItem label="40+ years" />
+              </Filter>
 
-            <Filter title="Ad Price ($)">
-              <div className="px-2">
+              <Filter title="Ad Price ($)">
                 <div className="flex justify-between mb-2">
                   <Input
                     type="number"
@@ -226,7 +249,7 @@ const AllInfluencersPage = () => {
                     }
                     className="w-16 h-8 text-sm"
                   />
-                  <span className="text-sm self-center">to</span>
+                  <span className="text-sm self-center text-gray-500">to</span>
                   <Input
                     type="number"
                     value={priceRange[1]}
@@ -244,69 +267,69 @@ const AllInfluencersPage = () => {
                   onValueChange={(value) =>
                     setPriceRange(value as [number, number])
                   }
-                  className="my-6"
+                  className="my-4"
                 />
-              </div>
-            </Filter>
+              </Filter>
 
-            <Filter title="Gender">
-              <CheckboxItem label="Male" />
-              <CheckboxItem label="Female" />
-            </Filter>
+              <Filter title="Gender">
+                <CheckboxItem label="Male" />
+                <CheckboxItem label="Female" />
+              </Filter>
 
-            <Filter title="Preferred Content Style">
-              <CheckboxItem label="Casual & Authentic" />
-              <CheckboxItem label="Professional & Polished" />
-              <CheckboxItem label="Fun & Energetic" />
-              <CheckboxItem label="Educational" />
-              <CheckboxItem label="Minimalist" />
-            </Filter>
+              <Filter title="Content Style">
+                <CheckboxItem label="Casual & Authentic" />
+                <CheckboxItem label="Professional & Polished" />
+                <CheckboxItem label="Fun & Energetic" />
+                <CheckboxItem label="Educational" />
+                <CheckboxItem label="Minimalist" />
+              </Filter>
 
-            <Filter title="Engagement Rate">
-              <CheckboxItem label="> 60%" />
-              <CheckboxItem label="> 75%" />
-              <CheckboxItem label="> 85%" />
-            </Filter>
+              <Filter title="Engagement Rate">
+                <CheckboxItem label="> 60%" />
+                <CheckboxItem label="> 75%" />
+                <CheckboxItem label="> 85%" />
+              </Filter>
 
-            <Filter title="Rating">
-              <div className="space-y-2">
-                {[5, 4, 3, 2, 1].map((rating) => (
-                  <div key={rating} className="flex items-center space-x-2">
-                    <Checkbox id={`rating-${rating}`} />
-                    <label htmlFor={`rating-${rating}`} className="flex">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span
-                          key={i}
-                          className={
-                            i < rating ? "text-yellow-400" : "text-gray-300"
-                          }
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </Filter>
+              <Filter title="Rating">
+                <div className="space-y-2">
+                  {[5, 4, 3, 2, 1].map((rating) => (
+                    <div key={rating} className="flex items-center space-x-2">
+                      <Checkbox id={`rating-${rating}`} />
+                      <label htmlFor={`rating-${rating}`} className="flex cursor-pointer">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <span
+                            key={i}
+                            className={
+                              i < rating ? "text-yellow-400" : "text-gray-300"
+                            }
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </Filter>
 
-            <Filter title="Type of Account">
-              <CheckboxItem label="Verified Account" value="6" />
-              <CheckboxItem label="Non verified Account" />
-              <CheckboxItem label="Both" />
-            </Filter>
+              <Filter title="Account Type">
+                <CheckboxItem label="Verified Account" value="6" />
+                <CheckboxItem label="Non verified Account" />
+                <CheckboxItem label="Both" />
+              </Filter>
 
-            <Filter title="Campaign Milestones">
-              <CheckboxItem label="2 +" />
-              <CheckboxItem label="5 +" />
-              <CheckboxItem label="10 +" />
-            </Filter>
+              <Filter title="Campaign Milestones">
+                <CheckboxItem label="2 +" />
+                <CheckboxItem label="5 +" />
+                <CheckboxItem label="10 +" />
+              </Filter>
+            </div>
 
-            <div className="flex gap-2 mt-6">
-              <Button variant="outline" className="flex-1">
+            <div className="flex gap-2 p-4 border-t border-gray-100 bg-gray-50">
+              <Button variant="outline" className="flex-1 hover:bg-white">
                 Reset
               </Button>
-              <Button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white">
+              <Button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm">
                 Apply
               </Button>
             </div>
