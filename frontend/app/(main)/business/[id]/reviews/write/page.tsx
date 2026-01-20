@@ -90,7 +90,7 @@ const WriteReviewPage = () => {
   // Reply functionality state
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, date: Date}>}>({});
+  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, username: string, image: string | null, date: Date}>}>({});
 
   // Vote state
   const [helpfulVotes, setHelpfulVotes] = useState<{[key: string]: {helpful: number, notHelpful: number}}>({});
@@ -110,6 +110,10 @@ const WriteReviewPage = () => {
     setReplyText("");
   };
 
+  const handleEmojiClick = (emoji: string) => {
+    setReplyText(prev => prev + emoji);
+  };
+
   const handleReplySubmit = async (reviewId: string) => {
     if (!replyText.trim()) return;
 
@@ -118,6 +122,8 @@ const WriteReviewPage = () => {
       id: Date.now().toString(),
       text: replyText,
       user: user?.name || user?.email?.split('@')[0] || "Anonymous",
+      username: user?.email?.split('@')[0] || 'user',
+      image: user?.image || null,
       date: new Date()
     };
 
@@ -524,10 +530,10 @@ const WriteReviewPage = () => {
         </div>
       )}
 
-      <div className="max-w-8xl p-3 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50 min-h-screen">
-        {/* Header */}
-        <div className="mb-6 px-2 sm:mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white">
+      {/* Header - Full Width */}
+      <div className="w-full bg-white   py-6 sm:py-8 lg:py-10 mb-2">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               <Link href={`/business/${storeId}`}>
                 <Button variant="ghost" size="sm" className="flex items-center gap-2 flex-shrink-0 -mt-2 hover:bg-transparent p-0">
@@ -608,7 +614,10 @@ const WriteReviewPage = () => {
             
           </div>
         </div>
+      </div>
 
+      {/* Main Content Area */}
+      <div className="max-w-8xl mx-auto px-2 sm:px-3 lg:px-4 py-4 sm:py-6 bg-gray-50 min-h-screen">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 px-16  ">
           {/* Main Review Form */}
           <div className="lg:col-span-3 mt-8">
@@ -1102,12 +1111,12 @@ const WriteReviewPage = () => {
                                 {/* Emoji Toolbar */}
                                 <div className="flex items-center justify-between mt-2">
                                   <div className="flex items-center gap-1 text-base">
-                                    <button type="button" className="hover:scale-110 transition-transform">👍</button>
-                                    <button type="button" className="hover:scale-110 transition-transform">❤️</button>
-                                    <button type="button" className="hover:scale-110 transition-transform">👏</button>
-                                    <button type="button" className="hover:scale-110 transition-transform">😂</button>
-                                    <button type="button" className="hover:scale-110 transition-transform">😍</button>
-                                    <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                                    <button type="button" onClick={() => handleEmojiClick('👍')} className="hover:scale-110 transition-transform">👍</button>
+                                    <button type="button" onClick={() => handleEmojiClick('❤️')} className="hover:scale-110 transition-transform">❤️</button>
+                                    <button type="button" onClick={() => handleEmojiClick('👏')} className="hover:scale-110 transition-transform">👏</button>
+                                    <button type="button" onClick={() => handleEmojiClick('😂')} className="hover:scale-110 transition-transform">😂</button>
+                                    <button type="button" onClick={() => handleEmojiClick('😍')} className="hover:scale-110 transition-transform">😍</button>
+                                    <button type="button" onClick={() => handleEmojiClick('🔥')} className="hover:scale-110 transition-transform">🔥</button>
                                   </div>
                                   <div className="flex gap-2">
                                     <Button
@@ -1131,15 +1140,26 @@ const WriteReviewPage = () => {
                                 <div key={reply.id} className="pl-4 border-l-2 border-gray-200">
                                   <div className="flex items-start gap-2">
                                     <div className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 bg-gradient-to-br from-blue-400 to-green-600 rounded-full flex items-center justify-center">
-                                      <span className="text-xs sm:text-sm font-bold text-white">
-                                        {reply.user.charAt(0)}
-                                      </span>
+                                      {reply.image ? (
+                                        <Image
+                                          src={reply.image}
+                                          alt={reply.user}
+                                          width={32}
+                                          height={32}
+                                          className="w-full h-full object-cover rounded-full"
+                                        />
+                                      ) : (
+                                        <span className="text-xs sm:text-sm font-bold text-white">
+                                          {reply.user.charAt(0)}
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 mb-1">
                                         <span className="font-semibold text-gray-900 text-xs sm:text-sm">
                                           {reply.user}
                                         </span>
+                                        <span className="text-gray-500 text-xs sm:text-sm">@{reply.username?.replace(/^@/, '') || 'user'}</span>
                                       <svg 
                                         className="w-3.5 h-3.5 flex-shrink-0 " 
                                         viewBox="0,0,256,256"
@@ -1168,11 +1188,7 @@ const WriteReviewPage = () => {
                                         </svg>
                                         <Badge className="bg-blue-500 text-white rounded-full text-xs p-4 px-2 py-0 h-4">Author</Badge>
                                         <span className="text-xs text-gray-500">
-                                          {new Date(reply.date).toLocaleTimeString('en-US', { 
-                                            hour: '2-digit', 
-                                            minute: '2-digit',
-                                            hour12: true
-                                          })}
+                                          {getRelativeTime(reply.date)}
                                         </span>
                                       </div>
                                       <p className="text-xs sm:text-sm text-gray-700">{reply.text}</p>
@@ -1244,12 +1260,12 @@ const WriteReviewPage = () => {
                                             />
                                             <div className="flex items-center justify-between mt-2">
                                               <div className="flex items-center gap-1 text-base">
-                                                <button type="button" className="hover:scale-110 transition-transform">👍</button>
-                                                <button type="button" className="hover:scale-110 transition-transform">❤️</button>
-                                                <button type="button" className="hover:scale-110 transition-transform">👏</button>
-                                                <button type="button" className="hover:scale-110 transition-transform">😂</button>
-                                                <button type="button" className="hover:scale-110 transition-transform">😍</button>
-                                                <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                                                <button type="button" onClick={() => handleEmojiClick('👍')} className="hover:scale-110 transition-transform">👍</button>
+                                                <button type="button" onClick={() => handleEmojiClick('❤️')} className="hover:scale-110 transition-transform">❤️</button>
+                                                <button type="button" onClick={() => handleEmojiClick('👏')} className="hover:scale-110 transition-transform">👏</button>
+                                                <button type="button" onClick={() => handleEmojiClick('😂')} className="hover:scale-110 transition-transform">😂</button>
+                                                <button type="button" onClick={() => handleEmojiClick('😍')} className="hover:scale-110 transition-transform">😍</button>
+                                                <button type="button" onClick={() => handleEmojiClick('🔥')} className="hover:scale-110 transition-transform">🔥</button>
                                               </div>
                                               <div className="flex gap-2">
                                                 <Button
@@ -1273,21 +1289,28 @@ const WriteReviewPage = () => {
                                             <div key={nestedReply.id} className="pl-4 border-l-2 border-gray-200">
                                               <div className="flex items-start gap-2">
                                                 <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
-                                                  <span className="text-xs font-bold text-white">
-                                                    {nestedReply.user.charAt(0)}
-                                                  </span>
+                                                  {nestedReply.image ? (
+                                                    <Image
+                                                      src={nestedReply.image}
+                                                      alt={nestedReply.user}
+                                                      width={24}
+                                                      height={24}
+                                                      className="w-full h-full object-cover rounded-full"
+                                                    />
+                                                  ) : (
+                                                    <span className="text-xs font-bold text-white">
+                                                      {nestedReply.user.charAt(0)}
+                                                    </span>
+                                                  )}
                                                 </div>
                                                 <div className="flex-1">
                                                   <div className="flex items-center gap-2 mb-1">
                                                     <span className="font-semibold text-gray-900 text-xs">
                                                       {nestedReply.user}
                                                     </span>
+                                                    <span className="text-gray-500 text-xs">@{nestedReply.username?.replace(/^@/, '') || 'user'}</span>
                                                     <span className="text-xs text-gray-500">
-                                                      {new Date(nestedReply.date).toLocaleTimeString('en-US', { 
-                                                        hour: '2-digit', 
-                                                        minute: '2-digit',
-                                                        hour12: true
-                                                      })}
+                                                      {getRelativeTime(nestedReply.date)}
                                                     </span>
                                                   </div>
                                                   <p className="text-xs text-gray-700">{nestedReply.text}</p>
@@ -1521,12 +1544,12 @@ const WriteReviewPage = () => {
                           {/* Emoji Toolbar */}
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center gap-1 text-base">
-                              <button type="button" className="hover:scale-110 transition-transform">👍</button>
-                              <button type="button" className="hover:scale-110 transition-transform">❤️</button>
-                              <button type="button" className="hover:scale-110 transition-transform">👏</button>
-                              <button type="button" className="hover:scale-110 transition-transform">😂</button>
-                              <button type="button" className="hover:scale-110 transition-transform">😍</button>
-                              <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                              <button type="button" onClick={() => handleEmojiClick('👍')} className="hover:scale-110 transition-transform">👍</button>
+                              <button type="button" onClick={() => handleEmojiClick('❤️')} className="hover:scale-110 transition-transform">❤️</button>
+                              <button type="button" onClick={() => handleEmojiClick('👏')} className="hover:scale-110 transition-transform">👏</button>
+                              <button type="button" onClick={() => handleEmojiClick('😂')} className="hover:scale-110 transition-transform">😂</button>
+                              <button type="button" onClick={() => handleEmojiClick('😍')} className="hover:scale-110 transition-transform">😍</button>
+                              <button type="button" onClick={() => handleEmojiClick('🔥')} className="hover:scale-110 transition-transform">🔥</button>
                             </div>
                             <div className="flex gap-2">
                               
@@ -1551,15 +1574,26 @@ const WriteReviewPage = () => {
                           <div key={reply.id} className="pl-4 border-l-2 border-gray-200">
                             <div className="flex items-start gap-2">
                               <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                                <span className="text-xs font-bold text-white">
-                                  {reply.user.charAt(0)}
-                                </span>
+                                {reply.image ? (
+                                  <Image
+                                    src={reply.image}
+                                    alt={reply.user}
+                                    width={24}
+                                    height={24}
+                                    className="w-full h-full object-cover rounded-full"
+                                  />
+                                ) : (
+                                  <span className="text-xs font-bold text-white">
+                                    {reply.user.charAt(0)}
+                                  </span>
+                                )}
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="font-semibold text-gray-900 text-xs">
                                     {reply.user}
                                   </span>
+                                  <span className="text-gray-500 text-xs">@{reply.username?.replace(/^@/, '') || 'user'}</span>
                                     <svg 
                                         className="w-3.5 h-3.5 flex-shrink-0 " 
                                         viewBox="0,0,256,256"
@@ -1588,11 +1622,7 @@ const WriteReviewPage = () => {
                                       </svg>
                                   <Badge className="bg-blue-500 text-white rounded-full text-xs p-4 px-2 py-0 h-4">Author</Badge>
                                   <span className="text-xs text-gray-500">
-                                    {new Date(reply.date).toLocaleTimeString('en-US', { 
-                                      hour: '2-digit', 
-                                      minute: '2-digit',
-                                      hour12: true
-                                    })}
+                                    {getRelativeTime(reply.date)}
                                   </span>
                                 </div>
                                 <p className="text-xs text-gray-700">{reply.text}</p>
@@ -1664,12 +1694,12 @@ const WriteReviewPage = () => {
                                       />
                                       <div className="flex items-center justify-between mt-2">
                                         <div className="flex items-center gap-1 text-base">
-                                          <button type="button" className="hover:scale-110 transition-transform">👍</button>
-                                          <button type="button" className="hover:scale-110 transition-transform">❤️</button>
-                                          <button type="button" className="hover:scale-110 transition-transform">👏</button>
-                                          <button type="button" className="hover:scale-110 transition-transform">😂</button>
-                                          <button type="button" className="hover:scale-110 transition-transform">😍</button>
-                                          <button type="button" className="hover:scale-110 transition-transform">🔥</button>
+                                          <button type="button" onClick={() => handleEmojiClick('👍')} className="hover:scale-110 transition-transform">👍</button>
+                                          <button type="button" onClick={() => handleEmojiClick('❤️')} className="hover:scale-110 transition-transform">❤️</button>
+                                          <button type="button" onClick={() => handleEmojiClick('👏')} className="hover:scale-110 transition-transform">👏</button>
+                                          <button type="button" onClick={() => handleEmojiClick('😂')} className="hover:scale-110 transition-transform">😂</button>
+                                          <button type="button" onClick={() => handleEmojiClick('😍')} className="hover:scale-110 transition-transform">😍</button>
+                                          <button type="button" onClick={() => handleEmojiClick('🔥')} className="hover:scale-110 transition-transform">🔥</button>
                                         </div>
                                         <div className="flex gap-2">
                                           <Button
@@ -1693,21 +1723,28 @@ const WriteReviewPage = () => {
                                       <div key={nestedReply.id} className="pl-4 border-l-2 border-gray-200">
                                         <div className="flex items-start gap-2">
                                           <div className="w-6 h-6 flex-shrink-0 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
-                                            <span className="text-xs font-bold text-white">
-                                              {nestedReply.user.charAt(0)}
-                                            </span>
+                                            {nestedReply.image ? (
+                                              <Image
+                                                src={nestedReply.image}
+                                                alt={nestedReply.user}
+                                                width={24}
+                                                height={24}
+                                                className="w-full h-full object-cover rounded-full"
+                                              />
+                                            ) : (
+                                              <span className="text-xs font-bold text-white">
+                                                {nestedReply.user.charAt(0)}
+                                              </span>
+                                            )}
                                           </div>
                                           <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-1">
                                               <span className="font-semibold text-gray-900 text-xs">
                                                 {nestedReply.user}
                                               </span>
+                                              <span className="text-gray-500 text-xs">@{nestedReply.username?.replace(/^@/, '') || 'user'}</span>
                                               <span className="text-xs text-gray-500">
-                                                {new Date(nestedReply.date).toLocaleTimeString('en-US', { 
-                                                  hour: '2-digit', 
-                                                  minute: '2-digit',
-                                                  hour12: true
-                                                })}
+                                                {getRelativeTime(nestedReply.date)}
                                               </span>
                                             </div>
                                             <p className="text-xs text-gray-700">{nestedReply.text}</p>
