@@ -269,7 +269,7 @@ const ReviewsPage = () => {
                         </g>
                       </g>
                     </svg>
-                    <span className="text-gray-500">@{store.user?.username?.replace(/^@/, '') || 'username'}</span>
+                    <span className="text-gray-500">@{store.username || store.user?.username?.replace(/^@/, '') || 'admin'}</span>
                   </div>
                   {store.tagline && (
                     <p className="text-xs sm:text-sm text-gray-500 truncate">{store.tagline}</p>

@@ -494,7 +494,7 @@ const BusinessPage = () => {
                   </span>
                 </h1>
 
-                <p className="text-gray-500 font-normal text-sm mb-1">@{store.user?.username?.replace(/^@/, '') || 'username'}</p>
+                <p className="text-gray-500 font-normal text-sm mb-1">@{store.username || store.user?.username?.replace(/^@/, '') || 'admin'}</p>
                 
                 <p className="text-gray-500 text-xs sm:text-[14px] truncate">
                   {store.tagline || "Lorem ipsum dolor sit amet"}
