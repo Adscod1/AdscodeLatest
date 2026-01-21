@@ -90,7 +90,7 @@ const WriteReviewPage = () => {
   // Reply functionality state
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, username: string, image: string | null, date: Date}>}>({});
+  const [replies, setReplies] = useState<{[key: string]: Array<{id: string, text: string, user: string, username: string, image: string | null, verified: boolean, date: Date}>}>({});
 
   // Vote state
   const [helpfulVotes, setHelpfulVotes] = useState<{[key: string]: {helpful: number, notHelpful: number}}>({});
@@ -124,6 +124,7 @@ const WriteReviewPage = () => {
       user: user?.name || user?.email?.split('@')[0] || "Anonymous",
       username: user?.email?.split('@')[0] || 'user',
       image: user?.image || null,
+      verified: true, // User is logged in, so they're verified
       date: new Date()
     };
 
@@ -1160,6 +1161,7 @@ const WriteReviewPage = () => {
                                           {reply.user}
                                         </span>
                                         <span className="text-gray-500 text-xs sm:text-sm">@{reply.username?.replace(/^@/, '') || 'user'}</span>
+                                      {reply.verified && (
                                       <svg 
                                         className="w-3.5 h-3.5 flex-shrink-0 " 
                                         viewBox="0,0,256,256"
@@ -1186,6 +1188,7 @@ const WriteReviewPage = () => {
                                             </g>
                                           </g>
                                         </svg>
+                                        )}
                                         <Badge className="bg-blue-500 text-white rounded-full text-xs p-4 px-2 py-0 h-4">Author</Badge>
                                         <span className="text-xs text-gray-500">
                                           {getRelativeTime(reply.date)}
@@ -1309,6 +1312,34 @@ const WriteReviewPage = () => {
                                                       {nestedReply.user}
                                                     </span>
                                                     <span className="text-gray-500 text-xs">@{nestedReply.username?.replace(/^@/, '') || 'user'}</span>
+                                                    {nestedReply.verified && (
+                                                    <svg 
+                                                      className="w-3 h-3 flex-shrink-0" 
+                                                      viewBox="0,0,256,256"
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                      <g 
+                                                        fill="#2284c5ff" 
+                                                        fillRule="nonzero" 
+                                                        stroke="none" 
+                                                        strokeWidth="1" 
+                                                        strokeLinecap="butt" 
+                                                        strokeLinejoin="miter" 
+                                                        strokeMiterlimit="10" 
+                                                        strokeDasharray="" 
+                                                        strokeDashoffset="0" 
+                                                        fontFamily="none" 
+                                                        fontWeight="normal" 
+                                                        fontSize="none" 
+                                                        textAnchor="inherit" 
+                                                        style={{mixBlendMode: 'normal'}}
+                                                      >
+                                                        <g transform="scale(8.53333,8.53333)">
+                                                          <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                                                        </g>
+                                                      </g>
+                                                    </svg>
+                                                    )}
                                                     <span className="text-xs text-gray-500">
                                                       {getRelativeTime(nestedReply.date)}
                                                     </span>
@@ -1594,6 +1625,7 @@ const WriteReviewPage = () => {
                                     {reply.user}
                                   </span>
                                   <span className="text-gray-500 text-xs">@{reply.username?.replace(/^@/, '') || 'user'}</span>
+                                  {reply.verified && (
                                     <svg 
                                         className="w-3.5 h-3.5 flex-shrink-0 " 
                                         viewBox="0,0,256,256"
@@ -1620,6 +1652,7 @@ const WriteReviewPage = () => {
                                           </g>
                                         </g>
                                       </svg>
+                                  )}
                                   <Badge className="bg-blue-500 text-white rounded-full text-xs p-4 px-2 py-0 h-4">Author</Badge>
                                   <span className="text-xs text-gray-500">
                                     {getRelativeTime(reply.date)}
@@ -1743,6 +1776,34 @@ const WriteReviewPage = () => {
                                                 {nestedReply.user}
                                               </span>
                                               <span className="text-gray-500 text-xs">@{nestedReply.username?.replace(/^@/, '') || 'user'}</span>
+                                              {nestedReply.verified && (
+                                              <svg 
+                                                className="w-3 h-3 flex-shrink-0" 
+                                                viewBox="0,0,256,256"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                              >
+                                                <g 
+                                                  fill="#2271c5ff" 
+                                                  fillRule="nonzero" 
+                                                  stroke="none" 
+                                                  strokeWidth="1" 
+                                                  strokeLinecap="butt" 
+                                                  strokeLinejoin="miter" 
+                                                  strokeMiterlimit="10" 
+                                                  strokeDasharray="" 
+                                                  strokeDashoffset="0" 
+                                                  fontFamily="none" 
+                                                  fontWeight="normal" 
+                                                  fontSize="none" 
+                                                  textAnchor="inherit" 
+                                                  style={{mixBlendMode: 'normal'}}
+                                                >
+                                                  <g transform="scale(8.53333,8.53333)">
+                                                    <path d="M26.97,16.3l-1.57,-2.57l0.78,-2.91c0.12,-0.46 -0.1,-0.95 -0.53,-1.15l-2.71,-1.32l-0.92,-2.87c-0.14,-0.46 -0.6,-0.74 -1.07,-0.69l-2.99,0.36l-2.32,-1.92c-0.37,-0.31 -0.91,-0.31 -1.28,0l-2.32,1.92l-2.99,-0.36c-0.47,-0.05 -0.93,0.23 -1.07,0.69l-0.92,2.87l-2.71,1.32c-0.43,0.2 -0.65,0.69 -0.53,1.15l0.78,2.91l-1.57,2.57c-0.25,0.41 -0.17,0.94 0.18,1.27l2.23,2.02l0.07,3.01c0.02,0.48 0.37,0.89 0.84,0.97l2.97,0.49l1.69,2.5c0.27,0.40 0.78,0.55 1.22,0.36l2.77,-1.19l2.77,1.19c0.13,0.05 0.26,0.08 0.39,0.08c0.33,0 0.64,-0.16 0.83,-0.44l1.69,-2.5l2.97,-0.49c0.47,-0.08 0.82,-0.49 0.84,-0.97l0.07,-3.01l2.23,-2.02c0.35,-0.33 0.43,-0.86 0.18,-1.27zM19.342,13.443l-4.438,5.142c-0.197,0.229 -0.476,0.347 -0.758,0.347c-0.215,0 -0.431,-0.069 -0.613,-0.211l-3.095,-2.407c-0.436,-0.339 -0.514,-0.967 -0.175,-1.403c0.339,-0.434 0.967,-0.516 1.403,-0.175l2.345,1.823l3.816,-4.422c0.359,-0.42 0.993,-0.465 1.41,-0.104c0.419,0.361 0.466,0.992 0.105,1.41z"></path>
+                                                  </g>
+                                                </g>
+                                              </svg>
+                                              )}
                                               <span className="text-xs text-gray-500">
                                                 {getRelativeTime(nestedReply.date)}
                                               </span>
