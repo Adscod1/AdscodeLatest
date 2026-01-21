@@ -29,6 +29,7 @@ export interface BusinessHoursDto {
 
 export interface CreateStoreDto {
   name: string;
+  username?: string;
   tagline?: string;
   description?: string;
   category?: string;
@@ -80,6 +81,7 @@ export class StoresService {
     const store = await this.prisma.store.create({
       data: {
         name: data.name,
+        username: data.username ?? null,
         tagline: data.tagline ?? null,
         description: data.description ?? null,
         category: data.category ?? null,

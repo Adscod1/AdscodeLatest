@@ -106,6 +106,7 @@ model Profile {
 model Store {
   id              String           @id @default(uuid())
   name            String
+  username        String?
   tagline         String?
   description     String?          @db.Text
   category        String?

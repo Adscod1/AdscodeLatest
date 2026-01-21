@@ -23,6 +23,7 @@ const businessHoursSchema = z
 const storeFormSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(2, "Store name must be at least 2 characters"),
+  username: z.string().optional().nullable(),
   tagline: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   category: z.string().optional().nullable(),

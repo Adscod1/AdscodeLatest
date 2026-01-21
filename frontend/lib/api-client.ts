@@ -190,6 +190,7 @@ export interface BusinessHours {
 
 export interface CreateStoreInput {
   name: string;
+  username?: string;
   tagline?: string;
   description?: string;
   category?: string;
