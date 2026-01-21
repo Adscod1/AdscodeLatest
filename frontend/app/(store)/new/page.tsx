@@ -87,21 +87,6 @@ const CreateNewStorePage = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Country
-                  </label>
-                  <Input
-                    {...methods.register("country")}
-                    placeholder="Enter your country"
-                  />
-                  {methods.formState.errors.country && (
-                    <p className="mt-1 text-sm text-destructive">
-                      {methods.formState.errors.country.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tagline
                   </label>
                   <Input
