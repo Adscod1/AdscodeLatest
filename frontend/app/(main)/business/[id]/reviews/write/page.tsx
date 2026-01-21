@@ -587,7 +587,9 @@ const WriteReviewPage = () => {
                         </g>
                       </g>
                     </svg>
-                    <span className="text-gray-500">@{store.username || store.user?.username?.replace(/^@/, '') || 'admin'}</span>
+                    <span className="text-gray-500">
+                      @{(store.username || store.user?.username || 'admin').replace(/^@/, '')}
+                    </span>
                   </div>
                   {store.tagline && (
                     <p className="text-xs sm:text-sm text-gray-500 truncate">{store.tagline}</p>
