@@ -1,17 +1,14 @@
-import { headers } from "next/headers";
 import ProfileContent from "./profile-content";
-import { auth } from "@/utils/auth";
+import { getBackendSession } from "@/utils/auth";
 import { redirect } from "next/navigation";
 import api from "@/lib/api-client";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
 const ProfilePage = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getBackendSession();
 
-  if (!session) {
+  if (!session?.user) {
     redirect("/auth/login");
   }
 

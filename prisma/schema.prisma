@@ -11,6 +11,7 @@ model User {
   id            String         @id @default(uuid())
   email         String         @unique
   name          String?
+  username      String?        @unique
   emailVerified Boolean        @default(false)
   image         String?
   createdAt     DateTime       @default(now())
@@ -189,33 +190,62 @@ model StoreHighlight {
 }
 
 model Product {
-  id                   String             @id @default(uuid())
-  title                String
-  description          String?            @db.Text
-  category             String?
-  vendor               String?
-  tags                 String?
-  price                Float
-  comparePrice         Float?
-  costPerItem          Float?
-  weight               Float?
-  weightUnit           String?
-  length               Float?
-  width                Float?
-  height               Float?
-  sizeUnit             String?
-  countryOfOrigin      String?
-  harmonizedSystemCode String?
-  status               String             @default("DRAFT")
-  storeId              String
-  views                Int                @default(0)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  store                Store              @relation(fields: [storeId], references: [id])
-  images               ProductImage[]
-  variations           ProductVariation[]
-  videos               ProductVideo[]
-  comments             Comment[]
+  id                              String             @id @default(uuid())
+  productId                       String?            @unique
+  title                           String
+  description                     String?            @db.Text
+  category                        String?
+  vendor                          String?
+  brand                           String?
+  model                           String?
+  condition                       String?
+  warranty                        String?
+  specifications                  String?            @db.Text
+  tags                            String?
+  price                           Float
+  comparePrice                    Float?
+  costPerItem                     Float?
+  currency                        String?            @default("UGX")
+  taxRate                         Float?
+  sku                             String?
+  barcode                         String?
+  stockQuantity                   Int?
+  lowStockAlert                   Int?
+  trackQuantity                   Boolean            @default(false)
+  continueSellingWhenOutOfStock   Boolean            @default(false)
+  weight                          Float?
+  weightUnit                      String?
+  length                          Float?
+  width                           Float?
+  height                          Float?
+  sizeUnit                        String?
+  requiresShipping                Boolean            @default(true)
+  shippingCost                    Float?
+  offerFreeShipping               Boolean            @default(false)
+  processingTime                  String?
+  shippingMethod                  String?
+  countryOfOrigin                 String?
+  harmonizedSystemCode            String?
+  status                          String             @default("DRAFT")
+  isScheduled                     Boolean            @default(false)
+  scheduledPublishDate            DateTime?
+  scheduledUnpublishDate          DateTime?
+  benefitsIntroText               String?            @db.Text
+  benefitsSectionImage            String?
+  howToUseVideo                   String?
+  howToUseDescription             String?            @db.Text
+  storeId                         String
+  views                           Int                @default(0)
+  createdAt                       DateTime           @default(now())
+  updatedAt                       DateTime           @updatedAt
+  store                           Store              @relation(fields: [storeId], references: [id])
+  images                          ProductImage[]
+  variations                      ProductVariation[]
+  videos                          ProductVideo[]
+  comments                        Comment[]
+  benefitItems                    BenefitItem[]
+  ingredientItems                 IngredientItem[]
+  faqItems                        FaqItem[]
 
   @@index([storeId], map: "product_storeId_fkey")
   @@map("product")
@@ -267,6 +297,40 @@ model Comment {
   @@index([userId], map: "comment_userId_fkey")
   @@index([productId], map: "comment_productId_fkey")
   @@map("comment")
+}
+
+model BenefitItem {
+  id          String  @id @default(uuid())
+  title       String
+  description String? @db.Text
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "benefit_item_productId_fkey")
+  @@map("benefit_item")
+}
+
+model IngredientItem {
+  id          String  @id @default(uuid())
+  name        String
+  image       String?
+  description String? @db.Text
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "ingredient_item_productId_fkey")
+  @@map("ingredient_item")
+}
+
+model FaqItem {
+  id        String  @id @default(uuid())
+  question  String  @db.Text
+  answer    String  @db.Text
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "faq_item_productId_fkey")
+  @@map("faq_item")
 }
 
 model StoreActivity {
