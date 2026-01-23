@@ -128,6 +128,7 @@ const StoreMediaPage = () => {
 
       const storeData: CreateStoreInput = {
         name: data.name,
+        username: cleanData.username as string | undefined,
         tagline: cleanData.tagline as string | undefined,
         description: cleanData.description as string | undefined,
         category: cleanData.category as string | undefined,

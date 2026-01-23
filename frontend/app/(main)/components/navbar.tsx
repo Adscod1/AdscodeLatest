@@ -137,12 +137,38 @@ const categoryItems = [
   "Furniture",
   "Electronics",
   "Automotive",
-  "Kidswear",
+  "Food & Beverage",
+  "Restaurants & Cafes",
+  "Real Estate",
+  "Travel & Tourism",
+  "Education",
+  "Sports & Fitness",
+  "Home & Garden",
+  "Pets & Animals",
+  "Books & Stationery",
+  "Photography",
+  "Music & Instruments",
+  "Art & Crafts",
+  "Jewelry & Accessories",
   "Technology",
-  "Art and Crafts",
-  "Film industry",
-  "Mechanics",
-  "Fashion"
+  "Software & Apps",
+  "Gaming",
+  "Beauty & Cosmetics",
+  "Hair & Salon",
+  "Spa & Wellness",
+  "Kids & Toys",
+  "Baby Products",
+  "Wedding & Events",
+  "Professional Services",
+  "Legal Services",
+  "Financial Services",
+  "Construction",
+  "Mechanics & Repair",
+  "Cleaning Services",
+  "Security Services",
+  "Marketing & Advertising",
+  "Agriculture",
+  "Manufacturing"
 ];
 
 export const Logo = () => {
@@ -231,7 +257,7 @@ export const FeedNavbar = () => {
   }, []);
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-[9999] bg-white border-b border-gray-200">
+    <div className="sticky top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       {/* Main Navigation Bar */}
       <nav className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">

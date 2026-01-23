@@ -72,6 +72,21 @@ const CreateNewStorePage = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Username
+                  </label>
+                  <Input
+                    {...methods.register("username")}
+                    placeholder="Enter your store username"
+                  />
+                  {methods.formState.errors.username && (
+                    <p className="mt-1 text-sm text-destructive">
+                      {methods.formState.errors.username.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tagline
                   </label>
                   <Input

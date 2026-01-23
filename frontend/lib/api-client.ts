@@ -147,6 +147,7 @@ export interface Store {
   id: string;
   userId: string;
   name: string;
+  username: string | null;
   tagline: string | null;
   description: string | null;
   category: string | null;
@@ -190,6 +191,7 @@ export interface BusinessHours {
 
 export interface CreateStoreInput {
   name: string;
+  username?: string;
   tagline?: string;
   description?: string;
   category?: string;

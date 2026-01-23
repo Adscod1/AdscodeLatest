@@ -5,11 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { StoreFormData, storeFormSchema } from "@/lib/validations/store";
 import { useStoreForm } from "@/store/use-store-form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { StoreFormLayout } from "../components/store-form-layout";
 import { StorePreview } from "../components/store-preview";
 import { Facebook, Instagram } from "lucide-react";
+import { CountrySelector } from "@/components/CountrySelector";
 
 const ContactInformationPage = () => {
   const { formData, setFormData } = useStoreForm();
@@ -136,22 +136,10 @@ const ContactInformationPage = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Country
                       </label>
-                      <Select 
-                        value={methods.watch("country") || "usa"}
+                      <CountrySelector
+                        value={methods.watch("country") || ""}
                         onValueChange={(value) => methods.setValue("country", value)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select Country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="usa">United States</SelectItem>
-                          <SelectItem value="canada">Canada</SelectItem>
-                          <SelectItem value="uk">United Kingdom</SelectItem>
-                          <SelectItem value="australia">Australia</SelectItem>
-                          <SelectItem value="germany">Germany</SelectItem>
-                          <SelectItem value="france">France</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      />
                     </div>
                   </div>
                 </div>

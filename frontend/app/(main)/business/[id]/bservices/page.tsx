@@ -115,6 +115,27 @@ export default function EcommercePage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const slides = [
+    {
+      gradient: 'from-blue-500 to-blue-400',
+      title: 'Flash Sale',
+      subtitle: '5 Days left',
+      icon: '⚡'
+    },
+    {
+      gradient: 'from-purple-500 to-purple-400',
+      title: 'New Arrivals',
+      subtitle: 'Check out latest products',
+      icon: '🎁'
+    },
+    {
+      gradient: 'from-pink-500 to-pink-400',
+      title: 'Special Offer',
+      subtitle: 'Limited time only',
+      icon: '✨'
+    }
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -140,6 +161,23 @@ export default function EcommercePage() {
     }
   }, [businessId]);
 
+  // Auto-slide carousel
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
   // Combine products and services for display
   const allItems = [...products, ...services];
 
@@ -154,39 +192,72 @@ export default function EcommercePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       
+      {/* Hero Banner - Full Width */}
+      <div className="relative bg-gradient-to-r overflow-hidden mb-8 h-[36rem] w-full">
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} transition-opacity duration-1000 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full"></div>
+              <div className="absolute bottom-10 right-20 w-24 h-24 bg-white rounded-full"></div>
+              <div className="absolute top-32 right-32 w-16 h-16 bg-white rounded-full"></div>
+            </div>
+            <div className="relative h-full flex items-center justify-between px-12">
+              <div className="text-white">
+                <div className="flex items-center space-x-2 mb-2">
+                  <h3 className="text-5xl font-bold">{slide.title}</h3>
+                  <span className="text-4xl">{slide.icon}</span>
+                </div>
+                <p className="text-3xl font-bold mb-6">{slide.subtitle}</p>
+                <button className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition flex items-center space-x-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>Shop Now!</span>
+                </button>
+              </div>
+              <div className="relative">
+                <div className="text-9xl transform rotate-12">
+                  {index === 0 ? '👟' : index === 1 ? '🎁' : '✨'}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition backdrop-blur-sm z-10"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition backdrop-blur-sm z-10"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        {/* Slide Indicators */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3 z-10">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`transition-all duration-300 rounded-full ${
+                currentSlide === index 
+                  ? 'w-8 h-3 bg-white' 
+                  : 'w-3 h-3 bg-white/50 hover:bg-white/70'
+              }`}
+            ></button>
+          ))}
+        </div>
+      </div>
 
       <div className=" mx-auto px-4 py-8">
-        {/* Hero Banner */}
-        <div className="relative bg-gradient-to-r from-blue-500 to-blue-400 overflow-scroll mb-8 h-80 w-full">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full"></div>
-            <div className="absolute bottom-10 right-20 w-24 h-24 bg-white rounded-full"></div>
-          </div>
-          <div className="relative h-full flex items-center justify-between px-12">
-            <div className="text-white">
-              <div className="flex items-center space-x-2 mb-2">
-                {/* <h3 className="text-5xl font-bold">Flash Sale</h3>
-                <span className="text-2xl">⚡</span> */}
-              </div>
-              {/* <p className="text-4xl font-bold mb-6">5 Days left</p> */}
-              {/* <button className="bg-white text-blue-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition flex items-center space-x-2">
-                <ShoppingCart className="w-4 h-4" />
-                <span>Shop Now!</span>
-              </button> */}
-            </div>
-            <div className="relative">
-              {/* <div className="text-8xl transform rotate-12">👟</div>
-              <div className="text-6xl absolute -right-8 top-12">🕶️</div> */}
-              {/* <div className="absolute -top-4 right-0 bg-white text-blue-600 px-4 py-1 rounded-full text-sm font-semibold">
-                 30%
-              </div> */}
-            </div>
-          </div>
-          {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            <button className={`w-2 h-2 rounded-full ${currentSlide === 0 ? 'bg-white' : 'bg-white/50'}`}></button>
-            <button className={`w-2 h-2 rounded-full ${currentSlide === 1 ? 'bg-white' : 'bg-white/50'}`}></button>
-          </div> */}
-        </div>
 
         {/* Category Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 m-8 mb-8">
@@ -287,16 +358,20 @@ export default function EcommercePage() {
                       </div>
                       <div className="flex items-center space-x-1 mb-1">
                         {[...Array(5)].map((_, i) => (
-
                           <svg
                             key={i}
                             className={`w-4 h-4 ${i < 4 ? 'text-yellow-400' : 'text-gray-300'}`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
+                            viewBox="0 0 24 24"
+                            fill={i < 4 ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            strokeWidth="1.5"
                           >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            <path
+                              d="M12 2.5c.3 0 .6.2.7.5l2.1 4.3 4.7.7c.3 0 .6.3.7.6.1.3 0 .6-.2.8l-3.4 3.3.8 4.7c.1.3 0 .6-.2.8-.2.2-.5.3-.8.1L12 15.4l-4.2 2.2c-.3.2-.6.1-.8-.1-.2-.2-.3-.5-.2-.8l.8-4.7L4.2 8.7c-.2-.2-.3-.5-.2-.8.1-.3.4-.6.7-.6l4.7-.7L11.3 3c.1-.3.4-.5.7-.5z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
-                          
                         ))}
                       </div>
                       {item.store && (
@@ -380,10 +455,16 @@ export default function EcommercePage() {
                             <svg
                               key={i}
                               className={`w-4 h-4 ${i < 4 ? 'text-yellow-400' : 'text-gray-300'}`}
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
+                              viewBox="0 0 24 24"
+                              fill={i < 4 ? "currentColor" : "none"}
+                              stroke="currentColor"
+                              strokeWidth="1.5"
                             >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              <path
+                                d="M12 2.5c.3 0 .6.2.7.5l2.1 4.3 4.7.7c.3 0 .6.3.7.6.1.3 0 .6-.2.8l-3.4 3.3.8 4.7c.1.3 0 .6-.2.8-.2.2-.5.3-.8.1L12 15.4l-4.2 2.2c-.3.2-.6.1-.8-.1-.2-.2-.3-.5-.2-.8l.8-4.7L4.2 8.7c-.2-.2-.3-.5-.2-.8.1-.3.4-.6.7-.6l4.7-.7L11.3 3c.1-.3.4-.5.7-.5z"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
                             </svg>
                           ))}
                         </div>
