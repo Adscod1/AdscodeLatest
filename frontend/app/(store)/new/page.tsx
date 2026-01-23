@@ -20,9 +20,33 @@ import { StorePreview } from "./components/store-preview";
 
 
 
+const BUSINESS_CATEGORIES = [
+  "Electronics",
+  "Fashion",
+  "Food",
+  "Health",
+  "Technology",
+  "Automotive",
+  "Real Estate",
+  "Home & Garden",
+  "Beauty & Cosmetics",
+  "Sports & Fitness",
+  "Books & Media",
+  "Toys & Games",
+  "Pet Supplies",
+  "Jewelry & Accessories",
+  "Art & Crafts",
+  "Travel & Tourism",
+  "Education",
+  "Professional Services",
+  "Restaurants & Catering",
+  "Other",
+];
+
 const CreateNewStorePage = () => {
   const { formData, setFormData } = useStoreForm();
   const hasInitialized = React.useRef(false);
+  const [showAllCategories, setShowAllCategories] = React.useState(false);
 
   const methods = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
@@ -112,20 +136,35 @@ const CreateNewStorePage = () => {
                     Business Category
                   </label>
                   <Select
-                    onValueChange={(value) =>
-                      methods.setValue("category", value)
-                    }
+                    onValueChange={(value) => {
+                      if (value === "show-more") {
+                        setShowAllCategories(true);
+                      } else {
+                        methods.setValue("category", value);
+                      }
+                    }}
                     value={methods.watch("category") || ""}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Electronics">Electronics</SelectItem>
-                      <SelectItem value="Fashion">Fashion</SelectItem>
-                      <SelectItem value="Food">Food</SelectItem>
-                      <SelectItem value="Health">Health</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
+                    <SelectContent className="max-h-[300px]">
+                      {(showAllCategories 
+                        ? BUSINESS_CATEGORIES 
+                        : BUSINESS_CATEGORIES.slice(0, 10)
+                      ).map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                      {!showAllCategories && (
+                        <SelectItem 
+                          value="show-more" 
+                          className="text-blue-600 font-medium"
+                        >
+                          Show more categories...
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
