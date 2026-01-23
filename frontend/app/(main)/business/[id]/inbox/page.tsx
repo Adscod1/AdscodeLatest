@@ -190,7 +190,7 @@ const BusinessInbox = () => {
           {/* Sidebar */}
           <div className="w-full lg:w-80 flex-shrink-0 space-y-3 sm:space-y-6 overflow-y-auto max-h-48 lg:max-h-none">
             {/* Search Card */}
-            <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4">
+            <div className="bg-white rounded shadow-sm p-3 sm:p-4">
               <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">
                 Search Message
               </h3>
@@ -201,13 +201,13 @@ const BusinessInbox = () => {
                   placeholder="Search messages..."
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
-                  className="w-full pl-8 sm:pl-10 pr-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-8 sm:pl-10 pr-4 py-1.5 sm:py-2 border border-gray-200 rounded text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
 
             {/* Quick Questions Card */}
-            <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 hidden lg:block">
+            <div className="bg-white rounded shadow-sm p-3 sm:p-4 hidden lg:block">
               <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3 flex items-center gap-2">
                 <HelpCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                 Quick Questions
@@ -217,7 +217,7 @@ const BusinessInbox = () => {
                   <button
                     key={q.id}
                     onClick={() => handleQuickQuestion(q.question)}
-                    className="w-full text-left p-2 sm:p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                    className="w-full text-left p-2 sm:p-3 border border-gray-200 rounded hover:border-blue-300 hover:bg-blue-50 transition-colors group"
                   >
                     <div className="flex items-start gap-2">
                       <span className="text-gray-400 group-hover:text-blue-500 transition-colors">
@@ -235,7 +235,7 @@ const BusinessInbox = () => {
 
           {/* Chat Area Card */}
           <div className="flex-1">
-            <div className="bg-white rounded-lg shadow-sm flex flex-col" style={{ minHeight: '650px' }}>
+            <div className="bg-white rounded shadow-sm flex flex-col" style={{ minHeight: '650px' }}>
               {/* Chat Header */}
               <div className="p-3 sm:p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-2 sm:space-x-3">
@@ -262,7 +262,7 @@ const BusinessInbox = () => {
                           {getBusinessInitials()}
                         </div>
                       )}
-                      <div className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg ${
+                      <div className={`px-3 py-2 sm:px-4 sm:py-2 rounded ${
                         message.sender === 'user' 
                           ? 'bg-blue-500 text-white' 
                           : 'bg-white text-gray-900 shadow-sm border border-gray-200'
@@ -286,7 +286,7 @@ const BusinessInbox = () => {
               {/* Message Input */}
               <div className="p-3 sm:p-4 border-t border-gray-200">
                 <div className="flex items-center space-x-2 sm:space-x-3">
-                  <button className="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                  <button className="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors">
                     <Paperclip className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
                   <div className="flex-1 relative">
@@ -296,12 +296,12 @@ const BusinessInbox = () => {
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      className="w-full px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-200 rounded text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <button 
                     onClick={handleSendMessage}
-                    className="p-1.5 sm:p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="p-1.5 sm:p-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors"
                   >
                     <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
