@@ -13,6 +13,7 @@ import { StoresModule } from './stores/stores.module';
 import { UploadModule } from './upload/upload.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     ServicesModule,
     InfluencersModule,
     NotificationsModule,
+    MessagesModule,
     UploadModule,
     ProfilesModule,
     ReviewsModule,
