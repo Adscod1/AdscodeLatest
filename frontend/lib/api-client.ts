@@ -1224,6 +1224,124 @@ export const getStoreReviews = async (storeId: string) => {
   return response.reviews;
 };
 
+// ============================================================================
+// MESSAGES API
+// ============================================================================
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderType: 'USER' | 'STORE';
+  content: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Conversation {
+  id: string;
+  storeId: string;
+  userId: string;
+  lastMessage?: string;
+  lastMessageAt: string;
+  createdAt: string;
+  updatedAt: string;
+  store?: {
+    id: string;
+    name: string;
+    logo: string | null;
+    username: string | null;
+  };
+  user?: {
+    id: string;
+    name: string | null;
+    image: string | null;
+    email: string;
+  };
+  unreadCount?: number;
+  messages?: Message[];
+}
+
+export interface GetConversationsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: 'all' | 'unread' | 'read';
+}
+
+export interface GetMessagesParams {
+  page?: number;
+  limit?: number;
+}
+
+export const messagesApi = {
+  // User endpoints
+  sendMessageToStore: (storeId: string, content: string) =>
+    apiRequest<{ success: boolean; conversation: Conversation; message: Message }>('/messages/send', {
+      method: 'POST',
+      body: JSON.stringify({ storeId, content }),
+    }),
+
+  sendMessage: (conversationId: string, content: string) =>
+    apiRequest<{ success: boolean; message: Message }>(`/messages/conversation/${conversationId}/send`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    }),
+
+  getUserConversations: (params?: GetConversationsParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    if (params?.status) searchParams.set('status', params.status);
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversations: Conversation[]; pagination: unknown }>(`/messages/conversations${query ? `?${query}` : ''}`);
+  },
+
+  getConversationMessages: (conversationId: string, params?: GetMessagesParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversation: Conversation; messages: Message[]; pagination: unknown }>(`/messages/conversations/${conversationId}${query ? `?${query}` : ''}`);
+  },
+
+  getUserUnreadCount: () =>
+    apiRequest<{ success: boolean; count: number }>('/messages/unread-count'),
+
+  getOrCreateConversation: (storeId: string) =>
+    apiRequest<{ success: boolean; conversation: Conversation }>(`/messages/store/${storeId}/start`),
+
+  // Store owner endpoints
+  getStoreConversations: (storeId: string, params?: GetConversationsParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    if (params?.status) searchParams.set('status', params.status);
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversations: Conversation[]; pagination: unknown }>(`/messages/store/${storeId}/conversations${query ? `?${query}` : ''}`);
+  },
+
+  getStoreConversationMessages: (storeId: string, conversationId: string, params?: GetMessagesParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversation: Conversation; messages: Message[]; pagination: unknown }>(`/messages/store/${storeId}/conversations/${conversationId}${query ? `?${query}` : ''}`);
+  },
+
+  replyAsStore: (storeId: string, conversationId: string, content: string) =>
+    apiRequest<{ success: boolean; message: Message }>(`/messages/store/${storeId}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ conversationId, content }),
+    }),
+
+  getStoreUnreadCount: (storeId: string) =>
+    apiRequest<{ success: boolean; count: number }>(`/messages/store/${storeId}/unread-count`),
+};
+
 // Export everything as default for convenience
 export default {
   auth: authApi,
@@ -1238,4 +1356,5 @@ export default {
   reviews: reviewsApi,
   comments: commentsApi,
   upload: uploadApi,
+  messages: messagesApi,
 };

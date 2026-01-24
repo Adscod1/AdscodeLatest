@@ -1,29 +1,23 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Home,
   Send,
   Paperclip,
-  ArrowLeft,
+  ChevronLeft,
   Store,
   Search,
   MessageCircle,
   HelpCircle,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
-import api from "@/lib/api-client";
-
-interface Message {
-  id: string;
-  text: string;
-  timestamp: string;
-  sender: 'user' | 'business';
-}
+import api, { Message } from "@/lib/api-client";
 
 interface QuickQuestion {
   id: string;
@@ -36,8 +30,10 @@ const BusinessInbox = () => {
   const businessId = params.id as string;
   const [messageText, setMessageText] = useState('');
   const [searchText, setSearchText] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
-  // Get current user from database
+  // Get current user from session
   const { data: user } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -57,11 +53,53 @@ const BusinessInbox = () => {
 
   // Fetch business/store data
   const { data: storeData } = useQuery({
-    queryKey: [`/api/stores/${businessId}`],
+    queryKey: [`store-${businessId}`],
     queryFn: () => api.stores.getById(businessId),
   });
 
-  const businessName = storeData?.store?.name || "Business";
+  const store = storeData?.store;
+  const businessName = store?.name || "Business";
+
+  // Get or create conversation with the store
+  const { data: conversationData, isLoading: isLoadingConversation } = useQuery({
+    queryKey: [`conversation-${businessId}`],
+    queryFn: () => api.messages.getOrCreateConversation(businessId),
+    enabled: !!businessId && !!user,
+  });
+
+  const conversation = conversationData?.conversation;
+
+  // Fetch messages for the conversation
+  const { data: messagesData, isLoading: isLoadingMessages } = useQuery({
+    queryKey: [`messages-${conversation?.id}`],
+    queryFn: () => api.messages.getConversationMessages(conversation!.id),
+    enabled: !!conversation?.id,
+    refetchInterval: 5000, // Poll every 5 seconds for new messages
+  });
+
+  const messages = messagesData?.messages || [];
+
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async (content: string) => {
+      if (conversation?.id) {
+        return api.messages.sendMessage(conversation.id, content);
+      } else {
+        return api.messages.sendMessageToStore(businessId, content);
+      }
+    },
+    onSuccess: () => {
+      setMessageText('');
+      // Refetch messages and conversation
+      queryClient.invalidateQueries({ queryKey: [`messages-${conversation?.id}`] });
+      queryClient.invalidateQueries({ queryKey: [`conversation-${businessId}`] });
+    },
+  });
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Quick questions
   const quickQuestions: QuickQuestion[] = [
@@ -97,32 +135,9 @@ const BusinessInbox = () => {
     }
   ];
 
-  // Sample messages - In production, fetch from API
-  const messages: Message[] = [
-    {
-      id: '1',
-      text: 'Hi! I saw your products and I\'m interested in learning more.',
-      timestamp: '2:30 PM',
-      sender: 'user'
-    },
-    {
-      id: '2',
-      text: 'Hello! Thank you for your interest. I\'d be happy to help you with any questions you have.',
-      timestamp: '2:35 PM',
-      sender: 'business'
-    },
-    {
-      id: '3',
-      text: 'Great! Do you have any special offers running right now?',
-      timestamp: '2:40 PM',
-      sender: 'user'
-    }
-  ];
-
   const handleSendMessage = () => {
-    if (messageText.trim()) {
-      // Here you would typically send the message to your backend
-      setMessageText('');
+    if (messageText.trim() && !sendMessageMutation.isPending) {
+      sendMessageMutation.mutate(messageText.trim());
     }
   };
 
@@ -141,6 +156,61 @@ const BusinessInbox = () => {
     return names.map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
+  const formatMessageTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  };
+
+  const formatMessageDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+      });
+    }
+  };
+
+  // Group messages by date
+  const groupedMessages = messages.reduce((groups: { [key: string]: Message[] }, message) => {
+    const dateKey = new Date(message.createdAt).toDateString();
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
+    groups[dateKey].push(message);
+    return groups;
+  }, {});
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-lg shadow-sm">
+          <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign in Required</h2>
+          <p className="text-gray-600 mb-4">Please sign in to message this business.</p>
+          <Link href="/auth/login">
+            <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              Sign In
+            </button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content Container */}
@@ -150,7 +220,7 @@ const BusinessInbox = () => {
           <div className="flex items-center gap-3 sm:gap-6">
             <Link href={`/business/${businessId}`}>
               <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
               </button>
             </Link>
             <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -239,9 +309,17 @@ const BusinessInbox = () => {
               {/* Chat Header */}
               <div className="p-3 sm:p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-2 sm:space-x-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                    <Store className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
+                  {store?.logo ? (
+                    <img 
+                      src={store.logo} 
+                      alt={businessName}
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                      <Store className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                  )}
                   <div>
                     <h3 className="text-sm sm:font-semibold text-gray-900">{businessName}</h3>
                     <p className="text-xs sm:text-sm text-gray-600 flex items-center">
@@ -254,33 +332,77 @@ const BusinessInbox = () => {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-                {messages.map((message) => (
-                  <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className="flex items-start space-x-1.5 sm:space-x-2 max-w-[85%] sm:max-w-xs lg:max-w-md">
-                      {message.sender === 'business' && (
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0">
-                          {getBusinessInitials()}
-                        </div>
-                      )}
-                      <div className={`px-3 py-2 sm:px-4 sm:py-2 rounded ${
-                        message.sender === 'user' 
-                          ? 'bg-blue-500 text-white' 
-                          : 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                      }`}>
-                        <p className="text-xs sm:text-sm font-medium mb-0.5 sm:mb-1">{message.sender === 'user' ? currentUserName : businessName}</p>
-                        <p className="text-xs sm:text-sm">{message.text}</p>
-                        <p className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1 ${message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
-                          {message.timestamp}
-                        </p>
-                      </div>
-                      {message.sender === 'user' && (
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0">
-                          {getUserInitials()}
-                        </div>
-                      )}
-                    </div>
+                {isLoadingConversation || isLoadingMessages ? (
+                  <div className="flex items-center justify-center h-full">
+                    <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
                   </div>
-                ))}
+                ) : messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <MessageCircle className="w-12 h-12 text-gray-300 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Start a conversation</h3>
+                    <p className="text-sm text-gray-500 max-w-sm">
+                      Send a message to {businessName} and they&apos;ll respond as soon as possible.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {Object.entries(groupedMessages).map(([dateKey, dateMessages]) => (
+                      <div key={dateKey}>
+                        {/* Date separator */}
+                        <div className="flex items-center justify-center my-4">
+                          <div className="bg-gray-100 px-3 py-1 rounded-full">
+                            <span className="text-xs text-gray-500">{formatMessageDate(dateMessages[0].createdAt)}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Messages for this date */}
+                        {dateMessages.map((message) => (
+                          <div key={message.id} className={`flex ${message.senderType === 'USER' ? 'justify-end' : 'justify-start'} mb-3`}>
+                            <div className="flex items-start space-x-1.5 sm:space-x-2 max-w-[85%] sm:max-w-xs lg:max-w-md">
+                              {message.senderType === 'STORE' && (
+                                store?.logo ? (
+                                  <img 
+                                    src={store.logo} 
+                                    alt={businessName}
+                                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover flex-shrink-0"
+                                  />
+                                ) : (
+                                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0">
+                                    {getBusinessInitials()}
+                                  </div>
+                                )
+                              )}
+                              <div className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg ${
+                                message.senderType === 'USER' 
+                                  ? 'bg-blue-500 text-white' 
+                                  : 'bg-gray-100 text-gray-900'
+                              }`}>
+                                <p className="text-xs sm:text-sm">{message.content}</p>
+                                <p className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1 ${message.senderType === 'USER' ? 'text-blue-100' : 'text-gray-500'}`}>
+                                  {formatMessageTime(message.createdAt)}
+                                </p>
+                              </div>
+                              {message.senderType === 'USER' && (
+                                currentUserImage ? (
+                                  <img 
+                                    src={currentUserImage} 
+                                    alt={currentUserName}
+                                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover flex-shrink-0"
+                                  />
+                                ) : (
+                                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0">
+                                    {getUserInitials()}
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </>
+                )}
               </div>
 
               {/* Message Input */}
@@ -296,16 +418,25 @@ const BusinessInbox = () => {
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      className="w-full px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-200 rounded text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      disabled={sendMessageMutation.isPending}
+                      className="w-full px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-200 rounded text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
                     />
                   </div>
                   <button 
                     onClick={handleSendMessage}
-                    className="p-1.5 sm:p-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors"
+                    disabled={!messageText.trim() || sendMessageMutation.isPending}
+                    className="p-1.5 sm:p-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                    {sendMessageMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                    )}
                   </button>
                 </div>
+                {sendMessageMutation.isError && (
+                  <p className="text-red-500 text-xs mt-2">Failed to send message. Please try again.</p>
+                )}
               </div>
             </div>
           </div>

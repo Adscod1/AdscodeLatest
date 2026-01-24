@@ -11,9 +11,11 @@ model User {
   id            String         @id @default(uuid())
   email         String         @unique
   name          String?
-  username      String?        @unique
   emailVerified Boolean        @default(false)
   image         String?
+  phoneNumber   String?
+  username      String?        @unique
+  dateOfBirth   DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   posts         Post[]
@@ -24,6 +26,7 @@ model User {
   Store         Store[]
   notifications Notification[]
   comments      Comment[]
+  conversations Conversation[]
 
   @@map("user")
 }
@@ -102,10 +105,11 @@ model Profile {
 }
 
 model Store {
-  id              String          @id @default(uuid())
+  id              String           @id @default(uuid())
   name            String
+  username        String?
   tagline         String?
-  description     String?         @db.Text
+  description     String?          @db.Text
   category        String?
   regNumber       String?
   yearEstablished Int?
@@ -120,11 +124,11 @@ model Store {
   logo            String?
   banner          String?
   userId          String
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   StoreReview     StoreReview[]
   Product         Product[]
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   StoreActivity   StoreActivity[]
   StoreHours      StoreHours[]
   StoreImage      StoreImage[]
@@ -132,6 +136,7 @@ model Store {
   StoreVideo      StoreVideo[]
   StoreHighlight  StoreHighlight[]
   campaigns       Campaign[]
+  conversations   Conversation[]
 
   @@index([userId], map: "store_userId_fkey")
   @@map("store")
@@ -351,9 +356,9 @@ model StoreReview {
   userId    String
   storeId   String
   rating    Int
-  comment   String?
-  images    String?  @db.Text // JSON array of image URLs
-  videos    String?  @db.Text // JSON array of video URLs
+  comment   String?  @db.Text
+  images    String?  @db.Text
+  videos    String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   store     Store    @relation(fields: [storeId], references: [id])
@@ -527,4 +532,49 @@ enum NotificationType {
   CAMPAIGN_SELECTION
   APPLICATION_UPDATE
   SYSTEM
+}
+
+// ============================================================================
+// MESSAGING SYSTEM
+// ============================================================================
+
+model Conversation {
+  id            String    @id @default(uuid())
+  storeId       String
+  userId        String
+  lastMessage   String?   @db.Text
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([storeId, userId])
+  @@index([storeId])
+  @@index([userId])
+  @@map("conversation")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderId       String
+  senderType     SenderType
+  content        String       @db.Text
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("message")
+}
+
+enum SenderType {
+  USER
+  STORE
 }

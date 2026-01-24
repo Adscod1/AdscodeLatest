@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
@@ -80,8 +80,9 @@ const dummyCampaignDetail: CampaignDetail = {
   ],
 };
 
-const CampaignDetailPage = ({ params }: { params: { id: string; campaignId: string } }) => {
+const CampaignDetailPage = () => {
   const router = useRouter();
+  const params = useParams();
   const [isSaved, setIsSaved] = useState(false);
 
   return (

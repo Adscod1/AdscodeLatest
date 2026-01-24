@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, Search, Filter } from "lucide-react";
@@ -78,8 +78,9 @@ const dummyCampaigns: Campaign[] = [
   },
 ];
 
-const CampaignsPage = ({ params }: { params: { id: string } }) => {
+const CampaignsPage = () => {
   const router = useRouter();
+  const params = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
