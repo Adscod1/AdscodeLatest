@@ -1077,7 +1077,7 @@ const BusinessPage = () => {
                                           onClick={() => handleReplySubmit(review.id)}
                                           className="bg-blue-600 hover:bg-blue-700 text-white"
                                         >
-                                          Post Reply
+                                          Post
                                         </Button>
                                       </div>
                                     </div>
@@ -1145,7 +1145,7 @@ const BusinessPage = () => {
                                               </svg>
                                               <span>Not helpful{helpfulVotes[reply.id]?.notHelpful ? ` (${helpfulVotes[reply.id].notHelpful})` : ''}</span>
                                             </button>
-                                            <button
+                                            {/* <button
                                               onClick={() => handleLike(reply.id)}
                                               className={`flex items-center gap-1 hover:text-pink-600 transition-colors ${
                                                 userLikes[reply.id] ? 'text-pink-600 font-semibold' : 'text-gray-500'
@@ -1155,8 +1155,8 @@ const BusinessPage = () => {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                               </svg>
                                               <span>Likes{likes[reply.id] ? ` (${likes[reply.id]})` : ''}</span>
-                                            </button>
-                                            <button
+                                            </button> */}
+                                            {/* <button
                                               onClick={() => handleDislike(reply.id)}
                                               className={`flex items-center gap-1 hover:text-purple-600 transition-colors ${
                                                 userDislikes[reply.id] ? 'text-purple-600 font-semibold' : 'text-gray-500'
@@ -1166,7 +1166,7 @@ const BusinessPage = () => {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                               </svg>
                                               <span>Dislikes{dislikes[reply.id] ? ` (${dislikes[reply.id]})` : ''}</span>
-                                            </button>
+                                            </button> */}
                                             
                                             <button 
                                               onClick={() => handleReplyClick(review.id, reply.id)}

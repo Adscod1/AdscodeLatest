@@ -101,7 +101,7 @@ const CampaignDetailPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Hero Image */}
-            <div className="relative  h-[600px] bg-gray-100 rounded-lg overflow-hidden mb-6 bg-red-500">
+            <div className="relative  h-[520px] w-[680px] bg-gray-100 rounded-lg overflow-hidden mb-6 bg-red-500">
               <Image
                 src={dummyCampaignDetail.mainImage}
                 alt={dummyCampaignDetail.title}
@@ -113,14 +113,14 @@ const CampaignDetailPage = () => {
             
 
             {/* Campaign Title and Meta */}
-            <div className="bg-white rounded-lg p-6 mb-6">
+            <div className="bg-white w-[680px] rounded p-6 mb-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
-                    <h1 className="text-3xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-gray-900">
                       {dummyCampaignDetail.title}
                     </h1>
-                    <span className="bg-green-500 text-white px-3 py-1 rounded text-xs font-semibold">
+                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
                       {dummyCampaignDetail.status}
                     </span>
                   </div>
@@ -139,7 +139,7 @@ const CampaignDetailPage = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <button className="p-2 hover:bg-gray-100  rounded-lg transition-colors">
                     <Share2 className="w-5 h-5 text-gray-600" />
                   </button>
                   <button
@@ -162,7 +162,7 @@ const CampaignDetailPage = () => {
                 {dummyCampaignDetail.categories.map((cat) => (
                   <span
                     key={cat}
-                    className="px-3 py-1 bg-gray-100 text-gray-800 rounded text-sm font-medium"
+                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
                   >
                     {cat}
                   </span>
@@ -172,26 +172,26 @@ const CampaignDetailPage = () => {
               {/* Campaign Info Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-gray-500" />
+                  <Briefcase className="w-4 h-4 text-gray-500" />
                   <span className="text-sm text-gray-700">{dummyCampaignDetail.campaignType}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-gray-500" />
+                  <Users className="w-4 h-4 text-gray-500" />
                   <span className="text-sm text-gray-700">{dummyCampaignDetail.publications} Publications</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-gray-500" />
+                  <Calendar className="w-4 h-4 text-gray-500" />
                   <span className="text-sm text-gray-700">{dummyCampaignDetail.dateRange}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <MapPin className="w-5 h-5 text-gray-500" />
+                <MapPin className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-700">{dummyCampaignDetail.location}</span>
               </div>
             </div>
 
             {/* About this Campaign */}
-            <div className="bg-white rounded-lg p-6 mb-6">
+            <div className="bg-white w-[680px] rounded p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">About this Campaign</h2>
               <p className="text-gray-700 leading-relaxed">
                 {dummyCampaignDetail.aboutText}
@@ -199,7 +199,7 @@ const CampaignDetailPage = () => {
             </div>
 
             {/* Requirements */}
-            <div className="bg-white rounded-lg p-6 mb-6">
+            <div className="bg-white w-[680px] rounded p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Requirements</h2>
               <div className="space-y-3">
                 {dummyCampaignDetail.requirements.map((req, index) => (
@@ -218,7 +218,7 @@ const CampaignDetailPage = () => {
             </div>
 
             {/* Deliverables */}
-            <div className="bg-white rounded-lg p-6 mb-6">
+            <div className="bg-white w-[680px] rounded p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Deliverables</h2>
               <div className="space-y-3">
                 {dummyCampaignDetail.deliverables.map((delivery, index) => (
@@ -235,7 +235,7 @@ const CampaignDetailPage = () => {
             </div>
 
             {/* What You'll Get */}
-            <div className="bg-white rounded-lg p-6">
+            <div className="bg-white w-[680px] rounded p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">What You'll Get</h2>
               <div className="space-y-3">
                 {dummyCampaignDetail.benefits.map((benefit, index) => (
@@ -253,18 +253,18 @@ const CampaignDetailPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg p-6 sticky top-8">
+          <div className="lg:col-span-3 px-4 w-400px">
+            <div className="bg-white rounded p-6 sticky top-8">
               {/* Compensation */}
               <div className="mb-6">
                 <p className="text-sm text-gray-600 mb-2">Compensation</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-semibold text-blue-600">
                   {dummyCampaignDetail.compensation}
                 </p>
               </div>
 
               {/* Apply Button */}
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 mb-3 rounded">
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-700 text-white font-medium py-3 mb-3 rounded">
                 Apply Now
               </Button>
 
@@ -280,7 +280,7 @@ const CampaignDetailPage = () => {
               <div className="space-y-4 pt-6 border-t border-gray-200">
                 <div>
                   <p className="text-sm text-gray-600 mb-2">Campaign Status</p>
-                  <span className="inline-block bg-green-500 text-white px-3 py-1 rounded text-xs font-semibold">
+                  <span className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
                     {dummyCampaignDetail.status}
                   </span>
                 </div>
