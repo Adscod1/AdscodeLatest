@@ -65,7 +65,7 @@ export class ProductsService {
         offerFreeShipping: dto.offerFreeShipping,
         processingTime: dto.processingTime,
         shippingMethod: dto.shippingMethod,
-        currency: dto.currency,
+        currency: dto.currency || 'UGX',
         taxRate: dto.taxRate,
         sku: dto.sku,
         barcode: dto.barcode,
