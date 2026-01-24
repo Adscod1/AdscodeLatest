@@ -152,10 +152,26 @@ const NewProductPublishingPage = () => {
       reset();
       router.push(`/${storeId}/listings`);
     },
-    onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to publish product"
-      );
+    onError: (error: any) => {
+      console.error("Product creation error:", error);
+      
+      // Extract detailed error message if available
+      let errorMessage = "Failed to publish product";
+      
+      // Check for ApiError with data property
+      if (error?.data?.message) {
+        // Handle array of validation messages
+        if (Array.isArray(error.data.message)) {
+          errorMessage = error.data.message.join(", ");
+        } else {
+          errorMessage = error.data.message;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      console.error("Error message:", errorMessage);
+      toast.error(errorMessage);
     },
   });
 
@@ -223,17 +239,21 @@ const NewProductPublishingPage = () => {
       scheduledUnpublishDate: (product as any).scheduledUnpublishDate || undefined,
       isScheduled: (product as any).isScheduled || false,
       // Sanitize variations to only include allowed fields (name, value, price, stock)
+      // Filter out any variations with empty required fields
       variations:
-        product.variations?.map((v) => ({
-          name: v.name,
-          value: v.value,
-          price: Number(v.price),
-          stock: Number(v.stock),
-        })) || [],
+        product.variations?.filter((v) => v.name && v.value)
+          .map((v) => ({
+            name: v.name,
+            value: v.value,
+            price: Number(v.price) || 0,
+            stock: Number(v.stock) || 0,
+          })) || [],
       // Sanitize images to only include url field
-      images: product.images?.map((img) => ({ url: img.url })) || [],
+      // Filter out any images with empty urls
+      images: product.images?.filter((img) => img.url).map((img) => ({ url: img.url })) || [],
       // Sanitize videos to only include url field
-      videos: product.videos?.map((vid) => ({ url: vid.url })) || [],
+      // Filter out any videos with empty urls
+      videos: product.videos?.filter((vid) => vid.url).map((vid) => ({ url: vid.url })) || [],
     };
 
     // Remove undefined fields to avoid validation errors
@@ -242,6 +262,17 @@ const NewProductPublishingPage = () => {
         delete finalData[key as keyof typeof finalData];
       }
     });
+
+    // Remove empty arrays to avoid potential validation issues
+    if (finalData.variations && finalData.variations.length === 0) {
+      delete (finalData as any).variations;
+    }
+    if (finalData.images && finalData.images.length === 0) {
+      delete (finalData as any).images;
+    }
+    if (finalData.videos && finalData.videos.length === 0) {
+      delete (finalData as any).videos;
+    }
 
     console.log("Final data being sent:", finalData);
     createProductMutation.mutate(finalData as CreateProductInput);

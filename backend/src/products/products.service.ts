@@ -28,11 +28,12 @@ export class ProductsService {
    * Create a new product
    */
   async create(userId: string, dto: CreateProductDto) {
-    // Verify user owns the store
-    await this.verifyStoreOwnership(userId, dto.storeId);
+    try {
+      // Verify user owns the store
+      await this.verifyStoreOwnership(userId, dto.storeId);
 
-    // Create the product with relations
-    const product = await this.prisma.product.create({
+      // Create the product with relations
+      const product = await this.prisma.product.create({
       data: {
         title: dto.title,
         description: dto.description,
@@ -152,6 +153,11 @@ export class ProductsService {
       product,
       message: 'Product created successfully',
     };
+    } catch (error) {
+      console.error('Error creating product:', error);
+      console.error('Product DTO:', JSON.stringify(dto, null, 2));
+      throw error;
+    }
   }
 
   /**
