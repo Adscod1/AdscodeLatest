@@ -192,24 +192,24 @@ const AllInfluencersPage = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover Influencers</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover Creators</h1>
           <p className="text-gray-600">
             Connect with talented content creators for your next campaign
           </p>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div className="p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search Input */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative border-rounded-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder="Search by name, niche, or keywords..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 rounded-full"
               />
             </div>
             
@@ -219,6 +219,7 @@ const AllInfluencersPage = () => {
                 variant={selectedNiche === null ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedNiche(null)}
+                 className="rounded-full"
               >
                 All
               </Button>
