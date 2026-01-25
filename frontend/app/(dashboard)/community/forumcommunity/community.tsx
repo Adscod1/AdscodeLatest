@@ -58,8 +58,8 @@ interface ForumSection {
   const forumSections: ForumSection[] = [
     {
       id: 'new-user-help',
-      title: 'New User Help & Support',
-      description: 'Get help with your journey to becoming an influencer',
+      title: 'Rising Creator Help and Support',
+      description: 'Get help with your journey to becoming a Pro Creator',
       posts: 245,
       members: 1200,
       lastActivity: '2 hours ago',
@@ -111,23 +111,26 @@ interface ForumSection {
 
   return (
     <DashboardLayout profile={profile}>
-        <div className="w-full max-w-none">
+        <div className="w-full max-w-none bg-gray-50">
           {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Community Forums</h1>
-            <p className="text-sm sm:text-base text-gray-600">Connect with other users and share experiences</p>
+          <div className="mb-6 sm:mb-8 flex justify-between items-start">
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Community Forums</h1>
+              <p className="text-sm sm:text-base text-gray-600">Connect with other users and share experiences</p>
+            </div>
+            <button className="text-md sm:text-md font-medium text-white cursor-pointer hover:text-white hover:bg-blue-600 bg-blue-500 rounded-full p-2 m-2">+ Create Forum</button>
           </div>
 
           {/* Forum Sections */}
           <div className="space-y-4 sm:space-y-6">
             {forumSections.map((section) => (
-              <div key={section.id} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+              <div key={section.id} className="bg-white rounded border border-gray-50 p-4 sm:p-6">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-3 mb-2">
                       <h3 className="text-base sm:text-lg font-semibold text-gray-900">{section.title}</h3>
                       {section.isActive && (
-                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full w-fit">
+                        <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-base rounded-full w-fit">
                           Active
                         </span>
                       )}
@@ -150,8 +153,8 @@ interface ForumSection {
                     </div>
                   </div>
                   
-                  <button className="w-full sm:w-auto px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors">
-                    Join Discussion
+                  <button className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors">
+                    Join
                   </button>
                 </div>
               </div>
@@ -159,12 +162,17 @@ interface ForumSection {
           </div>
 
           {/* Community Guidelines */}
-          <div className="mt-6 sm:mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4 sm:p-6">
+          <div className="mt-6 sm:mt-8 bg-blue-50 border border-blue-50 rounded p-4 sm:p-6">
             <div className="flex items-start space-x-3">
-              <Award className="w-5 sm:w-6 h-5 sm:h-6 text-yellow-600 mt-1 flex-shrink-0" />
+              <Award className="w-5 sm:w-6 h-5 sm:h-6 text-blue-600 mt-1 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-yellow-800 mb-1 text-sm sm:text-base">Community Guidelines</h3>
-                <p className="text-yellow-700 text-xs sm:text-sm">
+                <h3 className="font-semibold text-blue-600 mb-1 text-sm sm:text-base">Community Guidelines</h3>
+                <span>
+                {/* <button className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors">
+                    Read More
+                  </button> */}
+                </span>
+                <p className="text-blue-500 text-xs sm:text-sm">
                   Be respectful, help others, and share authentic experiences to build a supportive community
                 </p>
               </div>

@@ -25,7 +25,8 @@ import {
   Play,
   ThumbsUp,
   CheckCircle,
-  Clock
+  Clock,
+  Zap
 } from 'lucide-react';
 
 
@@ -105,7 +106,7 @@ import {
           {/* Requirements Summary */}
           <div className="bg-blue-50 border border-blue-50 rounded p-4 sm:p-6 mb-6 sm:mb-8">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Influencer Requirements Summary</h2>
-            <p className="text-gray-800 mb-4 text-sm sm:text-base">To become an Elite Partner on Adscod, you must meet these minimum requirements:</p>
+            <p className="text-blue-500 mb-4 text-sm sm:text-base">To become an Elite Partner on Adscod, you must meet these minimum requirements:</p>
             
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <div className="text-center">
@@ -197,7 +198,7 @@ import {
           </div>
 
           {/* Review Writing Requirements */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 rounded mb-6 sm:mb-8">
+          <div className="bg-white rounded shadow-sm border border-gray-100 rounded mb-6 sm:mb-8">
             <div className="p-4 sm:p-6 border-b border-gray-100">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">Review Writing Requirements</h3>
               <p className="text-sm sm:text-base text-gray-600">Build credibility through quality reviews</p>
@@ -297,23 +298,27 @@ import {
           </div>
 
           {/* Follower & Engagement Requirements */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
+          <div className="bg-white rounded shadow-sm border border-gray-100 mb-6 sm:mb-8">
+            <div className="p-4 sm:p-6 border-b border-gray-100">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">Follower & Engagement Requirements</h3>
               <p className="text-sm sm:text-base text-gray-600">Build your audience and engagement</p>
             </div>
             <div className="p-4 sm:p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-gray-100 rounded">
                   <div className="flex items-start space-x-3 mb-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Users className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium text-gray-900 text-sm sm:text-base">Build Instagram Following</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Reach 1,000+ Instagram followers</div>
+                      <div className="font-medium text-gray-900 text-sm sm:text-base">Build Adscod Following</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Reach 1000+ Adscod followers</div>
                       <div className="flex flex-wrap items-center mt-2 gap-2">
-                        <div className="text-xs sm:text-sm font-medium text-yellow-600">⚡ 250 points</div>
+                        <div className="text-xs sm:text-sm font-medium text-blue-500">
+                        <div className="text-xs sm:text-sm font-medium text-blue-500 flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-blue-500" />
+                        250 points</div>
+                      </div>
                         <div className="text-xs text-orange-500">In Progress</div>
                       </div>
                     </div>
@@ -325,36 +330,40 @@ import {
                       <span>76%</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gray-900 rounded-full w-3/4"></div>
+                      <div className="h-2 bg-blue-500 rounded-full w-3/4"></div>
                     </div>
                   </div>
-                  <button className="w-full py-2 px-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                  <button className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm">
                     Continue Progress
                   </button>
                 </div>
 
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-gray-100 rounded">
                   <div className="flex items-start space-x-3 mb-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Play className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium text-gray-900 text-sm sm:text-base">TikTok/YouTube Presence</div>
-                      <div className="text-xs sm:text-sm text-gray-600">Have 500+ followers on TikTok or YouTube</div>
+                      <div className="font-medium text-gray-900 text-sm sm:text-base">Create unbiased video reviews</div>
+                      <div className="text-xs sm:text-sm text-gray-600">Have 500+ reviews based on your experience</div>
                       <div className="flex flex-wrap items-center mt-2 gap-2">
-                        <div className="text-xs sm:text-sm font-medium text-yellow-600">⚡ 200 points</div>
-                        <div className="text-xs text-blue-500">Available</div>
+                        <div className="text-xs sm:text-sm font-medium text-yellow-600">
+                        <div className="text-xs sm:text-sm font-medium text-blue-500 flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-blue-500" />
+                        200 points</div> 
+                      </div>
+                      <div className="text-xs text-grey-500">Available</div>
                       </div>
                     </div>
                   </div>
-                  <div className="mb-2 text-xs text-gray-500">Choose one platform to focus on</div>
-                  <button className="w-full py-2 px-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                  <div className="mb-2 text-xs text-gray-500">Make sure you review businesses, products or services you have interracted with. No guess work. </div>
+                  <button className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm">
                     Start Task
                   </button>
                 </div>
               </div>
 
-              <div className="p-4 border border-gray-200 rounded-lg">
+              <div className="p-4 border border-gray-100 rounded">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-start space-x-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -364,12 +373,16 @@ import {
                       <div className="font-medium text-gray-900 text-sm sm:text-base">Engagement Rate Goal</div>
                       <div className="text-xs sm:text-sm text-gray-600">Maintain 3%+ engagement rate for 30 days</div>
                       <div className="flex flex-wrap items-center mt-2 gap-2">
-                        <div className="text-xs sm:text-sm font-medium text-yellow-600">⚡ 150 points</div>
-                        <div className="text-xs text-blue-500">Available</div>
+                        <div className="text-xs sm:text-sm font-medium text-yellow-600">
+                        <div className="text-xs sm:text-sm font-medium text-blue-500 flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-blue-500" />
+                        150 points</div>
+                        </div>
+                        <div className="text-xs text-grey-500">Available</div>
                       </div>
                     </div>
                   </div>
-                  <button className="w-full sm:w-auto py-2 px-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                  <button className="w-full sm:w-auto py-2 px-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors text-sm">
                     Start Task
                   </button>
                 </div>
@@ -378,14 +391,14 @@ import {
           </div>
 
           {/* Content Creation Skills */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 sm:mb-8">
+          <div className="bg-white rounded shadow-sm border border-gray-100 mb-6 sm:mb-8">
             <div className="p-4 sm:p-6 border-b border-gray-200">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">Content Creation Skills</h3>
               <p className="text-sm sm:text-base text-gray-600">Demonstrate content creation abilities</p>
             </div>
             <div className="p-4 sm:p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-gray-100 rounded">
                   <div className="flex items-start space-x-3 mb-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Play className="w-5 h-5 text-blue-600" />
@@ -394,7 +407,11 @@ import {
                       <div className="font-medium text-gray-900 text-sm sm:text-base">Create Video Content</div>
                       <div className="text-xs sm:text-sm text-gray-600">Post 5 engaging videos (min 30 seconds each)</div>
                       <div className="flex flex-wrap items-center mt-2 gap-2">
-                        <div className="text-xs sm:text-sm font-medium text-yellow-600">⚡ 200 points</div>
+                        <div className="text-xs sm:text-sm font-medium text-yellow-600">
+                        <div className="text-xs sm:text-sm font-medium text-blue-500 flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-blue-500" />
+                        200 points</div>
+                        </div>
                         <div className="text-xs text-orange-500">In Progress</div>
                       </div>
                     </div>
@@ -406,15 +423,15 @@ import {
                       <span>60%</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gray-900 rounded-full w-3/5"></div>
+                      <div className="h-2 bg-blue-500 rounded-full w-3/5"></div>
                     </div>
                   </div>
-                  <button className="w-full py-2 px-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm">
+                  <button className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm">
                     Continue Progress
                   </button>
                 </div>
 
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-gray-100 rounded">
                   <div className="flex items-start space-x-3 mb-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Camera className="w-5 h-5 text-blue-600" />
@@ -423,15 +440,19 @@ import {
                       <div className="font-medium text-gray-900 text-sm sm:text-base">Photography Portfolio</div>
                       <div className="text-xs sm:text-sm text-gray-600">Upload 20 high-quality product photos</div>
                       <div className="flex flex-wrap items-center mt-2 gap-2">
-                        <div className="text-xs sm:text-sm font-medium text-yellow-600">⚡ 150 points</div>
-                        <div className="text-xs text-green-500">Completed</div>
+                        <div className="text-xs sm:text-sm font-medium text-yellow-600">
+                        <div className="text-xs sm:text-sm font-medium text-blue-500 flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-blue-500" />
+                        150 points</div>
+                        </div>
+                        <div className="text-xs text-green-600">Completed</div>
                       </div>
                     </div>
                   </div>
                   <div className="mb-4 text-xs text-gray-500">All photos approved</div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-green-600 font-medium">Completed</span>
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
                 </div>
               </div>
@@ -439,14 +460,14 @@ import {
           </div>
 
           {/* Advanced Qualifications */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
+          <div className="bg-white rounded shadow-sm border border-gray-100">
+            <div className="p-4 sm:p-6 border-b border-gray-100">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">Advanced Qualifications</h3>
               <p className="text-sm sm:text-base text-gray-600">Final steps to become a verified influencer</p>
             </div>
             <div className="p-4 sm:p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <div className="p-4 border border-gray-200 rounded-lg opacity-50">
+                <div className="p-4 border border-gray-100 rounded opacity-50">
                   <div className="flex items-start space-x-3 mb-4">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Star className="w-5 h-5 text-gray-400" />
@@ -455,18 +476,22 @@ import {
                       <div className="font-medium text-gray-500 text-sm sm:text-base">Complete Brand Challenge</div>
                       <div className="text-xs sm:text-sm text-gray-400">Successfully complete a trial brand collaboration</div>
                       <div className="flex flex-wrap items-center mt-2 gap-2">
-                        <div className="text-xs sm:text-sm font-medium text-gray-400">⚡ 300 points</div>
-                        <div className="text-xs text-gray-400">Locked</div>
+                        <div className="text-xs sm:text-sm font-medium text-gray-400">
+                        <div className="text-xs sm:text-sm font-medium text-gray-500 flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-gray-500" />
+                        300 points</div>
+                        </div>
+                        <div className="text-xs text-gray-500">Locked</div>
                       </div>
                     </div>
                   </div>
                   <div className="mb-4 text-xs text-gray-400">Unlocks after completing previous tasks</div>
-                  <button className="w-full py-2 px-4 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed text-sm" disabled>
+                  <button className="w-full py-2 px-4 bg-gray-300 text-gray-500 rounded cursor-not-allowed text-sm" disabled>
                     🔒 Complete previous requirements
                   </button>
                 </div>
 
-                <div className="p-4 border border-gray-200 rounded-lg opacity-50">
+                <div className="p-4 border border-gray-100 rounded opacity-50">
                   <div className="flex items-start space-x-3 mb-4">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Users className="w-5 h-5 text-gray-400" />
@@ -475,13 +500,17 @@ import {
                       <div className="font-medium text-gray-500 text-sm sm:text-base">Community Leadership</div>
                       <div className="text-xs sm:text-sm text-gray-400">Help 5 new users complete their first review</div>
                       <div className="flex flex-wrap items-center mt-2 gap-2">
-                        <div className="text-xs sm:text-sm font-medium text-gray-400">⚡ 200 points</div>
+                        <div className="text-xs sm:text-sm font-medium text-gray-400">
+                        <div className="text-xs sm:text-sm font-medium text-gray-500 flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-gray-500" />
+                          200 points</div>
+                          </div>
                         <div className="text-xs text-gray-400">Locked</div>
                       </div>
                     </div>
                   </div>
                   <div className="mb-4 text-xs text-gray-400">Mentor role requirement</div>
-                  <button className="w-full py-2 px-4 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed text-sm" disabled>
+                  <button className="w-full py-2 px-4 bg-gray-300 text-gray-500 rounded cursor-not-allowed text-sm" disabled>
                     🔒 Complete previous requirements
                   </button>
                 </div>

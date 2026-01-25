@@ -201,13 +201,13 @@ const NotificationsDashboard = ({ user }: { user: Profile }) => {
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                 {unreadCount > 0 && (
-                  <span className="bg-red-100 text-red-800 text-xs sm:text-sm font-medium px-3 py-1 rounded-full text-center">
+                  <span className="bg-red-50 border-red-100 text-red-500 text-xs sm:text-sm font-medium px-3 py-1 rounded-full text-center">
                     {unreadCount} unread
                   </span>
                 )}
                 <button
                   onClick={markAllAsRead}
-                  className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200 text-center sm:text-left"
+                  className="text-blue-500 hover:text-blue-00 font-medium text-sm transition-colors duration-200 text-center sm:text-left"
                 >
                   Mark All as Read
                 </button>
@@ -215,11 +215,11 @@ const NotificationsDashboard = ({ user }: { user: Profile }) => {
             </div>
 
             {/* Notifications List */}
-            <div className="space-y-3 sm:space-y-4">
+            <div className="w-full w-full space-y-3 sm:space-y-4">
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`${getNotificationBgColor(notification.type, notification.isRead)} rounded-xl border border-gray-200 p-4 sm:p-6 transition-all duration-200 hover:shadow-sm cursor-pointer`}
+                  className={`${getNotificationBgColor(notification.type, notification.isRead)} rounded border border-gray-100 p-4 sm:p-6 transition-all duration-200 hover:shadow-sm cursor-pointer`}
                   onClick={() => toggleNotificationRead(notification.id)}
                 >
                   <div className="flex items-start space-x-3 sm:space-x-4">
