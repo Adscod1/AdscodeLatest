@@ -1,15 +1,12 @@
-import { headers } from "next/headers";
-import { auth } from "@/utils/auth";
 import { redirect } from "next/navigation";
+import { getBackendSession } from "@/utils/auth";
 import api from "@/lib/api-client";
 import MessagesDashboard from "./messages";
 
 const MessagesPage = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getBackendSession();
 
-  if (!session) {
+  if (!session?.user) {
     redirect("/auth/login");
   }
 
