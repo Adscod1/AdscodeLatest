@@ -46,7 +46,7 @@ const CategoryCard: React.FC<CategoryProps> = ({
   description, 
   reviewsNeeded 
 }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow h-full flex flex-col">
+  <div className="bg-white rounded border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow h-full flex flex-col">
     <div className="flex items-start justify-between mb-4">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
@@ -63,7 +63,7 @@ const CategoryCard: React.FC<CategoryProps> = ({
     
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-auto">
       <span className="text-xs sm:text-sm text-gray-500">Need {reviewsNeeded} reviews</span>
-      <button className="bg-gray-900 text-white px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium hover:bg-gray-800 transition-colors w-full sm:w-auto">
+      <button className="bg-blue-500 text-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-base hover:bg-blue-600 transition-colors w-full sm:w-auto">
         Browse Products
       </button>
     </div>
@@ -172,22 +172,22 @@ const Reviews = ({ user }: { user: Profile }) => {
               </div>
 
               {/* Categories Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8 border-gray-50 rounded">
                 {categories.map((category, index) => (
                   <CategoryCard key={index} {...category} />
                 ))}
               </div>
 
               {/* Review Writing Tips */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
+              <div className="bg-blue-50 border border-blue-50 rounded p-4 sm:p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0">
+                  <div className="w-6 h-6 text-gray-600 mt-0.5 flex-shrink-0">
                     <Star className="w-6 h-6" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Review Writing Tips</h3>
                     <p className="text-xs sm:text-sm text-gray-600">
-                      Write detailed, honest reviews (200+ words) to qualify for Aspiring Influencer status
+                      Write detailed, honest reviews (200+ words) to qualify for Pro Creator status
                     </p>
                   </div>
                 </div>
