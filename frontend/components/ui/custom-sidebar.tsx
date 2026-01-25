@@ -5,7 +5,8 @@ import { Profile } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import api from "@/lib/api-client";
+import api, { messagesApi } from "@/lib/api-client";
+import { useQuery } from "@tanstack/react-query";
 import { 
   Bell,
   Settings,
@@ -24,6 +25,35 @@ import {
   X
 } from 'lucide-react';
 import AllStoresCards from "@/app/(dashboard)/profile/components/all-stores-cards";
+
+// Component to display unread messages count (both store and influencer messages)
+const UnreadMessagesBadge = () => {
+  const { data: storeUnreadData } = useQuery({
+    queryKey: ['user-unread-count'],
+    queryFn: () => messagesApi.getUserUnreadCount(),
+    refetchInterval: 30000,
+    staleTime: 10000,
+  });
+
+  const { data: influencerUnreadData } = useQuery({
+    queryKey: ['user-influencer-unread-count'],
+    queryFn: () => messagesApi.getUserInfluencerUnreadCount(),
+    refetchInterval: 30000,
+    staleTime: 10000,
+  });
+
+  const storeCount = storeUnreadData?.count || 0;
+  const influencerCount = influencerUnreadData?.count || 0;
+  const totalCount = storeCount + influencerCount;
+
+  if (totalCount === 0) return null;
+
+  return (
+    <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+      {totalCount > 99 ? '99+' : totalCount}
+    </span>
+  );
+};
 
 interface CustomSidebarProps {
   profile: Profile | null;
@@ -289,15 +319,13 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ profile, influencer: prop
                 Profile
               </Link>
               <Link
-                href="#"
+                href="/messages"
                 onClick={handleLinkClick}
                 className={getLinkClassName("/messages")}
               >
                 <MessageSquare className="w-4 h-4 mr-3" />
                 Messages
-                <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
-                  14+
-                </span>
+                <UnreadMessagesBadge />
               </Link>
               <Link
                 href="/Notifications/not"

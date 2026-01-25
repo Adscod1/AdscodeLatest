@@ -1,29 +1,28 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import InfluencerSidebar from '@/components/ui/influencersidebar';
+import { DashboardLayout } from '@/components/ui/dashboard-layout';
+import { Profile } from '@prisma/client';
 import { 
   messagesApi, 
+  Conversation, 
+  Message, 
   InfluencerConversation, 
   InfluencerMessage,
-  Conversation,
-  Message,
   storesApi,
   influencersApi
 } from '@/lib/api-client';
 import { 
-  Home,
+  MessageSquare,
   Search,
   Send,
   ChevronLeft,
+  Store,
+  CheckCheck,
   Loader2,
   Inbox,
   RefreshCw,
   User,
-  MessageSquare,
-  CheckCheck,
-  Store,
   Users,
   Plus,
   X
@@ -31,18 +30,30 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-type TabType = 'inbox' | 'businesses' | 'influencers';
+interface MessagesDashboardProps {
+  user: Profile;
+}
+
+type TabType = 'stores' | 'influencers';
 type NewMessageTabType = 'businesses' | 'influencers';
 
-const InfluencerMessagesPage = () => {
+const MessagesDashboard = ({ user }: MessagesDashboardProps) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  const [activeTab, setActiveTab] = useState<TabType>('inbox');
-  const [selectedInboxConversation, setSelectedInboxConversation] = useState<string | null>(null);
-  const [selectedStoreConversation, setSelectedStoreConversation] = useState<string | null>(null);
-  const [selectedInfluencerConversation, setSelectedInfluencerConversation] = useState<string | null>(null);
+  // Get initial state from URL params
+  const initialTab = (searchParams.get('tab') as TabType) || 'stores';
+  const initialConversation = searchParams.get('conversation') || null;
+  const initialInfluencer = searchParams.get('influencer') || null;
+  const initialStore = searchParams.get('store') || null;
+  
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+  const [selectedStoreConversation, setSelectedStoreConversation] = useState<string | null>(initialTab === 'stores' ? initialConversation : null);
+  const [selectedInfluencerConversation, setSelectedInfluencerConversation] = useState<string | null>(initialTab === 'influencers' ? initialConversation : null);
   const [messageText, setMessageText] = useState('');
   const [searchText, setSearchText] = useState('');
   const [isMobile, setIsMobile] = useState(false);
@@ -54,7 +65,7 @@ const InfluencerMessagesPage = () => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkScreenSize();
@@ -66,41 +77,42 @@ const InfluencerMessagesPage = () => {
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [selectedInboxConversation, selectedStoreConversation, selectedInfluencerConversation]);
+  }, [selectedStoreConversation, selectedInfluencerConversation]);
+
+  // Handle URL params for opening a conversation with an influencer
+  useEffect(() => {
+    if (initialInfluencer && activeTab === 'influencers') {
+      messagesApi.getOrCreateInfluencerConversation(initialInfluencer)
+        .then(data => {
+          if (data.success && data.conversation) {
+            setSelectedInfluencerConversation(data.conversation.id);
+            queryClient.invalidateQueries({ queryKey: ['user-influencer-conversations'] });
+          }
+        })
+        .catch(() => {
+          toast.error('Failed to start conversation with influencer');
+        });
+    }
+  }, [initialInfluencer, activeTab, queryClient]);
+
+  // Handle URL params for opening a conversation with a store
+  useEffect(() => {
+    if (initialStore && activeTab === 'stores') {
+      messagesApi.getOrCreateConversation(initialStore)
+        .then(data => {
+          if (data.success && data.conversation) {
+            setSelectedStoreConversation(data.conversation.id);
+            queryClient.invalidateQueries({ queryKey: ['user-conversations'] });
+          }
+        })
+        .catch(() => {
+          toast.error('Failed to start conversation with store');
+        });
+    }
+  }, [initialStore, activeTab, queryClient]);
 
   // ============================================================================
-  // Inbox (messages from users) Queries
-  // ============================================================================
-
-  const { 
-    data: inboxConversationsData, 
-    isLoading: isLoadingInboxConversations,
-    refetch: refetchInboxConversations 
-  } = useQuery({
-    queryKey: ['influencer-inbox'],
-    queryFn: () => messagesApi.getInfluencerInbox(),
-    refetchInterval: 10000,
-  });
-
-  const { 
-    data: inboxMessagesData, 
-    isLoading: isLoadingInboxMessages,
-    refetch: refetchInboxMessages
-  } = useQuery({
-    queryKey: ['influencer-inbox-messages', selectedInboxConversation],
-    queryFn: () => selectedInboxConversation ? messagesApi.getInfluencerInboxMessages(selectedInboxConversation) : null,
-    enabled: !!selectedInboxConversation,
-    refetchInterval: 5000,
-  });
-
-  const { data: inboxUnreadData } = useQuery({
-    queryKey: ['influencer-inbox-unread-count'],
-    queryFn: () => messagesApi.getInfluencerInboxUnreadCount(),
-    refetchInterval: 10000,
-  });
-
-  // ============================================================================
-  // Business Conversations Queries (influencer as user messaging stores)
+  // Store Conversations Queries
   // ============================================================================
   
   const { 
@@ -131,7 +143,7 @@ const InfluencerMessagesPage = () => {
   });
 
   // ============================================================================
-  // Influencer Conversations Queries (influencer as user messaging other influencers)
+  // Influencer Conversations Queries
   // ============================================================================
 
   const { 
@@ -171,7 +183,7 @@ const InfluencerMessagesPage = () => {
     enabled: showNewMessageModal && newMessageTab === 'businesses',
   });
 
-  const { data: allInfluencersData, isLoading: isLoadingAllInfluencers } = useQuery({
+  const { data: allInfluencersData, isLoading: isLoadingInfluencers } = useQuery({
     queryKey: ['all-influencers-for-messages'],
     queryFn: () => influencersApi.getAll(),
     enabled: showNewMessageModal && newMessageTab === 'influencers',
@@ -181,22 +193,6 @@ const InfluencerMessagesPage = () => {
   // Mutations
   // ============================================================================
 
-  // Reply to user inbox messages
-  const replyToInboxMutation = useMutation({
-    mutationFn: ({ conversationId, content }: { conversationId: string; content: string }) =>
-      messagesApi.replyAsInfluencer(conversationId, content),
-    onSuccess: () => {
-      setMessageText('');
-      queryClient.invalidateQueries({ queryKey: ['influencer-inbox-messages', selectedInboxConversation] });
-      queryClient.invalidateQueries({ queryKey: ['influencer-inbox'] });
-      queryClient.invalidateQueries({ queryKey: ['influencer-inbox-unread-count'] });
-    },
-    onError: () => {
-      toast.error('Failed to send message. Please try again.');
-    },
-  });
-
-  // Send message to stores
   const sendStoreMessageMutation = useMutation({
     mutationFn: ({ conversationId, content }: { conversationId: string; content: string }) =>
       messagesApi.sendMessage(conversationId, content),
@@ -210,7 +206,6 @@ const InfluencerMessagesPage = () => {
     },
   });
 
-  // Send message to influencers
   const sendInfluencerMessageMutation = useMutation({
     mutationFn: ({ conversationId, content }: { conversationId: string; content: string }) =>
       messagesApi.sendInfluencerMessage(conversationId, content),
@@ -228,11 +223,6 @@ const InfluencerMessagesPage = () => {
   // Data
   // ============================================================================
 
-  const inboxConversations = inboxConversationsData?.conversations || [];
-  const inboxMessages = inboxMessagesData?.messages || [];
-  const currentInboxConversation = inboxConversations.find(c => c.id === selectedInboxConversation);
-  const inboxUnreadCount = inboxUnreadData?.count || 0;
-
   const storeConversations = storeConversationsData?.conversations || [];
   const storeMessages = storeMessagesData?.messages || [];
   const currentStoreConversation = storeConversations.find(c => c.id === selectedStoreConversation);
@@ -243,14 +233,9 @@ const InfluencerMessagesPage = () => {
   const currentInfluencerConversation = influencerConversations.find(c => c.id === selectedInfluencerConversation);
   const influencerUnreadCount = influencerUnreadData?.count || 0;
 
-  const totalUnreadCount = inboxUnreadCount + storeUnreadCount + influencerUnreadCount;
+  const totalUnreadCount = storeUnreadCount + influencerUnreadCount;
 
   // Filter conversations based on search
-  const filteredInboxConversations = inboxConversations.filter(conv =>
-    conv.user?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-    conv.user?.email?.toLowerCase().includes(searchText.toLowerCase())
-  );
-
   const filteredStoreConversations = storeConversations.filter(conv =>
     conv.store?.name?.toLowerCase().includes(searchText.toLowerCase())
   );
@@ -279,12 +264,7 @@ const InfluencerMessagesPage = () => {
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
     
-    if (activeTab === 'inbox' && selectedInboxConversation) {
-      replyToInboxMutation.mutate({
-        conversationId: selectedInboxConversation,
-        content: messageText.trim(),
-      });
-    } else if (activeTab === 'businesses' && selectedStoreConversation) {
+    if (activeTab === 'stores' && selectedStoreConversation) {
       sendStoreMessageMutation.mutate({
         conversationId: selectedStoreConversation,
         content: messageText.trim(),
@@ -313,9 +293,7 @@ const InfluencerMessagesPage = () => {
   };
 
   const handleBack = () => {
-    if (activeTab === 'inbox') {
-      setSelectedInboxConversation(null);
-    } else if (activeTab === 'businesses') {
+    if (activeTab === 'stores') {
       setSelectedStoreConversation(null);
     } else {
       setSelectedInfluencerConversation(null);
@@ -323,15 +301,16 @@ const InfluencerMessagesPage = () => {
   };
 
   const handleRefresh = () => {
-    if (activeTab === 'inbox') {
-      refetchInboxConversations();
-      if (selectedInboxConversation) refetchInboxMessages();
-    } else if (activeTab === 'businesses') {
+    if (activeTab === 'stores') {
       refetchStoreConversations();
-      if (selectedStoreConversation) refetchStoreMessages();
+      if (selectedStoreConversation) {
+        refetchStoreMessages();
+      }
     } else {
       refetchInfluencerConversations();
-      if (selectedInfluencerConversation) refetchInfluencerMessages();
+      if (selectedInfluencerConversation) {
+        refetchInfluencerMessages();
+      }
     }
     toast.success('Messages refreshed');
   };
@@ -345,7 +324,7 @@ const InfluencerMessagesPage = () => {
     try {
       const data = await messagesApi.getOrCreateConversation(storeId);
       if (data.success && data.conversation) {
-        setActiveTab('businesses');
+        setActiveTab('stores');
         setSelectedStoreConversation(data.conversation.id);
         setShowNewMessageModal(false);
         setNewMessageSearch('');
@@ -373,65 +352,26 @@ const InfluencerMessagesPage = () => {
     }
   };
 
-  // Get current selection and data based on active tab
-  const getSelectedConversation = () => {
-    if (activeTab === 'inbox') return selectedInboxConversation;
-    if (activeTab === 'businesses') return selectedStoreConversation;
-    return selectedInfluencerConversation;
-  };
-
-  const getConversations = () => {
-    if (activeTab === 'inbox') return filteredInboxConversations;
-    if (activeTab === 'businesses') return filteredStoreConversations;
-    return filteredInfluencerConversations;
-  };
-
-  const getMessages = (): Array<Message | InfluencerMessage> => {
-    if (activeTab === 'inbox') return inboxMessages;
-    if (activeTab === 'businesses') return storeMessages;
-    return influencerMessages;
-  };
-
-  const getIsLoading = () => {
-    if (activeTab === 'inbox') return isLoadingInboxConversations;
-    if (activeTab === 'businesses') return isLoadingStoreConversations;
-    return isLoadingInfluencerConversations;
-  };
-
-  const getIsLoadingMessages = () => {
-    if (activeTab === 'inbox') return isLoadingInboxMessages;
-    if (activeTab === 'businesses') return isLoadingStoreMessages;
-    return isLoadingInfluencerMessages;
-  };
-
-  const isSending = replyToInboxMutation.isPending || sendStoreMessageMutation.isPending || sendInfluencerMessageMutation.isPending;
+  const isSelectedConversation = activeTab === 'stores' ? selectedStoreConversation : selectedInfluencerConversation;
+  const isLoading = activeTab === 'stores' ? isLoadingStoreConversations : isLoadingInfluencerConversations;
+  const filteredConversations = activeTab === 'stores' ? filteredStoreConversations : filteredInfluencerConversations;
+  const messages: Array<Message | InfluencerMessage> = activeTab === 'stores' ? storeMessages : influencerMessages;
+  const isLoadingMessages = activeTab === 'stores' ? isLoadingStoreMessages : isLoadingInfluencerMessages;
+  const isSending = sendStoreMessageMutation.isPending || sendInfluencerMessageMutation.isPending;
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <InfluencerSidebar 
-        firstName="Influencer" 
-        lastName="" 
-        status="APPROVED" 
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 flex w-full overflow-hidden">
-        {/* Conversations List */}
+    <DashboardLayout profile={user}>
+      <div className="flex h-[calc(100vh-64px)] bg-gray-50">
+        {/* Conversations List - Hidden on mobile when conversation is selected */}
         <div className={`${
-          isMobile && getSelectedConversation() ? 'hidden' : 'flex'
-        } w-full lg:w-96 bg-white border-r border-gray-200 flex-col`}>
+          isMobile && isSelectedConversation ? 'hidden' : 'flex'
+        } w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 flex-col`}>
           {/* Header */}
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-              <Home className="h-4 w-4" />
-              <span>Home</span>
-              <span>/</span>
-              <span className="text-gray-900">Messages</span>
-            </div>
+          <div className="p-4 md:p-6 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
+                <MessageSquare className="w-6 h-6 text-gray-900" />
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Messages</h1>
                 {totalUnreadCount > 0 && (
                   <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                     {totalUnreadCount}
@@ -441,7 +381,7 @@ const InfluencerMessagesPage = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowNewMessageModal(true)}
-                  className="p-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+                  className="p-2 text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors"
                   title="New message"
                 >
                   <Plus className="w-5 h-5" />
@@ -457,38 +397,20 @@ const InfluencerMessagesPage = () => {
             </div>
             
             {/* Tabs */}
-            <div className="flex gap-1 mb-4">
+            <div className="flex gap-2 mb-4">
               <button
-                onClick={() => handleTabChange('inbox')}
-                className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-lg text-xs font-medium transition-colors ${
-                  activeTab === 'inbox'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <Inbox className="w-4 h-4" />
-                <span className="hidden sm:inline">Inbox</span>
-                {inboxUnreadCount > 0 && (
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    activeTab === 'inbox' ? 'bg-white text-blue-500' : 'bg-red-500 text-white'
-                  }`}>
-                    {inboxUnreadCount}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => handleTabChange('businesses')}
-                className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-lg text-xs font-medium transition-colors ${
-                  activeTab === 'businesses'
-                    ? 'bg-blue-500 text-white'
+                onClick={() => handleTabChange('stores')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'stores'
+                    ? 'bg-gray-900 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <Store className="w-4 h-4" />
-                <span className="hidden sm:inline">Businesses</span>
+                Businesses
                 {storeUnreadCount > 0 && (
                   <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    activeTab === 'businesses' ? 'bg-white text-blue-500' : 'bg-red-500 text-white'
+                    activeTab === 'stores' ? 'bg-white text-gray-900' : 'bg-red-500 text-white'
                   }`}>
                     {storeUnreadCount}
                   </span>
@@ -496,17 +418,17 @@ const InfluencerMessagesPage = () => {
               </button>
               <button
                 onClick={() => handleTabChange('influencers')}
-                className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-lg text-xs font-medium transition-colors ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === 'influencers'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-gray-900 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 <Users className="w-4 h-4" />
-                <span className="hidden sm:inline">Influencers</span>
+                Influencers
                 {influencerUnreadCount > 0 && (
                   <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    activeTab === 'influencers' ? 'bg-white text-blue-500' : 'bg-red-500 text-white'
+                    activeTab === 'influencers' ? 'bg-white text-gray-900' : 'bg-red-500 text-white'
                   }`}>
                     {influencerUnreadCount}
                   </span>
@@ -519,102 +441,49 @@ const InfluencerMessagesPage = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder={`Search ${activeTab === 'inbox' ? 'users' : activeTab}...`}
+                placeholder={`Search ${activeTab === 'stores' ? 'businesses' : 'influencers'}...`}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
               />
             </div>
           </div>
 
           {/* Conversations */}
           <div className="flex-1 overflow-y-auto">
-            {getIsLoading() ? (
+            {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
               </div>
-            ) : getConversations().length === 0 ? (
+            ) : filteredConversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <Inbox className="w-12 h-12 text-gray-300 mb-4" />
                 <h3 className="text-gray-600 font-medium mb-2">No conversations yet</h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  {activeTab === 'inbox' 
-                    ? 'When users message you, their conversations will appear here.'
-                    : activeTab === 'businesses'
-                    ? 'Start a conversation with a business.'
-                    : 'Start a conversation with a fellow influencer.'
+                  {activeTab === 'stores' 
+                    ? 'Start a conversation by messaging a business.'
+                    : 'Start a conversation by messaging an influencer.'
                   }
                 </p>
-                {activeTab !== 'inbox' && (
-                  <button
-                    onClick={() => {
-                      setShowNewMessageModal(true);
-                      setNewMessageTab(activeTab === 'businesses' ? 'businesses' : 'influencers');
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    New Message
-                  </button>
-                )}
-              </div>
-            ) : activeTab === 'inbox' ? (
-              // Inbox Conversations (from users)
-              filteredInboxConversations.map((conv) => (
-                <div
-                  key={conv.id}
-                  onClick={() => setSelectedInboxConversation(conv.id)}
-                  className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    selectedInboxConversation === conv.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
-                  }`}
+                <button
+                  onClick={() => {
+                    setShowNewMessageModal(true);
+                    setNewMessageTab(activeTab === 'stores' ? 'businesses' : 'influencers');
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                  <div className="flex items-start space-x-3">
-                    <div className="relative flex-shrink-0">
-                      {conv.user?.image ? (
-                        <Image
-                          src={conv.user.image}
-                          alt={conv.user.name || 'User'}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                          {conv.user?.name?.charAt(0)?.toUpperCase() || <User className="w-4 h-4" />}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-semibold text-gray-900 text-sm truncate">
-                          {conv.user?.name || 'Unknown User'}
-                        </h3>
-                        <span className="text-xs text-gray-500">
-                          {conv.lastMessageAt && formatMessageTime(conv.lastMessageAt)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-600 truncate pr-2">
-                          {conv.lastMessage || 'No messages yet'}
-                        </p>
-                        {(conv.unreadCount ?? 0) > 0 && (
-                          <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
-                            {conv.unreadCount}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : activeTab === 'businesses' ? (
+                  <Plus className="w-4 h-4" />
+                  New Message
+                </button>
+              </div>
+            ) : activeTab === 'stores' ? (
               // Store Conversations
               filteredStoreConversations.map((conv) => (
                 <div
                   key={conv.id}
                   onClick={() => setSelectedStoreConversation(conv.id)}
                   className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    selectedStoreConversation === conv.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    selectedStoreConversation === conv.id ? 'bg-gray-100 border-l-4 border-l-gray-900' : ''
                   }`}
                 >
                   <div className="flex items-start space-x-3">
@@ -623,13 +492,13 @@ const InfluencerMessagesPage = () => {
                         <Image
                           src={conv.store.logo}
                           alt={conv.store.name || 'Store'}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover"
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white font-semibold">
-                          {conv.store?.name?.charAt(0)?.toUpperCase() || <Store className="w-4 h-4" />}
+                        <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center text-white font-semibold">
+                          {conv.store?.name?.charAt(0)?.toUpperCase() || <Store className="w-5 h-5" />}
                         </div>
                       )}
                     </div>
@@ -638,7 +507,7 @@ const InfluencerMessagesPage = () => {
                         <h3 className="font-semibold text-gray-900 text-sm truncate">
                           {conv.store?.name || 'Unknown Store'}
                         </h3>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 flex-shrink-0">
                           {conv.lastMessageAt && formatMessageTime(conv.lastMessageAt)}
                         </span>
                       </div>
@@ -663,7 +532,7 @@ const InfluencerMessagesPage = () => {
                   key={conv.id}
                   onClick={() => setSelectedInfluencerConversation(conv.id)}
                   className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    selectedInfluencerConversation === conv.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    selectedInfluencerConversation === conv.id ? 'bg-gray-100 border-l-4 border-l-gray-900' : ''
                   }`}
                 >
                   <div className="flex items-start space-x-3">
@@ -672,13 +541,13 @@ const InfluencerMessagesPage = () => {
                         <Image
                           src={conv.influencer.user.image}
                           alt={`${conv.influencer.firstName} ${conv.influencer.lastName}`}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover"
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {conv.influencer?.firstName?.charAt(0)?.toUpperCase() || <User className="w-4 h-4" />}
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+                          {conv.influencer?.firstName?.charAt(0)?.toUpperCase() || <User className="w-5 h-5" />}
                         </div>
                       )}
                     </div>
@@ -687,7 +556,7 @@ const InfluencerMessagesPage = () => {
                         <h3 className="font-semibold text-gray-900 text-sm truncate">
                           {conv.influencer ? `${conv.influencer.firstName} ${conv.influencer.lastName}` : 'Unknown Influencer'}
                         </h3>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 flex-shrink-0">
                           {conv.lastMessageAt && formatMessageTime(conv.lastMessageAt)}
                         </span>
                       </div>
@@ -714,9 +583,9 @@ const InfluencerMessagesPage = () => {
 
         {/* Chat Area */}
         <div className={`${
-          isMobile && !getSelectedConversation() ? 'hidden' : 'flex'
+          isMobile && !isSelectedConversation ? 'hidden' : 'flex'
         } flex-1 flex-col bg-white`}>
-          {getSelectedConversation() ? (
+          {isSelectedConversation && (activeTab === 'stores' ? currentStoreConversation : currentInfluencerConversation) ? (
             <>
               {/* Chat Header */}
               <div className="p-4 border-b border-gray-200 bg-white">
@@ -729,35 +598,7 @@ const InfluencerMessagesPage = () => {
                       <ChevronLeft className="w-5 h-5" />
                     </button>
                   )}
-                  {activeTab === 'inbox' && currentInboxConversation ? (
-                    <>
-                      <div className="relative flex-shrink-0">
-                        {currentInboxConversation.user?.image ? (
-                          <Image
-                            src={currentInboxConversation.user.image}
-                            alt={currentInboxConversation.user.name || 'User'}
-                            width={40}
-                            height={40}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                            {currentInboxConversation.user?.name?.charAt(0)?.toUpperCase() || <User className="w-4 h-4" />}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate">
-                          {currentInboxConversation.user?.name || 'Unknown User'}
-                        </h3>
-                        {currentInboxConversation.user?.email && (
-                          <p className="text-xs text-gray-500 truncate">
-                            {currentInboxConversation.user.email}
-                          </p>
-                        )}
-                      </div>
-                    </>
-                  ) : activeTab === 'businesses' && currentStoreConversation ? (
+                  {activeTab === 'stores' && currentStoreConversation ? (
                     <>
                       <div className="relative flex-shrink-0">
                         {currentStoreConversation.store?.logo ? (
@@ -820,52 +661,49 @@ const InfluencerMessagesPage = () => {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                {getIsLoadingMessages() ? (
+                {isLoadingMessages ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
                   </div>
-                ) : getMessages().length === 0 ? (
+                ) : messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <MessageSquare className="w-12 h-12 text-gray-300 mb-4" />
                     <p className="text-gray-500">No messages yet. Start the conversation!</p>
                   </div>
                 ) : (
                   <>
-                    {getMessages().map((message) => {
-                      // Determine if this message is from "me" based on the tab
-                      const isFromMe = activeTab === 'inbox' 
-                        ? message.senderType === 'INFLUENCER'
-                        : message.senderType === 'USER';
-                      
-                      return (
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.senderType === 'USER' ? 'justify-end' : 'justify-start'}`}
+                      >
                         <div
-                          key={message.id}
-                          className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}
+                          className={`max-w-[75%] md:max-w-md px-4 py-3 rounded-2xl ${
+                            message.senderType === 'USER'
+                              ? 'bg-gray-900 text-white rounded-br-md'
+                              : activeTab === 'influencers'
+                              ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-sm rounded-bl-md'
+                              : 'bg-white text-gray-900 shadow-sm border border-gray-200 rounded-bl-md'
+                          }`}
                         >
-                          <div
-                            className={`max-w-[75%] md:max-w-md px-4 py-3 rounded-2xl ${
-                              isFromMe
-                                ? 'bg-blue-500 text-white rounded-br-md'
-                                : 'bg-white text-gray-900 shadow-sm border border-gray-200 rounded-bl-md'
-                            }`}
-                          >
-                            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-                            <div className={`flex items-center gap-1 mt-1 ${
-                              isFromMe ? 'justify-end' : 'justify-start'
+                          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                          <div className={`flex items-center gap-1 mt-1 ${
+                            message.senderType === 'USER' ? 'justify-end' : 'justify-start'
+                          }`}>
+                            <span className={`text-xs ${
+                              message.senderType === 'USER' || (activeTab === 'influencers' && message.senderType === 'INFLUENCER')
+                                ? 'text-gray-300' 
+                                : 'text-gray-500'
                             }`}>
-                              <span className={`text-xs ${
-                                isFromMe ? 'text-blue-100' : 'text-gray-500'
-                              }`}>
-                                {formatMessageTime(message.createdAt)}
-                              </span>
-                              {isFromMe && message.isRead && (
-                                <CheckCheck className="w-3 h-3 text-blue-200" />
-                              )}
-                            </div>
+                              {formatMessageTime(message.createdAt)}
+                            </span>
+                            {message.senderType === 'USER' && message.isRead && (
+                              <CheckCheck className="w-3 h-3 text-blue-400" />
+                            )}
                           </div>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                     <div ref={messagesEndRef} />
                   </>
                 )}
@@ -881,7 +719,7 @@ const InfluencerMessagesPage = () => {
                       onChange={(e) => setMessageText(e.target.value)}
                       onKeyPress={handleKeyPress}
                       rows={1}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none min-h-[48px] max-h-32"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none min-h-[48px] max-h-32"
                       style={{
                         height: 'auto',
                         overflowY: messageText.split('\n').length > 3 ? 'auto' : 'hidden'
@@ -891,7 +729,7 @@ const InfluencerMessagesPage = () => {
                   <button
                     onClick={handleSendMessage}
                     disabled={!messageText.trim() || isSending}
-                    className="p-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                    className="p-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                   >
                     {isSending ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -910,25 +748,21 @@ const InfluencerMessagesPage = () => {
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Your Messages</h2>
               <p className="text-gray-500 max-w-sm mb-6">
-                {activeTab === 'inbox'
-                  ? "Select a conversation from your inbox to view messages from users."
-                  : activeTab === 'businesses'
+                {activeTab === 'stores'
                   ? "Select a conversation or start a new one with a business."
-                  : "Select a conversation or start a new one with a fellow influencer."
+                  : "Select a conversation or start a new one with an influencer."
                 }
               </p>
-              {activeTab !== 'inbox' && (
-                <button
-                  onClick={() => {
-                    setShowNewMessageModal(true);
-                    setNewMessageTab(activeTab === 'businesses' ? 'businesses' : 'influencers');
-                  }}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                  Start New Conversation
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setShowNewMessageModal(true);
+                  setNewMessageTab(activeTab === 'stores' ? 'businesses' : 'influencers');
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                Start New Conversation
+              </button>
             </div>
           )}
         </div>
@@ -959,7 +793,7 @@ const InfluencerMessagesPage = () => {
                   onClick={() => setNewMessageTab('businesses')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                     newMessageTab === 'businesses'
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-gray-900 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -970,7 +804,7 @@ const InfluencerMessagesPage = () => {
                   onClick={() => setNewMessageTab('influencers')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                     newMessageTab === 'influencers'
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-gray-900 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -989,7 +823,7 @@ const InfluencerMessagesPage = () => {
                   placeholder={`Search ${newMessageTab}...`}
                   value={newMessageSearch}
                   onChange={(e) => setNewMessageSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 />
               </div>
             </div>
@@ -1042,7 +876,7 @@ const InfluencerMessagesPage = () => {
                   ))
                 )
               ) : (
-                isLoadingAllInfluencers ? (
+                isLoadingInfluencers ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
                   </div>
@@ -1091,8 +925,8 @@ const InfluencerMessagesPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </DashboardLayout>
   );
 };
 
-export default InfluencerMessagesPage;
+export default MessagesDashboard;

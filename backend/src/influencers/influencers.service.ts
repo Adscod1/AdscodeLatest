@@ -74,6 +74,75 @@ export class InfluencersService {
   }
 
   /**
+   * Get a single influencer by ID
+   */
+  async findById(id: string) {
+    const influencer = await this.prisma.influencer.findUnique({
+      where: { id },
+      include: {
+        socialAccounts: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    if (!influencer) {
+      throw new NotFoundException('Influencer not found');
+    }
+
+    // Calculate total followers across all platforms
+    const totalFollowers = influencer.socialAccounts.reduce(
+      (sum, account) => sum + (parseInt(account.followers || '0', 10)),
+      0
+    );
+
+    // Mock engagement rate (in real app, calculate from actual metrics)
+    const engagementRate = Math.random() * 10; // 0-10%
+
+    // Build social links object
+    const socialLinks: Record<string, string> = {};
+    influencer.socialAccounts.forEach((account) => {
+      if (account.url) {
+        socialLinks[account.platform.toLowerCase()] = account.url;
+      }
+    });
+
+    // Combine city and country for location
+    const locationParts = [influencer.city, influencer.country].filter(Boolean);
+    const location = locationParts.length > 0 ? locationParts.join(', ') : null;
+
+    return {
+      id: influencer.id,
+      userId: influencer.userId,
+      firstName: influencer.firstName,
+      lastName: influencer.lastName,
+      bio: influencer.bio,
+      primaryNiche: influencer.primaryNiche,
+      location,
+      status: influencer.status,
+      totalFollowers,
+      engagementRate: Number(engagementRate.toFixed(2)),
+      profilePicture: influencer.user?.image || null,
+      email: influencer.user?.email || null,
+      socialLinks,
+      socialAccounts: influencer.socialAccounts.map((account) => ({
+        platform: account.platform,
+        handle: account.handle,
+        followerCount: parseInt(account.followers || '0', 10),
+        profileUrl: account.url,
+      })),
+      createdAt: influencer.createdAt,
+      updatedAt: influencer.updatedAt,
+    };
+  }
+
+  /**
    * Register a new influencer profile
    */
   async register(userId: string, dto: RegisterInfluencerDto) {

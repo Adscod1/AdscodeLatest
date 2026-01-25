@@ -20,6 +20,17 @@ export class InfluencersController {
     return this.influencersService.findAll();
   }
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Get influencer by ID' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Influencer profile with all details',
+  })
+  @ApiResponse({ status: 404, description: 'Influencer not found' })
+  async getInfluencerById(@Param('id') id: string) {
+    return this.influencersService.findById(id);
+  }
+
   @Get('me')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
