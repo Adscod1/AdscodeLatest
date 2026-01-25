@@ -48,12 +48,25 @@ export class ServicesController {
   @ApiResponse({ status: 400, description: 'Invalid input' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(@UserId() userId: string, @Body() data: CreateServiceDto) {
-    const service = await this.servicesService.create(userId, data);
-    return {
-      success: true,
-      message: 'Service created successfully',
-      service,
-    };
+    console.log('=== SERVICE CREATE REQUEST ===');
+    console.log('User ID:', userId);
+    console.log('Data:', JSON.stringify(data, null, 2));
+    
+    try {
+      const service = await this.servicesService.create(userId, data);
+      console.log('=== SERVICE CREATED SUCCESSFULLY ===');
+      return {
+        success: true,
+        message: 'Service created successfully',
+        service,
+      };
+    } catch (error) {
+      console.error('=== SERVICE CREATE ERROR ===');
+      console.error('Error:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      throw error;
+    }
   }
 
   @Get()

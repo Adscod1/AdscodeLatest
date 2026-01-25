@@ -40,37 +40,56 @@ const NewServicePublishingPage = () => {
     setIsSubmitting(true);
 
     try {
+      // Prepare the service data, excluding properties not in the DTO
+      const { media, currency, requiresBooking, ...serviceData } = service;
+      // Also exclude from form data
+      const { media: _, currency: __, requiresBooking: ___, ...formData } = data as any;
+      
       // Ensure all required fields are present and properly typed
       const finalData = {
-        ...service,
-        ...data,
+        ...serviceData,
+        ...formData,
         storeId: storeId as string,
         status: "PUBLISHED",
         // Ensure all numeric fields are properly converted
         price: Number(service.price) || 0,
         comparePrice: service.comparePrice ? Number(service.comparePrice) : undefined,
         costPerService: service.costPerService ? Number(service.costPerService) : undefined,
-        experience: Number(service.experience) || 0,
-        // Ensure arrays are properly initialized
-        media: service.media || [],
+        experience: service.experience ? Number(service.experience) : undefined,
+        // Convert media to images and videos arrays
+        images: media?.filter((m: any) => m.type === 'image').map((m: any) => ({ url: m.url })) || [],
+        videos: media?.filter((m: any) => m.type === 'video').map((m: any) => ({ url: m.url })) || [],
       };
 
-      const response = await api.services.create({
-          ...finalData,
-          images: finalData.media?.filter((m: any) => m.type === 'image').map((m: any) => ({ url: m.url })) || [],
-          videos: finalData.media?.filter((m: any) => m.type === 'video').map((m: any) => ({ url: m.url })) || [],
-        });
+      const response = await api.services.create(finalData);
 
       if (response.success) {
         toast.success("Service published successfully!");
         reset();
-        router.push(`/${storeId}/products?tab=services`);
+        router.push(`/${storeId}/listings`);
       } else {
         toast.error('Failed to publish service');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error publishing service:', error);
-      toast.error('An unexpected error occurred. Please try again.');
+      
+      // Extract detailed error message if available
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      
+      // Check for ApiError with data property
+      if (error?.data?.message) {
+        // Handle array of validation messages
+        if (Array.isArray(error.data.message)) {
+          errorMessage = error.data.message.join(", ");
+        } else {
+          errorMessage = error.data.message;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      console.error("Error message:", errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

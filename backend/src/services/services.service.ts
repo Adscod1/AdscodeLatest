@@ -21,10 +21,13 @@ export class ServicesService {
    * Create a new service
    */
   async create(userId: string, data: CreateServiceDto) {
-    // Validate required fields
-    if (!data.title || !data.storeId) {
-      throw new BadRequestException('Title and storeId are required');
-    }
+    try {
+      console.log('Creating service with data:', JSON.stringify(data, null, 2));
+      
+      // Validate required fields
+      if (!data.title || !data.storeId) {
+        throw new BadRequestException('Title and storeId are required');
+      }
 
     // Verify store ownership
     const store = await this.prisma.store.findUnique({
@@ -48,6 +51,7 @@ export class ServicesService {
         costPerItem: data.costPerService,
         status: data.status || 'DRAFT',
         storeId: data.storeId,
+        currency: 'USD', // Default currency for services
         // Store service-specific data
         ...(data.location && { countryOfOrigin: data.location }),
         ...(data.duration && { harmonizedSystemCode: data.duration }),
@@ -155,7 +159,12 @@ export class ServicesService {
     });
 
     return service;
+  } catch (error) {
+    console.error('Error creating service:', error);
+    console.error('Service DTO:', JSON.stringify(data, null, 2));
+    throw error;
   }
+}
 
   /**
    * Get all services for a store
