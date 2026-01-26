@@ -50,6 +50,11 @@ export default function CouponDetailsPage() {
       { device: 'Desktop', percentage: 25 },
       { device: 'Tablet', percentage: 7 }
     ],
+    genderData: [
+      { gender: 'Male', percentage: 60 },
+      { gender: 'Female', percentage: 35 },
+      { gender: 'Other', percentage: 5 }
+    ],
     geographyData: [
       { region: 'North America', percentage: 52 },
       { region: 'Europe', percentage: 28 },
@@ -66,7 +71,7 @@ export default function CouponDetailsPage() {
           <div className="flex items-center gap-4">
             <Link
               href={`/${storeId}/discounts`}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              className="flex items-center gap-3 text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
@@ -76,11 +81,11 @@ export default function CouponDetailsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-2">
+            <button className="px-3 py-2 text-sm font-medium text-blue-500 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white flex items-center gap-2">
               <Edit className="w-4 h-4" />
               Edit
             </button>
-            <button className="px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 flex items-center gap-2">
+            <button className="px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-500 rounded hover:bg-red-500 hover:text-white flex items-center gap-2">
               <Trash2 className="w-4 h-4" />
               Delete
             </button>
@@ -90,25 +95,25 @@ export default function CouponDetailsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+        <div className="bg-white rounded p-4 border border-gray-100">
           <div className="text-sm text-gray-500 mb-1">Total Revenue</div>
           <div className="text-2xl font-bold text-gray-900 mb-1">{couponData.totalRevenue}</div>
-          <div className="text-xs text-green-600">↑ +12%</div>
+          <div className="text-xs text-green-600">↑ +12%  this week</div>
         </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+        <div className="bg-white rounded p-4 border border-gray-100">
           <div className="text-sm text-gray-500 mb-1">Usage Count</div>
           <div className="text-2xl font-bold text-gray-900 mb-1">{couponData.usageCount}</div>
-          <div className="text-xs text-green-600">↑ +8%</div>
+          <div className="text-xs text-green-600">↑ +8% this week</div>
         </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+        <div className="bg-white rounded p-4 border border-gray-100">
           <div className="text-sm text-gray-500 mb-1">Avg Order Value</div>
           <div className="text-2xl font-bold text-gray-900 mb-1">{couponData.avgOrderValue}</div>
-          <div className="text-xs text-green-600">↑ +5%</div>
+          <div className="text-xs text-green-600">↑ +5% this week</div>
         </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+        <div className="bg-white rounded p-4 border border-gray-100">
           <div className="text-sm text-gray-500 mb-1">Conversion Rate</div>
           <div className="text-2xl font-bold text-gray-900 mb-1">{couponData.conversionRate}</div>
-          <div className="text-xs text-green-600">↑ +2%</div>
+          <div className="text-xs text-green-600">↑ +2% this week</div>
         </div>
       </div>
 
@@ -116,18 +121,18 @@ export default function CouponDetailsPage() {
         {/* Left Column */}
         <div className="space-y-6">
           {/* Coupon Information Card 1 */}
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Coupon Information</h3>
-              <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+              <h3 className="text-lg font-bold text-gray-900">Coupon Information</h3>
+              <span className="px-3 py-1 bg-green-100 text-green-600 text-sm font-base rounded-full">
                 {couponData.status}
               </span>
             </div>
             
             <div className="grid grid-cols-2 gap-6 mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <span className="text-purple-600 font-bold text-lg">%</span>
+                <div className="w-12 h-12 bg-blue-100 rounded flex items-center justify-center">
+                  <span className="text-blue-500 font-bold text-lg">%</span>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{couponData.discountValue}</div>
@@ -135,7 +140,7 @@ export default function CouponDetailsPage() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-purple-600 mb-2">{couponData.code}</div>
+                <div className="text-2xl font-bold text-blue-500 mb-2">{couponData.code}</div>
               </div>
             </div>
 
@@ -168,7 +173,7 @@ export default function CouponDetailsPage() {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
                 <div
-                  className="bg-purple-500 h-2 rounded-full transition-all"
+                  className="bg-blue-500 h-2 rounded-full transition-all"
                   style={{ width: `${couponData.redemptionProgress.percentage}%` }}
                 />
               </div>
@@ -181,74 +186,12 @@ export default function CouponDetailsPage() {
             </div>
           </div>
 
-          {/* Coupon Information Card 2 */}
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          {/* Customer Segments */}
+          <div className="bg-white rounded p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Coupon Information</h3>
-              <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                {couponData.status}
-              </span>
+              <h3 className="text-lg font-semibold text-gray-900">Customer Segments</h3>
             </div>
-            
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <span className="text-purple-600 font-bold text-lg">%</span>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">{couponData.discountValue}</div>
-                  <div className="text-xl font-bold text-gray-900">{couponData.discount}</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-3xl font-bold text-purple-600 mb-2">{couponData.code}</div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div>
-                <div className="text-sm text-gray-500 mb-1">Start Date</div>
-                <div className="font-semibold text-gray-900">{couponData.startDate}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">End Date</div>
-                <div className="font-semibold text-gray-900">{couponData.endDate}</div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div>
-                <div className="text-sm text-gray-500 mb-1">Minimum Order</div>
-                <div className="font-semibold text-gray-900">{couponData.minimumOrder}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">Peak Usage Time</div>
-                <div className="font-semibold text-gray-900">{couponData.peakUsageTime}</div>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm text-gray-500 mb-2">Redemption Progress</div>
-              <div className="text-sm font-semibold text-gray-900 mb-2">
-                {couponData.redemptionProgress.current} used
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
-                <div
-                  className="bg-purple-500 h-2 rounded-full transition-all"
-                  style={{ width: `${couponData.redemptionProgress.percentage}%` }}
-                />
-              </div>
-              <div className="text-xs text-gray-500">
-                {couponData.redemptionProgress.percentage}% of limit reached
-              </div>
-              <div className="text-right text-sm text-gray-500 mt-1">
-                {1000 - couponData.redemptionProgress.current} remaining
-              </div>
-            </div>
-
-            {/* Customer Segments */}
-            <div className="mt-6">
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">Customer Segments</h4>
+          <div className="mt-6">
               <div className="space-y-3">
                 {couponData.customerSegments.map((segment, index) => (
                   <div key={index}>
@@ -258,7 +201,7 @@ export default function CouponDetailsPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-purple-500 h-2 rounded-full transition-all"
+                        className="bg-blue-500 h-2 rounded-full transition-all"
                         style={{ width: `${segment.percentage}%` }}
                       />
                     </div>
@@ -280,8 +223,29 @@ export default function CouponDetailsPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-purple-500 h-2 rounded-full transition-all"
+                        className="bg-blue-500 h-2 rounded-full transition-all"
                         style={{ width: `${device.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Gender */}
+             <div className="mt-6">
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">Gender</h4>
+              <div className="space-y-3">
+                {couponData.genderData.map((gender, index) => (
+                  <div key={index}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-gray-700">{gender.gender}</span>
+                      <span className="text-sm font-medium text-gray-600">{gender.percentage}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full transition-all"
+                        style={{ width: `${gender.percentage}%` }}
                       />
                     </div>
                   </div>
@@ -301,7 +265,7 @@ export default function CouponDetailsPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-purple-500 h-2 rounded-full transition-all"
+                        className="bg-blue-500 h-2 rounded-full transition-all"
                         style={{ width: `${geo.percentage}%` }}
                       />
                     </div>
@@ -315,14 +279,14 @@ export default function CouponDetailsPage() {
         {/* Right Column */}
         <div className="space-y-6">
           {/* Top Products */}
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded p-6 border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Products</h3>
             <div className="space-y-3">
               {couponData.topProducts.map((product, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-purple-600 text-sm font-bold">{product.rank}</span>
+                    <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-gray-700 text-xs font-semibold">{product.rank}</span>
                     </div>
                     <span className="text-sm font-medium text-gray-900">{product.name}</span>
                   </div>
@@ -333,11 +297,11 @@ export default function CouponDetailsPage() {
           </div>
 
           {/* Restrictions */}
-          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded p-6 border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Restrictions</h3>
             
             <div className="mb-4">
-              <div className="text-sm text-gray-500 mb-2">Applicable Categories</div>
+              <div className="text-sm text-semibold text-gray-700 mb-2">Applicable Categories</div>
               <div className="flex gap-2">
                 {couponData.restrictions.applicableCategories.map((category, index) => (
                   <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
@@ -348,7 +312,7 @@ export default function CouponDetailsPage() {
             </div>
 
             <div>
-              <div className="text-sm text-gray-500 mb-2">Customer Groups</div>
+              <div className="text-sm text-semibold text-gray-700 mb-2">Customer Groups</div>
               <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
                 {couponData.restrictions.customerGroups}
               </span>

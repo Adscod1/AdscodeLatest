@@ -744,7 +744,7 @@ const NewProductPublishingPage = () => {
                       <div>
                         <h3 className="text-sm font-medium mb-1">Apply Discount</h3>
                         <p className="text-xs text-muted-foreground">
-                          Create and manage coupons & discounts
+                          Create and manage coupons and Discounts
                         </p>
                       </div>
                       <Switch

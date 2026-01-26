@@ -131,7 +131,7 @@ const MarketingCampaigns: React.FC = () => {
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Marketing Campaigns</h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">Create and manage your marketing campaigns</p>
           </div>
-          <Link href={`/${storeId}/createCampaign`} className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-100 hover:text-gray-800 w-full sm:w-auto">
+          <Link href={`/${storeId}/createCampaign`} className="bg-blue-500 text-white px-4 py-2 rounded text-medium flex items-center justify-center space-x-2 hover:bg-blue-600 w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             <span className="whitespace-nowrap">Create Campaign</span>
           </Link>
@@ -139,36 +139,36 @@ const MarketingCampaigns: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded border border-gray-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-xs sm:text-sm">Total Budget</span>
+              <span className="text-gray-700 text-xs font-semibold sm:text-sm">Total Budget</span>
               <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(stats.totalBudget)}</div>
             <div className="text-xs sm:text-sm text-gray-500">Across {campaigns.length} campaigns</div>
           </div>
 
-          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded border border-gray-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-xs sm:text-sm">Active Campaigns</span>
+              <span className="text-gray-700 text-xs font-semibold sm:text-sm">Active Campaigns</span>
               <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.activeCampaigns}</div>
             <div className="text-xs sm:text-sm text-gray-500">{stats.activeCampaigns} published</div>
           </div>
 
-          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded border border-gray-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-xs sm:text-sm">Draft Campaigns</span>
+              <span className="text-gray-700 text-xs font-semibold sm:text-sm">Draft Campaigns</span>
               <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">{campaigns.filter(c => c.status === 'DRAFT').length}</div>
             <div className="text-xs sm:text-sm text-gray-500">Ready to publish</div>
           </div>
 
-          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded border border-gray-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-600 text-xs sm:text-sm">Total Applicants</span>
+              <span className="text-gray-700 text-xs font-semibold sm:text-sm">Total Applicants</span>
               <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
             </div>
             <div className="text-xl sm:text-2xl font-bold text-gray-900">
@@ -181,10 +181,10 @@ const MarketingCampaigns: React.FC = () => {
         {/* Dashboard Cards - Simplified */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Campaign Types Breakdown */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded border border-gray-100">
             <h3 className="text-base sm:text-lg font-semibold mb-4">Campaign Types</h3>
             <div className="space-y-3">
-              {['PRODUCT', 'COUPON', 'VIDEO', 'PROFILE'].map((type) => {
+              {['Product', 'Coupon', 'Video', 'Profile'].map((type) => {
                 const count = campaigns.filter(c => c.type === type).length;
                 const totalBudget = campaigns
                   .filter(c => c.type === type)
@@ -194,10 +194,10 @@ const MarketingCampaigns: React.FC = () => {
                   <div key={type} className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                       <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                        type === 'PRODUCT' ? 'bg-blue-500' :
-                        type === 'COUPON' ? 'bg-green-500' :
-                        type === 'VIDEO' ? 'bg-purple-500' :
-                        'bg-orange-500'
+                        type === 'Product' ? 'bg-blue-500' :
+                        type === 'Coupon' ? 'bg-green-500' :
+                        type === 'Video' ? 'bg-purple-500' :
+                        'bg-yellow-500'
                       }`}></div>
                       <span className="text-gray-700 text-sm sm:text-base truncate">{type}</span>
                     </div>
@@ -212,7 +212,7 @@ const MarketingCampaigns: React.FC = () => {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-4 sm:p-6 rounded border border-gray-100">
             <h3 className="text-base sm:text-lg font-semibold mb-4">Recent Campaigns</h3>
             <div className="space-y-3">
               {campaigns.slice(0, 4).map((campaign) => (
@@ -236,7 +236,7 @@ const MarketingCampaigns: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+        <div className="bg-white rounded border border-gray-100 p-4 sm:p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
             <div className="relative w-full lg:w-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -245,14 +245,14 @@ const MarketingCampaigns: React.FC = () => {
                 placeholder="Search campaigns..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full lg:w-64 text-sm sm:text-base"
+                className="pl-10 pr-64 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-full lg:w-85 text-sm sm:text-base"
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full lg:w-auto">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base w-full sm:w-auto"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base w-full sm:w-auto"
               >
                 <option>All Status</option>
                 <option>Active</option>
@@ -263,13 +263,13 @@ const MarketingCampaigns: React.FC = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base w-full sm:w-auto"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base w-full sm:w-auto"
               >
                 <option>All Types</option>
-                <option>PRODUCT</option>
-                <option>COUPON</option>
-                <option>VIDEO</option>
-                <option>PROFILE</option>
+                <option>Poduct</option>
+                <option>Coupon</option>
+                <option>Video</option>
+                <option>Profile</option>
               </select>
             </div>
           </div>

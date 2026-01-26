@@ -72,6 +72,7 @@ export default function CouponsPage() {
       startDate: '2024-01-15',
       endDate: '2024-02-15',
       conversionRate: '23%',
+      applicants: 120,
       status: 'Active',
       products: 'Premium Sneakers',
       customerGroups: 'VIP Customers'
@@ -151,68 +152,69 @@ export default function CouponsPage() {
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <div className="flex items-center justify-between">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Coupons & Discounts</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Coupons and Discounts</h1>
         <Link
                 href={`/${storeId}/discounts/new`}
-                className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-gray-100 hover:text-gray-800 transition-colors flex items-center justify-center gap-2"
+                className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Create Coupon</span>
                 <span className="sm:hidden">Create</span>
               </Link>
               </div>
-        <p className="text-xs sm:text-sm text-gray-500">Manage promotional codes and discount campaigns</p>
+        <p className="text-xs sm:text-sm text-gray-600">Manage promotional codes and discount campaigns</p>
         
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
         {stats.map((stat, idx) => (
-          <div key={idx} className="bg-white rounded-lg p-3 sm:p-4 md:p-5 shadow-sm border border-gray-200">
+          <div key={idx} className="bg-white rounded p-3 sm:p-4 md:p-5 border border-gray-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate pr-2">
+              <span className="text-sm font-semibold text-gray-600 tracking-wide truncate pr-2">
                 {stat.label}
               </span>
               {stat.icon && <stat.icon className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />}
             </div>
             <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
-            <div className="text-xs text-gray-500 truncate">{stat.subtext}</div>
+            <div className="text-xs text-blue-500 truncate">{stat.subtext}</div>
           </div>
         ))}
       </div>
 
       {/* Main Content */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded shadow-sm border border-gray-100">
         {/* Search and Filters */}
-        <div className="p-3 sm:p-4 border-b border-gray-200">
+        <div className="p-3 sm:p-4 border-b border-gray-100">
           <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search coupons..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option>All Status</option>
                 <option>Active</option>
+                <option>Pending</option>
                 <option>Expired</option>
               </select>
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-3 sm:px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 sm:px-4 py-2 border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option>All Types</option>
                 <option>Percentage</option>
                 <option>Fixed Amount</option>
-                <option>Free Shipping</option>
+                <option>Free Delivery</option>
               </select>
               
             </div>
@@ -222,10 +224,10 @@ export default function CouponsPage() {
         {/* Coupons List */}
         <div className="divide-y divide-gray-100">
           {coupons.map((coupon) => (
-            <div key={coupon.id} className="p-3 sm:p-4 md:p-5 hover:bg-gray-50 transition-colors">
+            <div key={coupon.id} className="p-3 sm:p-4 md:p-5 hover:bg-blue-50 transition-colors">
               <div className="flex items-start gap-3 sm:gap-4">
                 {/* Icon */}
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-600 rounded flex items-center justify-center flex-shrink-0">
                   <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
 
@@ -237,17 +239,17 @@ export default function CouponsPage() {
                         <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
                           {coupon.title}
                         </h3>
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded self-start">
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full self-start">
                           {coupon.code}
                         </span>
                       </div>
-                      <p className="text-xs sm:text-sm text-gray-500">{coupon.description}</p>
+                      <p className="text-xs sm:text-sm text-gray-600">{coupon.description}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${
+                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-base ${
                         coupon.status === 'Active' 
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-red-50 text-red-700'
+                          ? 'bg-green-100 text-green-600'
+                          : 'bg-red-100 text-red-700'
                       }`}>
                         {coupon.status}
                       </span>
@@ -263,7 +265,7 @@ export default function CouponsPage() {
                           <div className="absolute right-0 top-8 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                             <button
                               onClick={() => handleMenuAction('view', coupon)}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                             >
                               <Eye className="w-4 h-4" />
                               View Details
@@ -297,6 +299,7 @@ export default function CouponsPage() {
                   </div>
 
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                    
                     {/* Usage */}
                     <div className="col-span-2 lg:col-span-1">
                       <div className="text-xs text-gray-500 mb-1">Usage</div>
@@ -305,7 +308,7 @@ export default function CouponsPage() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-1.5">
                         <div
-                          className="bg-black h-1.5 rounded-full transition-all"
+                          className="bg-blue-500                          sed -n '280,330p' /Users/admin/Documents/Adscodfinal/AdscodeLatest/frontend/app/\(store\)/\[storeId\]/discounts/page.tsx h-1.5 rounded-full transition-all"
                           style={{ width: `${(coupon.usage.current / coupon.usage.total) * 100}%` }}
                         />
                       </div>
@@ -335,6 +338,7 @@ export default function CouponsPage() {
                       </div>
                     </div>
                   </div>
+
 
                   {/* Additional Info */}
                   <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs">

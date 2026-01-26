@@ -928,26 +928,26 @@ const InfluencerCampaignManager = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-base font-medium text-gray-700 mb-2">
               Campaign Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={campaignData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter campaign title"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-base font-medium text-gray-700 mb-2">
               Category <span className="text-red-500">*</span>
             </label>
             <select
               value={campaignData.category}
               onChange={(e) => handleInputChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select a category</option>
               {categories.map(cat => (
@@ -959,15 +959,33 @@ const InfluencerCampaignManager = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-base font-medium text-gray-700 mb-2">
               Campaign Type <span className="text-red-500">*</span>
             </label>
             <select
               value={campaignData.campaignType}
               onChange={(e) => handleCampaignTypeSelect(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select campaign type</option>
+              {campaignTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-6">
+          <div>
+            <label className="block text-base font-medium text-gray-700 mb-2">
+              Location <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={campaignData.campaignType}
+              onChange={(e) => handleCampaignTypeSelect(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select location</option>
               {campaignTypes.map(type => (
                 <option key={type} value={type}>{type}</option>
               ))}
@@ -1010,7 +1028,7 @@ const InfluencerCampaignManager = () => {
               ) : (
                 <button 
                   onClick={openProductBrowser}
-                  className="w-[50%] bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                  className="w-[50%] bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
                 >
                   <ShoppingBag className="w-5 h-5" />
                   Browse Shop
@@ -1129,7 +1147,7 @@ const InfluencerCampaignManager = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
                     <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
                   </svg>
@@ -1137,11 +1155,7 @@ const InfluencerCampaignManager = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Discount Campaign Setup</h3>
               </div>
 
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                </svg>
-                <h4 className="text-sm font-semibold text-gray-700">Select from Discount Database</h4>
+              <div className="flex items-center mt-2 gap-2 mb-2">
               </div>
 
               <div>
@@ -1151,7 +1165,7 @@ const InfluencerCampaignManager = () => {
                 <select
                   value={selectedDiscount}
                   onChange={(e) => handleDiscountSelect(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select an existing discount</option>
                   <option value="summer20">SUMMER20 - 20% Off Summer Collection</option>
@@ -1179,15 +1193,15 @@ const InfluencerCampaignManager = () => {
                   value={discountCode}
                   onChange={(e) => handleDiscountCodeChange(e.target.value)}
                   placeholder="Enter discount code (e.g., SAVE20)"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                  className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
                 />
                 <p className="text-xs text-gray-500 mt-1">Enter a custom discount code manually</p>
               </div>
 
               {(selectedDiscount || discountCode) && (
-                <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
+                <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center shrink-0">
                       <CheckCircle className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
@@ -1209,7 +1223,7 @@ const InfluencerCampaignManager = () => {
                   value={applicationInstructions}
                   onChange={(e) => handleApplicationInstructionsChange(e.target.value)}
                   placeholder="Describe how this discount should be applied (e.g., influencers only, customers only, or both)"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">Specify who can use this discount and any special conditions</p>
               </div>
@@ -1225,7 +1239,7 @@ const InfluencerCampaignManager = () => {
             rows={4}
             value={campaignData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Describe your campaign objectives and requirements"
           />
         </div>
@@ -1235,7 +1249,7 @@ const InfluencerCampaignManager = () => {
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6">Campaign Objective</h3>
 
         {!campaignData.campaignType ? (
-          <div className="p-6 border border-dashed border-gray-300 rounded-lg bg-gray-50 text-center">
+          <div className="p-6 border border-dashed border-gray-200 rounded bg-gray-50 text-center">
             <p className="text-sm text-gray-600 font-medium">Please select a campaign type first</p>
             <p className="text-xs text-gray-500 mt-1">Campaign objectives will be available once you choose a campaign type above</p>
           </div>
@@ -1281,7 +1295,7 @@ const InfluencerCampaignManager = () => {
               return (
                 <div 
                   key={objectiveKey}
-                  className={`relative p-4 border rounded-lg cursor-pointer transition-all ${
+                  className={`relative p-4 border rounded cursor-pointer transition-all ${
                     isSelected
                       ? 'border-blue-500 bg-blue-50' 
                       : 'border-gray-200 hover:border-gray-300'
@@ -1289,7 +1303,7 @@ const InfluencerCampaignManager = () => {
                   onClick={() => handleObjectiveChange(objectiveKey)}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border-2 ${
+                    <div className={`w-6 h-6 rounded flex items-center justify-center shrink-0 border-2 ${
                       isSelected ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
                     }`}>
                       {isSelected && (
@@ -1311,7 +1325,7 @@ const InfluencerCampaignManager = () => {
       </div>
 
       <div>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Budget & Timeline</h3>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Budget and Timeline</h3>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="sm:col-span-2 lg:col-span-1">
@@ -1322,7 +1336,7 @@ const InfluencerCampaignManager = () => {
               type="text"
               value={campaignData.budget}
               onChange={(e) => handleInputChange('budget', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               placeholder="e.g., 5000"
             />
           </div>
@@ -1335,7 +1349,7 @@ const InfluencerCampaignManager = () => {
                   variant="outline"
                   role="combobox"
                   aria-expanded={currencyOpen}
-                  className="w-full justify-between px-3 py-2 h-auto border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                  className="w-full justify-between px-3 py-2 h-auto border border-gray-200 rounded hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 >
                   {campaignData.currency || "Select currency..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -1350,7 +1364,7 @@ const InfluencerCampaignManager = () => {
                         value={currencySearch}
                         onValueChange={setCurrencySearch}
                         placeholder="Search currency..."
-                        className="h-10 w-full rounded-md border border-gray-300 bg-white pl-9 pr-9 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        className="h-10 w-full rounded-md border border-gray-200 bg-white pl-9 pr-9 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                       />
                       {campaignData.currency && (
                         <button
@@ -1409,7 +1423,7 @@ const InfluencerCampaignManager = () => {
               type="date"
               value={campaignData.startDate}
               onChange={(e) => handleInputChange('startDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           
@@ -1421,7 +1435,7 @@ const InfluencerCampaignManager = () => {
               type="date"
               value={campaignData.endDate}
               onChange={(e) => handleInputChange('endDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -1435,18 +1449,18 @@ const InfluencerCampaignManager = () => {
       <div>
         <div className="flex items-center gap-2 mb-4">
           <Target className="w-5 h-5 text-blue-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Campaign Targets & Goals</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Campaign Targets and Goals</h2>
         </div>
         <p className="text-sm text-gray-500 mb-6">Define measurable goals for your campaign performance</p>
         
         <div className="space-y-4">
           {campaignData.targets.map((target, index) => (
-            <div key={index} className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+            <div key={index} className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded p-4 hover:border-blue-50 transition-colors">
               <div className="flex-1">
                 <select
                   value={target.metric}
                   onChange={(e) => handleTargetChange(index, 'metric', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 >
                   <option value="">Select Metric</option>
                   {metricOptions.map(metric => (
@@ -1460,7 +1474,7 @@ const InfluencerCampaignManager = () => {
                   value={target.value}
                   onChange={(e) => handleTargetChange(index, 'value', e.target.value)}
                   placeholder={target.metric ? getPlaceholderForMetric(target.metric) : "Select a metric first"}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
               <div className="flex-1">
@@ -1468,13 +1482,13 @@ const InfluencerCampaignManager = () => {
                   type="text"
                   value={target.unit}
                   readOnly
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-600 text-sm cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded bg-gray-50 text-gray-600 text-sm cursor-not-allowed"
                   placeholder="Auto-selected"
                 />
               </div>
               <button
                 onClick={() => removeTarget(index)}
-                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -1483,7 +1497,7 @@ const InfluencerCampaignManager = () => {
           
           <button
             onClick={addTarget}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-200 text-gray-600 rounded hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
             Add Target
@@ -1501,7 +1515,7 @@ const InfluencerCampaignManager = () => {
             </div>
             <Link 
               href={`/${storeId}/creator-studio?tab=Discovery&campaignMode=true&campaignTitle=${encodeURIComponent(campaignData.title || 'New Campaign')}&step=1`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium"
             >
               <Plus className="w-4 h-4" />
               Add Influencers
@@ -1514,7 +1528,7 @@ const InfluencerCampaignManager = () => {
               {campaignData.selectedInfluencers.map((influencer) => (
                 <div 
                   key={influencer.id} 
-                  className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                  className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded hover:border-gray-200 transition-colors"
                 >
                   <div className="flex items-center gap-4 flex-1">
                     {/* Profile Picture/Icon */}
@@ -1627,7 +1641,7 @@ const InfluencerCampaignManager = () => {
               ))}
             </div>
           ) : (
-            <div className="p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 text-center">
+            <div className="p-4 border border-dashed border-gray-200 rounded bg-blue-50 text-center">
               <p className="text-sm text-gray-600">No influencers selected yet.</p>
               <p className="text-xs text-gray-500 mt-1">Click "Add Influencers" to discover and select creators for your campaign.</p>
             </div>
@@ -1649,7 +1663,7 @@ const InfluencerCampaignManager = () => {
 
       <div className="space-y-4">
         {campaignData.milestones.map((milestone, index) => (
-          <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors">
+          <div key={index} className="bg-gray-50 border border-gray-100 rounded p-5 hover:border-gray-100 transition-colors">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-sm font-semibold text-gray-900">Milestone {index + 1}</h3>
               {index > 0 && (
@@ -1670,7 +1684,7 @@ const InfluencerCampaignManager = () => {
                   value={milestone.title}
                   onChange={(e) => handleMilestoneChange(index, 'title', e.target.value)}
                   placeholder="e.g., Campaign Kickoff"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
               <div>
@@ -1679,7 +1693,7 @@ const InfluencerCampaignManager = () => {
                   type="date"
                   value={milestone.dueDate}
                   onChange={(e) => handleMilestoneChange(index, 'dueDate', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
             </div>
@@ -1691,7 +1705,7 @@ const InfluencerCampaignManager = () => {
                 value={milestone.description}
                 onChange={(e) => handleMilestoneChange(index, 'description', e.target.value)}
                 placeholder="Describe this milestone..."
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all resize-none"
+                className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all resize-none"
               />
             </div>
           </div>
@@ -1699,7 +1713,7 @@ const InfluencerCampaignManager = () => {
         
         <button
           onClick={addMilestone}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-500 rounded hover:text-blue-600 hover:bg-blue-50 hover:border-blue-500 transition-all text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Milestone
@@ -1720,7 +1734,7 @@ const InfluencerCampaignManager = () => {
 
       <div className="space-y-4">
         {campaignData.deliverables.map((deliverable, index) => (
-          <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors">
+          <div key={index} className="bg-gray-50 border border-gray-100 rounded p-5 transition-colors">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-sm font-semibold text-gray-900">Deliverable {index + 1}</h3>
               {index > 0 && (
@@ -1739,7 +1753,7 @@ const InfluencerCampaignManager = () => {
                 <select
                   value={deliverable.type}
                   onChange={(e) => handleDeliverableChange(index, 'type', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 >
                   {deliverableTypes.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -1753,7 +1767,7 @@ const InfluencerCampaignManager = () => {
                   min="1"
                   value={deliverable.quantity}
                   onChange={(e) => handleDeliverableChange(index, 'quantity', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all"
                 />
               </div>
             </div>
@@ -1765,7 +1779,7 @@ const InfluencerCampaignManager = () => {
                 value={deliverable.description}
                 onChange={(e) => handleDeliverableChange(index, 'description', e.target.value)}
                 placeholder="Describe the specific requirements for this deliverable..."
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all resize-none"
+                className="w-full px-3 py-2.5 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white transition-all resize-none"
               />
             </div>
           </div>
@@ -1773,7 +1787,7 @@ const InfluencerCampaignManager = () => {
         
         <button
           onClick={addDeliverable}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed border-gray-200 text-gray-600 rounded hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Deliverable
@@ -1809,16 +1823,16 @@ const InfluencerCampaignManager = () => {
         </div>
 
         {!hasRequiredData ? (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-yellow-600" />
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-blue-50 border border-blue-100 rounded p-8 text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-8 h-8 text-blue-500" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Complete Campaign Details</h3>
               <p className="text-gray-600 mb-4">
                 Fill in the required campaign information to preview how your campaign will appear to influencers.
               </p>
-              <div className="text-left bg-white rounded-lg p-4 mt-4">
+              <div className="text-left border-gray-100 rounded p-4 mt-4">
                 <p className="text-sm font-medium text-gray-700 mb-2">Required fields:</p>
                 <ul className="space-y-1 text-sm text-gray-600">
                   {!campaignData.title && <li className="flex items-center gap-2"><span className="text-red-500">✗</span> Campaign Title</li>}
@@ -2360,18 +2374,18 @@ const InfluencerCampaignManager = () => {
           </button>
           
           <div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-1">Create New Campaign</h1>
-            <p className="text-sm text-gray-500">Set up your comprehensive influencer marketing campaign</p>
+            <h1 className="text-2xl sm:text-2xl font-semibold text-gray-900 mb-1">Create New Campaign</h1>
+            <p className="text-sm text-gray-600">Set up your comprehensive influencer marketing campaign</p>
           </div>
         </div>
 
         {/* Tab Navigation - Wallet Style */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
+        <div className="bg-white rounded border border-gray-100 mb-6 overflow-hidden">
           {/* Mobile Step Navigation */}
-          <div className="block sm:hidden border-b border-gray-200">
+          <div className="block sm:hidden border-b border-gray-100">
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-gray-900">
                   Step {currentStep + 1} of {steps.length}
                 </span>
                 <span className="text-xs text-gray-500">
@@ -2419,7 +2433,7 @@ const InfluencerCampaignManager = () => {
         </div>
 
         {/* Step Content - Wallet Card Style */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8">
+        <div className="bg-white rounded border border-gray-100 p-6 sm:p-8">
           {renderStepContent()}
         </div>
 
@@ -2438,7 +2452,7 @@ const InfluencerCampaignManager = () => {
           <button
             onClick={prevStep}
             disabled={currentStep === 0 || isSubmitting}
-            className={`w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg transition-colors text-sm font-medium ${
+            className={`w-full sm:w-auto px-6 py-2.5 border border-gray-100 rounded transition-colors text-sm font-medium ${
               currentStep === 0 || isSubmitting
                 ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
                 : 'text-gray-700 hover:bg-gray-50'
@@ -2450,7 +2464,7 @@ const InfluencerCampaignManager = () => {
           <button
             onClick={currentStep === steps.length - 1 ? handleSubmitCampaign : handleNextStep}
             disabled={isSubmitting}
-            className={`w-full sm:w-auto px-6 py-2.5 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2 ${
+            className={`w-full sm:w-auto px-6 py-2.5 rounded transition-colors text-sm font-medium flex items-center justify-center gap-2 ${
               isSubmitting
                 ? 'bg-blue-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700'

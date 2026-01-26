@@ -52,7 +52,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked, onChange, label })
           onChange={onChange}
           className="sr-only peer"
         />
-        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
       </label>
     </div>
   );
@@ -186,15 +186,15 @@ export default function NotificationsPage() {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 text-sm">
                 <Bell className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-700">{unreadCount} unread</span>
+                <span className="font-bold text-gray-700">{unreadCount} Unread</span>
               </div>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
+              <button className="px-4 py-2 border border-blue-500 rounded text-sm font-medium text-blue-500 hover:bg-blue-500 hover:text-white transition-colors flex items-center gap-2">
                 <Settings className="w-4 h-4" />
                 Settings
               </button>
               <button 
                 onClick={markAllAsRead}
-                className="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                className="px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 transition-colors"
               >
                 Mark all as read
               </button>
@@ -203,37 +203,37 @@ export default function NotificationsPage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-white border border-gray-100 rounded p-4 flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Bell className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <div className="text-xs text-gray-500">All Notifications</div>
-                <div className="text-lg font-bold text-gray-900">{notifications.length} total</div>
+                <div className="text-lg font-bold text-gray-900">{notifications.length} Total</div>
               </div>
               <button className="ml-auto text-sm text-blue-600 font-medium hover:underline">
                 View
               </button>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-white border border-gray-100 rounded p-4 flex items-center gap-3">
               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                 <BellRing className="w-5 h-5 text-red-600" />
               </div>
               <div>
                 <div className="text-xs text-gray-500">Important</div>
-                <div className="text-lg font-bold text-gray-900">{notifications.filter(n => n.badge === 'Important').length} unread</div>
+                <div className="text-lg font-bold text-gray-900">{notifications.filter(n => n.badge === 'Important').length} Unread</div>
               </div>
               <button className="ml-auto text-sm text-blue-600 font-medium hover:underline">
                 View
               </button>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-white border border-gray-100 rounded p-4 flex items-center gap-3">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <CheckCheck className="w-5 h-5 text-green-600" />
               </div>
               <div>
                 <div className="text-xs text-gray-500">Read</div>
-                <div className="text-lg font-bold text-gray-900">{notifications.filter(n => n.isRead).length} notifications</div>
+                <div className="text-lg font-bold text-gray-900">{notifications.filter(n => n.isRead).length} Notifications</div>
               </div>
               <button className="ml-auto text-sm text-blue-600 font-medium hover:underline">
                 View
@@ -245,13 +245,13 @@ export default function NotificationsPage() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Notifications */}
-          <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200">
+          <div className="lg:col-span-2 bg-white rounded border border-gray-100">
             <div className="p-4 border-b border-gray-200">
               <h2 className="text-base font-semibold text-gray-900">Recent Notifications</h2>
             </div>
             <div className="divide-y divide-gray-100">
               {notifications.map((notification) => (
-                <div key={notification.id} className={`p-4 ${notification.isRead ? 'bg-white' : 'bg-blue-50'} hover:bg-gray-50 transition-colors`}>
+                <div key={notification.id} className={`p-4 ${notification.isRead ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                   <div className="flex items-start gap-3">
                     <div className={`w-10 h-10 ${notification.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                       <notification.icon className={`w-5 h-5 ${notification.iconColor}`} />
@@ -263,7 +263,7 @@ export default function NotificationsPage() {
                             {notification.title}
                           </h3>
                           {notification.badge && (
-                            <span className={`${notification.badgeColor} text-white px-2 py-0.5 rounded text-xs font-medium`}>
+                            <span className={`${notification.badgeColor} text-white px-2 py-0.5 rounded-full text-xs font-medium`}>
                               {notification.badge}
                             </span>
                           )}
@@ -313,14 +313,14 @@ export default function NotificationsPage() {
           </div>
 
           {/* Notification Preferences */}
-          <div className="bg-white rounded-lg border border-gray-200">
+          <div className="bg-white rounded border border-gray-100">
             <div className="p-4 border-b border-gray-200">
               <h2 className="text-base font-semibold text-gray-900">Notification Preferences</h2>
             </div>
             <div className="p-4 space-y-6 max-h-[800px] overflow-y-auto">
               {/* Orders & Sales */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Orders & Sales</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">Orders and Sales</h3>
                 <p className="text-xs text-gray-500 mb-3">Get notified about new orders, payments, and sales updates</p>
                 <div className="space-y-3">
                   <ToggleSwitch
@@ -348,7 +348,7 @@ export default function NotificationsPage() {
 
               {/* Marketing & Campaigns */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Marketing & Campaigns</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">Marketing and Campaigns</h3>
                 <p className="text-xs text-gray-500 mb-3">Stay updated on your marketing campaigns and performance</p>
                 <div className="space-y-3">
                   <ToggleSwitch
@@ -376,7 +376,7 @@ export default function NotificationsPage() {
 
               {/* Inventory & Products */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Inventory & Products</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">Inventory and Products</h3>
                 <p className="text-xs text-gray-500 mb-3">Receive alerts on stock levels and product updates</p>
                 <div className="space-y-3">
                   <ToggleSwitch
@@ -404,7 +404,7 @@ export default function NotificationsPage() {
 
               {/* Customers & Support */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Customers & Support</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">Customers and Support</h3>
                 <p className="text-xs text-gray-500 mb-3">Keep track of customer activity and support requests</p>
                 <div className="space-y-3">
                   <ToggleSwitch

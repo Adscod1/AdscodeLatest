@@ -30,7 +30,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked, onChange }) => {
         onChange={onChange}
         className="sr-only peer"
       />
-      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
     </label>
   );
 };
@@ -50,6 +50,8 @@ export default function SettingsPage() {
 
   // Account Information
   const [fullName, setFullName] = useState('Igni Administrator');
+  const [username, setUsername] = useState('@adscodofficial');
+  const [location, setLocation] = useState('Kampala, Uganda');
   const [email, setEmail] = useState('igni@adscod.com');
   const [phone, setPhone] = useState('+1 (555) 123-4567');
   const [company, setCompany] = useState('Adscod Inc.');
@@ -113,12 +115,12 @@ export default function SettingsPage() {
               <p className="text-sm text-gray-500 mt-1">Manage your account settings and preferences</p>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              <button className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+              <button className="flex-1 sm:flex-none px-4 py-2 border border-blue-500 rounded text-sm font-medium text-blue-500 hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-center gap-2">
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Export Data</span>
                 <span className="sm:hidden">Export</span>
               </button>
-              <button className="flex-1 sm:flex-none px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+              <button className="flex-1 sm:flex-none px-4 py-2 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600 transition-colors">
                 Save Changes
               </button>
             </div>
@@ -134,7 +136,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id as SettingsTab)}
                 className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'border-black text-gray-900'
+                    ? 'border-blue-500 text-gray-900'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -149,14 +151,14 @@ export default function SettingsPage() {
         <div className="space-y-6">
           {/* Account Information */}
           {activeTab === 'account' && (
-            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+            <div className="bg-white rounded border border-gray-100 p-4 sm:p-6">
               <div className="flex items-start gap-3 mb-6">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">Account Information</h2>
-                  <p className="text-sm text-gray-500">Update your personal information</p>
+                  <p className="text-sm text-gray-600">Update your personal information</p>
                 </div>
               </div>
 
@@ -168,7 +170,7 @@ export default function SettingsPage() {
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -177,10 +179,31 @@ export default function SettingsPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input
+                      type="username"
+                      value={email}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <input
+                      type="location"
+                      value={email}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
+                
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -189,7 +212,7 @@ export default function SettingsPage() {
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -198,7 +221,7 @@ export default function SettingsPage() {
                       type="text"
                       value={company}
                       onChange={(e) => setCompany(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -209,8 +232,28 @@ export default function SettingsPage() {
                     <select
                       value={timezone}
                       onChange={(e) => setTimezone(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
                     >
+                      <option>West Africa Time - WAT (UTC+1)</option>
+                      <option>Central Africa Time - CAT (UTC+2)</option>
+                      <option>East Africa Time - EAT (UTC+3)</option>
+                      <option>South Africa Standard Time - SAST (UTC+2)</option>
+                      <option>Morocco Standard Time (UTC+1)</option>
+                      <option>Egypt Standard Time (UTC+2)</option>
+                      <option>Nigeria Time (UTC+1)</option>
+                      <option>Kenya Time (UTC+3)</option>
+                      <option>Ethiopia Time (UTC+3)</option>
+                      <option>Ghana Time (UTC+0)</option>
+                      <option>Tanzania Time (UTC+3)</option>
+                      <option>Uganda Time (UTC+3)</option>
+                      <option>Rwanda Time (UTC+2)</option>
+                      <option>Cameroon Time (UTC+1)</option>
+                      <option>Senegal Time (UTC+0)</option>
+                      <option>Ivory Coast Time (UTC+0)</option>
+                      <option>Zimbabwe Time (UTC+2)</option>
+                      <option>Botswana Time (UTC+2)</option>
+                      <option>Namibia Time (UTC+2)</option>
+                      <option>Madagascar Time (UTC+3)</option>
                       <option>Eastern Time (UTC-5)</option>
                       <option>Pacific Time (UTC-8)</option>
                       <option>Central Time (UTC-6)</option>
@@ -222,30 +265,70 @@ export default function SettingsPage() {
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                      className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
                     >
                       <option>English</option>
-                      <option>Spanish</option>
                       <option>French</option>
+                      <option>Swahili</option>
                       <option>German</option>
                     </select>
                   </div>
                 </div>
               </div>
+
+              {/* Danger Zone */}
+              <div className="border-t border-gray-200 my-8"></div>
+            <div className="bg-red-50 rounded border border-red-100 mt-10 p-4 sm:p-6">
+                <div className="flex items-start gap-3 mb-6">
+                  <div className="w-10 h-10 bg-red-50 rounded flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600">Danger Zone</h2>
+                    <p className="text-sm text-red-500">Irreversible and destructive actions</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-red-50 border border-red-100 rounded">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Delete Account</p>
+                      <p className="text-xs text-gray-500">Permanently delete your account and all data</p>
+                    </div>
+                    <button className="w-full sm:w-auto px-4 py-2 bg-red-500 text-white text-sm font-base rounded-full hover:bg-red-600 transition-colors flex items-center justify-center gap-2">
+                      <Trash2 className="w-4 h-4" />
+                      Delete Account
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-red-50 border border-red-100 rounded">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Export Data</p>
+                      <p className="text-xs text-gray-500">Download all of your data before deletion</p>
+                    </div>
+                    <button className="w-full sm:w-auto px-4 py-2 border border-red-500 text-red-500 text-sm font-medium rounded-full hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+                      <Download className="w-4 h-4" />
+                      Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           )}
 
+          
           {/* Security & Privacy */}
           {activeTab === 'security' && (
             <div className="space-y-6">
               {/* Security */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+              <div className="bg-white rounded border border-gray-100 p-4 sm:p-6">
                 <div className="flex items-start gap-3 mb-6">
                   <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Shield className="w-5 h-5 text-red-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Security & Privacy</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">Security and                    sed -n '315,325p' /Users/admin/Documents/Adscodfinal/AdscodeLatest/frontend/app/\(store\)/\[storeId\]/settings/page.tsx Privacy</h2>
                     <p className="text-sm text-gray-500">Manage your security preferences</p>
                   </div>
                 </div>
@@ -260,7 +343,7 @@ export default function SettingsPage() {
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
                           placeholder="Enter current password"
-                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 pr-10 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <button
                           type="button"
@@ -279,7 +362,7 @@ export default function SettingsPage() {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           placeholder="Enter new password"
-                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 pr-10 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <button
                           type="button"
@@ -366,10 +449,10 @@ export default function SettingsPage() {
 
           {/* Notifications */}
           {activeTab === 'notifications' && (
-            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+            <div className="bg-white rounded border border-gray-100 p-4 sm:p-6">
               <div className="flex items-start gap-3 mb-6">
-                <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Bell className="w-5 h-5 text-yellow-600" />
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Bell className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
@@ -384,10 +467,10 @@ export default function SettingsPage() {
 
           {/* Appearance */}
           {activeTab === 'appearance' && (
-            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+            <div className="bg-white rounded border border-gray-100 p-4 sm:p-6">
               <div className="flex items-start gap-3 mb-6">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Palette className="w-5 h-5 text-purple-600" />
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Palette className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900">Appearance</h2>
@@ -405,14 +488,14 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Theme Color</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-3">Theme Color</label>
                   <div className="flex items-center gap-3">
                     {themeColors.map((theme) => (
                       <button
                         key={theme.name}
                         onClick={() => setThemeColor(theme.name)}
                         className={`w-10 h-10 rounded-full ${theme.color} relative transition-transform hover:scale-110 ${
-                          themeColor === theme.name ? 'ring-2 ring-offset-2 ring-gray-400' : ''
+                          themeColor === theme.name ? 'ring-2 ring-offset-2 ring-gray-50' : ''
                         }`}
                       >
                         {themeColor === theme.name && (
@@ -428,7 +511,7 @@ export default function SettingsPage() {
                   <select
                     value={sidebarPosition}
                     onChange={(e) => setSidebarPosition(e.target.value)}
-                    className="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                    className="w-full sm:w-64 px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
                   >
                     <option>Left</option>
                     <option>Right</option>
@@ -440,7 +523,7 @@ export default function SettingsPage() {
 
           {/* Integrations */}
           {activeTab === 'integrations' && (
-            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+            <div className="bg-white rounded border border-gray-100 p-4 sm:p-6">
               <div className="flex items-start gap-3 mb-6">
                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Plug className="w-5 h-5 text-green-600" />
@@ -453,7 +536,7 @@ export default function SettingsPage() {
 
               <div className="space-y-3">
                 {integrations.map((integration, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={index} className="flex items-center justify-between p-4 border border-gray-100 rounded hover:bg-blue-50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${integration.status === 'connected' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                       <div>
@@ -461,22 +544,22 @@ export default function SettingsPage() {
                         <p className="text-xs text-gray-500">{integration.lastSync}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-8">
                       {integration.status === 'connected' ? (
                         <>
-                          <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full hidden sm:inline">
+                          <span className="px-3 py-1 bg-green-100 text-green-600 text-xs font-base rounded-full hidden sm:inline">
                             Connected
                           </span>
-                          <button className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                          <button className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-base text-blue-500 hover:bg-blue-500 hover:text-white border border-blue-500 rounded-full transition-colors">
                             Configure
                           </button>
                         </>
                       ) : (
                         <>
-                          <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full hidden sm:inline">
+                          <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-base rounded-full hidden sm:inline">
                             Disconnected
                           </span>
-                          <button className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                          <button className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-base text-blue-500 rounded-full transition-colors hover:text-white hover:bg-blue-500 border border-blue-500">
                             Connect
                           </button>
                         </>
@@ -492,13 +575,13 @@ export default function SettingsPage() {
           {activeTab === 'billing' && (
             <div className="space-y-6">
               {/* Current Plan */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+              <div className="bg-white rounded border border-gray-100 p-4 sm:p-6">
                 <div className="flex items-start gap-3 mb-6">
                   <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <CreditCard className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Billing & Usage</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">Billing and Usage</h2>
                     <p className="text-sm text-gray-500">Manage your subscription and usage</p>
                   </div>
                 </div>
@@ -507,9 +590,9 @@ export default function SettingsPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-xl sm:text-2xl font-bold">Pro Plan</h3>
-                      <p className="text-sm text-gray-900 mt-1">$49.99/month • Renews on Feb 1, 2024</p>
+                      <p className="text-sm font-bold text-gray-700 mt-1">$49.99/month • Renews on Feb 1, 2024</p>
                     </div>
-                    <span className="px-3 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
+                    <span className="px-3 py-1 bg-green-500 text-white text-xs font-base rounded-full">
                       Active
                     </span>
                   </div>
@@ -520,7 +603,7 @@ export default function SettingsPage() {
                         <span className="font-medium text-gray-900">8,500 / 10,000</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-black rounded-full h-2" style={{ width: '85%' }}></div>
+                        <div className="bg-blue-500 rounded-full h-2" style={{ width: '85%' }}></div>
                       </div>
                     </div>
                     <div>
@@ -529,7 +612,7 @@ export default function SettingsPage() {
                         <span className="font-medium text-gray-900">45 GB / 100 GB</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-black rounded-full h-2" style={{ width: '45%' }}></div>
+                        <div className="bg-blue-500 rounded-full h-2" style={{ width: '45%' }}></div>
                       </div>
                     </div>
                   </div>
@@ -544,7 +627,7 @@ export default function SettingsPage() {
                       { plan: 'Pro Plan - Monthly', date: '2023-11-01', amount: '$49.99', status: 'Paid' },
                       { plan: 'Starter Plan - Monthly', date: '2023-10-01', amount: '$19.99', status: 'Paid' },
                     ].map((invoice, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div key={index} className="flex items-center justify-between p-3 sm:p-4 border border-gray-100 rounded hover:bg-blue-50 transition-colors">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-900 truncate">{invoice.plan}</p>
                           <p className="text-xs text-gray-500">{invoice.date}</p>
@@ -557,43 +640,6 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Danger Zone */}
-              <div className="bg-red-50 rounded-lg border border-red-200 p-4 sm:p-6">
-                <div className="flex items-start gap-3 mb-6">
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-red-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-red-900">Danger Zone</h2>
-                    <p className="text-sm text-red-600">Irreversible and destructive actions</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white border border-red-200 rounded-lg">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Delete Account</p>
-                      <p className="text-xs text-gray-500">Permanently delete your account and all data</p>
-                    </div>
-                    <button className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
-                      <Trash2 className="w-4 h-4" />
-                      Delete Account
-                    </button>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white border border-red-200 rounded-lg">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Export Data</p>
-                      <p className="text-xs text-gray-500">Download all of your data before deletion</p>
-                    </div>
-                    <button className="w-full sm:w-auto px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                      <Download className="w-4 h-4" />
-                      Export
-                    </button>
                   </div>
                 </div>
               </div>
