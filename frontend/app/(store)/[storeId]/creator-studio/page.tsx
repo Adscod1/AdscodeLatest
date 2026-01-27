@@ -27,7 +27,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
-import { format, addMonths, addDays, startOfMonth, startOfWeek, endOfMonth, isSameMonth, isSameDay } from "date-fns";
+import { format, subMonths, addMonths, addDays, startOfMonth, startOfWeek, endOfMonth, isSameMonth, isSameDay } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -504,7 +504,7 @@ const CreatorStudioDashboard = () => {
         title: 'Content #1',
         creator: '@creator1',
         type: 'video',
-        size: '4.2 GB',
+        engagement: '4.2% ER',
         likes: '1.2K',
         comments: 89,
         views: '5.4K'
@@ -534,17 +534,17 @@ const CreatorStudioDashboard = () => {
     return (
       <div className="space-y-4 sm:space-y-6">
         <div className="flex items-center gap-2 mb-4 sm:mb-6">
-          <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Camera className="w-4 h-4 sm:w-5 sm:h-5" /> 
           <h3 className="text-base sm:text-lg font-semibold">Content Library</h3>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {contentItems.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div key={item.id} className="bg-white rounded border border-gray-100 overflow-hidden hover:bg-gray-50 transition-shadow">
               <div className="relative aspect-square bg-gray-100 flex items-center justify-center">
                 <Camera className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                 {item.type && (
-                  <span className="absolute top-3 right-3 px-2 py-1 bg-gray-700 text-white text-xs rounded-full">
+                  <span className="absolute top-3 right-3 px-2 py-1 bg-gray-600 text-white text-xs rounded-full">
                     {item.type}
                   </span>
                 )}
@@ -555,9 +555,9 @@ const CreatorStudioDashboard = () => {
                     <h4 className="text-sm sm:text-base font-semibold">{item.title}</h4>
                     <p className="text-xs sm:text-sm text-gray-600">By {item.creator}</p>
                   </div>
-                  {item.size && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded border border-gray-200">
-                      {item.size}
+                  {item.engagement && (
+                    <span className="px-2 py-1 bg-gray-50 text-gray-700 text-xs text-medium uppercase rounded-full border border-gray-100">
+                      {item.engagement}
                     </span>
                   )}
                 </div>
@@ -626,8 +626,8 @@ const CreatorStudioDashboard = () => {
       {
         title: 'Approve 5 pending content pieces',
         time: 'Due in 2 hours',
-        priority: 'HIGH',
-        badge: 'bg-red-100 text-red-700'
+        priority: 'High',
+        badge: 'bg-red-100 text-red-500'
       },
       {
         title: 'Content Review Deadline',
@@ -657,13 +657,13 @@ const CreatorStudioDashboard = () => {
         title: 'Send campaign brief to new influencers',
         time: 'Due in 4 hours',
         priority: 'Medium',
-        badge: 'bg-purple-100 text-purple-700'
+        badge: 'bg-yellow-50 text-yellow-600'
       },
       {
         title: 'Review analytics report',
         time: 'Due tomorrow',
         priority: 'Low',
-        badge: 'bg-gray-100 text-gray-700'
+        badge: 'bg-green-100 text-green-600'
       }
     ];
 
@@ -678,52 +678,52 @@ const CreatorStudioDashboard = () => {
             <p className="text-sm text-gray-500">Manage your campaign schedule and deadlines</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-4 py-2 text-sm text-blue-500 border border-blue-500 rounded hover:bg-blue-500 hover:text-white">
               <Filter size={16} />
               Filter
             </button>
             <button
               onClick={() => setShowAddEventModal(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-500 rounded-lg hover:bg-purple-700"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600"
             >
-              <span className="text-lg">+</span>
+              <span className="text-medium">+</span>
               Add Event
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Full Calendar Section */}
-<div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-  <div className="flex items-center justify-between mb-6">
-    <h2 className="text-lg font-semibold text-gray-800">Campaign Calendar</h2>
-    <div className="flex items-center space-x-2">
-      <button
-        onClick={() => setDate(addMonths(date, -1))}
-        className="p-2 rounded-md hover:bg-gray-100 transition"
-      >
-        ←
-      </button>
-      <span className="font-medium text-gray-700">
-        {format(date, "MMMM yyyy")}
-      </span>
-      <button
-        onClick={() => setDate(addMonths(date, 1))}
-        className="p-2 rounded-md hover:bg-gray-100 transition"
-      >
-        →
-      </button>
-    </div>
-  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Full Calendar Section */}
+          <div className="lg:col-span-2 bg-white rounded p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Campaign Calendar</h2>
+              <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={() => setDate(subMonths(date, 1))}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {format(date, 'MMMM yyyy')}
+                    </h3>
+                    <button
+                      onClick={() => setDate(addMonths(date, 1))}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+              </div>
 
-  {/* Calendar Grid */}
-  <div className="grid grid-cols-7 text-sm font-medium text-gray-500 border-b pb-2 mb-2">
-    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-      <div key={day} className="text-center uppercase tracking-wide">
-        {day}
-      </div>
-    ))}
-  </div>
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 text-sm font-medium text-gray-500 border-b pb-2 mb-2">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                <div key={day} className="text-center uppercase tracking-wide">
+                  {day}
+                </div>
+              ))}
+          </div>
 
   <div className="grid grid-cols-7 gap-1 text-sm">
     {Array.from({ length: startOfWeek(endOfMonth(date)).getDate() + 7 }).map(
@@ -740,14 +740,14 @@ const CreatorStudioDashboard = () => {
             className={`h-24 rounded-md p-2 text-left transition
               ${isCurrentMonth ? "text-gray-800" : "text-gray-400"}
               ${isToday ? "border border-blue-500" : ""}
-              ${isSelected ? "bg-blue-600 text-white" : "hover:bg-gray-100"}
+              ${isSelected ? "bg-blue-600 text-white" : "hover:bg-blue-50"}
             `}
           >
             <div className="font-medium">{format(day, "d")}</div>
             {/* Example event */}
             {isSelected && (
-              <div className="mt-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                Event: Meeting
+              <div className="mt-2 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
+                Event: Campaign Launch
               </div>
             )}
           </button>
@@ -760,14 +760,14 @@ const CreatorStudioDashboard = () => {
           {/* Right Sidebar */}
           <div className="space-y-6">
             {/* Upcoming Events */}
-            <div className="bg-white rounded-lg p-5 shadow-sm">
+            <div className="bg-white rounded border-gray-100 p-5">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h3>
               <div className="space-y-3">
                 {upcomingEvents.map((event, idx) => (
                   <div key={idx} className="flex items-start justify-between pb-3 border-b border-gray-100 last:border-0">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="w-1.5 h-1.5 bg-purple-600 rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                         <h4 className="text-sm font-semibold text-gray-900">{event.title}</h4>
                       </div>
                       <p className="text-xs text-gray-600 ml-3.5 mb-1">{event.subtitle}</p>
@@ -776,7 +776,7 @@ const CreatorStudioDashboard = () => {
                         <span>{event.time}</span>
                       </div>
                     </div>
-                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                    <span className="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded-full font-base">
                       {event.type}
                     </span>
                   </div>
@@ -785,23 +785,23 @@ const CreatorStudioDashboard = () => {
             </div>
 
             {/* Tasks Due Soon */}
-            <div className="bg-white rounded-lg p-5 shadow-sm">
+            <div className="bg-white rounded p-5 border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Tasks Due Soon</h3>
               <div className="space-y-3">
                 {tasksDueSoon.map((task, idx) => (
                   <div key={idx} className="pb-3 border-b border-gray-100 last:border-0">
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center gap-2 flex-1">
-                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-1.5"></div>
+                        <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-1.5"></div>
                         <h4 className="text-sm font-semibold text-gray-900">{task.title}</h4>
                       </div>
                       {task.priority && (
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${task.badge}`}>
+                        <span className={`text-xs px-2 py-1 rounded-full font-base ${task.badge}`}>
                           {task.priority}
                         </span>
                       )}
                       {task.type && (
-                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                        <span className="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded-full font-base">
                           {task.type}
                         </span>
                       )}
@@ -823,7 +823,7 @@ const CreatorStudioDashboard = () => {
         {/* Add Event Modal */}
         {showAddEventModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <div className="bg-white rounded p-6 w-full max-w-md shadow-xl">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Add New Event</h3>
@@ -847,7 +847,7 @@ const CreatorStudioDashboard = () => {
                     type="text"
                     value={eventTitle}
                     onChange={(e) => setEventTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Campaign Launch: Summer Fashion"
                   />
                 </div>
@@ -859,7 +859,7 @@ const CreatorStudioDashboard = () => {
                     type="text"
                     value={eventSubtitle}
                     onChange={(e) => setEventSubtitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Summer Fashion Collection"
                   />
                 </div>
@@ -871,13 +871,13 @@ const CreatorStudioDashboard = () => {
                   </label>
                   <button
                     onClick={() => setShowEventTypeDropdown(!showEventTypeDropdown)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-left flex items-center justify-between"
+                    className="w-full px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-left flex items-center justify-between"
                   >
                     <span className="text-gray-700">{eventType}</span>
                     <ChevronRight size={16} className={`text-gray-400 transform transition-transform ${showEventTypeDropdown ? 'rotate-90' : ''}`} />
                   </button>
                   {showEventTypeDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-blue-500 rounded shadow-lg">
                       {eventTypes.map((type) => (
                         <button
                           key={type}
@@ -886,7 +886,7 @@ const CreatorStudioDashboard = () => {
                             setShowEventTypeDropdown(false);
                           }}
                           className={`w-full px-3 py-2 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                            type === eventType ? 'bg-purple-600 text-white' : 'text-gray-700'
+                            type === eventType ? 'bg-blue-500 text-white' : 'text-gray-700'
                           }`}
                         >
                           {type}
@@ -922,11 +922,11 @@ const CreatorStudioDashboard = () => {
                       type="text"
                       value={selectedTime}
                       onChange={(e) => setSelectedTime(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="--:--"
                     />
-                    <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                      <Clock size={16} className="text-gray-600" />
+                    <button className="p-2 border border-blue-500 rounded hover:bg-blue-50">
+                      <Clock size={16} className="text-blue-500" />
                     </button>
                   </div>
                 </div>
@@ -936,11 +936,11 @@ const CreatorStudioDashboard = () => {
               <div className="flex items-center justify-end gap-3 mt-6">
                 <button
                   onClick={() => setShowAddEventModal(false)}
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 rounded"
                 >
                   Cancel
                 </button>
-                <button className="px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+                <button className="px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600">
                   Add Event
                 </button>
               </div>
@@ -955,7 +955,6 @@ const CreatorStudioDashboard = () => {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
-          <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           <h3 className="text-base sm:text-lg font-semibold">
             {campaignMode ? `Select Influencers for "${campaignTitle}"` : 'Influencer Discovery'}
           </h3>
@@ -963,7 +962,7 @@ const CreatorStudioDashboard = () => {
         {campaignMode && selectedInfluencers.length > 0 && (
           <Link
             href={`/${storeId}/createCampaign`}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+            className="px-4 py-2 bg-blue-500 text-white rounded text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap"
           >
             Back to Campaign ({selectedInfluencers.length})
           </Link>
@@ -988,13 +987,13 @@ const CreatorStudioDashboard = () => {
       <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search creators by name, handle, category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
             />
           </div>
         </div>
@@ -1002,7 +1001,7 @@ const CreatorStudioDashboard = () => {
           <div className="relative">
             <button 
               onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-              className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded hover:bg-gray-50 flex items-center gap-2"
             >
               <Filter className="w-4 h-4" />
               <span className="text-sm">Filters</span>
@@ -1011,9 +1010,9 @@ const CreatorStudioDashboard = () => {
 
             {/* Filter Dropdown */}
             {showFilterDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl border border-gray-200 shadow-lg z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded border border-gray-200 shadow z-50 overflow-hidden">
                 <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
-                  <h2 className="font-semibold text-gray-900">Filters</h2>
+                  <h2 className="font-semibold text-gray-700">Filters</h2>
                   <button className="text-blue-500 text-sm hover:text-blue-600 font-medium">
                     Clear all
                   </button>
@@ -1305,8 +1304,8 @@ const CreatorStudioDashboard = () => {
           </div>
         </div>
       ) : creatorsError ? (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800 text-sm">{creatorsError}</p>
+        <div className="bg-red-50 border border-red-100 rounded p-4">
+          <p className="text-red-500 text-sm">{creatorsError}</p>
         </div>
       ) : filteredCreators.length === 0 ? (
         <div className="text-center py-12">
@@ -1342,7 +1341,7 @@ const CreatorStudioDashboard = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredCreators.map((creator) => (
-            <div key={creator.id} className="bg-white rounded-lg border border-gray-200 p-5 sm:p-6">
+            <div key={creator.id} className="bg-white rounded border border-gray-100 p-5 sm:p-6">
               {/* Profile Header */}
               <div className="flex flex-col items-center text-center mb-5">
                 {creator.image ? (
@@ -1776,14 +1775,14 @@ const CreatorStudioDashboard = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 sm:space-x-8 sm:gap-0 mt-4 sm:mt-6 overflow-x-auto">
+          <div className="flex flex-wrap justify-start gap-4 sm:space-x-8 sm:gap-0 mt-6 sm:mt-6 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-2 px-1 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab
-                    ? 'border-black text-black'
+                    ? 'border-blue-500 text-black'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
