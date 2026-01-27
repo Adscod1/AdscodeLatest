@@ -4,7 +4,7 @@ import { ChevronLeft, Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../../product/components/product-tabs";
 import { useForm } from "react-hook-form";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { FileUpload } from "@/components/ui/file-upload";
 import { X } from "lucide-react";
 import { useServiceStore, CreateServiceInput } from "@/store/use-service-store";
+import api from "@/lib/api-client";
 
 interface MediaFile {
   url: string;
@@ -31,7 +32,12 @@ interface MediaFile {
 const CreateNewService = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editServiceId = searchParams.get('edit');
+  const isEditMode = !!editServiceId;
+  
   const { service, updateService, reset } = useServiceStore();
+  const [isLoadingService, setIsLoadingService] = useState(isEditMode);
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CreateServiceInput>({
     defaultValues: {
@@ -41,6 +47,35 @@ const CreateNewService = () => {
       status: service.status || "DRAFT",
     },
   });
+
+  // Fetch existing service data if in edit mode
+  React.useEffect(() => {
+    const fetchServiceData = async () => {
+      if (isEditMode && editServiceId) {
+        try {
+          setIsLoadingService(true);
+          const response = await api.services.getById(editServiceId);
+          if (response.service) {
+            const serviceData = response.service as any;
+            // Update store with fetched service data
+            updateService({
+              ...serviceData,
+              storeId: storeId as string,
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching service:', error);
+          toast.error('Failed to load service data');
+        } finally {
+          setIsLoadingService(false);
+        }
+      } else {
+        setIsLoadingService(false);
+      }
+    };
+
+    fetchServiceData();
+  }, [isEditMode, editServiceId, storeId]);
 
   // State for service media
   const [serviceMedia, setServiceMedia] = useState<MediaFile[]>(

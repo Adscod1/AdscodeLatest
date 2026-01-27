@@ -142,7 +142,11 @@ const ProductDetailsPage = () => {
             <Share className="w-4 h-4 mr-2" />
             Share
           </Button>
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => router.push(`/${storeId}/product/new?edit=${productId}`)}
+          >
             <Edit className="w-4 h-4 mr-2" />
             Edit
           </Button>

@@ -4,7 +4,7 @@ import { ChevronLeft, Info } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../components/product-tabs";
 import { useForm } from "react-hook-form";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { CreateProductInput } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import ProductStatusCard from "../components/product-status-card";
 import { useProductStore } from "@/store/use-product-store";
 import { FileUpload } from "@/components/ui/file-upload";
 import { X } from "lucide-react";
+import api from "@/lib/api-client";
 
 interface ExtendedCreateProductInput extends CreateProductInput {
   brand?: string;
@@ -35,8 +36,13 @@ interface ExtendedCreateProductInput extends CreateProductInput {
 const CreateNewProduct = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editProductId = searchParams.get('edit');
+  const isEditMode = !!editProductId;
+  
   const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
   const hasSyncedRef = React.useRef(false);
+  const [isLoadingProduct, setIsLoadingProduct] = React.useState(isEditMode);
   
   // State for sale channels
   const [saleChannels, setSaleChannels] = React.useState({
@@ -55,9 +61,37 @@ const CreateNewProduct = () => {
     },
   });
 
+  // Fetch existing product data if in edit mode
+  React.useEffect(() => {
+    const fetchProductData = async () => {
+      if (isEditMode && editProductId && _hasHydrated) {
+        try {
+          setIsLoadingProduct(true);
+          const response = await api.products.getById(editProductId);
+          if (response.product) {
+            const productData = response.product as any;
+            // Update store with fetched product data
+            updateProduct({
+              ...productData,
+              storeId: storeId as string,
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching product:', error);
+        } finally {
+          setIsLoadingProduct(false);
+        }
+      } else if (!isEditMode) {
+        setIsLoadingProduct(false);
+      }
+    };
+
+    fetchProductData();
+  }, [isEditMode, editProductId, _hasHydrated, storeId]);
+
   // Sync form with store data ONCE after hydration
   React.useEffect(() => {
-    if (_hasHydrated && !hasSyncedRef.current) {
+    if (_hasHydrated && !hasSyncedRef.current && !isLoadingProduct) {
       hasSyncedRef.current = true;
       resetForm({
         ...product,
@@ -69,7 +103,7 @@ const CreateNewProduct = () => {
         specifications: (product as ExtendedCreateProductInput).specifications || "",
       });
     }
-  }, [_hasHydrated]);
+  }, [_hasHydrated, isLoadingProduct]);
 
   // State for product images and videos - initialized lazily after hydration
   const [productImages, setProductImages] = React.useState<string[]>([]);
@@ -98,14 +132,14 @@ const CreateNewProduct = () => {
 
   // Sync images/videos state ONCE after hydration
   React.useEffect(() => {
-    if (_hasHydrated && !hasMediaSyncedRef.current) {
+    if (_hasHydrated && !hasMediaSyncedRef.current && !isLoadingProduct) {
       hasMediaSyncedRef.current = true;
       const storedImages = product.images?.map(img => img.url) || [];
       const storedVideos = product.videos?.map(vid => vid.url) || [];
       setProductImages(storedImages);
       setProductVideos(storedVideos);
     }
-  }, [_hasHydrated, product.images, product.videos]);
+  }, [_hasHydrated, product.images, product.videos, isLoadingProduct]);
 
   // Handle image upload
   const handleImageUpload = (url: string) => {
@@ -150,7 +184,13 @@ const CreateNewProduct = () => {
       images: productImages.map(url => ({ url })),
       videos: productVideos.map(url => ({ url })),
     });
-    router.push(`/${storeId}/product/new/specific-information`);
+    
+    // If in edit mode, navigate with the edit parameter
+    if (isEditMode && editProductId) {
+      router.push(`/${storeId}/product/new/specific-information?edit=${editProductId}`);
+    } else {
+      router.push(`/${storeId}/product/new/specific-information`);
+    }
   };
 
   const handleCancel = () => {
@@ -183,12 +223,12 @@ const CreateNewProduct = () => {
   }, [watch, updateProduct, storeId]);
 
   // Show loading state until hydration completes
-  if (!_hasHydrated) {
+  if (!_hasHydrated || isLoadingProduct) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-gray-500">{isLoadingProduct ? 'Loading product...' : 'Loading...'}</p>
         </div>
       </div>
     );
@@ -228,9 +268,9 @@ const CreateNewProduct = () => {
             {/* Basic Information Form */}
             <Card>
               <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
+                <CardTitle>{isEditMode ? 'Edit Product - Basic Information' : 'Basic Information'}</CardTitle>
                 <p className="text-sm text-gray-500">
-                  Provide essential details about your product
+                  {isEditMode ? 'Update the details about your product' : 'Provide essential details about your product'}
                 </p>
               </CardHeader>
               <CardContent>

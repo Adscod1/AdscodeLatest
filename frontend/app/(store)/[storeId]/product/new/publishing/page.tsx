@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Calendar, Rocket } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm } from "react-hook-form";
 import api, { CreateProductInput } from "@/lib/api-client";
@@ -101,6 +101,10 @@ const formatNumberWithCommas = (value: number): string => {
 const NewProductPublishingPage = () => {
   const router = useRouter();
   const { storeId } = useParams();
+  const searchParams = useSearchParams();
+  const editProductId = searchParams.get('edit');
+  const isEditMode = !!editProductId;
+  
   const { product, updateProduct, reset, _hasHydrated } = useProductStore();
   const [showScheduleModal, setShowScheduleModal] = React.useState(false);
   const [hasDiscount, setHasDiscount] = React.useState(false);
@@ -146,17 +150,22 @@ const NewProductPublishingPage = () => {
   }, [_hasHydrated, product, resetForm, storeId]);
 
   const createProductMutation = useMutation({
-    mutationFn: (data: CreateProductInput) => api.products.create(data),
+    mutationFn: (data: CreateProductInput) => {
+      if (isEditMode && editProductId) {
+        return api.products.update(editProductId, data);
+      }
+      return api.products.create(data);
+    },
     onSuccess: () => {
-      toast.success("Product published successfully!");
+      toast.success(isEditMode ? "Product updated successfully!" : "Product published successfully!");
       reset();
       router.push(`/${storeId}/listings`);
     },
     onError: (error: any) => {
-      console.error("Product creation error:", error);
+      console.error("Product operation error:", error);
       
       // Extract detailed error message if available
-      let errorMessage = "Failed to publish product";
+      let errorMessage = isEditMode ? "Failed to update product" : "Failed to publish product";
       
       // Check for ApiError with data property
       if (error?.data?.message) {
@@ -317,7 +326,9 @@ const NewProductPublishingPage = () => {
           <Button variant="outline" onClick={handleCancel} className="flex-1 sm:flex-none text-sm">
             Cancel
           </Button>
-          <Button onClick={handleSubmit(onSubmit)} className="flex-1 sm:flex-none text-sm">Publish</Button>
+          <Button onClick={handleSubmit(onSubmit)} className="flex-1 sm:flex-none text-sm">
+            {isEditMode ? 'Update Product' : 'Publish'}
+          </Button>
         </div>
       </div>
 
@@ -331,10 +342,10 @@ const NewProductPublishingPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-pink-500">
-                  Let&apos;s check everything before publishing
+                  {isEditMode ? "Review changes before updating" : "Let's check everything before publishing"}
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Make sure all info is correct before selling your product
+                  {isEditMode ? "Make sure all info is correct before saving your changes" : "Make sure all info is correct before selling your product"}
                 </p>
               </CardHeader>
               <CardContent className="space-y-6 sm:space-y-8">

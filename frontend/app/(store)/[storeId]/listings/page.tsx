@@ -263,7 +263,7 @@ const StoreListings = () => {
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link href={`/${storeId}/product/${product.id}/edit`}>
+                            <Link href={`/${storeId}/product/new?edit=${product.id}`}>
                               <Pencil className="w-4 h-4 mr-2" />
                               Edit
                             </Link>

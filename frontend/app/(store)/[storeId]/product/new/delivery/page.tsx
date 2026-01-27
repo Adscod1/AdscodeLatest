@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm } from "react-hook-form";
 import { CreateProductInput } from "@/lib/api-client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +38,10 @@ interface ExtendedDeliveryInput extends CreateProductInput {
 const DeliveryPage = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editProductId = searchParams.get('edit');
+  const isEditMode = !!editProductId;
+  
   const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
   const hasSyncedRef = React.useRef(false);
 
@@ -112,7 +116,13 @@ const DeliveryPage = () => {
       ...data,
       storeId: storeId as string,
     });
-    router.push(`/${storeId}/product/new/publishing`);
+    
+    // If in edit mode, navigate with the edit parameter
+    if (isEditMode && editProductId) {
+      router.push(`/${storeId}/product/new/publishing?edit=${editProductId}`);
+    } else {
+      router.push(`/${storeId}/product/new/publishing`);
+    }
   };
 
   const handleCancel = () => {

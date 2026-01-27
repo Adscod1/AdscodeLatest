@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ProductTabs } from "../../components/product-tabs";
 import { useForm, useFieldArray } from "react-hook-form";
 import { CreateProductInput } from "@/lib/api-client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,6 +60,10 @@ const generateProductId = (): string => {
 const NewProductSaleInformation = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editProductId = searchParams.get('edit');
+  const isEditMode = !!editProductId;
+  
   const { product, updateProduct, reset: resetStore, _hasHydrated } = useProductStore();
   const [copied, setCopied] = React.useState(false);
   const [expandedVariants, setExpandedVariants] = React.useState<Record<string, boolean>>({
@@ -240,7 +244,13 @@ const NewProductSaleInformation = () => {
       ...data,
       storeId: storeId as string,
     });
-    router.push(`/${storeId}/product/new/delivery`);
+    
+    // If in edit mode, navigate with the edit parameter
+    if (isEditMode && editProductId) {
+      router.push(`/${storeId}/product/new/delivery?edit=${editProductId}`);
+    } else {
+      router.push(`/${storeId}/product/new/delivery`);
+    }
   };
 
   const handleCancel = () => {
