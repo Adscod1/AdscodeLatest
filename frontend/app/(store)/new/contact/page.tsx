@@ -32,7 +32,7 @@ const ContactInformationPage = () => {
       <StoreFormLayout>
         <div className="flex gap-6">
           <div className="flex-1">
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded p-6 border border-gray-100">
               {/* Contact Information Section */}
               <div className="mb-8">
                 <h2 className="text-lg font-semibold mb-6 text-gray-900">

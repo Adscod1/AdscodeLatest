@@ -121,7 +121,7 @@ const BusinessHoursPage = () => {
         <div className="flex gap-6">
           <div className="flex-1">
             {/* Business Hours Form */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded p-6 border border-gray-100">
               <h2 className="text-lg font-semibold mb-6">Business Hours</h2>
 
               <div className="space-y-4">
@@ -137,9 +137,9 @@ const BusinessHoursPage = () => {
                         </Label>
                       </div>
 
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-10">
                         {/* Toggle Switch */}
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-6">
                           <Switch
                             id={`toggle-${day}`}
                             checked={dayData?.isOpen}
@@ -156,7 +156,7 @@ const BusinessHoursPage = () => {
                         </div>
 
                         {dayData?.isOpen && (
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-4">
                             <Clock className="w-4 h-4 text-gray-400" />
                             <Select
                               value={dayData.open}
@@ -204,7 +204,7 @@ const BusinessHoursPage = () => {
                           </div>
                         )}
                         {!dayData?.isOpen && (
-                          <span className="text-sm text-gray-500 italic">
+                          <span className="text-sm text-gray-500">
                             Closed all day
                           </span>
                         )}

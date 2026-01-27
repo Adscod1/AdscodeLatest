@@ -128,7 +128,7 @@ export function StorePreview() {
   if (!context) {
     return (
       <div className="w-80">
-        <div className="bg-white rounded-xl border border-gray-200 sticky top-24">
+        <div className="bg-white rounded border border-gray-100 sticky top-24">
           <div className="p-4 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Preview</h2>
           </div>
@@ -193,7 +193,7 @@ export function StorePreview() {
 
   return (
     <div className="w-80">
-      <div className="bg-white rounded-xl border border-gray-200 sticky top-24">
+      <div className="bg-white rounded border border-gray-100 sticky top-24">
         {/* Header */}
         <div className="p-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">Preview</h2>
@@ -201,9 +201,9 @@ export function StorePreview() {
 
         <div className="p-4 space-y-6">
           {/* Store Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded shadow-sm border border-gray-100 overflow-hidden">
             {/* Cover Image */}
-            <div className="aspect-[16/10] bg-gradient-to-br from-orange-200 to-yellow-300 relative">
+            <div className="aspect-[16/10] bg-gradient-to-br from-blue-200 to-blue-300 relative">
               {formData.bannerImages && formData.bannerImages.length > 0 ? (
                 <Image
                   src={formData.bannerImages[activeBannerIndex] || formData.bannerImages[0]}
@@ -227,7 +227,7 @@ export function StorePreview() {
             {/* Store Info Section */}
             <div className="p-4 pb-4 border-b border-gray-200">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="relative w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 overflow-hidden">
+                <div className="relative w-10 h-10 bg-black rounded flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 overflow-hidden">
                   {formData.logo ? (
                     <Image
                       src={formData.logo}
@@ -251,28 +251,28 @@ export function StorePreview() {
               <div className="space-y-2 text-sm">
                 <div className="flex items-start space-x-2 text-gray-600">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span className="text-xs leading-relaxed">
+                  <span className="text-sm leading-relaxed">
                     {formData.address || "business Address"}
                   </span>
                 </div>
                 
                 <div className="flex items-center space-x-2 text-gray-600">
                   <Phone className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-xs">
+                  <span className="text-sm">
                     {formData.phone || "contact"}
                   </span>
                 </div>
                 
                 <div className="flex items-center space-x-2 text-gray-600">
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-xs">
+                  <span className="text-sm">
                     {formData.email || "Business email"}
                   </span>
                 </div>
                 
                 <div className="flex items-center space-x-2 text-blue-500">
                   <Globe className="w-4 h-4 flex-shrink-0" />
-                  <a href={formData.website || "#"} className="text-xs hover:underline">
+                  <a href={formData.website || "#"} className="text-sm hover:underline">
                     {formData.website || "website link"}
                   </a>
                 </div>
@@ -281,7 +281,7 @@ export function StorePreview() {
           </div>
 
           {/* Business Highlights */}
-          <div className="pb-4 border-b border-gray-200">
+          <div className="pb-4 bg-white border-b border-gray-200">
             <h3 className="font-semibold text-gray-900 mb-4">Business Highlights</h3>
             <div className="flex flex-wrap gap-2">
               {formData.selectedHighlights && formData.selectedHighlights.length > 0 ? (

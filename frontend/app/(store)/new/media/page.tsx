@@ -202,7 +202,7 @@ const StoreMediaPage = () => {
       >
         <div className="flex gap-6">
           <div className="flex-1">
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded p-6 border border-gray-100">
               {/* Header */}
               <div className="space-y-8">
                 {/* Business Logo */}
@@ -230,7 +230,7 @@ const StoreMediaPage = () => {
                       <label className="block text-sm font-medium text-gray-700">
                         Banner Images
                       </label>
-                      <p className="text-xs text-red-600 font-medium mt-1">Must be three</p>
+                      <p className="text-xs text-red-500 font-medium mt-1">Must be three</p>
                     </div>
                     <span className="text-sm text-gray-500">
                       {bannerImages.length}/3 images
@@ -246,7 +246,7 @@ const StoreMediaPage = () => {
                         onClick={() => setActiveBannerIndex(index)}
                       >
                         <div className={cn(
-                          "w-full h-full rounded-lg overflow-hidden border-2 transition-all",
+                          "w-full h-full rounded-md overflow-hidden border-2 transition-all",
                           activeBannerIndex === index 
                             ? "border-blue-500 ring-2 ring-blue-200" 
                             : "border-gray-200 hover:border-blue-300"
