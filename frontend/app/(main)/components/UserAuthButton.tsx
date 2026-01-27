@@ -112,7 +112,7 @@ export const UserAuthButton = () => {
                   {user.name || "User"}
                 </h3>
                 <p className="text-gray-500 text-sm truncate">
-                  @{(user.username || user.email?.split('@')[0] || 'user').replace(/^@/, '')}
+                  @{(user.email?.split('@')[0] || 'user').replace(/^@/, '')}
                 </p>
               </div>
             </div>

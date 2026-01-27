@@ -843,7 +843,6 @@ export interface Profile {
   id: string;
   userId: string;
   name: string | null;
-  username: string | null;
   image: string | null;
   bio: string | null;
   location: string | null;
