@@ -113,7 +113,13 @@ const CreateNewService = () => {
       media: serviceMedia,
       experience: Number(data.experience) || 0,
     });
-    router.push(`/${storeId}/service/new/sale`);
+    
+    // If in edit mode, navigate with the edit parameter
+    if (isEditMode && editServiceId) {
+      router.push(`/${storeId}/service/new/sale?edit=${editServiceId}`);
+    } else {
+      router.push(`/${storeId}/service/new/sale`);
+    }
   };
 
   const handleCancel = () => {

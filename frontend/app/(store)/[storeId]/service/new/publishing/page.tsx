@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Loader2, Rocket, CheckCircle2, Info } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ProductTabs } from "../../../product/components/product-tabs";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,6 +25,10 @@ import api from "@/lib/api-client";
 const NewServicePublishingPage = () => {
   const router = useRouter();
   const { storeId } = useParams();
+  const searchParams = useSearchParams();
+  const editServiceId = searchParams.get('edit');
+  const isEditMode = !!editServiceId;
+  
   const { service, reset } = useServiceStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
@@ -61,17 +65,20 @@ const NewServicePublishingPage = () => {
         videos: media?.filter((m: any) => m.type === 'video').map((m: any) => ({ url: m.url })) || [],
       };
 
-      const response = await api.services.create(finalData);
+      // Use update API if in edit mode, otherwise create
+      const response = isEditMode && editServiceId 
+        ? await api.services.update(editServiceId, finalData)
+        : await api.services.create(finalData);
 
       if (response.success) {
-        toast.success("Service published successfully!");
+        toast.success(isEditMode ? "Service updated successfully!" : "Service published successfully!");
         reset();
         router.push(`/${storeId}/listings`);
       } else {
-        toast.error('Failed to publish service');
+        toast.error(isEditMode ? 'Failed to update service' : 'Failed to publish service');
       }
     } catch (error: any) {
-      console.error('Error publishing service:', error);
+      console.error(isEditMode ? 'Error updating service:' : 'Error publishing service:', error);
       
       // Extract detailed error message if available
       let errorMessage = "An unexpected error occurred. Please try again.";
@@ -140,10 +147,10 @@ const NewServicePublishingPage = () => {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Publishing...
+                {isEditMode ? 'Updating...' : 'Publishing...'}
               </>
             ) : (
-              'Publish'
+              isEditMode ? 'Update Service' : 'Publish'
             )}
           </Button>
         </div>
@@ -159,10 +166,10 @@ const NewServicePublishingPage = () => {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="px-4 sm:px-6 lg:px-8 py-6 border-b">
                 <h2 className="text-xl sm:text-2xl font-semibold text-pink-500">
-                  Let&apos;s check everything before publishing
+                  {isEditMode ? "Review changes before updating" : "Let's check everything before publishing"}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Make sure all info is correct before offering your service
+                  {isEditMode ? "Make sure all info is correct before saving your changes" : "Make sure all info is correct before offering your service"}
                 </p>
               </div>
               <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6 sm:space-y-8">

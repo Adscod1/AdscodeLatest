@@ -4,7 +4,7 @@ import { ChevronLeft, Info } from "lucide-react";
 import Link from "next/link";
 import { ProductTabs } from "../../../product/components/product-tabs";
 import { useForm } from "react-hook-form";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,10 @@ interface ServicePricingInput {
 const NewServiceSalePage = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editServiceId = searchParams.get('edit');
+  const isEditMode = !!editServiceId;
+  
   const { service, updateService, reset } = useServiceStore();
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ServicePricingInput>({
@@ -57,7 +61,13 @@ const NewServiceSalePage = () => {
       currency: data.currency,
       storeId: storeId as string,
     });
-    router.push(`/${storeId}/service/new/delivery`);
+    
+    // If in edit mode, navigate with the edit parameter
+    if (isEditMode && editServiceId) {
+      router.push(`/${storeId}/service/new/delivery?edit=${editServiceId}`);
+    } else {
+      router.push(`/${storeId}/service/new/delivery`);
+    }
   };
 
   const handleCancel = () => {

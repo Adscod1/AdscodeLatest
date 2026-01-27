@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { ChevronLeft, Calendar, Clock, Plus, Trash2, ChevronLeft as ChevronLeftIcon, ChevronRight } from "lucide-react";
 import { ProductTabs } from "../../../product/components/product-tabs";
 import { useForm } from "react-hook-form";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,6 +32,10 @@ interface ServiceDeliveryInput {
 const ServiceDeliveryInfo = () => {
   const { storeId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editServiceId = searchParams.get('edit');
+  const isEditMode = !!editServiceId;
+  
   const { service, updateService, reset } = useServiceStore();
 
   const [selectedDays, setSelectedDays] = useState<string[]>(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]);
@@ -105,7 +109,13 @@ const ServiceDeliveryInfo = () => {
       ...data,
       storeId: storeId as string,
     });
-    router.push(`/${storeId}/service/new/publishing`);
+    
+    // If in edit mode, navigate with the edit parameter
+    if (isEditMode && editServiceId) {
+      router.push(`/${storeId}/service/new/publishing?edit=${editServiceId}`);
+    } else {
+      router.push(`/${storeId}/service/new/publishing`);
+    }
   };
 
   const handleCancel = () => {
