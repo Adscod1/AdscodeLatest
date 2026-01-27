@@ -28,6 +28,11 @@ import {
 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
 import { format, addMonths, addDays, startOfMonth, startOfWeek, endOfMonth, isSameMonth, isSameDay } from "date-fns";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from 'lucide-react';
 
 
 interface Creator {
@@ -147,6 +152,67 @@ const CreatorStudioDashboard = () => {
   const [date, setDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+  // Discovery filter state
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([20, 200]);
+  const [expandedFilters, setExpandedFilters] = useState<Record<string, boolean>>({
+    Category: true,
+    Followers: true,
+  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedFollowerRanges, setSelectedFollowerRanges] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
+  const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
+  const [selectedContentStyles, setSelectedContentStyles] = useState<string[]>([]);
+  const [selectedEngagementRates, setSelectedEngagementRates] = useState<string[]>([]);
+  const [selectedAccountTypes, setSelectedAccountTypes] = useState<string[]>([]);
+
+  // Filtered creators based on search and filters
+  const filteredCreators = creators.filter(creator => {
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = 
+        creator.name.toLowerCase().includes(query) ||
+        creator.handle.toLowerCase().includes(query) ||
+        creator.category.toLowerCase().includes(query) ||
+        creator.location.toLowerCase().includes(query);
+      if (!matchesSearch) return false;
+    }
+
+    // Category filter
+    if (selectedCategories.length > 0) {
+      if (!selectedCategories.some(cat => 
+        creator.category.toLowerCase().includes(cat.toLowerCase())
+      )) return false;
+    }
+
+    // Followers filter
+    if (selectedFollowerRanges.length > 0) {
+      const followersStr = creator.followers;
+      const followersNum = parseFloat(followersStr.replace(/[KMk]/g, '')) * 
+        (followersStr.includes('M') ? 1000000 : followersStr.includes('K') || followersStr.includes('k') ? 1000 : 1);
+      
+      const matchesFollowers = selectedFollowerRanges.some(range => {
+        if (range === '1K - 10K') return followersNum >= 1000 && followersNum < 10000;
+        if (range === '10K - 100K') return followersNum >= 10000 && followersNum < 100000;
+        if (range === '100K - 1M') return followersNum >= 100000 && followersNum < 1000000;
+        if (range === '1M+') return followersNum >= 1000000;
+        return true;
+      });
+      if (!matchesFollowers) return false;
+    }
+
+    // Rating filter
+    if (selectedRatings.length > 0) {
+      const creatorRating = parseFloat(creator.rating);
+      if (!selectedRatings.some(r => creatorRating >= r)) return false;
+    }
+
+    return true;
+  });
+
 
   const menuItems = [
     { icon: BarChart3, label: 'Dashboard', path: 'Dashboard' },
@@ -168,11 +234,13 @@ const CreatorStudioDashboard = () => {
       try {
         setCreatorsLoading(true);
         setCreatorsError(null);
-        const data = await api.influencers.list();
+        // Use getAll which returns the array directly
+        const data = await api.influencers.getAll();
         
-        if (data.success && Array.isArray(data.data)) {
+        // Backend returns array directly, not wrapped in { success, data }
+        if (Array.isArray(data)) {
           // Transform Influencer data to Creator format
-          const transformedCreators: Creator[] = data.data.map((influencer: any) => ({
+          const transformedCreators: Creator[] = data.map((influencer: any) => ({
             id: influencer.id,
             name: `${influencer.firstName || ''} ${influencer.lastName || ''}`.trim() || 'Unknown',
             handle: influencer.socialAccounts?.[0]?.handle || `@${influencer.firstName?.toLowerCase() || 'user'}`,
@@ -186,9 +254,9 @@ const CreatorStudioDashboard = () => {
             email: '',
             bio: influencer.bio,
             platforms: {
-              instagram: influencer.socialAccounts?.find((a: any) => a.platform === 'Instagram')?.handle || '',
-              youtube: influencer.socialAccounts?.find((a: any) => a.platform === 'YouTube')?.handle || '',
-              tiktok: influencer.socialAccounts?.find((a: any) => a.platform === 'TikTok')?.handle || '',
+              instagram: influencer.socialAccounts?.find((a: any) => a.platform === 'INSTAGRAM')?.handle || '',
+              youtube: influencer.socialAccounts?.find((a: any) => a.platform === 'YOUTUBE')?.handle || '',
+              tiktok: influencer.socialAccounts?.find((a: any) => a.platform === 'TIKTOK')?.handle || '',
             },
             userId: influencer.userId,
             image: influencer.profilePicture,
@@ -923,16 +991,309 @@ const CreatorStudioDashboard = () => {
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search creators..."
+              placeholder="Search creators by name, handle, category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-         
-          <button className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <div className="w-4 h-4">filter</div>
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Filter className="w-4 h-4" />
+              <span className="text-sm">Filters</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Filter Dropdown */}
+            {showFilterDropdown && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl border border-gray-200 shadow-lg z-50 overflow-hidden">
+                <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
+                  <h2 className="font-semibold text-gray-900">Filters</h2>
+                  <button className="text-blue-500 text-sm hover:text-blue-600 font-medium">
+                    Clear all
+                  </button>
+                </div>
+
+                <div className="max-h-[60vh] overflow-y-auto">
+                  {/* Category Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Category: !prev.Category }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Category</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Category ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Category && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Banking', 'Fashion', 'Technology', 'Lifestyle', 'Food', 'General'].map(cat => (
+                          <div key={cat} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`cat-${cat}`} 
+                              checked={selectedCategories.includes(cat)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedCategories([...selectedCategories, cat]);
+                                } else {
+                                  setSelectedCategories(selectedCategories.filter(c => c !== cat));
+                                }
+                              }}
+                            />
+                            <label htmlFor={`cat-${cat}`} className="text-sm text-gray-700 cursor-pointer">{cat}</label>
+                          </div>
+                        ))}
+                        <button className="text-blue-500 text-xs hover:text-blue-600 mt-2">See more</button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Followers Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Followers: !prev.Followers }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Followers</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Followers ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Followers && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['1K - 10K', '10K - 100K', '100K - 1M', '1M+'].map(range => (
+                          <div key={range} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`followers-${range}`}
+                              checked={selectedFollowerRanges.includes(range)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedFollowerRanges([...selectedFollowerRanges, range]);
+                                } else {
+                                  setSelectedFollowerRanges(selectedFollowerRanges.filter(r => r !== range));
+                                }
+                              }}
+                            />
+                            <label htmlFor={`followers-${range}`} className="text-sm text-gray-700 cursor-pointer">{range}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Age Criteria Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Age: !prev.Age }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Age Criteria</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Age ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Age && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['13 - 17 years', '18 - 25 years', '26 - 40 years', '40+ years'].map(age => (
+                          <div key={age} className="flex items-center space-x-2">
+                            <Checkbox id={`age-${age}`} />
+                            <label htmlFor={`age-${age}`} className="text-sm text-gray-700 cursor-pointer">{age}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Ad Price Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Price: !prev.Price }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Ad Price ($)</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Price ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Price && (
+                      <div className="px-4 pb-4">
+                        <div className="flex justify-between mb-2 gap-2">
+                          <Input
+                            type="number"
+                            value={priceRange[0]}
+                            onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                            className="w-20 h-8 text-sm"
+                          />
+                          <span className="text-sm self-center text-gray-500">to</span>
+                          <Input
+                            type="number"
+                            value={priceRange[1]}
+                            onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 0])}
+                            className="w-20 h-8 text-sm"
+                          />
+                        </div>
+                        <Slider
+                          defaultValue={[20, 200]}
+                          max={500}
+                          step={10}
+                          value={priceRange}
+                          onValueChange={(value) => setPriceRange(value as [number, number])}
+                          className="my-4"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Gender Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Gender: !prev.Gender }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Gender</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Gender ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Gender && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Male', 'Female'].map(gender => (
+                          <div key={gender} className="flex items-center space-x-2">
+                            <Checkbox id={`gender-${gender}`} />
+                            <label htmlFor={`gender-${gender}`} className="text-sm text-gray-700 cursor-pointer">{gender}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content Style Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, ContentStyle: !prev.ContentStyle }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Content Style</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.ContentStyle ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.ContentStyle && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Casual & Authentic', 'Professional & Polished', 'Fun & Energetic', 'Educational', 'Minimalist'].map(style => (
+                          <div key={style} className="flex items-center space-x-2">
+                            <Checkbox id={`style-${style}`} />
+                            <label htmlFor={`style-${style}`} className="text-sm text-gray-700 cursor-pointer">{style}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Engagement Rate Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Engagement: !prev.Engagement }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Engagement Rate</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Engagement ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Engagement && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['> 60%', '> 75%', '> 85%'].map(rate => (
+                          <div key={rate} className="flex items-center space-x-2">
+                            <Checkbox id={`engagement-${rate}`} />
+                            <label htmlFor={`engagement-${rate}`} className="text-sm text-gray-700 cursor-pointer">{rate}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Rating Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Rating: !prev.Rating }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Rating</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Rating ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Rating && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {[5, 4, 3, 2, 1].map((rating) => (
+                          <div key={rating} className="flex items-center space-x-2">
+                            <Checkbox id={`rating-${rating}`} />
+                            <label htmlFor={`rating-${rating}`} className="flex cursor-pointer">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <span key={i} className={i < rating ? "text-yellow-400" : "text-gray-300"}>★</span>
+                              ))}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Account Type Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, AccountType: !prev.AccountType }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Account Type</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.AccountType ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.AccountType && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Verified Account', 'Non verified Account', 'Both'].map(type => (
+                          <div key={type} className="flex items-center space-x-2">
+                            <Checkbox id={`account-${type}`} />
+                            <label htmlFor={`account-${type}`} className="text-sm text-gray-700 cursor-pointer">{type}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Campaign Milestones Filter */}
+                  <div>
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Milestones: !prev.Milestones }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Campaign Milestones</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Milestones ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Milestones && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['2 +', '5 +', '10 +'].map(milestone => (
+                          <div key={milestone} className="flex items-center space-x-2">
+                            <Checkbox id={`milestone-${milestone}`} />
+                            <label htmlFor={`milestone-${milestone}`} className="text-sm text-gray-700 cursor-pointer">{milestone}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 p-4 border-t border-gray-100 bg-gray-50">
+                  <Button variant="outline" className="flex-1 hover:bg-white" onClick={() => {
+                    setPriceRange([20, 200]);
+                    setSelectedCategories([]);
+                    setSelectedFollowerRanges([]);
+                    setSelectedRatings([]);
+                    setSelectedGenders([]);
+                    setSelectedContentStyles([]);
+                    setSelectedEngagementRates([]);
+                    setSelectedAccountTypes([]);
+                    setSearchQuery('');
+                  }}>
+                    Reset
+                  </Button>
+                  <Button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm" onClick={() => setShowFilterDropdown(false)}>
+                    Apply
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -947,14 +1308,40 @@ const CreatorStudioDashboard = () => {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800 text-sm">{creatorsError}</p>
         </div>
-      ) : creators.length === 0 ? (
+      ) : filteredCreators.length === 0 ? (
         <div className="text-center py-12">
           <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600">No approved creators found yet</p>
+          <p className="text-gray-600">
+            {creators.length === 0 
+              ? 'No approved creators found yet' 
+              : 'No creators match your filters'}
+          </p>
+          {creators.length > 0 && (
+            <button 
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategories([]);
+                setSelectedFollowerRanges([]);
+                setSelectedRatings([]);
+              }}
+              className="mt-3 text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {creators.map((creator) => (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-gray-600">
+              Showing {filteredCreators.length} of {creators.length} creators
+              {(selectedCategories.length > 0 || selectedFollowerRanges.length > 0 || searchQuery) && (
+                <span className="ml-2 text-blue-600">• Filtered</span>
+              )}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {filteredCreators.map((creator) => (
             <div key={creator.id} className="bg-white rounded-lg border border-gray-200 p-5 sm:p-6">
               {/* Profile Header */}
               <div className="flex flex-col items-center text-center mb-5">
@@ -1084,7 +1471,8 @@ const CreatorStudioDashboard = () => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
