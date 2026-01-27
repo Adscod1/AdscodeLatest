@@ -733,6 +733,10 @@ export const influencersApi = {
   // Get all influencers with success wrapper
   list: () => 
     apiRequest<{ success: boolean; data: Influencer[] }>('/influencer/list'),
+
+  // Get influencer by ID
+  getById: (id: string) => 
+    apiRequest<Influencer>(`/influencer/${id}`),
   
   // Get current influencer profile
   getMe: () => 
@@ -839,6 +843,7 @@ export interface Profile {
   id: string;
   userId: string;
   name: string | null;
+  username: string | null;
   image: string | null;
   bio: string | null;
   location: string | null;
@@ -1263,6 +1268,45 @@ export interface Conversation {
   messages?: Message[];
 }
 
+// Influencer messaging types
+export interface InfluencerMessage {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderType: 'USER' | 'INFLUENCER';
+  content: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InfluencerConversation {
+  id: string;
+  influencerId: string;
+  userId: string;
+  lastMessage?: string;
+  lastMessageAt: string;
+  createdAt: string;
+  updatedAt: string;
+  influencer?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    primaryNiche: string | null;
+    user?: {
+      image: string | null;
+    };
+  };
+  user?: {
+    id: string;
+    name: string | null;
+    image: string | null;
+    email: string;
+  };
+  unreadCount?: number;
+  messages?: InfluencerMessage[];
+}
+
 export interface GetConversationsParams {
   page?: number;
   limit?: number;
@@ -1340,6 +1384,69 @@ export const messagesApi = {
 
   getStoreUnreadCount: (storeId: string) =>
     apiRequest<{ success: boolean; count: number }>(`/messages/store/${storeId}/unread-count`),
+
+  // Influencer messaging endpoints (for users messaging influencers)
+  sendMessageToInfluencer: (influencerId: string, content: string) =>
+    apiRequest<{ success: boolean; conversation: InfluencerConversation; message: InfluencerMessage }>('/messages/influencer/send', {
+      method: 'POST',
+      body: JSON.stringify({ influencerId, content }),
+    }),
+
+  getOrCreateInfluencerConversation: (influencerId: string) =>
+    apiRequest<{ success: boolean; conversation: InfluencerConversation }>(`/messages/influencer/start/${influencerId}`),
+
+  getUserInfluencerConversations: (params?: GetConversationsParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversations: InfluencerConversation[]; pagination: unknown }>(`/messages/influencer/conversations${query ? `?${query}` : ''}`);
+  },
+
+  getInfluencerConversationMessages: (conversationId: string, params?: GetMessagesParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversation: InfluencerConversation; messages: InfluencerMessage[]; pagination: unknown }>(`/messages/influencer/conversations/${conversationId}${query ? `?${query}` : ''}`);
+  },
+
+  sendInfluencerMessage: (conversationId: string, content: string) =>
+    apiRequest<{ success: boolean; message: InfluencerMessage }>(`/messages/influencer/conversations/${conversationId}/send`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    }),
+
+  getUserInfluencerUnreadCount: () =>
+    apiRequest<{ success: boolean; count: number }>('/messages/influencer/unread-count'),
+
+  // Influencer inbox endpoints (for influencers viewing their messages)
+  getInfluencerInbox: (params?: GetConversationsParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversations: InfluencerConversation[]; pagination: unknown }>(`/messages/influencer/inbox${query ? `?${query}` : ''}`);
+  },
+
+  getInfluencerInboxMessages: (conversationId: string, params?: GetMessagesParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    const query = searchParams.toString();
+    return apiRequest<{ success: boolean; conversation: InfluencerConversation; messages: InfluencerMessage[]; pagination: unknown }>(`/messages/influencer/inbox/${conversationId}${query ? `?${query}` : ''}`);
+  },
+
+  replyAsInfluencer: (conversationId: string, content: string) =>
+    apiRequest<{ success: boolean; message: InfluencerMessage }>('/messages/influencer/inbox/reply', {
+      method: 'POST',
+      body: JSON.stringify({ conversationId, content }),
+    }),
+
+  getInfluencerInboxUnreadCount: () =>
+    apiRequest<{ success: boolean; count: number }>('/messages/influencer/inbox/unread-count'),
 };
 
 // Export everything as default for convenience

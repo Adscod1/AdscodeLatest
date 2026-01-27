@@ -27,6 +27,7 @@ model User {
   notifications Notification[]
   comments      Comment[]
   conversations Conversation[]
+  influencerConversations InfluencerConversation[]
 
   @@map("user")
 }
@@ -195,62 +196,62 @@ model StoreHighlight {
 }
 
 model Product {
-  id                            String              @id @default(uuid())
-  title                         String
-  description                   String?             @db.Text
-  category                      String?
-  vendor                        String?
-  tags                          String?
-  price                         Float
-  comparePrice                  Float?
-  costPerItem                   Float?
-  weight                        Float?
-  weightUnit                    String?
-  length                        Float?
-  width                         Float?
-  height                        Float?
-  sizeUnit                      String?
-  countryOfOrigin               String?
-  harmonizedSystemCode          String?
-  status                        String              @default("DRAFT")
-  storeId                       String
-  views                         Int                 @default(0)
-  benefitsIntroText             String?             @db.Text
-  benefitsSectionImage          String?
-  howToUseVideo                 String?
-  howToUseDescription           String?             @db.Text
-  brand                         String?
-  model                         String?
-  condition                     String?
-  warranty                      String?
-  specifications                String?             @db.Text
-  shippingCost                  Float?
-  offerFreeShipping             Boolean?            @default(false)
-  processingTime                String?
-  shippingMethod                String?
-  currency                      String?
-  taxRate                       Float?
-  sku                           String?
-  barcode                       String?
-  productId                     String?
-  stockQuantity                 Int?
-  lowStockAlert                 Int?
-  trackQuantity                 Boolean?            @default(false)
-  continueSellingWhenOutOfStock Boolean?            @default(false)
-  requiresShipping              Boolean?            @default(true)
-  scheduledPublishDate          DateTime?
-  scheduledUnpublishDate        DateTime?
-  isScheduled                   Boolean?            @default(false)
-  createdAt                     DateTime            @default(now())
-  updatedAt                     DateTime            @updatedAt
-  store                         Store               @relation(fields: [storeId], references: [id])
-  images                        ProductImage[]
-  variations                    ProductVariation[]
-  videos                        ProductVideo[]
-  comments                      Comment[]
-  benefitItems                  ProductBenefit[]
-  ingredientItems               ProductIngredient[]
-  faqItems                      ProductFaq[]
+  id                              String             @id @default(uuid())
+  productId                       String?            @unique
+  title                           String
+  description                     String?            @db.Text
+  category                        String?
+  vendor                          String?
+  brand                           String?
+  model                           String?
+  condition                       String?
+  warranty                        String?
+  specifications                  String?            @db.Text
+  tags                            String?
+  price                           Float
+  comparePrice                    Float?
+  costPerItem                     Float?
+  currency                        String?            @default("UGX")
+  taxRate                         Float?
+  sku                             String?
+  barcode                         String?
+  stockQuantity                   Int?
+  lowStockAlert                   Int?
+  trackQuantity                   Boolean            @default(false)
+  continueSellingWhenOutOfStock   Boolean            @default(false)
+  weight                          Float?
+  weightUnit                      String?
+  length                          Float?
+  width                           Float?
+  height                          Float?
+  sizeUnit                        String?
+  requiresShipping                Boolean            @default(true)
+  shippingCost                    Float?
+  offerFreeShipping               Boolean            @default(false)
+  processingTime                  String?
+  shippingMethod                  String?
+  countryOfOrigin                 String?
+  harmonizedSystemCode            String?
+  status                          String             @default("DRAFT")
+  isScheduled                     Boolean            @default(false)
+  scheduledPublishDate            DateTime?
+  scheduledUnpublishDate          DateTime?
+  benefitsIntroText               String?            @db.Text
+  benefitsSectionImage            String?
+  howToUseVideo                   String?
+  howToUseDescription             String?            @db.Text
+  storeId                         String
+  views                           Int                @default(0)
+  createdAt                       DateTime           @default(now())
+  updatedAt                       DateTime           @updatedAt
+  store                           Store              @relation(fields: [storeId], references: [id])
+  images                          ProductImage[]
+  variations                      ProductVariation[]
+  videos                          ProductVideo[]
+  comments                        Comment[]
+  benefitItems                    BenefitItem[]
+  ingredientItems                 IngredientItem[]
+  faqItems                        FaqItem[]
 
   @@index([storeId], map: "product_storeId_fkey")
   @@map("product")
@@ -304,38 +305,38 @@ model Comment {
   @@map("comment")
 }
 
-model ProductBenefit {
+model BenefitItem {
   id          String  @id @default(uuid())
   title       String
-  description String  @db.Text
+  description String? @db.Text
   productId   String
   product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@index([productId], map: "product_benefit_productId_fkey")
-  @@map("product_benefit")
+  @@index([productId], map: "benefit_item_productId_fkey")
+  @@map("benefit_item")
 }
 
-model ProductIngredient {
+model IngredientItem {
   id          String  @id @default(uuid())
   name        String
   image       String?
-  description String  @db.Text
+  description String? @db.Text
   productId   String
   product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@index([productId], map: "product_ingredient_productId_fkey")
-  @@map("product_ingredient")
+  @@index([productId], map: "ingredient_item_productId_fkey")
+  @@map("ingredient_item")
 }
 
-model ProductFaq {
+model FaqItem {
   id        String  @id @default(uuid())
   question  String  @db.Text
   answer    String  @db.Text
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@index([productId], map: "product_faq_productId_fkey")
-  @@map("product_faq")
+  @@index([productId], map: "faq_item_productId_fkey")
+  @@map("faq_item")
 }
 
 model StoreActivity {
@@ -357,8 +358,8 @@ model StoreReview {
   storeId   String
   rating    Int
   comment   String?  @db.Text
-  images    String?  @db.Text // JSON array of image URLs
-  videos    String?  @db.Text // JSON array of video URLs
+  images    String?  @db.Text
+  videos    String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   store     Store    @relation(fields: [storeId], references: [id])
@@ -390,6 +391,7 @@ model Influencer {
   user                 User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   socialAccounts       InfluencerSocial[]
   campaignApplications CampaignInfluencer[]
+  conversations        InfluencerConversation[]
 
   @@map("influencer")
 }
@@ -539,17 +541,17 @@ enum NotificationType {
 // ============================================================================
 
 model Conversation {
-  id          String    @id @default(uuid())
-  storeId     String
-  userId      String
-  lastMessage String?   @db.Text
-  lastMessageAt DateTime @default(now())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default(uuid())
+  storeId       String
+  userId        String
+  lastMessage   String?   @db.Text
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages    Message[]
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
 
   @@unique([storeId, userId])
   @@index([storeId])
@@ -567,7 +569,7 @@ model Message {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
   @@index([senderId])
@@ -577,4 +579,50 @@ model Message {
 enum SenderType {
   USER
   STORE
+  INFLUENCER
+}
+
+// ============================================================================
+// INFLUENCER MESSAGING SYSTEM
+// ============================================================================
+
+model InfluencerConversation {
+  id            String    @id @default(uuid())
+  influencerId  String
+  userId        String
+  lastMessage   String?   @db.Text
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  influencer Influencer           @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages   InfluencerMessage[]
+
+  @@unique([influencerId, userId])
+  @@index([influencerId])
+  @@index([userId])
+  @@map("influencer_conversation")
+}
+
+model InfluencerMessage {
+  id             String                 @id @default(uuid())
+  conversationId String
+  senderId       String
+  senderType     InfluencerSenderType
+  content        String                 @db.Text
+  isRead         Boolean                @default(false)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  conversation InfluencerConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("influencer_message")
+}
+
+enum InfluencerSenderType {
+  USER
+  INFLUENCER
 }

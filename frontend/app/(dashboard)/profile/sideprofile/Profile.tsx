@@ -103,28 +103,28 @@ const SocialProfile = ({ user }: { user: Profile }) => {
       title: "Profile Complete",
       description: "Completed profile setup",
       date: "Mar 15",
-      icon: <Star className="w-4 h-4 text-yellow-500" />
+      icon: <Star className="w-4 h-4 text-blue-500" />
     },
     {
       id: 2,
       title: "First Post",
       description: "Shared your first content",
       date: "Mar 16",
-      icon: <Star className="w-4 h-4 text-yellow-500" />
+      icon: <Star className="w-4 h-4 text-blue-500" />
     },
     {
       id: 3,
       title: "Engagement Master",
       description: "Achieved 100+ likes on a post",
       date: "Mar 20",
-      icon: <Star className="w-4 h-4 text-yellow-500" />
+      icon: <Star className="w-4 h-4 text-blue-500" />
     },
     {
       id: 4,
       title: "Community Builder",
       description: "Engaged with 20+ posts",
       date: "Mar 22",
-      icon: <Star className="w-4 h-4 text-yellow-500" />
+      icon: <Star className="w-4 h-4 text-blue-500" />
     }
   ];
 
@@ -169,11 +169,13 @@ const SocialProfile = ({ user }: { user: Profile }) => {
               {/* Profile Info */}
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{profile?.name || "Anonymous User"}</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                    <span className="capitalize">{profile?.name || "@usernam"}</span>
+                  </h1>
                   <span className="text-sm sm:text-base text-gray-600">{profile?.role || "User"}</span>
                 </div>
                 <div className="flex items-center space-x-1 mb-3">
-                  <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded font-medium">Regular User</span>
+                  <span className="text-xs text-blue-500 bg-blue-50 px-2 py-1 rounded font-medium">Rising Creator</span>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 mb-4 max-w-md">
                   Content creator passionate about lifestyle, tech, and travel. Building authentic connections through engaging storytelling.
@@ -181,40 +183,44 @@ const SocialProfile = ({ user }: { user: Profile }) => {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-xs sm:text-sm text-gray-500">
                   <div className="flex items-center space-x-1">
                     <MapPin className="w-4 h-4 flex-shrink-0" />
-                    <span>San Francisco, CA</span>
+                    <span>Kamapala, Uganda</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Calendar className="w-4 h-4 flex-shrink-0" />
-                    <span>Joined March 2024</span>
+                    <span>Joined March 2026</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Edit Profile Button */}
-            <button className="w-full sm:w-auto bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2">
+            <button className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2">
               <Settings className="w-4 h-4" />
               <span>Edit Profile</span>
             </button>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
-            <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600 mb-1">856</div>
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mt-6 sm:mt-8">
+            <div className="bg-blue-50 border border-blue-50 rounded p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-700 mb-1">856</div>
               <div className="text-xs sm:text-sm text-gray-500">Followers</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600 mb-1">234</div>
+            <div className="bg-blue-50 border border-blue-50 rounded p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-700 mb-1">672</div>
               <div className="text-xs sm:text-sm text-gray-500">Following</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600 mb-1">47</div>
+            <div className="bg-blue-50 border border-blue-50 rounded p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-700 mb-1">234</div>
               <div className="text-xs sm:text-sm text-gray-500">Posts</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
-              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-600 mb-1">4.2%</div>
-              <div className="text-xs sm:text-sm text-gray-500">Engagement</div>
+            <div className="bg-blue-50 border border-blue-50 rounded p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600 mb-1">67%</div>
+              <div className="text-xs sm:text-sm text-gray-500">Performance score</div>
+            </div>
+            <div className="bg-blue-50 border border-blue-50 rounded p-3 sm:p-4 lg:p-6 text-center hover:border-gray-300 transition-colors">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600 mb-1">4.2</div>
+              <div className="text-xs sm:text-sm text-gray-500">Engagement Rate</div>
             </div>
           </div>
         </div>
@@ -222,12 +228,12 @@ const SocialProfile = ({ user }: { user: Profile }) => {
         {/* Content Area */}
         <div className="flex-1 p-4 sm:p-6 lg:p-8">
           {/* Tabs */}
-          <div className="flex space-x-4 sm:space-x-8 mb-6 sm:mb-8 border-b border-gray-200 overflow-x-auto">
+          <div className="flex space-x-4 sm:space-x-8 mb-6 sm:mb-8 border-b border-gray-100 overflow-x-auto">
             <button
               onClick={() => setActiveTab('recent')}
               className={`pb-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                 activeTab === 'recent'
-                  ? 'border-gray-900 text-gray-900'
+                  ? 'border-blue-500 text-gray-900'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -237,7 +243,7 @@ const SocialProfile = ({ user }: { user: Profile }) => {
               onClick={() => setActiveTab('achievements')}
               className={`pb-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                 activeTab === 'achievements'
-                  ? 'border-gray-900 text-gray-900'
+                  ? 'border-blue-500 text-gray-900'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -247,7 +253,7 @@ const SocialProfile = ({ user }: { user: Profile }) => {
               onClick={() => setActiveTab('analytics')}
               className={`pb-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                 activeTab === 'analytics'
-                  ? 'border-gray-900 text-gray-900'
+                  ? 'border-blue-500 text-gray-900'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -259,7 +265,7 @@ const SocialProfile = ({ user }: { user: Profile }) => {
           {activeTab === 'recent' && (
             <div className="space-y-4 sm:space-y-6">
               {posts.map((post) => (
-                <div key={post.id} className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 hover:border-gray-300 transition-colors">
+                <div key={post.id} className="bg-white rounded p-4 sm:p-6 border border-gray-100 hover:bg-blue-50 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm sm:text-base text-gray-900 mb-4 break-words">{post.content} {post.emoji}</p>
@@ -288,10 +294,10 @@ const SocialProfile = ({ user }: { user: Profile }) => {
           {activeTab === 'achievements' && (
             <div className="space-y-3 sm:space-y-4">
               {achievements.map((achievement) => (
-                <div key={achievement.id} className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 hover:border-gray-300 transition-colors">
+                <div key={achievement.id} className="bg-white rounded p-4 sm:p-6 border border-gray-100 hover:bg-blue-50 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
                     <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
                         {achievement.icon}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -309,7 +315,7 @@ const SocialProfile = ({ user }: { user: Profile }) => {
           {activeTab === 'analytics' && (
             <div className="flex flex-col xl:flex-row gap-6 sm:gap-8">
               {/* Growth Metrics Card */}
-              <div className="flex-1 bg-white rounded-lg p-4 sm:p-6 border border-gray-200">
+              <div className="flex-1 bg-white rounded p-4 sm:p-6 border border-gray-100">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Growth Metrics</h3>
                 <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Your account growth over time</p>
                 
@@ -321,18 +327,18 @@ const SocialProfile = ({ user }: { user: Profile }) => {
                   
                   <div className="flex items-center justify-between">
                     <span className="text-xs sm:text-sm font-medium text-gray-700">Engagement Rate</span>
-                    <span className="text-xs sm:text-sm font-medium text-blue-600">4.2% average</span>
+                    <span className="text-xs sm:text-sm font-medium text-blue-500">4.2% Average</span>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <span className="text-xs sm:text-sm font-medium text-gray-700">Post Frequency</span>
-                    <span className="text-xs sm:text-sm font-medium text-purple-600">3 posts/week</span>
+                    <span className="text-xs sm:text-sm font-medium text-yellow-500">3 Posts per week</span>
                   </div>
                 </div>
               </div>
 
               {/* Top Content Card */}
-              <div className="flex-1 bg-white rounded-lg p-4 sm:p-6 border border-gray-200">
+              <div className="flex-1 bg-white rounded p-4 sm:p-6 border border-gray-100">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Top Content</h3>
                 <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Your best performing posts</p>
                 

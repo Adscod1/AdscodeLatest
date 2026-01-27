@@ -21,7 +21,7 @@ export const navLinks: NavLinkType[] = [
   },
   {
     href: "/influencer/all",
-    label: "Discover Influencers",
+    label: "Discover Creators",
     subText: "Find right creators",
     icon: Users,
     isActive: false,

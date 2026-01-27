@@ -152,3 +152,31 @@ export class ConversationResponseDto {
   @ApiPropertyOptional({ type: [MessageResponseDto] })
   messages?: MessageResponseDto[];
 }
+
+// ============================================================================
+// INFLUENCER MESSAGING DTOs
+// ============================================================================
+
+export class CreateInfluencerMessageDto {
+  @ApiProperty({ description: 'The influencer ID to send message to' })
+  @IsUUID()
+  @IsNotEmpty()
+  influencerId: string;
+
+  @ApiProperty({ description: 'Message content' })
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+}
+
+export class InfluencerReplyDto {
+  @ApiProperty({ description: 'Conversation ID' })
+  @IsUUID()
+  @IsNotEmpty()
+  conversationId: string;
+
+  @ApiProperty({ description: 'Message content' })
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+}

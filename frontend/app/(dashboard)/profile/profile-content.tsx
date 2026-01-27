@@ -85,90 +85,90 @@ const ProfileContent = ({ user }: { user: Profile }) => {
 
   return (
     <DashboardLayout profile={profile}>
-          <div className="overflow-x-hidden">
+          <div className="overflow-x-hidden bg-gray-50 p-2 sm:p-4 lg:p-4 w-full">
           {/* Welcome Banner */}
-          <div className="border border-2xl rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-black mb-6 sm:mb-8 relative overflow-hidden">
+          <div className="border rounded sm:rounded p-4 sm:p-6 lg:p-8 text-black mb-6 sm:mb-8 relative overflow-hidden bg-white border-gray-100">
             <div className="relative z-10">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
-                Welcome {profile?.name || "Anonymous User"}
+                Welcome, {profile?.name || "Anonymous User"}
               </h1>
               <p className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base">
-                Complete your first tasks to become an Aspiring Influencer
+                Complete your first tasks to become a Pro Creator
               </p>
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8">
-                <div className="bg-white/20 rounded-lg p-3 sm:p-4">
+                <div className="bg-white/20 rounded p-3 sm:p-4">
                   <p className="text-xs sm:text-sm">Current Level</p>
-                  <p className="text-lg sm:text-xl font-semibold">New User</p>
+                  <p className="text-lg sm:text-xl font-semibold">Rising Creator</p>
                 </div>
-                <div className="bg-white/20 rounded-lg p-3 sm:p-4">
+                <div className="bg-white/20 rounded p-3 sm:p-4">
                   <p className="text-xs sm:text-sm">Points Earned</p>
                   <p className="text-lg sm:text-xl font-semibold">125 / 500</p>
                 </div>
               </div>
               
               <div className="mt-4">
-                <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
-                  <span className="text-grey-500">Progress to Aspiring Influencer</span>
+                <div className="flex items-center justify-between text-xs sm:text-sm mb-2 rounded">
+                  <span className="text-grey-500">Progress to Pro Creator</span>
                   <span className="text-white font-medium">25%</span>
                 </div>
                 <div className="w-full bg-gray-200 bg-opacity-30 rounded-full h-2">
-                  <div className="bg-black h-2 rounded-full" style={{ width: '25%' }}></div>
+                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '35%' }}></div>
                 </div>
               </div>
             </div>
             
             {/* Decorative Star - Hidden on mobile */}
             <div className="absolute top-8 sm:top-16 right-4 sm:right-8 p-2 sm:p-4 bg-white/20 border rounded-full hidden sm:block">
-              <Star className="w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 text-yellow-400" />
+              <Star className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 text-yellow-500" />
             </div>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-            <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+            <div className="bg-white rounded sm:rounded p-4 sm:p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-gray-600 text-xs sm:text-sm">Reviews Written</h3>
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </div>
               <div className="text-xl sm:text-2xl font-bold text-gray-900">2/5</div>
               <p className="text-xs text-blue-500">3 more to advance</p>
             </div>
             
-            <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+            <div className="bg-white rounded sm:rounded p-4 sm:p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-gray-600 text-xs sm:text-sm">Social Accounts</h3>
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </div>
               <div className="text-xl sm:text-2xl font-bold text-gray-900">1/2</div>
-              <p className="text-xs text-green-600">Connect Instagram/TikTok</p>
+              <p className="text-xs text-blue-500">Connect Instagram/TikTok</p>
             </div>
             
-            <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+            <div className="bg-white rounded sm:rounded p-4 sm:p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-gray-600 text-xs sm:text-sm">Profile Complete</h3>
-                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-purple-100 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-gray-100 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
                 </div>
               </div>
               <div className="text-xl sm:text-2xl font-bold text-gray-900">80%</div>
-              <p className="text-xs text-purple-500">Add bio & photo</p>
+              <p className="text-xs text-blue-500">Add bio & photo</p>
             </div>
             
-            <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+            <div className="bg-white rounded sm:rounded p-4 sm:p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-gray-600 text-xs sm:text-sm">Points Earned</h3>
-                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </div>
               <div className="text-xl sm:text-2xl font-bold text-gray-900">125</div>
-              <p className="text-xs text-yellow-700">375 to next level</p>
+              <p className="text-xs text-blue-500">375 to next level</p>
             </div>
           </div>
 
           {/* Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Your Next Steps */}
-            <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200">
+            <div className="bg-white rounded sm:rounded border border-gray-100">
               <div className="p-4 sm:p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base sm:text-lg font-semibold text-gray-900">Your Next Steps</h2>
@@ -177,40 +177,40 @@ const ProfileContent = ({ user }: { user: Profile }) => {
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
-                <p className="text-gray-600 text-xs sm:text-sm mt-1">Complete these to become an Aspiring Influencer</p>
+                <p className="text-gray-600 text-xs sm:text-sm mt-1">Complete these to become a Pro Creator</p>
               </div>
               
               <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-                <div className="flex items-center space-x-3 sm:space-x-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 flex-shrink-0" />
+                <div className="flex items-center space-x-3 sm:space-x-4 p-3 bg-gray-50 rounded hover:bg-blue-50">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">Profile Setup</h3>
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">Profile setup</h3>
                     <p className="text-xs sm:text-sm text-gray-600">Added profile picture</p>
                   </div>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">Complete</span>
+                  <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">Complete</span>
                 </div>
                 
-                <div className="flex items-center space-x-3 sm:space-x-4 p-3 border bg-blue-50 border-gray-200 rounded-lg hover:bg-gray-50">
-                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
+                <div className="flex items-center space-x-3 sm:space-x-4 p-3 border bg-blue-50 rounded hover:bg-gray-50 border-none">
+                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">Write 3 More Reviews</h3>
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">Write 3 more reviews</h3>
                     <p className="text-xs sm:text-sm text-gray-600">Progress: 2/5 completed</p>
                   </div>
-                  <button className="bg-gray-900 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-800 whitespace-nowrap">
+                  <button className="bg-blue-500 text-white px-2 sm:px-3 py-1.5 rounded-full text-xs sm:text-sm font-base hover:bg-blue-600 whitespace-nowrap">
                     <span className="hidden sm:inline">Start Writing</span>
                     <span className="sm:hidden">Start</span>
                   </button>
                 </div>
                 
-                <div className="flex items-center space-x-3 sm:space-x-4 p-3 border bg-yellow-50 border-gray-200 rounded-lg hover:bg-gray-50">
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-600" />
+                <div className="flex items-center space-x-3 sm:space-x-4 p-3 border bg-blue-50 border-none rounded hover:bg-gray-50">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900 text-sm sm:text-base">Connect Social Media</h3>
                     <p className="text-xs sm:text-sm text-gray-600">Link Instagram or TikTok account</p>
                   </div>
-                  <button className="bg-blue-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 whitespace-nowrap">
+                  <button className="bg-blue-500 text-white px-2 sm:px-3 py-1.5 rounded-full text-xs sm:text-sm font-base hover:bg-blue-500 whitespace-nowrap">
                     <span className="hidden sm:inline">Connect Now</span>
                     <span className="sm:hidden">Connect</span>
                   </button>
@@ -219,24 +219,24 @@ const ProfileContent = ({ user }: { user: Profile }) => {
             </div>
 
             {/* Your Journey */}
-            <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200">
+            <div className="bg-white rounded sm:rounded border border-gray-100">
               <div className="p-4 sm:p-6 border-b border-gray-200">
                 <h2 className="text-base sm:text-lg font-semibold text-gray-900">Your Journey</h2>
                 <p className="text-gray-600 text-xs sm:text-sm mt-1">Progression through Adscod levels</p>
               </div>
               
               <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                {/* Current Level - New User */}
-                <div className="relative bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200">
+                {/* Current Level - Rising Creator */}
+                <div className="relative bg-green-50 p-3 sm:p-4 rounded border border-none">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                      <span className="font-medium text-gray-900 text-sm sm:text-base">New User</span>
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                      <span className="font-medium text-gray-700 text-sm sm:text-base">Rising Creator</span>
                     </div>
                     <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">Current Level</span>
                   </div>
                   
-                  <div className="rounded-lg p-3 sm:p-4">
+                  <div className="rounded p-3 sm:p-4">
                     <p className="font-medium text-green-600 mb-3 text-sm sm:text-base">Welcome to Adscod! Start your journey here.</p>
                     <ul className="text-xs sm:text-sm text-gray-600 space-y-2">
                       <li className="flex items-center space-x-2">
@@ -255,58 +255,59 @@ const ProfileContent = ({ user }: { user: Profile }) => {
                   </div>
                 </div>
 
-                {/* Next Level - Aspiring Influencer */}
-                <div className="relative border border-blue-200 p-3 sm:p-4 rounded-lg">
+                {/* Next Level - Pro Creator */}
+                <div className="relative bg-blue-50 border border-blue-50 p-3 sm:p-4 rounded">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
-                      <span className="font-medium text-gray-900 text-sm sm:text-base">Aspiring Influencer</span>
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-gray-300 rounded-full bg-gray-100"></div>
+                      <span className="font-medium text-gray-900 text-sm sm:text-base">Pro Creator</span>
                     </div>
                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">Next Level</span>
                   </div>
                   
-                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+                  <div className="bg-blue-50 p-3 sm:p-4 border border-blue-50">
                     <p className="font-medium text-gray-900 mb-3 text-sm sm:text-base">Build your audience and credibility</p>
                     <ul className="text-xs sm:text-sm text-gray-600 space-y-2">
                       <li className="flex items-center space-x-2">
                         <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 rounded-full flex-shrink-0"></div>
-                        <span>5+ quality reviews</span>
+                        <span>50+ quality reviews</span>
                       </li>
                       <li className="flex items-center space-x-2">
                         <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 rounded-full flex-shrink-0"></div>
-                        <span>500+ social followers</span>
+                        <span>1000+ followers</span>
                       </li>
                       <li className="flex items-center space-x-2">
                         <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 rounded-full flex-shrink-0"></div>
-                        <span>Regular content creation</span>
+                        <span>60%+ performance score and 3.5+ rating</span>
                       </li>
                     </ul>
                   </div>
                 </div>
 
-                {/* Future Level - Verified Influencer */}
+                {/* Future Level - Elite Partner */}
                 <div className="relative opacity-60">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-gray-300 rounded-full bg-gray-100"></div>
-                      <span className="font-medium text-gray-500 text-sm sm:text-base">Verified Influencer</span>
+                      <span className="font-medium text-gray-900 text-sm sm:text-base">Elite Partner</span>
                     </div>
-                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium whitespace-nowrap">Future</span>
+                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">Future</span>
                   </div>
                   
-                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
-                    <p className="font-medium text-gray-500 mb-3 text-sm sm:text-base">Access exclusive brand partnerships</p>
+                  <div className="bg-gray-50 rounded p-3 sm:p-4 border border-gray-50">
+                    <p className="font-medium text-gray-700 mb-3 text-sm sm:text-base">Access exclusive brand partnerships</p>
                     <ul className="text-xs sm:text-sm text-gray-500 space-y-2">
                       <li className="flex items-center space-x-2">
                         <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 rounded-full flex-shrink-0"></div>
-                        <span>10+ reviews, 4.5+ rating</span>
+                        <span>80%+ performance score and 4.5+ rating</span>
                       </li>
                       <li className="flex items-center space-x-2">
                         <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 rounded-full flex-shrink-0"></div>
-                        <span>5000+ views per post</span>
+                        <span>5000+ average views per post</span>
                       </li>
                       <li className="flex items-center space-x-2">
                         <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-300 rounded-full flex-shrink-0"></div>
-                        <span>Brand collaboration ready</span>
+                        <span>50+ Brand collaborations ready</span>
                       </li>
                     </ul>
                   </div>

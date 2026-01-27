@@ -229,10 +229,16 @@ export default function AnalyticsDashboard() {
             <p className="text-gray-600 mt-1 text-xs sm:text-sm md:text-base">Track your store's performance and insights</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-            <select className="border border-gray-300 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm w-full sm:w-auto">
+            <select className="border border-gray-200 rounded px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm w-full sm:w-auto">
+              <option>Today</option>
+              <option>Yesterday</option>
+              <option>Last 7 days</option>
               <option>Last 30 days</option>
+              <option>Last 60 days</option>
+              <option>Last 90 days</option>
+              <option>Last year</option>
             </select>
-            <button className="bg-gray-900 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium w-full sm:w-auto">
+            <button className="bg-blue-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded text-xs sm:text-sm font-medium hover:bg-blue-600 w-full sm:w-auto">
               Export
             </button>
           </div>
@@ -240,6 +246,7 @@ export default function AnalyticsDashboard() {
 
         {/* Top Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
+
           <MetricCard
             title="Revenue"
             value="$45,231"
@@ -271,7 +278,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Secondary Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8 border border-gray-100 rounded">
           <MetricCard
             title="Page Views"
             value="18,420"
@@ -312,7 +319,7 @@ export default function AnalyticsDashboard() {
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600"></div>
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600"></div>
                   <span className="text-gray-600">Actual: $45,231</span>
                 </div>
                 <div className="flex items-center gap-2">

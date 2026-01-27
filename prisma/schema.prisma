@@ -27,6 +27,7 @@ model User {
   notifications Notification[]
   comments      Comment[]
   conversations Conversation[]
+  influencerConversations InfluencerConversation[]
 
   @@map("user")
 }
@@ -390,6 +391,7 @@ model Influencer {
   user                 User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   socialAccounts       InfluencerSocial[]
   campaignApplications CampaignInfluencer[]
+  conversations        InfluencerConversation[]
 
   @@map("influencer")
 }
@@ -577,4 +579,50 @@ model Message {
 enum SenderType {
   USER
   STORE
+  INFLUENCER
+}
+
+// ============================================================================
+// INFLUENCER MESSAGING SYSTEM
+// ============================================================================
+
+model InfluencerConversation {
+  id            String    @id @default(uuid())
+  influencerId  String
+  userId        String
+  lastMessage   String?   @db.Text
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  influencer Influencer           @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages   InfluencerMessage[]
+
+  @@unique([influencerId, userId])
+  @@index([influencerId])
+  @@index([userId])
+  @@map("influencer_conversation")
+}
+
+model InfluencerMessage {
+  id             String                 @id @default(uuid())
+  conversationId String
+  senderId       String
+  senderType     InfluencerSenderType
+  content        String                 @db.Text
+  isRead         Boolean                @default(false)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  conversation InfluencerConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("influencer_message")
+}
+
+enum InfluencerSenderType {
+  USER
+  INFLUENCER
 }

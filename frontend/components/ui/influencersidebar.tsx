@@ -2,8 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import NotificationBell from './notification-bell';
+import { messagesApi } from '@/lib/api-client';
 import { 
   Home, 
   BarChart3, 
@@ -18,6 +21,26 @@ import {
   Star,
   Settings
 } from 'lucide-react';
+
+// Component to display unread messages count for influencer
+const InfluencerUnreadBadge = () => {
+  const { data: unreadData } = useQuery({
+    queryKey: ['influencer-inbox-unread-count'],
+    queryFn: () => messagesApi.getInfluencerInboxUnreadCount(),
+    refetchInterval: 30000,
+    staleTime: 10000,
+  });
+
+  const count = unreadData?.count || 0;
+
+  if (count === 0) return null;
+
+  return (
+    <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+};
 
 interface InfluencerSidebarProps {
   firstName: string;
@@ -38,15 +61,12 @@ const InfluencerSidebar = ({
     <div className={`w-64 bg-white shadow-sm border-r border-gray-200 h-screen ${className}`}>
       <div className="p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+          <Link href="/" className="flex items-center">
+            <div className="mr-2 bg-blue-500 rounded">
+              <Image src="/logo.svg" alt="Adscod Logo" width={32} height={32} />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Adscod</h1>
-              <p className="text-xs text-gray-500">Influencer Platform</p>
-            </div>
-          </div>
+            <span className="text-xl font-bold text-gray-900">Adscod</span>
+          </Link>
           
           {/* Notification Bell */}
           <NotificationBell />
@@ -124,9 +144,7 @@ const InfluencerSidebar = ({
         >
           <MessageSquare className="w-5 h-5" />
           <span className="flex-1">Messages</span>
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-black text-white">
-            5
-          </span>
+          <InfluencerUnreadBadge />
         </Link>
       </nav>
 
