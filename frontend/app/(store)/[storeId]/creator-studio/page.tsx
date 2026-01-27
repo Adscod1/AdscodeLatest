@@ -324,13 +324,14 @@ const CreatorStudioDashboard = () => {
           <p className="text-sm text-gray-600 mt-1">Track ROI and campaign effectiveness</p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option>Last 30 days</option>
+          <select className="px-4 py-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option>Last 7 days</option>
+            <option>Last 30 days</option>
+            <option>Last 60 days</option>
             <option>Last 90 days</option>
             <option>Last 12 months</option>
           </select>
-          <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
+          <button className="px-4 py-2 border border-gray-200 rounded text-sm hover:bg-gray-50 flex items-center gap-2">
             <CalendarIcon className="w-4 h-4" />
             Custom Range
           </button>
@@ -340,7 +341,7 @@ const CreatorStudioDashboard = () => {
       {/* Main Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Campaign Performance Card */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="bg-white rounded border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-blue-600" />
@@ -353,16 +354,16 @@ const CreatorStudioDashboard = () => {
             <div>
               <div className="flex justify-between items-baseline mb-1">
                 <span className="text-sm text-gray-600 uppercase tracking-wide">TOTAL REACH</span>
-                <span className="text-xs text-gray-600 font-medium">+12% vs last month</span>
+                <span className="text-xs text-green-600 font-medium">+12% vs last month</span>
               </div>
-              <p className="text-xl  text-gray-900">2.4M</p>
+              <p className="text-xl text-bold text-gray-900">2.4M</p>
             </div>
 
             {/* Engagement Rate */}
             <div>
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-sm text-gray-600 uppercase tracking-wide">ENGAGEMENT RATE</span>
-                <span className="text-xs text-gray-600 font-medium">+0.8% vs last month</span>
+                <span className="text-sm text-gray-700 uppercase tracking-wide">ENGAGEMENT RATE</span>
+                <span className="text-xs text-green-600 font-medium">+0.8% vs last month</span>
               </div>
               <p className="text-xl  text-gray-900">4.2%</p>
             </div>
@@ -385,11 +386,11 @@ const CreatorStudioDashboard = () => {
                 <span className="text-base font-semibold text-gray-900">1,847</span>
               </div>
             </div>
-          </div>
+          </div> 
         </div>
 
         {/* Financial Metrics Card */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="bg-white rounded border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <div className="text-lg font-bold text-green-600">$</div>
@@ -399,8 +400,8 @@ const CreatorStudioDashboard = () => {
 
           {/* ROI Highlight Box */}
           <div className=" p-6 mb-6 border-b border-gray-200">
-            <p className="text-sm text-green-800 mb-2 uppercase tracking-wide">Return on Investment</p>
-            <p className="text-5xl font-bold text-blue-600 mb-1">200%</p>
+            <p className="text-sm text-gray-600 mb-2 uppercase tracking-wide">Return on Investment</p>
+            <p className="text-3xl font-bold text-blue-500 mb-1">200%</p>
             <p className="text-sm text-gray-800">Excellent performance</p>
           </div>
 
@@ -1121,15 +1122,15 @@ const CreatorStudioDashboard = () => {
     // Show empty state if no applications
     if (applications.length === 0) {
       return (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="w-8 h-8 text-gray-400" />
+        <div className="bg-white rounded border border-gray-100 p-12 text-center">
+          <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-6 h-6 text-blue-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Yet</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No applications yet</h3>
           <p className="text-gray-600 mb-6">
-            You haven&apos;t received any influencer applications yet. Make sure your campaigns are published to start receiving applications.
+            You haven&apos;t received any influencer applications yet.<br/> Make sure your campaigns are published to start receiving applications.
           </p>
-          <Link href={`/${storeId}/campaign`} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <Link href={`/${storeId}/campaign`} className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             View Campaigns
           </Link>
         </div>
