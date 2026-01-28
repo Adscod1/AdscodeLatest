@@ -230,7 +230,7 @@ const SpecificInformationPage = () => {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-900">Section Image</Label>
                     {watch("benefitsSectionImage") ? (
-                      <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
+                      <div className="relative w-full h-28 rounded overflow-hidden border border-gray-100">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={watch("benefitsSectionImage")}
@@ -251,7 +251,7 @@ const SpecificInformationPage = () => {
                         </Button>
                       </div>
                     ) : (
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg">
+                      <div className="border-2 border-dashed border-gray-200 rounded">
                         <FileUpload
                           type="product"
                           onUpload={handleImageUpload}
@@ -261,7 +261,7 @@ const SpecificInformationPage = () => {
                           className="border-0"
                         >
                           <div className="py-16 flex flex-col items-center justify-center text-center">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+                            <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center mb-3">
                               <svg
                                 className="w-6 h-6 text-gray-400"
                                 fill="none"
@@ -297,7 +297,7 @@ const SpecificInformationPage = () => {
                     {fields.map((field, index) => (
                       <div
                         key={field.id}
-                        className="bg-gray-50 rounded-lg p-4 space-y-3 relative"
+                        className="bg-gray-50 rounded p-4 space-y-3 relative"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <Input
@@ -328,7 +328,7 @@ const SpecificInformationPage = () => {
                     <button
                       type="button"
                       onClick={handleAddItem}
-                      className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 flex items-center justify-center text-sm text-blue-600 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                      className="w-full border-2 border-dashed border-gray-200 rounded py-4 flex items-center justify-center text-sm text-blue-600 hover:border-gray-400 hover:bg-gray-50 transition-colors"
                     >
                       <span className="mr-2">+</span> Add Item
                     </button>
@@ -348,7 +348,7 @@ const SpecificInformationPage = () => {
                     {ingredientFields.map((field, index) => (
                       <div
                         key={field.id}
-                        className="bg-gray-50 rounded-lg p-4 space-y-3"
+                        className="bg-gray-50 rounded p-4 space-y-3"
                       >
                         <div className="flex items-start justify-between gap-3 mb-3">
                           <Label className="text-sm font-medium text-gray-900">Name</Label>
@@ -372,7 +372,7 @@ const SpecificInformationPage = () => {
                         <div className="space-y-2">
                           <Label className="text-sm font-medium text-gray-900">Image</Label>
                           {watch(`ingredientItems.${index}.image`) ? (
-                            <div className="relative w-full h-32 rounded-lg overflow-hidden border border-gray-200">
+                            <div className="relative w-full h-28 rounded overflow-hidden border border-gray-200">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={watch(`ingredientItems.${index}.image`)}
@@ -392,7 +392,7 @@ const SpecificInformationPage = () => {
                               </Button>
                             </div>
                           ) : (
-                            <div className="border-2 border-dashed border-gray-300 rounded-lg">
+                            <div className="border-2 border-dashed border-gray-200 rounded">
                               <FileUpload
                                 type="product"
                                 onUpload={(url) => handleIngredientImageUpload(url, index)}
@@ -402,7 +402,7 @@ const SpecificInformationPage = () => {
                                 className="border-0"
                               >
                                 <div className="py-12 flex flex-col items-center justify-center text-center">
-                                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mb-2">
+                                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-2">
                                     <svg
                                       className="w-5 h-5 text-gray-400"
                                       fill="none"
@@ -444,7 +444,7 @@ const SpecificInformationPage = () => {
                     <button
                       type="button"
                       onClick={handleAddIngredient}
-                      className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 flex items-center justify-center text-sm text-blue-600 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                      className="w-full border-2 border-dashed border-gray-200 rounded py-4 flex items-center justify-center text-sm text-blue-600 hover:border-gray-400 hover:bg-gray-50 transition-colors"
                     >
                       <span className="mr-2">+</span> Add Item
                     </button>
@@ -464,7 +464,7 @@ const SpecificInformationPage = () => {
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-900">Tutorial Video</Label>
                     {watch("howToUseVideo") ? (
-                      <div className="relative w-full rounded-lg overflow-hidden border border-gray-200">
+                      <div className="relative w-full rounded overflow-hidden border border-gray-200">
                         <video
                           src={watch("howToUseVideo")}
                           className="w-full h-64 object-cover"
@@ -484,7 +484,7 @@ const SpecificInformationPage = () => {
                         </Button>
                       </div>
                     ) : (
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg">
+                      <div className="border-2 border-dashed border-gray-200 rounded">
                         <FileUpload
                           type="video"
                           onUpload={handleVideoUpload}
@@ -494,7 +494,7 @@ const SpecificInformationPage = () => {
                           className="border-0"
                         >
                           <div className="py-16 flex flex-col items-center justify-center text-center">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+                            <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center mb-3">
                               <svg
                                 className="w-6 h-6 text-gray-400"
                                 fill="none"
@@ -549,14 +549,14 @@ const SpecificInformationPage = () => {
                       <button
                         type="button"
                         onClick={handleAddFaq}
-                        className="w-full border-2 border-dashed border-gray-300 rounded-lg py-4 flex items-center justify-center text-sm text-blue-600 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                        className="w-full border-2 border-dashed border-gray-200 rounded py-4 flex items-center justify-center text-sm text-blue-600 hover:border-gray-400 hover:bg-gray-50 transition-colors"
                       >
                         <span className="mr-2">+</span> Add Question
                       </button>
                     ) : (
                       <div className="space-y-6">
                         {faqFields.map((field, index) => (
-                          <div key={field.id} className="bg-gray-50 rounded-lg p-6 space-y-4">
+                          <div key={field.id} className="bg-gray-50 rounded p-6 space-y-4">
                             <div className="flex items-start justify-between gap-3">
                               <Label className="text-sm font-semibold text-gray-900">Question</Label>
                               <Button

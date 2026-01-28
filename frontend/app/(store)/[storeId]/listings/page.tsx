@@ -121,7 +121,7 @@ const StoreListings = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="bg-gray-50 p-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -130,7 +130,7 @@ const StoreListings = () => {
             Manage your product and service catalog
           </p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => setIsDialogOpen(true)} className="rounded">
           <Plus className="w-4 h-4 mr-2" />
           Add Listing
         </Button>
@@ -138,12 +138,12 @@ const StoreListings = () => {
 
       {/* Search and Filters */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
-        <div className="relative flex-1 max-w-full lg:max-w-2xl">
+        <div className="relative flex-1 max-w-full lg:max-w-3xl">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <Input type="text" placeholder="Search products" className="pl-10 w-full" />
+          <Input type="text" placeholder="Search products" className="pl-10 w-full rounded" />
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
-          <Button variant="outline" size="sm" className="w-full sm:w-auto">
+          <Button variant="ghost" size="sm" className="w-full sm:w-auto rounded border border-gray-200">
             <SlidersHorizontal className="w-4 h-4 mr-2" />
             Filter
           </Button>
@@ -162,7 +162,7 @@ const StoreListings = () => {
       </div>
 
       {/* Products Table */}
-      <div className="rounded-lg border">
+      <div className="rounded border">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -184,7 +184,7 @@ const StoreListings = () => {
                 </TableRow>
               ) : products?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={6} className="text-start">
                     No products found. Start by adding a new product.
                   </TableCell>
                 </TableRow>
@@ -317,11 +317,18 @@ const StoreListings = () => {
             Showing {products?.length || 0} product
             {(products?.length || 0) !== 1 ? "s" : ""}
           </span>
-          <div className="flex items-center justify-center sm:justify-end space-x-2">
-            <Button variant="outline" size="sm" disabled>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded bg-gray-50 text-gray-800 hover:bg-gray-100 border-gray-200"
+            >
               Previous
             </Button>
-            <Button variant="outline" size="sm" disabled>
+            <Button 
+              size="sm" 
+              className="rounded bg-blue-500 text-white hover:bg-blue-600"
+            >
               Next
             </Button>
           </div>

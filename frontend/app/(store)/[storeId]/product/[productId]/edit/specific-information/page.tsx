@@ -216,7 +216,7 @@ const EditSpecificInformationPage = () => {
               <div className="space-y-2">
                 <Label>Section Image</Label>
                 {watch("benefitsSectionImage") ? (
-                  <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                  <div className="relative w-full h-42 rounded overflow-hidden border">
                     <img
                       src={watch("benefitsSectionImage")}
                       alt="Benefits section"
@@ -233,7 +233,7 @@ const EditSpecificInformationPage = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                  <div className="border-2 border-dashed rounded p-8 text-center">
                     <FileUpload
                       type="product"
                       onUpload={handleImageUpload}
@@ -251,7 +251,7 @@ const EditSpecificInformationPage = () => {
               <div className="space-y-4">
                 <Label>Items</Label>
                 {fields.map((field, index) => (
-                  <div key={field.id} className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div key={field.id} className="bg-gray-50 rounded p-4 space-y-3">
                     <div className="flex gap-3">
                       <Input
                         {...register(`benefitItems.${index}.title`)}
@@ -277,7 +277,7 @@ const EditSpecificInformationPage = () => {
                 <button
                   type="button"
                   onClick={() => append({ title: "", description: "" })}
-                  className="w-full border-2 border-dashed rounded-lg py-4 text-sm text-blue-600 hover:bg-gray-50"
+                  className="w-full border-2 border-dashed rounded py-4 text-sm text-blue-600 hover:bg-gray-50"
                 >
                   + Add Item
                 </button>
@@ -298,7 +298,7 @@ const EditSpecificInformationPage = () => {
               <div className="space-y-4">
                 <Label>Items</Label>
                 {ingredientFields.map((field, index) => (
-                  <div key={field.id} className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div key={field.id} className="bg-gray-50 rounded p-4 space-y-3">
                     <div className="flex gap-3">
                       <Input
                         {...register(`ingredientItems.${index}.name`)}
@@ -324,7 +324,7 @@ const EditSpecificInformationPage = () => {
                 <button
                   type="button"
                   onClick={() => appendIngredient({ name: "", image: "", description: "" })}
-                  className="w-full border-2 border-dashed rounded-lg py-4 text-sm text-blue-600 hover:bg-gray-50"
+                  className="w-full border-2 border-dashed rounded py-4 text-sm text-blue-600 hover:bg-gray-50"
                 >
                   + Add Item
                 </button>
@@ -366,7 +366,7 @@ const EditSpecificInformationPage = () => {
 
               <div className="space-y-4">
                 {faqFields.map((field, index) => (
-                  <div key={field.id} className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div key={field.id} className="bg-gray-50 rounded p-4 space-y-3">
                     <div className="flex gap-3">
                       <Input
                         {...register(`faqItems.${index}.question`)}
@@ -392,7 +392,7 @@ const EditSpecificInformationPage = () => {
                 <button
                   type="button"
                   onClick={() => appendFaq({ question: "", answer: "" })}
-                  className="w-full border-2 border-dashed rounded-lg py-4 text-sm text-blue-600 hover:bg-gray-50"
+                  className="w-full border-2 border-dashed rounded py-4 text-sm text-blue-600 hover:bg-gray-50"
                 >
                   + Add FAQ
                 </button>

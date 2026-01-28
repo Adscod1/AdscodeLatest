@@ -25,13 +25,13 @@ export default function AddCatalogDialog({ isOpen, onClose, storeId }: AddCatalo
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl w-full max-w-4xl p-8 relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded w-full max-w-4xl p-8 relative max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors hover:bg-gray-100 rounded p-2"
         >
-          <X size={24} />
+          <X size={16} />
         </button>
         
         <button 
@@ -46,11 +46,11 @@ export default function AddCatalogDialog({ isOpen, onClose, storeId }: AddCatalo
 
         {/* Title Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">
             What would you like to add?
           </h1>
-          <p className="text-gray-500 text-lg">
-            Choose whether you're adding a product or a service to your catalog
+          <p className="text-gray-500 text-md">
+            Choose whether you're adding a product or service to your catalog
           </p>
         </div>
 
@@ -59,30 +59,30 @@ export default function AddCatalogDialog({ isOpen, onClose, storeId }: AddCatalo
           {/* Product Card */}
           <button 
             onClick={handleProductClick}
-            className="flex-1 bg-white rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all text-center group"
+            className="flex-1 bg-white rounded p-8 border border-gray-100 hover:shadow-lg hover:border-gray-100 transition-all text-center group"
           >
-            <div className="bg-gray-100 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-gray-200 transition-colors mx-auto">
+            <div className="bg-gray-100 w-14 h-14 rounded-lg flex items-center justify-center mb-6 group-hover:bg-gray-100 transition-colors mx-auto">
               <Package size={32} className="text-gray-700" />
             </div>
             
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Product</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-3">Product</h2>
             
             <p className="text-gray-500 mb-6 leading-relaxed">
-              Physical or digital items that you sell with inventory tracking
+              Physical or digital items that you <br/> sell with inventory tracking
             </p>
             
             <ul className="space-y-2 text-left">
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-gray-400 mt-1">•</span>
+              <li className="flex items-center gap-2 text-gray-600">
+                <span className="text-gray-400">•</span>
                 <span>Inventory management</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-gray-400 mt-1">•</span>
-                <span>Shipping & delivery options</span>
+              <li className="flex items-center gap-2 text-gray-600">
+                <span className="text-gray-400">•</span>
+                <span>Shipping and delivery options</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-gray-400 mt-1">•</span>
-                <span>Product variants & SKUs</span>
+              <li className="flex items-center gap-2 text-gray-600">
+                <span className="text-gray-400">•</span>
+                <span>Product variants and SKUs</span>
               </li>
             </ul>
           </button>
@@ -90,29 +90,29 @@ export default function AddCatalogDialog({ isOpen, onClose, storeId }: AddCatalo
           {/* Service Card */}
           <button 
             onClick={handleServiceClick}
-            className="flex-1 bg-white rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:border-blue-200 transition-all text-center group"
+            className="flex-1 bg-white rounded p-8 border border-gray-100 hover:shadow-lg hover:border-blue-100 transition-all text-center group"
           >
-            <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors mx-auto">
+            <div className="bg-blue-50 w-14 h-14 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors mx-auto">
               <Briefcase size={32} className="text-blue-500" />
             </div>
             
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Service</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-3">Service</h2>
             
             <p className="text-gray-500 mb-6 leading-relaxed">
-              Professional services or bookings that you offer to customers
+              Professional services or bookings <br/> that you offer to customers
             </p>
             
             <ul className="space-y-2 text-left">
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-gray-400 mt-1">•</span>
-                <span>Booking & scheduling</span>
+              <li className="flex items-center gap-2 text-gray-600">
+                <span className="text-gray-400">•</span>
+                <span>Booking and scheduling</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-gray-400 mt-1">•</span>
-                <span>Duration & pricing</span>
+              <li className="flex items-center gap-2 text-gray-600">
+                <span className="text-gray-400">•</span>
+                <span>Duration and pricing</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-600">
-                <span className="text-gray-400 mt-1">•</span>
+              <li className="flex items-center gap-2 text-gray-600">
+                <span className="text-gray-400">•</span>
                 <span>Staff assignment</span>
               </li>
             </ul>

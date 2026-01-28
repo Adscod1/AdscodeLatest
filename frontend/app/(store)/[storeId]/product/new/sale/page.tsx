@@ -321,8 +321,8 @@ const NewProductSaleInformation = () => {
             {/* Sale Information Form */}
             <Card>
               <CardHeader>
-                <CardTitle>Pricing & Sales</CardTitle>
-                <p className="text-sm text-gray-500">
+                <CardTitle>Pricing and Sales</CardTitle>
+                <p className="text-sm text-gray-500 space-y-4">
                   Set your pricing and manage inventory
                 </p>
               </CardHeader>

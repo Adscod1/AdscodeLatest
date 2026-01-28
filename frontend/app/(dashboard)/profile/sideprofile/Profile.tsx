@@ -170,7 +170,7 @@ const SocialProfile = ({ user }: { user: Profile }) => {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-                    <span className="capitalize">{profile?.name || "@usernam"}</span>
+                    <span className="capitalize">{profile?.name || "@username"}</span>
                   </h1>
                   <span className="text-sm sm:text-base text-gray-600">{profile?.role || "User"}</span>
                 </div>

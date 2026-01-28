@@ -24,6 +24,7 @@ import { useProductStore } from "@/store/use-product-store";
 import { FileUpload } from "@/components/ui/file-upload";
 import { X } from "lucide-react";
 import api from "@/lib/api-client";
+import {Plus} from "lucide-react";
 
 interface ExtendedCreateProductInput extends CreateProductInput {
   brand?: string;
@@ -267,7 +268,7 @@ const CreateNewProduct = () => {
 
             {/* Basic Information Form */}
             <Card>
-              <CardHeader>
+              <CardHeader className="space-y-1">
                 <CardTitle>{isEditMode ? 'Edit Product - Basic Information' : 'Basic Information'}</CardTitle>
                 <p className="text-sm text-gray-500">
                   {isEditMode ? 'Update the details about your product' : 'Provide essential details about your product'}
@@ -276,12 +277,12 @@ const CreateNewProduct = () => {
               <CardContent>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
                   {/* Info Banner */}
-                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Info className="w-3 h-3 text-purple-600" />
+                  <div className="bg-gray-50 border border-gray-100 rounded p-4 flex items-start gap-3 mt-2">
+                    <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Info className="w-3 h-3 text-gray-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-purple-900">
+                      <p className="text-sm font-medium text-gray-700">
                         Creating a Product Listing
                       </p>
                     </div>
@@ -295,7 +296,7 @@ const CreateNewProduct = () => {
                     <Input
                       id="title"
                       {...register("title", { required: true })}
-                      placeholder="e.g., Wireless Headphones Pro"
+                      placeholder="e.g., Wireless Headphones, iPhone 17 Pro"
                     />
                   </div>
 
@@ -520,9 +521,9 @@ const CreateNewProduct = () => {
                         maxSize={5}
                         endpoint="/product/media"
                       >
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 hover:border-gray-400 hover:bg-gray-50 transition-all cursor-pointer">
+                        <div className="border-2 border-dashed border-gray-200 rounded p-4 sm:p-8 hover:border-gray-300 hover:bg-gray-50 transition-all cursor-pointer">
                           <div className="flex flex-col items-center justify-center text-center">
-                            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                            <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center mb-4">
                               <svg
                                 className="w-8 h-8 text-gray-400"
                                 fill="none"
@@ -595,20 +596,20 @@ const CreateNewProduct = () => {
                         ))}
 
                         {/* Add new image button */}
+
                         {productImages.length + productVideos.length < 10 && (
-                          <div className="aspect-square">
+                          <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg overflow-hidden flex items-center justify-center">
                             <FileUpload
                               type="product"
                               onUpload={handleImageUpload}
                               accept="image/*"
                               maxSize={5}
                               endpoint="/product/media"
-                              className="h-full"
+                              className="h-full w-full flex items-center justify-center hover:bg-gray-100 transition-colors"
                             >
-                              <div className="flex items-center justify-center h-full border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-                                <Button variant="ghost" size="icon" type="button">
-                                  +
-                                </Button>
+                              <div className="flex flex-col items-center justify-center h-full w-full cursor-pointer">
+                                <Plus/>
+                                <span className="text-sm text-gray-700">Image</span>
                               </div>
                             </FileUpload>
                           </div>
@@ -616,19 +617,18 @@ const CreateNewProduct = () => {
 
                         {/* Add new video button */}
                         {productImages.length + productVideos.length < 10 && productVideos.length < 3 && (
-                          <div className="aspect-square">
+                          <div className="aspect-square justify-start border-2 border-dashed border-gray-300 rounded-lg overflow-hidden flex items-center justify-center">
                             <FileUpload
                               type="video"
                               onUpload={handleVideoUpload}
                               accept="video/*"
                               maxSize={30}
                               endpoint="/product/media"
-                              className="h-full"
+                              className="h-full w-full flex items-center justify-center hover:bg-gray-100 transition-colors"
                             >
-                              <div className="flex flex-col items-center justify-center h-full border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-                                <Button variant="ghost" size="sm" type="button">
-                                  + Video
-                                </Button>
+                              <div className="flex flex-col items-center justify-center h-full w-full cursor-pointer">
+                                <Plus/>
+                                <span className="text-sm text-gray-700">Video</span>
                               </div>
                             </FileUpload>
                           </div>
