@@ -58,6 +58,7 @@ const AllStoresCards = () => {
     setUserRole("User");
     setShowAddUserModal(false);
   };
+  
 
   const handleCancelAddUser = () => {
     setUserEmail("");
