@@ -566,19 +566,42 @@ export default function ProductDetailPage() {
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="bg-white rounded shadow-sm p-6 mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Related products</h2>
-              <button className="text-blue-600 hover:text-blue-700 font-medium">
-                View all →
-              </button>
-            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Related products</h2>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="relative px-14">
+              {/* Left Chevron */}
+              <button
+                onClick={() => {
+                  const container = document.getElementById('related-products-scroll');
+                  if (container) container.scrollBy({ left: -300, behavior: 'smooth' });
+                }}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border border-gray-200"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-600" />
+              </button>
+              
+              {/* Right Chevron */}
+              <button
+                onClick={() => {
+                  const container = document.getElementById('related-products-scroll');
+                  if (container) container.scrollBy({ left: 300, behavior: 'smooth' });
+                }}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border border-gray-200"
+              >
+                <ChevronRight className="w-5 h-5 text-gray-600" />
+              </button>
+              
+              {/* Scrollable Container */}
+              <div
+                id="related-products-scroll"
+                className="flex gap-6 overflow-x-auto scrollbar-hide pb-2"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
               {relatedProducts.map((relatedProduct) => (
                 <Link
                   key={relatedProduct.id}
                   href={`/product/${relatedProduct.id}`}
-                  className="group"
+                  className="group flex-shrink-0 w-72"
                 >
                   <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-square bg-gray-100">
@@ -651,6 +674,7 @@ export default function ProductDetailPage() {
                   </div>
                 </Link>
               ))}
+              </div>
             </div>
           </div>
         )}
