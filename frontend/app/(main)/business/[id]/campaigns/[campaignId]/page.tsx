@@ -13,6 +13,44 @@ import {
   Heart,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+
+const StarRating = ({ rating }: { rating: number }) => {
+  const SoftStar = ({ filled }: { filled: boolean }) => (
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path
+        d="M12 2.5c.3 0 .6.2.7.5l2.1 4.3 4.7.7c.3 0 .6.3.7.6.1.3 0 .6-.2.8l-3.4 3.3.8 4.7c.1.3 0 .6-.2.8-.2.2-.5.3-.8.1L12 15.4l-4.2 2.2c-.3.2-.6.1-.8-.1-.2-.2-.3-.5-.2-.8l.8-4.7L4.2 8.7c-.2-.2-.3-.5-.2-.8.1-.3.4-.6.7-.6l4.7-.7L11.3 3c.1-.3.4-.5.7-.5z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
+  return (
+    <div className="flex items-center space-x-0.5">
+      {[...Array(5)].map((_, i) => (
+        <div
+          key={i}
+          className={
+            i < Math.floor(rating)
+              ? "text-yellow-400"
+              : i < rating
+              ? "text-yellow-400 opacity-60"
+              : "text-gray-300"
+          }
+        >
+          <SoftStar filled={i < Math.floor(rating)} />
+        </div>
+      ))}
+    </div>
+  );
+};
 
 interface CampaignDetail {
   id: string;
@@ -97,11 +135,11 @@ const CampaignDetailPage = () => {
           <span className="text-sm font-medium">Back to Campaigns</span>
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-4">
             {/* Hero Image */}
-            <div className="relative  h-[520px] w-[680px] bg-gray-100 rounded-lg overflow-hidden mb-6 bg-red-500">
+            <div className="relative h-[520px] w-full bg-gray-100 rounded-lg overflow-hidden mb-6">
               <Image
                 src={dummyCampaignDetail.mainImage}
                 alt={dummyCampaignDetail.title}
@@ -113,7 +151,7 @@ const CampaignDetailPage = () => {
             
 
             {/* Campaign Title and Meta */}
-            <div className="bg-white w-[680px] rounded p-6 mb-6">
+            <div className="bg-white w-full rounded p-6 mb-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
@@ -125,11 +163,7 @@ const CampaignDetailPage = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="flex gap-0.5">
-                      {[...Array(4)].map((_, i) => (
-                        <span key={i} className="text-yellow-400 text-lg">★</span>
-                      ))}
-                    </div>
+                    <StarRating rating={dummyCampaignDetail.rating} />
                     <span className="font-bold text-gray-900">
                       {dummyCampaignDetail.rating}
                     </span>
@@ -191,7 +225,7 @@ const CampaignDetailPage = () => {
             </div>
 
             {/* About this Campaign */}
-            <div className="bg-white w-[680px] rounded p-6 mb-6">
+            <div className="bg-white w-full rounded p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">About this Campaign</h2>
               <p className="text-gray-700 leading-relaxed">
                 {dummyCampaignDetail.aboutText}
@@ -199,7 +233,7 @@ const CampaignDetailPage = () => {
             </div>
 
             {/* Requirements */}
-            <div className="bg-white w-[680px] rounded p-6 mb-6">
+            <div className="bg-white w-full rounded p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Requirements</h2>
               <div className="space-y-3">
                 {dummyCampaignDetail.requirements.map((req, index) => (
@@ -218,7 +252,7 @@ const CampaignDetailPage = () => {
             </div>
 
             {/* Deliverables */}
-            <div className="bg-white w-[680px] rounded p-6 mb-6">
+            <div className="bg-white w-full rounded p-6 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Deliverables</h2>
               <div className="space-y-3">
                 {dummyCampaignDetail.deliverables.map((delivery, index) => (
@@ -235,7 +269,7 @@ const CampaignDetailPage = () => {
             </div>
 
             {/* What You'll Get */}
-            <div className="bg-white w-[680px] rounded p-6">
+            <div className="bg-white w-full rounded p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">What You'll Get</h2>
               <div className="space-y-3">
                 {dummyCampaignDetail.benefits.map((benefit, index) => (
@@ -253,7 +287,7 @@ const CampaignDetailPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-3 px-4 w-400px">
+          <div className="lg:col-span-2">
             <div className="bg-white rounded p-6 sticky top-8">
               {/* Compensation */}
               <div className="mb-6">
@@ -272,9 +306,9 @@ const CampaignDetailPage = () => {
               <button className="w-full py-3 text-gray-700 font-medium hover:bg-gray-50 rounded transition-colors mb-2 border border-gray-200">
                 Save for Later
               </button>
-              <button className="w-full py-3 text-gray-700 font-medium hover:bg-gray-50 rounded transition-colors mb-6 border border-gray-200">
+              <Link href="/messages" className="block w-full py-3 text-center text-gray-700 font-medium hover:bg-gray-50 rounded transition-colors mb-6 border border-gray-200">
                 Ask a Question
-              </button>
+              </Link>
 
               {/* Campaign Status Section */}
               <div className="space-y-4 pt-6 border-t border-gray-200">

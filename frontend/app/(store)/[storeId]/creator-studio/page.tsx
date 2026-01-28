@@ -27,7 +27,12 @@ import {
   Loader2
 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
-import { format, addMonths, addDays, startOfMonth, startOfWeek, endOfMonth, isSameMonth, isSameDay } from "date-fns";
+import { format, subMonths, addMonths, addDays, startOfMonth, startOfWeek, endOfMonth, isSameMonth, isSameDay } from "date-fns";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from 'lucide-react';
 
 
 interface Creator {
@@ -147,6 +152,67 @@ const CreatorStudioDashboard = () => {
   const [date, setDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+  // Discovery filter state
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([20, 200]);
+  const [expandedFilters, setExpandedFilters] = useState<Record<string, boolean>>({
+    Category: true,
+    Followers: true,
+  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedFollowerRanges, setSelectedFollowerRanges] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
+  const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
+  const [selectedContentStyles, setSelectedContentStyles] = useState<string[]>([]);
+  const [selectedEngagementRates, setSelectedEngagementRates] = useState<string[]>([]);
+  const [selectedAccountTypes, setSelectedAccountTypes] = useState<string[]>([]);
+
+  // Filtered creators based on search and filters
+  const filteredCreators = creators.filter(creator => {
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = 
+        creator.name.toLowerCase().includes(query) ||
+        creator.handle.toLowerCase().includes(query) ||
+        creator.category.toLowerCase().includes(query) ||
+        creator.location.toLowerCase().includes(query);
+      if (!matchesSearch) return false;
+    }
+
+    // Category filter
+    if (selectedCategories.length > 0) {
+      if (!selectedCategories.some(cat => 
+        creator.category.toLowerCase().includes(cat.toLowerCase())
+      )) return false;
+    }
+
+    // Followers filter
+    if (selectedFollowerRanges.length > 0) {
+      const followersStr = creator.followers;
+      const followersNum = parseFloat(followersStr.replace(/[KMk]/g, '')) * 
+        (followersStr.includes('M') ? 1000000 : followersStr.includes('K') || followersStr.includes('k') ? 1000 : 1);
+      
+      const matchesFollowers = selectedFollowerRanges.some(range => {
+        if (range === '1K - 10K') return followersNum >= 1000 && followersNum < 10000;
+        if (range === '10K - 100K') return followersNum >= 10000 && followersNum < 100000;
+        if (range === '100K - 1M') return followersNum >= 100000 && followersNum < 1000000;
+        if (range === '1M+') return followersNum >= 1000000;
+        return true;
+      });
+      if (!matchesFollowers) return false;
+    }
+
+    // Rating filter
+    if (selectedRatings.length > 0) {
+      const creatorRating = parseFloat(creator.rating);
+      if (!selectedRatings.some(r => creatorRating >= r)) return false;
+    }
+
+    return true;
+  });
+
 
   const menuItems = [
     { icon: BarChart3, label: 'Dashboard', path: 'Dashboard' },
@@ -168,11 +234,13 @@ const CreatorStudioDashboard = () => {
       try {
         setCreatorsLoading(true);
         setCreatorsError(null);
-        const data = await api.influencers.list();
+        // Use getAll which returns the array directly
+        const data = await api.influencers.getAll();
         
-        if (data.success && Array.isArray(data.data)) {
+        // Backend returns array directly, not wrapped in { success, data }
+        if (Array.isArray(data)) {
           // Transform Influencer data to Creator format
-          const transformedCreators: Creator[] = data.data.map((influencer: any) => ({
+          const transformedCreators: Creator[] = data.map((influencer: any) => ({
             id: influencer.id,
             name: `${influencer.firstName || ''} ${influencer.lastName || ''}`.trim() || 'Unknown',
             handle: influencer.socialAccounts?.[0]?.handle || `@${influencer.firstName?.toLowerCase() || 'user'}`,
@@ -186,9 +254,9 @@ const CreatorStudioDashboard = () => {
             email: '',
             bio: influencer.bio,
             platforms: {
-              instagram: influencer.socialAccounts?.find((a: any) => a.platform === 'Instagram')?.handle || '',
-              youtube: influencer.socialAccounts?.find((a: any) => a.platform === 'YouTube')?.handle || '',
-              tiktok: influencer.socialAccounts?.find((a: any) => a.platform === 'TikTok')?.handle || '',
+              instagram: influencer.socialAccounts?.find((a: any) => a.platform === 'INSTAGRAM')?.handle || '',
+              youtube: influencer.socialAccounts?.find((a: any) => a.platform === 'YOUTUBE')?.handle || '',
+              tiktok: influencer.socialAccounts?.find((a: any) => a.platform === 'TIKTOK')?.handle || '',
             },
             userId: influencer.userId,
             image: influencer.profilePicture,
@@ -324,13 +392,14 @@ const CreatorStudioDashboard = () => {
           <p className="text-sm text-gray-600 mt-1">Track ROI and campaign effectiveness</p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option>Last 30 days</option>
+          <select className="px-4 py-2 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option>Last 7 days</option>
+            <option>Last 30 days</option>
+            <option>Last 60 days</option>
             <option>Last 90 days</option>
             <option>Last 12 months</option>
           </select>
-          <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
+          <button className="px-4 py-2 border border-gray-200 rounded text-sm hover:bg-gray-50 flex items-center gap-2">
             <CalendarIcon className="w-4 h-4" />
             Custom Range
           </button>
@@ -340,7 +409,7 @@ const CreatorStudioDashboard = () => {
       {/* Main Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Campaign Performance Card */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="bg-white rounded border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-blue-600" />
@@ -353,16 +422,16 @@ const CreatorStudioDashboard = () => {
             <div>
               <div className="flex justify-between items-baseline mb-1">
                 <span className="text-sm text-gray-600 uppercase tracking-wide">TOTAL REACH</span>
-                <span className="text-xs text-gray-600 font-medium">+12% vs last month</span>
+                <span className="text-xs text-green-600 font-medium">+12% vs last month</span>
               </div>
-              <p className="text-xl  text-gray-900">2.4M</p>
+              <p className="text-xl text-bold text-gray-900">2.4M</p>
             </div>
 
             {/* Engagement Rate */}
             <div>
               <div className="flex justify-between items-baseline mb-1">
-                <span className="text-sm text-gray-600 uppercase tracking-wide">ENGAGEMENT RATE</span>
-                <span className="text-xs text-gray-600 font-medium">+0.8% vs last month</span>
+                <span className="text-sm text-gray-700 uppercase tracking-wide">ENGAGEMENT RATE</span>
+                <span className="text-xs text-green-600 font-medium">+0.8% vs last month</span>
               </div>
               <p className="text-xl  text-gray-900">4.2%</p>
             </div>
@@ -385,11 +454,11 @@ const CreatorStudioDashboard = () => {
                 <span className="text-base font-semibold text-gray-900">1,847</span>
               </div>
             </div>
-          </div>
+          </div> 
         </div>
 
         {/* Financial Metrics Card */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="bg-white rounded border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <div className="text-lg font-bold text-green-600">$</div>
@@ -399,8 +468,8 @@ const CreatorStudioDashboard = () => {
 
           {/* ROI Highlight Box */}
           <div className=" p-6 mb-6 border-b border-gray-200">
-            <p className="text-sm text-green-800 mb-2 uppercase tracking-wide">Return on Investment</p>
-            <p className="text-5xl font-bold text-blue-600 mb-1">200%</p>
+            <p className="text-sm text-gray-600 mb-2 uppercase tracking-wide">Return on Investment</p>
+            <p className="text-3xl font-bold text-blue-500 mb-1">200%</p>
             <p className="text-sm text-gray-800">Excellent performance</p>
           </div>
 
@@ -435,7 +504,7 @@ const CreatorStudioDashboard = () => {
         title: 'Content #1',
         creator: '@creator1',
         type: 'video',
-        size: '4.2 GB',
+        engagement: '4.2% ER',
         likes: '1.2K',
         comments: 89,
         views: '5.4K'
@@ -465,17 +534,17 @@ const CreatorStudioDashboard = () => {
     return (
       <div className="space-y-4 sm:space-y-6">
         <div className="flex items-center gap-2 mb-4 sm:mb-6">
-          <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Camera className="w-4 h-4 sm:w-5 sm:h-5" /> 
           <h3 className="text-base sm:text-lg font-semibold">Content Library</h3>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {contentItems.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div key={item.id} className="bg-white rounded border border-gray-100 overflow-hidden hover:bg-gray-50 transition-shadow">
               <div className="relative aspect-square bg-gray-100 flex items-center justify-center">
                 <Camera className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                 {item.type && (
-                  <span className="absolute top-3 right-3 px-2 py-1 bg-gray-700 text-white text-xs rounded-full">
+                  <span className="absolute top-3 right-3 px-2 py-1 bg-gray-600 text-white text-xs rounded-full">
                     {item.type}
                   </span>
                 )}
@@ -486,9 +555,9 @@ const CreatorStudioDashboard = () => {
                     <h4 className="text-sm sm:text-base font-semibold">{item.title}</h4>
                     <p className="text-xs sm:text-sm text-gray-600">By {item.creator}</p>
                   </div>
-                  {item.size && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded border border-gray-200">
-                      {item.size}
+                  {item.engagement && (
+                    <span className="px-2 py-1 bg-gray-50 text-gray-700 text-xs text-medium uppercase rounded-full border border-gray-100">
+                      {item.engagement}
                     </span>
                   )}
                 </div>
@@ -557,8 +626,8 @@ const CreatorStudioDashboard = () => {
       {
         title: 'Approve 5 pending content pieces',
         time: 'Due in 2 hours',
-        priority: 'HIGH',
-        badge: 'bg-red-100 text-red-700'
+        priority: 'High',
+        badge: 'bg-red-100 text-red-500'
       },
       {
         title: 'Content Review Deadline',
@@ -588,13 +657,13 @@ const CreatorStudioDashboard = () => {
         title: 'Send campaign brief to new influencers',
         time: 'Due in 4 hours',
         priority: 'Medium',
-        badge: 'bg-purple-100 text-purple-700'
+        badge: 'bg-yellow-50 text-yellow-600'
       },
       {
         title: 'Review analytics report',
         time: 'Due tomorrow',
         priority: 'Low',
-        badge: 'bg-gray-100 text-gray-700'
+        badge: 'bg-green-100 text-green-600'
       }
     ];
 
@@ -609,52 +678,52 @@ const CreatorStudioDashboard = () => {
             <p className="text-sm text-gray-500">Manage your campaign schedule and deadlines</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="flex items-center gap-2 px-4 py-2 text-sm text-blue-500 border border-blue-500 rounded hover:bg-blue-500 hover:text-white">
               <Filter size={16} />
               Filter
             </button>
             <button
               onClick={() => setShowAddEventModal(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-500 rounded-lg hover:bg-purple-700"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600"
             >
-              <span className="text-lg">+</span>
+              <span className="text-medium">+</span>
               Add Event
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Full Calendar Section */}
-<div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-  <div className="flex items-center justify-between mb-6">
-    <h2 className="text-lg font-semibold text-gray-800">Campaign Calendar</h2>
-    <div className="flex items-center space-x-2">
-      <button
-        onClick={() => setDate(addMonths(date, -1))}
-        className="p-2 rounded-md hover:bg-gray-100 transition"
-      >
-        ←
-      </button>
-      <span className="font-medium text-gray-700">
-        {format(date, "MMMM yyyy")}
-      </span>
-      <button
-        onClick={() => setDate(addMonths(date, 1))}
-        className="p-2 rounded-md hover:bg-gray-100 transition"
-      >
-        →
-      </button>
-    </div>
-  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Full Calendar Section */}
+          <div className="lg:col-span-2 bg-white rounded p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Campaign Calendar</h2>
+              <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={() => setDate(subMonths(date, 1))}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {format(date, 'MMMM yyyy')}
+                    </h3>
+                    <button
+                      onClick={() => setDate(addMonths(date, 1))}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+              </div>
 
-  {/* Calendar Grid */}
-  <div className="grid grid-cols-7 text-sm font-medium text-gray-500 border-b pb-2 mb-2">
-    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-      <div key={day} className="text-center uppercase tracking-wide">
-        {day}
-      </div>
-    ))}
-  </div>
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 text-sm font-medium text-gray-500 border-b pb-2 mb-2">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                <div key={day} className="text-center uppercase tracking-wide">
+                  {day}
+                </div>
+              ))}
+          </div>
 
   <div className="grid grid-cols-7 gap-1 text-sm">
     {Array.from({ length: startOfWeek(endOfMonth(date)).getDate() + 7 }).map(
@@ -671,14 +740,14 @@ const CreatorStudioDashboard = () => {
             className={`h-24 rounded-md p-2 text-left transition
               ${isCurrentMonth ? "text-gray-800" : "text-gray-400"}
               ${isToday ? "border border-blue-500" : ""}
-              ${isSelected ? "bg-blue-600 text-white" : "hover:bg-gray-100"}
+              ${isSelected ? "bg-blue-600 text-white" : "hover:bg-blue-50"}
             `}
           >
             <div className="font-medium">{format(day, "d")}</div>
             {/* Example event */}
             {isSelected && (
-              <div className="mt-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                Event: Meeting
+              <div className="mt-2 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
+                Event: Campaign Launch
               </div>
             )}
           </button>
@@ -691,14 +760,14 @@ const CreatorStudioDashboard = () => {
           {/* Right Sidebar */}
           <div className="space-y-6">
             {/* Upcoming Events */}
-            <div className="bg-white rounded-lg p-5 shadow-sm">
+            <div className="bg-white rounded border-gray-100 p-5">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h3>
               <div className="space-y-3">
                 {upcomingEvents.map((event, idx) => (
                   <div key={idx} className="flex items-start justify-between pb-3 border-b border-gray-100 last:border-0">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="w-1.5 h-1.5 bg-purple-600 rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
                         <h4 className="text-sm font-semibold text-gray-900">{event.title}</h4>
                       </div>
                       <p className="text-xs text-gray-600 ml-3.5 mb-1">{event.subtitle}</p>
@@ -707,7 +776,7 @@ const CreatorStudioDashboard = () => {
                         <span>{event.time}</span>
                       </div>
                     </div>
-                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                    <span className="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded-full font-base">
                       {event.type}
                     </span>
                   </div>
@@ -716,23 +785,23 @@ const CreatorStudioDashboard = () => {
             </div>
 
             {/* Tasks Due Soon */}
-            <div className="bg-white rounded-lg p-5 shadow-sm">
+            <div className="bg-white rounded p-5 border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Tasks Due Soon</h3>
               <div className="space-y-3">
                 {tasksDueSoon.map((task, idx) => (
                   <div key={idx} className="pb-3 border-b border-gray-100 last:border-0">
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center gap-2 flex-1">
-                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-1.5"></div>
+                        <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-1.5"></div>
                         <h4 className="text-sm font-semibold text-gray-900">{task.title}</h4>
                       </div>
                       {task.priority && (
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${task.badge}`}>
+                        <span className={`text-xs px-2 py-1 rounded-full font-base ${task.badge}`}>
                           {task.priority}
                         </span>
                       )}
                       {task.type && (
-                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                        <span className="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded-full font-base">
                           {task.type}
                         </span>
                       )}
@@ -754,7 +823,7 @@ const CreatorStudioDashboard = () => {
         {/* Add Event Modal */}
         {showAddEventModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <div className="bg-white rounded p-6 w-full max-w-md shadow-xl">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Add New Event</h3>
@@ -778,7 +847,7 @@ const CreatorStudioDashboard = () => {
                     type="text"
                     value={eventTitle}
                     onChange={(e) => setEventTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Campaign Launch: Summer Fashion"
                   />
                 </div>
@@ -790,7 +859,7 @@ const CreatorStudioDashboard = () => {
                     type="text"
                     value={eventSubtitle}
                     onChange={(e) => setEventSubtitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Summer Fashion Collection"
                   />
                 </div>
@@ -802,13 +871,13 @@ const CreatorStudioDashboard = () => {
                   </label>
                   <button
                     onClick={() => setShowEventTypeDropdown(!showEventTypeDropdown)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-left flex items-center justify-between"
+                    className="w-full px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-left flex items-center justify-between"
                   >
                     <span className="text-gray-700">{eventType}</span>
                     <ChevronRight size={16} className={`text-gray-400 transform transition-transform ${showEventTypeDropdown ? 'rotate-90' : ''}`} />
                   </button>
                   {showEventTypeDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-blue-500 rounded shadow-lg">
                       {eventTypes.map((type) => (
                         <button
                           key={type}
@@ -817,7 +886,7 @@ const CreatorStudioDashboard = () => {
                             setShowEventTypeDropdown(false);
                           }}
                           className={`w-full px-3 py-2 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                            type === eventType ? 'bg-purple-600 text-white' : 'text-gray-700'
+                            type === eventType ? 'bg-blue-500 text-white' : 'text-gray-700'
                           }`}
                         >
                           {type}
@@ -853,11 +922,11 @@ const CreatorStudioDashboard = () => {
                       type="text"
                       value={selectedTime}
                       onChange={(e) => setSelectedTime(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-3 py-2 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="--:--"
                     />
-                    <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                      <Clock size={16} className="text-gray-600" />
+                    <button className="p-2 border border-blue-500 rounded hover:bg-blue-50">
+                      <Clock size={16} className="text-blue-500" />
                     </button>
                   </div>
                 </div>
@@ -867,11 +936,11 @@ const CreatorStudioDashboard = () => {
               <div className="flex items-center justify-end gap-3 mt-6">
                 <button
                   onClick={() => setShowAddEventModal(false)}
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 rounded"
                 >
                   Cancel
                 </button>
-                <button className="px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+                <button className="px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600">
                   Add Event
                 </button>
               </div>
@@ -886,7 +955,6 @@ const CreatorStudioDashboard = () => {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
-          <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           <h3 className="text-base sm:text-lg font-semibold">
             {campaignMode ? `Select Influencers for "${campaignTitle}"` : 'Influencer Discovery'}
           </h3>
@@ -894,7 +962,7 @@ const CreatorStudioDashboard = () => {
         {campaignMode && selectedInfluencers.length > 0 && (
           <Link
             href={`/${storeId}/createCampaign`}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+            className="px-4 py-2 bg-blue-500 text-white rounded text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap"
           >
             Back to Campaign ({selectedInfluencers.length})
           </Link>
@@ -919,19 +987,312 @@ const CreatorStudioDashboard = () => {
       <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search creators..."
-              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              placeholder="Search creators by name, handle, category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
             />
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-         
-          <button className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <div className="w-4 h-4">filter</div>
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              className="px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Filter className="w-4 h-4" />
+              <span className="text-sm">Filters</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Filter Dropdown */}
+            {showFilterDropdown && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded border border-gray-200 shadow z-50 overflow-hidden">
+                <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
+                  <h2 className="font-semibold text-gray-700">Filters</h2>
+                  <button className="text-blue-500 text-sm hover:text-blue-600 font-medium">
+                    Clear all
+                  </button>
+                </div>
+
+                <div className="max-h-[60vh] overflow-y-auto">
+                  {/* Category Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Category: !prev.Category }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Category</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Category ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Category && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Banking', 'Fashion', 'Technology', 'Lifestyle', 'Food', 'General'].map(cat => (
+                          <div key={cat} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`cat-${cat}`} 
+                              checked={selectedCategories.includes(cat)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedCategories([...selectedCategories, cat]);
+                                } else {
+                                  setSelectedCategories(selectedCategories.filter(c => c !== cat));
+                                }
+                              }}
+                            />
+                            <label htmlFor={`cat-${cat}`} className="text-sm text-gray-700 cursor-pointer">{cat}</label>
+                          </div>
+                        ))}
+                        <button className="text-blue-500 text-xs hover:text-blue-600 mt-2">See more</button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Followers Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Followers: !prev.Followers }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Followers</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Followers ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Followers && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['1K - 10K', '10K - 100K', '100K - 1M', '1M+'].map(range => (
+                          <div key={range} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`followers-${range}`}
+                              checked={selectedFollowerRanges.includes(range)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedFollowerRanges([...selectedFollowerRanges, range]);
+                                } else {
+                                  setSelectedFollowerRanges(selectedFollowerRanges.filter(r => r !== range));
+                                }
+                              }}
+                            />
+                            <label htmlFor={`followers-${range}`} className="text-sm text-gray-700 cursor-pointer">{range}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Age Criteria Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Age: !prev.Age }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Age Criteria</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Age ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Age && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['13 - 17 years', '18 - 25 years', '26 - 40 years', '40+ years'].map(age => (
+                          <div key={age} className="flex items-center space-x-2">
+                            <Checkbox id={`age-${age}`} />
+                            <label htmlFor={`age-${age}`} className="text-sm text-gray-700 cursor-pointer">{age}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Ad Price Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Price: !prev.Price }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Ad Price ($)</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Price ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Price && (
+                      <div className="px-4 pb-4">
+                        <div className="flex justify-between mb-2 gap-2">
+                          <Input
+                            type="number"
+                            value={priceRange[0]}
+                            onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                            className="w-20 h-8 text-sm"
+                          />
+                          <span className="text-sm self-center text-gray-500">to</span>
+                          <Input
+                            type="number"
+                            value={priceRange[1]}
+                            onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 0])}
+                            className="w-20 h-8 text-sm"
+                          />
+                        </div>
+                        <Slider
+                          defaultValue={[20, 200]}
+                          max={500}
+                          step={10}
+                          value={priceRange}
+                          onValueChange={(value) => setPriceRange(value as [number, number])}
+                          className="my-4"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Gender Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Gender: !prev.Gender }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Gender</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Gender ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Gender && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Male', 'Female'].map(gender => (
+                          <div key={gender} className="flex items-center space-x-2">
+                            <Checkbox id={`gender-${gender}`} />
+                            <label htmlFor={`gender-${gender}`} className="text-sm text-gray-700 cursor-pointer">{gender}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content Style Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, ContentStyle: !prev.ContentStyle }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Content Style</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.ContentStyle ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.ContentStyle && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Casual & Authentic', 'Professional & Polished', 'Fun & Energetic', 'Educational', 'Minimalist'].map(style => (
+                          <div key={style} className="flex items-center space-x-2">
+                            <Checkbox id={`style-${style}`} />
+                            <label htmlFor={`style-${style}`} className="text-sm text-gray-700 cursor-pointer">{style}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Engagement Rate Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Engagement: !prev.Engagement }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Engagement Rate</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Engagement ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Engagement && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['> 60%', '> 75%', '> 85%'].map(rate => (
+                          <div key={rate} className="flex items-center space-x-2">
+                            <Checkbox id={`engagement-${rate}`} />
+                            <label htmlFor={`engagement-${rate}`} className="text-sm text-gray-700 cursor-pointer">{rate}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Rating Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Rating: !prev.Rating }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Rating</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Rating ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Rating && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {[5, 4, 3, 2, 1].map((rating) => (
+                          <div key={rating} className="flex items-center space-x-2">
+                            <Checkbox id={`rating-${rating}`} />
+                            <label htmlFor={`rating-${rating}`} className="flex cursor-pointer">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <span key={i} className={i < rating ? "text-yellow-400" : "text-gray-300"}>★</span>
+                              ))}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Account Type Filter */}
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, AccountType: !prev.AccountType }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Account Type</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.AccountType ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.AccountType && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['Verified Account', 'Non verified Account', 'Both'].map(type => (
+                          <div key={type} className="flex items-center space-x-2">
+                            <Checkbox id={`account-${type}`} />
+                            <label htmlFor={`account-${type}`} className="text-sm text-gray-700 cursor-pointer">{type}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Campaign Milestones Filter */}
+                  <div>
+                    <button
+                      onClick={() => setExpandedFilters(prev => ({ ...prev, Milestones: !prev.Milestones }))}
+                      className="w-full flex justify-between items-center p-4 hover:bg-gray-50"
+                    >
+                      <span className="font-medium text-gray-900">Campaign Milestones</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${expandedFilters.Milestones ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedFilters.Milestones && (
+                      <div className="px-4 pb-4 space-y-2">
+                        {['2 +', '5 +', '10 +'].map(milestone => (
+                          <div key={milestone} className="flex items-center space-x-2">
+                            <Checkbox id={`milestone-${milestone}`} />
+                            <label htmlFor={`milestone-${milestone}`} className="text-sm text-gray-700 cursor-pointer">{milestone}</label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 p-4 border-t border-gray-100 bg-gray-50">
+                  <Button variant="outline" className="flex-1 hover:bg-white" onClick={() => {
+                    setPriceRange([20, 200]);
+                    setSelectedCategories([]);
+                    setSelectedFollowerRanges([]);
+                    setSelectedRatings([]);
+                    setSelectedGenders([]);
+                    setSelectedContentStyles([]);
+                    setSelectedEngagementRates([]);
+                    setSelectedAccountTypes([]);
+                    setSearchQuery('');
+                  }}>
+                    Reset
+                  </Button>
+                  <Button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm" onClick={() => setShowFilterDropdown(false)}>
+                    Apply
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -943,18 +1304,44 @@ const CreatorStudioDashboard = () => {
           </div>
         </div>
       ) : creatorsError ? (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800 text-sm">{creatorsError}</p>
+        <div className="bg-red-50 border border-red-100 rounded p-4">
+          <p className="text-red-500 text-sm">{creatorsError}</p>
         </div>
-      ) : creators.length === 0 ? (
+      ) : filteredCreators.length === 0 ? (
         <div className="text-center py-12">
           <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600">No approved creators found yet</p>
+          <p className="text-gray-600">
+            {creators.length === 0 
+              ? 'No approved creators found yet' 
+              : 'No creators match your filters'}
+          </p>
+          {creators.length > 0 && (
+            <button 
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategories([]);
+                setSelectedFollowerRanges([]);
+                setSelectedRatings([]);
+              }}
+              className="mt-3 text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {creators.map((creator) => (
-            <div key={creator.id} className="bg-white rounded-lg border border-gray-200 p-5 sm:p-6">
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-gray-600">
+              Showing {filteredCreators.length} of {creators.length} creators
+              {(selectedCategories.length > 0 || selectedFollowerRanges.length > 0 || searchQuery) && (
+                <span className="ml-2 text-blue-600">• Filtered</span>
+              )}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {filteredCreators.map((creator) => (
+            <div key={creator.id} className="bg-white rounded border border-gray-100 p-5 sm:p-6">
               {/* Profile Header */}
               <div className="flex flex-col items-center text-center mb-5">
                 {creator.image ? (
@@ -1083,7 +1470,8 @@ const CreatorStudioDashboard = () => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
@@ -1121,15 +1509,15 @@ const CreatorStudioDashboard = () => {
     // Show empty state if no applications
     if (applications.length === 0) {
       return (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="w-8 h-8 text-gray-400" />
+        <div className="bg-white rounded border border-gray-100 p-12 text-center">
+          <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-6 h-6 text-blue-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Applications Yet</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No applications yet</h3>
           <p className="text-gray-600 mb-6">
-            You haven&apos;t received any influencer applications yet. Make sure your campaigns are published to start receiving applications.
+            You haven&apos;t received any influencer applications yet.<br/> Make sure your campaigns are published to start receiving applications.
           </p>
-          <Link href={`/${storeId}/campaign`} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <Link href={`/${storeId}/campaign`} className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             View Campaigns
           </Link>
         </div>
@@ -1387,14 +1775,14 @@ const CreatorStudioDashboard = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 sm:space-x-8 sm:gap-0 mt-4 sm:mt-6 overflow-x-auto">
+          <div className="flex flex-wrap justify-start gap-4 sm:space-x-8 sm:gap-0 mt-6 sm:mt-6 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-2 px-1 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab
-                    ? 'border-black text-black'
+                    ? 'border-blue-500 text-black'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >

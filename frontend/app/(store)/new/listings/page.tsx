@@ -110,9 +110,48 @@ const ListingsAndHighlightsPage = () => {
   const highlights = [
     "Fast Service",
     "Free WiFi",
-    "Parking",
-    "Warranty",
+    "Parking Space",
+    "Warranty Included",
     "TV & Rest Room",
+    "Free Delivery",
+    "24/7 Support",
+    "Fast Delivery",
+    "Quality Guranteed",
+    "Best Prices",
+    "Verified Member",
+    "Accepts Mobile Money",
+    "Order with Glovo",
+    "Online Booking",
+    "In-person Visits",
+    "Accepts Cards",
+    "Cash on Delivery",
+    "Gift Wrapping",
+    "Express Delivery",
+    "Installment Payments",
+    "Local Pickup",
+    "National Delivery",
+    "Warranty Included",
+    "Returns Accepted",
+    "Live Chat Support",
+    "Loyalty Program",
+    "Seasonal Discounts",
+    "New Arrivals",
+    "Exclusive Offers",
+    "Customer Reviews",
+    "Owner Operated",
+    "Eco-Friendly",
+    "Family Owned",
+    "Pet Friendly",
+    "Wheelchair Accessible",
+    "Outdoor Seating",
+    "Vegan Options",
+    "Gluten-Free",
+    "Halal Options",
+    "Organic Products",
+    "Locally Sourced",
+    "Handmade Products",
+    "Artisan Goods",
+    "Custom Orders",
   ];
 
   const methods = useForm<StoreFormData>({
@@ -170,6 +209,7 @@ const ListingsAndHighlightsPage = () => {
 
               {/* Business Highlights Section */}
               <div>
+              <div className="bg-white rounded p-6 mb-16 border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold">Business Highlights</h2>
                 </div>
@@ -185,10 +225,10 @@ const ListingsAndHighlightsPage = () => {
                         key={highlight}
                         onClick={() => toggleHighlight(highlight)}
                         className={cn(
-                          "inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium transition-all",
+                          "inline-flex items-center px-5 py-2.5 rounded-full text-sm font-base transition-all",
                           isSelected
-                            ? "bg-blue-50 border border-blue-200 text-blue-700"
-                            : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                            ? "bg-blue-50 border border-blue-100 text-blue-700"
+                            : "bg-white border border-gray-100 text-gray-700 hover:bg-gray-50"
                         )}
                       >
                         {IconComponent && (
@@ -202,6 +242,7 @@ const ListingsAndHighlightsPage = () => {
                     );
                   })}
                 </div>
+              </div>
               </div>
             </div>
           </div>

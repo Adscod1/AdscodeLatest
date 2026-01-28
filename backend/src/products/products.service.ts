@@ -209,6 +209,10 @@ export class ProductsService {
             id: true,
             name: true,
             logo: true,
+            tagline: true,
+            description: true,
+            category: true,
+            banner: true,
           },
         },
         _count: {

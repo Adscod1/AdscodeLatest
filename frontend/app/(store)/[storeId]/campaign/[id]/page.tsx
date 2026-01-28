@@ -636,8 +636,8 @@ export default function CampaignDetailPage() {
               </div>
               
               <div className="border-b border-gray-200">
-                <div className="flex">
-                  {['Metrics', 'Demographics', 'Ad Sets', 'Influencers'].map((tab) => (
+                <div className="flex overflow-x-auto">
+                  {['Metrics', 'Demographics', 'Ad Sets', 'Influencers', 'Leaderboard'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -692,6 +692,87 @@ export default function CampaignDetailPage() {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div className="bg-purple-600 h-2 rounded-full" style={{ width: campaign?.status === 'COMPLETED' ? '100%' : campaign?.status === 'PUBLISHED' ? '50%' : '0%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">ROAS (Return on Ad Spend)</span>
+                          <span className="text-sm font-semibold text-purple-600">8.9x</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: '89%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">Bounce Rate</span>
+                          <span className="text-sm font-semibold text-gray-900">32.5%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-500 h-2 rounded-full" style={{ width: '32.5%' }}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Adscod-Only Metrics */}
+                    <div className="pt-6 border-t border-gray-200">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                        <h3 className="text-sm font-semibold text-gray-900">Adscod-Only Metrics</h3>
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">Exclusive</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Influence-to-Conversion Ratio */}
+                        <div className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700">Influence-to-Conversion Ratio</span>
+                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Excellent</span>
+                          </div>
+                          <div className="text-3xl font-bold text-green-500 mb-1">3.2x</div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                            <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '80%' }}></div>
+                          </div>
+                          <p className="text-xs text-gray-500">Measures influencer impact on conversions</p>
+                        </div>
+
+                        {/* Trust Velocity Score */}
+                        <div className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700">Trust Velocity Score</span>
+                            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">High Trust</span>
+                          </div>
+                          <div className="text-3xl font-bold text-purple-500 mb-1">87</div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                            <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: '87%' }}></div>
+                          </div>
+                          <p className="text-xs text-gray-500">Speed of audience trust building</p>
+                        </div>
+
+                        {/* Revenue Consistency Index */}
+                        <div className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700">Revenue Consistency Index</span>
+                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Stable</span>
+                          </div>
+                          <div className="text-3xl font-bold text-green-500 mb-1">92%</div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                            <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '92%' }}></div>
+                          </div>
+                          <p className="text-xs text-gray-500">Revenue stability across campaigns</p>
+                        </div>
+
+                        {/* Engagement-to-Sales Delta */}
+                        <div className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700">Engagement-to-Sales Delta</span>
+                            <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">Converting</span>
+                          </div>
+                          <div className="text-3xl font-bold text-orange-500 mb-1">1.45x</div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                            <div className="bg-orange-400 h-1.5 rounded-full" style={{ width: '72%' }}></div>
+                          </div>
+                          <p className="text-xs text-gray-500">Gap between engagement and actual sales</p>
                         </div>
                       </div>
                     </div>
@@ -866,6 +947,182 @@ export default function CampaignDetailPage() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'Leaderboard' && (
+                  <div className="space-y-6">
+                    {/* Leaderboard Header */}
+                    <div className="bg-gradient-to-r from-purple-50 to-green-50 rounded-lg p-5 border border-purple-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <h3 className="text-lg font-bold text-gray-900">Adscod Performance Leaderboard</h3>
+                      </div>
+                      <p className="text-sm text-gray-600">Influencers ranked by their overall Adscod score (weighted average of ICR, Trust Velocity, Revenue Consistency, and E2S Delta)</p>
+                    </div>
+
+                    {/* Leaderboard Entries */}
+                    <div className="space-y-3">
+                      {/* 1st Place - Emma Davis */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                              <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
+                                E
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900">Emma Davis</h4>
+                              <p className="text-sm text-gray-500">TikTok • 500K followers</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-purple-600">4.1x</div>
+                              <div className="text-xs text-gray-500">ICR</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-gray-900">94</div>
+                              <div className="text-xs text-gray-500">Trust</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-green-600">97%</div>
+                              <div className="text-xs text-gray-500">Consistency</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-purple-600">1.8x</div>
+                              <div className="text-xs text-gray-500">E2S</div>
+                            </div>
+                            <div className="text-center min-w-[60px]">
+                              <div className="text-2xl font-bold text-green-500">91</div>
+                              <div className="text-xs text-gray-500">Adscod Score</div>
+                              <div className="w-full bg-green-200 rounded-full h-1 mt-1">
+                                <div className="bg-green-500 h-1 rounded-full" style={{ width: '91%' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 2nd Place - Mike Chen */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                              <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                                M
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900">Mike Chen</h4>
+                              <p className="text-sm text-gray-500">YouTube • 350K followers</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-purple-600">3.5x</div>
+                              <div className="text-xs text-gray-500">ICR</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-gray-900">91</div>
+                              <div className="text-xs text-gray-500">Trust</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-green-600">95%</div>
+                              <div className="text-xs text-gray-500">Consistency</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-purple-600">1.6x</div>
+                              <div className="text-xs text-gray-500">E2S</div>
+                            </div>
+                            <div className="text-center min-w-[60px]">
+                              <div className="text-2xl font-bold text-green-500">84</div>
+                              <div className="text-xs text-gray-500">Adscod Score</div>
+                              <div className="w-full bg-green-200 rounded-full h-1 mt-1">
+                                <div className="bg-green-500 h-1 rounded-full" style={{ width: '84%' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 3rd Place - Sarah Johnson */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                              <svg className="w-6 h-6 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">
+                                S
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900">Sarah Johnson</h4>
+                              <p className="text-sm text-gray-500">Instagram • 125K followers</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-purple-600">2.8x</div>
+                              <div className="text-xs text-gray-500">ICR</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-gray-900">82</div>
+                              <div className="text-xs text-gray-500">Trust</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-green-600">88%</div>
+                              <div className="text-xs text-gray-500">Consistency</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-purple-600">1.2x</div>
+                              <div className="text-xs text-gray-500">E2S</div>
+                            </div>
+                            <div className="text-center min-w-[60px]">
+                              <div className="text-2xl font-bold text-orange-500">72</div>
+                              <div className="text-xs text-gray-500">Adscod Score</div>
+                              <div className="w-full bg-orange-200 rounded-full h-1 mt-1">
+                                <div className="bg-orange-400 h-1 rounded-full" style={{ width: '72%' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Score Calculation Legend */}
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-3">Score Calculation</h4>
+                      <div className="flex flex-wrap items-center gap-6">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                          <span className="text-sm text-gray-600">ICR: 25%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                          <span className="text-sm text-gray-600">Trust: 25%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <span className="text-sm text-gray-600">Consistency: 25%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-orange-400"></div>
+                          <span className="text-sm text-gray-600">E2S Delta: 25%</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

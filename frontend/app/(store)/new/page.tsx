@@ -23,7 +23,39 @@ import { StorePreview } from "./components/store-preview";
 const BUSINESS_CATEGORIES = [
   "Electronics",
   "Fashion",
-  "Food",
+  "Banking",
+  "Entertainment",
+  "Wellness & Fitness",
+  "Beauty & Personal Care",
+  "Education & Learning",
+  "Finance & Investment",
+  "Marketing",
+  "Advertising",
+  "Consulting",
+  "Shopping",
+  "Media & Publishing",
+  "Transportation",
+  "Logistics",
+  "Healthcare",
+  "Agriculture",
+  "Environmental Services",
+  "Renewable Energy",
+  "Non-Profit & Charity",
+  "Legal Services",
+  "HR & Recruitment",
+  "Telecommunications",
+  "Insurance",
+  "Construction",
+  "Hotel & Hospitality",
+  "Music & Audio",
+  "Gaming",
+  "Sports",
+  "Lifestyle",
+  "Events",
+  "Weddings",
+  "Photography & Videography",
+  "Food & Beverage",
+  "Apparel",
   "Health",
   "Technology",
   "Automotive",
@@ -36,7 +68,7 @@ const BUSINESS_CATEGORIES = [
   "Pet Supplies",
   "Jewelry & Accessories",
   "Art & Crafts",
-  "Travel & Tourism",
+  "Tourism & Travel",
   "Education",
   "Professional Services",
   "Restaurants & Catering",
@@ -75,7 +107,7 @@ const CreateNewStorePage = () => {
         <div className="flex gap-6">
           <div className="flex-1">
             {/* Basic Information Form */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white rounded p-6 border border-gray-100">
               <h2 className="text-lg font-semibold mb-6">Basic Information</h2>
 
               <div className="space-y-6">
