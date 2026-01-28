@@ -583,26 +583,26 @@ const BusinessPage = () => {
                     <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
                       <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
                     </div>
-                    <span className="text-xs sm:text-sm break-all group-hover:text-blue-600 transition-colors">www.adscod.com</span>
+                    <span className="text-sm sm:text-sm break-all group-hover:text-blue-600 transition-colors">www.adscod.com</span>
                   </div>
                   <div className="flex items-center text-gray-700 group cursor-pointer">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
                       <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
                     </div>
-                    <span className="text-xs sm:text-sm group-hover:text-blue-600 transition-colors">{store.phone || "+256 700 000 000"}</span>
+                    <span className="text-sm sm:text-sm group-hover:text-blue-600 transition-colors">{store.phone || "+256 700 000 000"}</span>
                   </div>
                   <div className="flex items-center text-gray-700 group cursor-pointer">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
                       <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
                     </div>
-                    <span className="text-xs sm:text-sm group-hover:text-blue-600 transition-colors">Kansanga, Kampala</span>
+                    <span className="text-sm sm:text-sm group-hover:text-blue-600 transition-colors">Kansanga, Kampala</span>
                   </div>
                   {store.email && (
                     <div className="flex items-center text-gray-700 group cursor-pointer">
                       <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
                         <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
                       </div>
-                      <span className="text-xs sm:text-sm break-all group-hover:text-blue-600 transition-colors">{store.email}</span>
+                      <span className="text-sm sm:text-sm break-all group-hover:text-blue-600 transition-colors">{store.email}</span>
                     </div>
                   )}
                 </div>

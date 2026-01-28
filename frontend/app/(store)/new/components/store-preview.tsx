@@ -227,7 +227,7 @@ export function StorePreview() {
             {/* Store Info Section */}
             <div className="p-4 pb-4 border-b border-gray-200">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="relative w-10 h-10 bg-black rounded flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 overflow-hidden">
+                <div className="relative w-10 h-10 bg-blue-500 rounded flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 overflow-hidden">
                   {formData.logo ? (
                     <Image
                       src={formData.logo}
@@ -252,28 +252,28 @@ export function StorePreview() {
                 <div className="flex items-start space-x-2 text-gray-600">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span className="text-sm leading-relaxed">
-                    {formData.address || "business Address"}
+                    {formData.address || "Business Address"}
                   </span>
                 </div>
                 
                 <div className="flex items-center space-x-2 text-gray-600">
                   <Phone className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm">
-                    {formData.phone || "contact"}
+                    {formData.phone || "Contact"}
                   </span>
                 </div>
                 
                 <div className="flex items-center space-x-2 text-gray-600">
                   <Mail className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm">
-                    {formData.email || "Business email"}
+                    {formData.email || "Business Email"}
                   </span>
                 </div>
                 
                 <div className="flex items-center space-x-2 text-blue-500">
                   <Globe className="w-4 h-4 flex-shrink-0" />
                   <a href={formData.website || "#"} className="text-sm hover:underline">
-                    {formData.website || "website link"}
+                    {formData.website || "Website Link"}
                   </a>
                 </div>
               </div>
@@ -346,13 +346,13 @@ export function StorePreview() {
           </div>
 
           {/* Tips Section */}
-          <div className="pb-4 border-b border-gray-200">
+          <div className="pb-4 border-gray-200">
             <h3 className="font-semibold text-gray-900 mb-4">Tips</h3>
             <div className="space-y-3">
               {tips.map((tip, index) => (
                 <div key={index} className="flex items-start space-x-3">
                   <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-gray-600 leading-relaxed">{tip}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{tip}</p>
                 </div>
               ))}
             </div>

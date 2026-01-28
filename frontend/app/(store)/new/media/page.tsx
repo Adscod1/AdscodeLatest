@@ -276,18 +276,18 @@ const StoreMediaPage = () => {
                       </div>
                     ))}
                     
-                    {/* Add new banner button */}
-                    {bannerImages.length < 3 && (
-                      <div className="aspect-video">
+                  {/* Add new banner button */}
+                  {bannerImages.length < 3 && (
+                      <div className="aspect-video border-2 border-dashed border-gray-200 rounded-md hover:border-blue-500 hover:bg-blue-50 transition-colors flex items-center justify-center">
                         <FileUpload
                           type="banner"
                           onUpload={handleBannerImageUpload}
                           accept="image/*"
                           maxSize={5}
-                          className="h-full"
+                          className="h-full w-full flex items-center justify-center"
                           endpoint="/new/media"
                         >
-                          <div className="flex flex-col items-center justify-center h-full">
+                          <div className="flex flex-col items-center justify-center">
                             <Plus className="w-8 h-8 text-gray-400 mb-2" />
                             <span className="text-sm text-gray-500">Add Banner</span>
                           </div>
@@ -308,10 +308,12 @@ const StoreMediaPage = () => {
                     </span>
                   </div>
                   
+                    
+
                   <div className="grid grid-cols-3 gap-4">
                     {/* Existing gallery images */}
                     {galleryImages.map((imageUrl, index) => (
-                      <div key={index} className="aspect-square relative group">
+                      <div key={index} className="aspect-video relative group ">
                         <FileUpload
                           type="gallery"
                           onUpload={() => {}} // Already uploaded
@@ -319,7 +321,6 @@ const StoreMediaPage = () => {
                           className="h-full"
                         />
                         <Button
-                          variant="destructive"
                           size="sm"
                           className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={() => removeGalleryImage(index)}
@@ -337,7 +338,7 @@ const StoreMediaPage = () => {
                           onUpload={handleGalleryImageUpload}
                           accept="image/*"
                           maxSize={5}
-                          className="h-full"
+                          className="h-full w-full flex items-center justify-center"
                           endpoint="/new/media"
                         >
                           <div className="flex flex-col items-center justify-center h-full">

@@ -31,7 +31,8 @@ import {
   Flag,
   MoreHorizontal,
   Pin,
-  Send
+  Send,
+  Plus,
 } from 'lucide-react';
 
 interface ForumSection {
@@ -119,8 +120,8 @@ interface ForumPost {
       author: 'Sarah Mitchell',
       avatar: 'SM',
       avatarColor: 'bg-green-500',
-      badge: 'Verified Influencer',
-      badgeColor: 'bg-teal-100 text-teal-600',
+      badge: 'Elite Partner',
+      badgeColor: 'bg-yellow-50 text-yellow-500',
       isPinned: true,
       content: 'Welcome to everyone joining the platform! 👋 I remember being a new user just 6 months ago. Here are my top tips: 1) Complete your profile 100%, 2) Start with categories you\'re passionate about, 3) Engage with the community daily. Feel free to ask any questions!',
       likes: 45,
@@ -132,7 +133,7 @@ interface ForumPost {
           author: 'Tom Harris',
           avatar: 'TH',
           avatarColor: 'bg-gray-400',
-          badge: 'New User',
+          badge: 'Rising Creator',
           badgeColor: 'bg-gray-100 text-gray-600',
           content: 'This is so helpful! Thank you for sharing your experience.',
           likes: 5,
@@ -142,9 +143,9 @@ interface ForumPost {
           id: '1-2',
           author: 'Amy Chen',
           avatar: 'AC',
-          avatarColor: 'bg-emerald-500',
-          badge: 'Rising Star',
-          badgeColor: 'bg-emerald-100 text-emerald-600',
+          avatarColor: 'bg-green-500',
+          badge: 'Rising Creator',
+          badgeColor: 'bg-gray-100 text-gray-600',
           content: 'Totally agree with point 3! Engagement is everything.',
           likes: 3,
           timeAgo: '45 min ago'
@@ -156,8 +157,8 @@ interface ForumPost {
       author: 'Mike Chen',
       avatar: 'MC',
       avatarColor: 'bg-teal-500',
-      badge: 'Rising Star',
-      badgeColor: 'bg-emerald-100 text-emerald-600',
+      badge: 'Pro Creator',
+      badgeColor: 'bg-blue-50 text-blue-500',
       isPinned: false,
       content: 'How long does it typically take to get verified? I\'ve been writing reviews for about 2 weeks now and wondering what the timeline looks like.',
       likes: 8,
@@ -170,7 +171,7 @@ interface ForumPost {
       author: 'Emma Wilson',
       avatar: 'EW',
       avatarColor: 'bg-purple-400',
-      badge: 'New User',
+      badge: 'Rising Creator',
       badgeColor: 'bg-gray-100 text-gray-600',
       isPinned: false,
       content: 'Just joined today! Super excited to start my influencer journey. Any advice on which categories to start with for beginners?',
@@ -370,9 +371,9 @@ interface ForumPost {
           </div>
 
           {/* New Discussion Input */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+          <div className="bg-white rounded border border-gray-100 p-4 mb-6">
             <div className="flex items-start gap-3">
-              <div className={`w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm font-medium`}>
+              <div className={`w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium`}>
                 {profile?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
               </div>
               <div className="flex-1">
@@ -380,7 +381,7 @@ interface ForumPost {
                   value={newDiscussion}
                   onChange={(e) => setNewDiscussion(e.target.value)}
                   placeholder="Start a new discussion..."
-                  className="w-full p-3 border-0 resize-none text-sm text-gray-700 placeholder-gray-400 focus:outline-none min-h-[60px]"
+                  className="w-full p-3 border-0 resize-none text-sm text-gray-700 placeholder-gray-400 bg-gray-50 focus:outline-none min-h-[110px]"
                   rows={2}
                 />
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
@@ -388,9 +389,8 @@ interface ForumPost {
                   <button 
                     onClick={handlePostDiscussion}
                     disabled={!newDiscussion.trim()}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors disabled:cursor-not-allowed"
                   >
-                    <FileText className="w-4 h-4" />
                     Post
                   </button>
                 </div>
@@ -407,7 +407,7 @@ interface ForumPost {
                 placeholder="Search posts and replies..."
                 value={postSearchQuery}
                 onChange={(e) => setPostSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div className="flex gap-3">
@@ -418,14 +418,14 @@ interface ForumPost {
                     setShowPostFilterDropdown(!showPostFilterDropdown);
                     setShowPostSortDropdown(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded text-sm text-gray-600 transition-colors"
                 >
                   <Filter className="w-4 h-4" />
                   <span>{postFilterOptions.find(o => o.value === postFilter)?.label}</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showPostFilterDropdown && (
-                  <div className="absolute top-full left-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  <div className="absolute top-full left-0 mt-1 w-36 bg-white border border-gray-200 rounded">
                     {postFilterOptions.map((option) => (
                       <button
                         key={option.value}
@@ -451,14 +451,14 @@ interface ForumPost {
                     setShowPostSortDropdown(!showPostSortDropdown);
                     setShowPostFilterDropdown(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                   <span>{postSortOptions.find(o => o.value === postSort)?.label}</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showPostSortDropdown && (
-                  <div className="absolute top-full right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  <div className="absolute top-full right-0 mt-1 w-36 bg-white border border-gray-200 rounded shadow-lg z-10">
                     {postSortOptions.map((option) => (
                       <button
                         key={option.value}
@@ -482,7 +482,7 @@ interface ForumPost {
           {/* Posts List */}
           <div className="space-y-4">
             {filteredPosts.map((post) => (
-              <div key={post.id} className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+              <div key={post.id} className="bg-white rounded border border-gray-50 p-4 sm:p-6">
                 {/* Post Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -496,7 +496,7 @@ interface ForumPost {
                           {post.badge}
                         </span>
                         {post.isPinned && (
-                          <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-pink-100 text-pink-600">
+                          <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-red-50 text-red-500">
                             <Pin className="w-3 h-3" />
                             Pinned
                           </span>
@@ -545,10 +545,10 @@ interface ForumPost {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600">
+                    <button className="p-1.5 hover:bg-gray-50 rounded text-gray-400 hover:text-gray-600">
                       <Share2 className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600">
+                    <button className="p-1.5 hover:bg-gray-50 rounded text-gray-400 hover:text-gray-600">
                       <Flag className="w-4 h-4" />
                     </button>
                   </div>
@@ -566,7 +566,7 @@ interface ForumPost {
                           value={replyText}
                           onChange={(e) => setReplyText(e.target.value)}
                           placeholder="Write a reply..."
-                          className="w-full p-3 border border-gray-200 rounded-lg resize-none text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full p-3 border border-gray-100 rounded resize-none text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           rows={3}
                           autoFocus
                         />
@@ -576,16 +576,15 @@ interface ForumPost {
                               setReplyingTo(null);
                               setReplyText('');
                             }}
-                            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800"
+                            className="px-4 py-2 text-sm font-medium rounded-full text-gray-600 hover:text-gray-800"
                           >
                             Cancel
                           </button>
                           <button 
                             onClick={handleSubmitReply}
                             disabled={!replyText.trim()}
-                            className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <Send className="w-4 h-4" />
                             Reply
                           </button>
                         </div>
@@ -639,11 +638,14 @@ interface ForumPost {
           {/* Header */}
           <div className="mb-6 sm:mb-8 flex justify-between items-start">
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Community Forums</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Community Forum</h1>
               <p className="text-sm sm:text-base text-gray-600">Connect with other users and share experiences</p>
             </div>
-            <button className="text-md sm:text-md font-medium text-white cursor-pointer hover:text-white hover:bg-blue-600 bg-blue-500 rounded-full p-2 px-4 m-2">+ Create Forum</button>
-          </div>
+              <button className="flex items-center gap-2 text-md sm:text-md font-base text-white cursor-pointer hover:text-white hover:bg-blue-600 bg-blue-500 rounded p-2 px-4 m-2">
+                <Plus className="w-4 h-4" />
+                Create Forum
+              </button>
+            </div>
 
           {/* Search and Filters */}
           <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -654,7 +656,7 @@ interface ForumPost {
                 placeholder="Search forums..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div className="flex gap-3">
@@ -665,14 +667,14 @@ interface ForumPost {
                     setShowFilterDropdown(!showFilterDropdown);
                     setShowSortDropdown(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                   <Filter className="w-4 h-4" />
                   <span>{filterOptions.find(o => o.value === filterStatus)?.label}</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showFilterDropdown && (
-                  <div className="absolute top-full left-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  <div className="absolute top-full left-0 mt-1 w-36 bg-white border border-gray-200 rounded shadow-lg z-10">
                     {filterOptions.map((option) => (
                       <button
                         key={option.value}
@@ -698,14 +700,14 @@ interface ForumPost {
                     setShowSortDropdown(!showSortDropdown);
                     setShowFilterDropdown(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                   <span>{sortOptions.find(o => o.value === sortBy)?.label}</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {showSortDropdown && (
-                  <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
                     {sortOptions.map((option) => (
                       <button
                         key={option.value}
