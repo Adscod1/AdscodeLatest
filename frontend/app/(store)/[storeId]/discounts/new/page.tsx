@@ -16,6 +16,12 @@ export default function CreateCouponModal() {
   const [startDate, setStartDate] = useState('October 10th, 2025');
   const [endDate, setEndDate] = useState('October 10th, 2025');
   const [selectedEndDate, setSelectedEndDate] = useState(10);
+  
+  // Calendar navigation state
+  const [startCalendarMonth, setStartCalendarMonth] = useState(9); // October (0-indexed)
+  const [startCalendarYear, setStartCalendarYear] = useState(2025);
+  const [endCalendarMonth, setEndCalendarMonth] = useState(9); // October (0-indexed)
+  const [endCalendarYear, setEndCalendarYear] = useState(2025);
 
   const [formData, setFormData] = useState({
     couponTitle: '',
@@ -41,7 +47,7 @@ export default function CreateCouponModal() {
 
   const handleDateSelect = (date: number) => {
     setSelectedEndDate(date);
-    setEndDate(`October ${date}th, 2025`);
+    setEndDate(`${monthNames[endCalendarMonth]} ${date}th, ${endCalendarYear}`);
     setShowEndCalendar(false);
   };
 
@@ -53,7 +59,90 @@ export default function CreateCouponModal() {
     return days;
   };
 
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const navigateStartMonth = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') {
+      if (startCalendarMonth === 0) {
+        setStartCalendarMonth(11);
+        setStartCalendarYear(startCalendarYear - 1);
+      } else {
+        setStartCalendarMonth(startCalendarMonth - 1);
+      }
+    } else {
+      if (startCalendarMonth === 11) {
+        setStartCalendarMonth(0);
+        setStartCalendarYear(startCalendarYear + 1);
+      } else {
+        setStartCalendarMonth(startCalendarMonth + 1);
+      }
+    }
+  };
+
+  const navigateEndMonth = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') {
+      if (endCalendarMonth === 0) {
+        setEndCalendarMonth(11);
+        setEndCalendarYear(endCalendarYear - 1);
+      } else {
+        setEndCalendarMonth(endCalendarMonth - 1);
+      }
+    } else {
+      if (endCalendarMonth === 11) {
+        setEndCalendarMonth(0);
+        setEndCalendarYear(endCalendarYear + 1);
+      } else {
+        setEndCalendarMonth(endCalendarMonth + 1);
+      }
+    }
+  };
+
   const handleClose = () => {
+    router.push(`/${storeId}/discounts`);
+  };
+
+  const handleCreateCoupon = () => {
+    // Validate required fields
+    if (!formData.couponTitle.trim()) {
+      alert('Please enter a coupon title');
+      return;
+    }
+    if (!formData.couponCode.trim()) {
+      alert('Please enter a coupon code');
+      return;
+    }
+
+    // Create new coupon object
+    const newCoupon = {
+      id: Date.now(),
+      code: formData.couponCode,
+      title: formData.couponTitle,
+      description: formData.description || `${formData.discountPercentage}% Off`,
+      discountType,
+      discountValue: formData.discountPercentage,
+      minimumOrderAmount: formData.minimumOrderAmount,
+      usage: { current: 0, total: parseInt(formData.usageLimit) || 0 },
+      startDate,
+      endDate,
+      conversionRate: '0%',
+      status: activateCoupon ? 'Active' : 'Inactive',
+      categories: formData.categories,
+      products: formData.products,
+      customerGroups: 'All Customers',
+      createdAt: new Date().toISOString()
+    };
+
+    // Get existing coupons from localStorage
+    const existingCoupons = JSON.parse(localStorage.getItem(`coupons_${storeId}`) || '[]');
+    
+    // Add new coupon
+    existingCoupons.push(newCoupon);
+    
+    // Save to localStorage
+    localStorage.setItem(`coupons_${storeId}`, JSON.stringify(existingCoupons));
+
+    // Navigate back to discount list
     router.push(`/${storeId}/discounts`);
   };
 
@@ -235,13 +324,19 @@ export default function CreateCouponModal() {
                   {showStartCalendar && (
                     <div className="absolute z-20 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-4 w-80">
                       <div className="flex items-center justify-between mb-4">
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <button 
+                          onClick={() => navigateStartMonth('prev')}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                           </svg>
                         </button>
-                        <span className="font-semibold text-sm">October 2025</span>
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <span className="font-semibold text-sm">{monthNames[startCalendarMonth]} {startCalendarYear}</span>
+                        <button 
+                          onClick={() => navigateStartMonth('next')}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
@@ -267,7 +362,7 @@ export default function CreateCouponModal() {
                           <button
                             key={day}
                             onClick={() => {
-                              setStartDate(`October ${day}th, 2025`);
+                              setStartDate(`${monthNames[startCalendarMonth]} ${day}th, ${startCalendarYear}`);
                               setShowStartCalendar(false);
                             }}
                             className="p-2 text-sm rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
@@ -296,13 +391,19 @@ export default function CreateCouponModal() {
                   {showEndCalendar && (
                     <div className="absolute z-20 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-4 w-80">
                       <div className="flex items-center justify-between mb-4">
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <button 
+                          onClick={() => navigateEndMonth('prev')}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                           </svg>
                         </button>
-                        <span className="font-semibold text-sm">October 2025</span>
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <span className="font-semibold text-sm">{monthNames[endCalendarMonth]} {endCalendarYear}</span>
+                        <button 
+                          onClick={() => navigateEndMonth('next')}
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
@@ -404,7 +505,10 @@ export default function CreateCouponModal() {
           >
             Cancel
           </button>
-          <button className="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+          <button 
+            onClick={handleCreateCoupon}
+            className="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+          >
             Create Coupon
           </button>
         </div>

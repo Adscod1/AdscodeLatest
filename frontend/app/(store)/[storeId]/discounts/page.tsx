@@ -12,6 +12,7 @@ export default function CouponsPage() {
   const [typeFilter, setTypeFilter] = useState('All Types');
   const [openDropdown, setOpenDropdown] = useState<number | null>(null);
   const dropdownRefs = useRef<{[key: number]: HTMLDivElement | null}>({});
+  const [customCoupons, setCustomCoupons] = useState<any[]>([]);
 
   const coupons = [
     {
@@ -91,6 +92,15 @@ export default function CouponsPage() {
       customerGroups: 'All Customers'
     }
   ];
+
+  // Load custom coupons from localStorage on mount
+  useEffect(() => {
+    const savedCoupons = JSON.parse(localStorage.getItem(`coupons_${storeId}`) || '[]');
+    setCustomCoupons(savedCoupons);
+  }, [storeId]);
+
+  // Combine mock coupons with custom coupons
+  const allCoupons = [...customCoupons, ...coupons];
 
   const stats = [
     { label: 'Active Coupons', value: '4', subtext: '5 total coupons', icon: null },
@@ -223,7 +233,7 @@ export default function CouponsPage() {
 
         {/* Coupons List */}
         <div className="divide-y divide-gray-100">
-          {coupons.map((coupon) => (
+          {allCoupons.map((coupon) => (
             <div key={coupon.id} className="p-3 sm:p-4 md:p-5 hover:bg-blue-50 transition-colors">
               <div className="flex items-start gap-3 sm:gap-4">
                 {/* Icon */}
